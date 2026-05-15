@@ -1,0 +1,1048 @@
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&display=swap');
+/* 1. RESET Y CONFIGURACIÓN BASE */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: 'Metal Mania', cursive;
+}
+
+/* --- OPTIMIZACIÓN DEL PORTAL --- */
+#escena-portal {
+    position: fixed; /* Cambiado a fixed para que no se mueva */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #111 url('img/Sin rejas.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 1.5s ease, visibility 1.5s;
+    z-index: 2000; /* Debe ser el más alto para recibir el clic inicial */
+    cursor: pointer;
+}
+
+/* 2. TÍTULO GÓTICO (Reemplaza visualmente a la reja) */
+.titulo-mictlan {
+    font-family: 'Metal Mania', cursive; 
+    font-size: 5rem; /* Tamaño grande y potente */
+    color: #00ffff; /* Color cian místico */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    /* Efecto de resplandor neón gótico */
+    text-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.8),
+        0 0 30px rgba(0, 255, 255, 0.4),
+        2px 2px 10px #000;
+    transition: transform 0.5s ease, text-shadow 0.5s ease;
+    z-index: 20;
+}
+
+.titulo-mictlan:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 25px rgba(0, 255, 255, 1);
+}
+
+.instruccion {
+    margin-top: 30px;
+    font-family: 'Metal Mania', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+    color: #ff0000; /* Rojo puro */
+    text-align: center;
+    /* Resplandor rojo para que brille en la oscuridad */
+    text-shadow: 
+        0 0 10px rgba(255, 0, 0, 0.9),
+        0 0 25px rgba(255, 0, 0, 0.5);
+    opacity: 0.9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.instruccion:hover {
+    color: #fff; /* Al pasar el mouse brilla en blanco/rojo */
+    text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+    transform: scale(1.05);
+}
+
+/* El resto de tu código (resplandor, campo-santo, lapidas) se queda igual */
+.resplandor-suelo {
+    position: absolute;
+    bottom: -10px;
+    width: 130%;
+    left: -15%;
+    height: 120px;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+    filter: blur(20px);
+    pointer-events: none;
+}
+
+#campo-santo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: url('img/Criptos.png') no-repeat center center;
+    background-size: cover;
+    z-index: 100;
+    display: none; 
+}
+
+/* Animación para que el rojo se mueva como niebla o nubes siniestras */
+@keyframes cieloMictlan {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+/* 3. LAS TUMBAS Y LOGOS */
+
+.zona-tumba {
+overflow: visible !important;
+    position: absolute;
+    /* Usamos transform aquí para centrar Y permitir animaciones futuras */
+    transform: translate(-50%, -50%);
+transition: transform 0.1s ease; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    z-index: 150;
+}
+/* Resplandor en la base de la tumba */
+.zona-tumba::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* Ajusta según donde termine tu imagen de tumba */
+    width: 100px;
+    height: 30px;
+    background: radial-gradient(ellipse, var(--color-cripto, #00ffff) 0%, transparent 70%);
+    filter: blur(10px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1; /* Para que quede detrás de la tumba */
+    pointer-events: none;
+}
+
+.zona-tumba:hover::after {
+    opacity: 0.5; /* El color brilla cuando pasas el mouse */
+}
+.zona-tumba:hover {
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.4));
+}
+
+/* El contenedor del logo */
+.moneda-sustraer {
+    width: 60px; /* Tamaño del círculo del logo */
+    height: 60px;
+    opacity: 0;
+    transform: translateY(30px) scale(0.5);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px; /* Espacio entre logo y nombre */
+}
+
+/* Para que la imagen ocupe todo el espacio */
+.moneda-sustraer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* El nombre de la cripto */
+.nombre-cripto {
+    font-family: 'Metal Mania', cursive;
+    color: var(--color-cripto, #fff); 
+    font-size: 1.1rem; /* Un pelín más grande para que se aprecie el color */
+    opacity: 0;
+    transition: all 0.3s ease;
+    text-align: center;
+    pointer-events: none;
+    
+    /* El truco: saturamos el color y le damos un resplandor fuerte */
+    text-shadow: 
+        0 0 5px var(--color-cripto),
+        0 0 15px var(--color-cripto);
+    filter: brightness(1.2) saturate(1.5); 
+}
+
+/* EFECTOS HOVER */
+.zona-tumba:hover .moneda-sustraer {
+    opacity: 1;
+    transform: translateY(-60px) scale(1.2); /* Sube el logo al centro de la tumba */
+    animation: levitarMictlan 3s infinite ease-in-out;
+}
+
+.zona-tumba:hover .nombre-cripto {
+    opacity: 1;
+}
+
+@keyframes levitarMictlan {
+    0%, 100% { transform: translateY(-60px); }
+    50% { transform: translateY(-75px); }
+}
+/* El contenedor circular de la moneda */
+.moneda-flotante {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.2;
+    transform: translateY(10px) scale(0.8);
+animation: pulsoEspectral 3s infinite alternate;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Fondo con transparencia mística */
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+border: 2px solid var(--color-cripto); /* El borde ahora también brilla con el color de la moneda */
+    box-shadow: 0 0 15px var(--color-cripto), inset 0 0 10px var(--color-cripto);
+}
+@keyframes pulsoEspectral {
+    from { filter: brightness(0.5) blur(1px); }
+    to { filter: brightness(1.2) blur(0px); }
+}
+
+/* El símbolo de texto (₿, Ξ, etc.) */
+.simbolo-cripto {
+    font-family: 'Arial', sans-serif; /* Fuente limpia para los símbolos */
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-cripto);
+    filter: drop-shadow(0 0 5px var(--color-cripto));
+}
+
+/* Animación de levitación */
+@keyframes levitarMictlan {
+    0%, 100% { transform: translateY(-50px); }
+    50% { transform: translateY(-65px); }
+}
+
+.zona-tumba:hover .moneda-flotante {
+    opacity: 1;
+    transform: translateY(-50px) scale(1.1);
+    animation: levitarMictlan 3s infinite ease-in-out;
+}
+
+
+
+.zona-tumba.alma-maestra {
+    position: absolute !important;
+    transform: translate(-50%, -100%) !important; /* Cambiamos el ancla a la base */
+    z-index: 90;
+    height: auto !important;
+    width: 120px !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: all;
+}
+
+/* Usamos la animación de levitación suave que no rompe la posición */
+.alma-maestra .sigilo-soulgeist {
+    width: 100px; 
+    height: 100px;
+    background: url('img/Soul.png') no-repeat center center;
+    background-size: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.3));
+opacity: 0.7; /* Lo hace un poco más transparente */
+    transition: opacity 0.5s ease;
+    margin-bottom: 5px;
+    animation: flotarSoulgeist 4s ease-in-out infinite;
+}
+
+@keyframes flotarSoulgeist {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+.alma-maestra:hover {
+    opacity: 1; /* Solo brilla fuerte cuando pasas el mouse */
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6));
+}
+
+.alma-maestra .nombre-cripto {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    opacity: 1 !important;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+.zona-tumba.alma-maestra:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    width: 100px;
+    height: 40px;
+    background: radial-gradient(ellipse, rgba(0, 255, 255, 0.3) 0%, transparent 80%);
+    filter: blur(10px);
+    z-index: -1;
+    animation: pulsoAlma 2s infinite alternate;
+}
+
+@keyframes pulsoAlma {
+    from { opacity: 0.4; transform: scale(1); }
+    to { opacity: 0.8; transform: scale(1.4); }
+}
+
+.niebla-contenedor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    pointer-events: none; /* CRÍTICO: Para que no bloquee los clics a las tumbas */
+    z-index: 500; 
+    opacity: 0.6; /* Un poco más transparente para mejorar rendimiento */
+}
+
+.niebla-capa {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    /* Usamos un gradiente mucho más sólido y blanco */
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.15) 40%, 
+        rgba(200, 230, 230, 0.3) 80%, 
+        rgba(150, 180, 180, 0.4) 100%);
+    filter: blur(45px) contrast(120%); /* El contraste ayuda a que no sea solo una mancha plana */
+    bottom: -100px;
+    animation: moverNiebla 20s linear infinite;
+}
+
+.niebla-trasera {
+    animation: moverNiebla 35s linear infinite reverse;
+    opacity: 0.7;
+    /* Un toque de cian para que combine con Soulgeist */
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 60%);
+    bottom: -20px;
+    filter: blur(60px);
+}
+
+@keyframes moverNiebla {
+    0% { 
+        transform: translateX(0) translateY(0); 
+    }
+    50% {
+        transform: translateX(-25%) translateY(-20px); /* Sube un poco a mitad del camino */
+    }
+    100% { 
+        transform: translateX(-50%) translateY(0); 
+    }
+}
+/* --- BALANCE DE LAS TUMBAS (AL HACER HOVER) --- */
+.balance-proyectado {
+    font-family: 'Cinzel', serif; /* Más elegante que Arial para este tema */
+    font-size: 0.85rem;
+    color: #fff;
+    margin-top: 5px;
+    opacity: 0; 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* El secreto de la legibilidad: Sombra negra profunda + Resplandor de color */
+    text-shadow: 
+        1px 1px 2px #000, 
+        0 0 10px var(--color-cripto); 
+    filter: drop-shadow(0 0 5px rgba(0,0,0,1));
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.zona-tumba:hover .balance-proyectado {
+    opacity: 1;
+    transform: translateY(-8px); /* Sube un poco más para separarse de la tumba */
+}
+.zona-tumba:hover .moneda-flotante {
+    filter: drop-shadow(0 0 15px var(--color-cripto)) brightness(1.2);
+    transform: scale(1.1) translateY(-5px);
+}
+
+/* --- PODER SOULGEIST (LA TUMBA MAESTRA) --- */
+.balance-actual {
+    font-family: 'Nosifer', cursive; /* El poder principal merece la fuente tétrica */
+    font-size: 0.5rem; /* Un poco más pequeña porque Nosifer es ancha */
+    color: #00ffff;
+    text-shadow: 
+        1px 1px 2px #000, 
+        0 0 8px rgba(0, 255, 255, 0.6);
+    margin-top: 8px;
+    letter-spacing: 1px;
+}
+
+/* --- 2. MODAL DEL RITUAL (Añadir al final) --- */
+#modal-ritual {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+    border: 2px solid var(--color-ritmo, #00ffff);
+    padding: 30px;
+    z-index: 3000; /* Por encima de todo */
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 0 20px var(--color-ritmo);
+    width: 320px;
+    display: none; /* Se activa con JS */
+}
+
+.contenido-ritual h3 {
+    font-family: 'Metal Mania', cursive;
+    color: var(--color-ritmo);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.contenido-ritual p {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+#wallet-input {
+    background: #000;
+    border: 1px solid #444;
+    color: #00ffff;
+    padding: 12px;
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-family: monospace;
+}
+
+.botones-exchange {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.botones-exchange button {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 10px 15px;
+    font-family: 'Metal Mania', cursive;
+    cursor: pointer;
+    transition: 0.3s;
+    flex: 1;
+}
+
+.botones-exchange button:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 10px #fff;
+}
+#modal-ritual {
+    /* ... tus otros estilos ... */
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    min-height: 180px;
+    display: none; /* Se maneja con JS */
+}
+/* --- LIMPIEZA Y FORZADO TOTAL --- */
+
+/* --- SISTEMA DE CURSORES DEFINTIVO (Mictlán) --- */
+
+/* 1. Daga en toda la base (Fondo) */
+html, body, #campo-santo {
+    cursor: url('./img/daga.png') 5 28, auto !important;
+}
+
+/* 2. El Pentáculo en el Portal de Entrada */
+/* Usamos tu ID real: #escena-portal */
+#escena-portal, 
+#escena-portal *, 
+.titulo-mictlan, 
+.instruccion {
+    cursor: url('./img/daga.png') 16 16, pointer !important;
+}
+
+/* 3. El Pentáculo en el Cementerio */
+.zona-tumba, 
+.alma-maestra,
+.botones-exchange button,
+#luna-soulgeist, 
+a, 
+button {
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+}
+
+/* 4. EL ESCUDO DE LAS TUMBAS (Para que los logos no se suban) */
+/* Esto hace que el mouse "atraviese" los logos y toque la tumba */
+.moneda-sustraer, 
+.moneda-sustraer img, 
+.nombre-cripto, 
+.simbolo-cripto, 
+.balance-proyectado {
+    pointer-events: none !important;
+}
+
+/* 5. Inputs (Para que no salga la rayita de texto) */
+#wallet-input {
+    cursor: url('./img/pentaculo.png') 16 16, text !important;
+}
+/* El núcleo de la niebla */
+.alma-viajera {
+    position: fixed;
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle, #fff, var(--color-alma) 40%, transparent 70%);
+    border-radius: 50%;
+    z-index: 9999;
+    pointer-events: none;
+    /* Efecto de gas: desenfoque fuerte y mezcla de color */
+    filter: blur(4px);
+    mix-blend-mode: screen;
+    /* Animación para que la niebla cambie de forma mientras vuela */
+    animation: distorsionarNiebla 0.3s infinite alternate;
+}
+
+/* Las partículas que deja atrás (el rastro de niebla) */
+.rastro-niebla {
+    position: fixed;
+    background: var(--color-alma);
+    border-radius: 50%;
+    z-index: 9998;
+    pointer-events: none;
+    filter: blur(6px);
+    opacity: 0.4;
+}
+
+@keyframes distorsionarNiebla {
+    0% { transform: scale(1) skew(5deg); opacity: 0.8; }
+    100% { transform: scale(1.4) skew(-5deg); opacity: 0.5; }
+}
+/* El contenedor padre DEBE tener esto para que el % de los pilares funcione */
+#contenedor-criptos {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+}
+
+/* --- ESTILO BASE PARA AMBOS --- */
+.inscripcion-pilar {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    z-index: 100;
+    writing-mode: vertical-rl; 
+    text-orientation: upright;
+    font-family: 'Nosifer', cursive;
+    letter-spacing: 5px;
+    font-weight: bold;
+    transition: all 0.6s ease;
+}
+
+/* --- PILAR IZQUIERDO (ASCENSO / AZUL) --- */
+.pilar-izquierdo {
+    top: 35%; 
+    left: 51%; 
+    color: #008b8b; /* Azul oscuro base */
+    text-shadow: 2px 2px 4px #000;
+    animation: resplandor-azul 5s infinite ease-in-out;
+}
+
+.pilar-izquierdo:hover {
+    color: #00ffff; /* Brilla al tocarlo */
+    opacity: 1 !important;
+    transform: scale(1.05);
+    text-shadow: 0 0 15px #00ffff, 0 0 5px #000;
+}
+
+/* --- PILAR DERECHO (MICTLÁN / ROJO) --- */
+.pilar-derecho {
+    top: 35%;
+    left: 63%;
+    color: #8b0000; /* Rojo oscuro base */
+    text-shadow: 2px 2px 4px #000;
+    animation: resplandor-rojo 3.5s infinite ease-in-out;
+}
+
+.pilar-derecho:hover {
+    color: #ff0000; /* Brilla al tocarlo */
+    opacity: 1 !important;
+    transform: scale(1.05);
+    text-shadow: 0 0 15px #ff0000, 0 0 5px #000;
+}
+
+/* --- ANIMACIONES INDEPENDIENTES --- */
+@keyframes resplandor-azul {
+    0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 2px #008b8b); }
+    50% { opacity: 0.8; filter: drop-shadow(0 0 10px #00ffff); }
+}
+
+@keyframes resplandor-rojo {
+    0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #8b0000); }
+    50% { opacity: 0.9; filter: drop-shadow(0 0 12px #ff0000); }
+}
+
+.inscripcion-pilar span {
+    font-size: 0.6rem;
+    opacity: 0.7;
+}
+
+.inscripcion-pilar small {
+    writing-mode: horizontal-tb;
+    font-size: 0.5rem;
+    margin-top: 10px;
+    color: #666;
+    opacity: 0.3;
+    transition: 0.5s;
+    letter-spacing: 1px;
+}
+
+/* Efecto al pasar el mouse */
+.inscripcion-pilar:hover span {
+    opacity: 1;
+    transform: scale(1.1);
+    text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+}
+
+.inscripcion-pilar:hover small {
+    opacity: 1;
+    color: #fff;
+}
+
+.inscripcion-pilar small {
+    font-size: 0.5rem;
+    color: #666;
+    opacity: 0.3;
+    transition: 0.5s;
+}
+
+.inscripcion-pilar:hover small {
+    opacity: 1;
+}
+/* Este nombre debe coincidir con el modal.className del JS */
+.modal-pergamino {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 750px;
+    background: url('img/contrato.png') no-repeat center center;
+    background-size: contain;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+}
+
+.pergamino-content {
+    width: 80%;
+    margin-top: 35px;
+    text-align: center;
+    color: #2a1b0a; /* Color tinta */
+    font-family: 'Nosifer', 'Metal+Mania';
+}
+
+.pergamino-titulo {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #4a0000;
+}
+
+.pergamino-texto {
+    color: #2a1b0a;
+    font-size: 0.8rem; /* Tamaño ideal para que quepa todo */
+    line-height: 1.3;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.pergamino-botones {
+    margin-top: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+/* El botón ya lo tienes como .btn-ritual, ese está bien */
+.btn-ritual {
+    padding: 10px 20px;
+    border: none;
+    font-family: 'Nosifer', cursive;
+    cursor: pointer;
+    background: #4a0000;
+    color: #e0c097;
+    box-shadow: 2px 2px 5px #000;
+    transition: 0.3s;
+}
+
+.btn-ritual:hover {
+    transform: scale(1.1);
+    background: #ff0000;
+    color: #fff;
+}
+.candelabro-central {
+    position: fixed !important;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px; 
+    z-index: 1000;
+    pointer-events: none;
+    filter: brightness(0.8) contrast(1.2) saturate(0.8) drop-shadow(0 0 15px #000);
+    
+    /* INICIO OCULTO */
+    display: none; 
+    opacity: 0;
+    transition: opacity 1s ease-in;
+}
+.candelabro-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.img-candelabro {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.menu-textos {
+    position: absolute;
+    top: 0; /* Bajamos el contenedor al nivel de las velas */
+    left: -50%; 
+    width: 200%; 
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; /* Alineamos desde arriba para controlar mejor el descenso */
+}
+
+.opcion {
+    font-family: 'nosifer', serif;
+    font-size: 11px;
+    color: #8b0000; /* Rojo sangre seca */
+    text-shadow: 2px 2px 4px #000;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+cursor: url('img/pentaculo.png'), auto !important;
+    opacity: 0.8;
+}
+
+/* AJUSTE FINO DE ALTURA (AQUÍ ES DONDE BAJAMOS LAS LETRAS) */
+.leyes { 
+    transform: translate(25px, 35px) rotate(-10deg); 
+}
+
+.oraculo { 
+    transform: translateY(8px); /* Valor positivo para BAJAR la letra central */
+}
+
+.alianzas { 
+    transform: translate(-25px, 35px) rotate(10deg); 
+}
+
+/* --- ESTILO BASE (Sin cambios) --- */
+.opcion {
+    font-family: 'nosifer', serif;
+    font-size: 11px;
+    color: #8b0000;
+    text-shadow: 2px 2px 4px #000;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 0.8;
+    /* Añadimos transición para que el crecimiento sea fluido */
+    transition: transform 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+}
+
+/* --- HOVERS INDIVIDUALES: Mantienen la posición y añaden escala --- */
+
+.leyes:hover {
+    color: #ff0000;
+    opacity: 1;
+    /* REPETIMOS su posición original y AGREGAMOS el scale */
+    transform: translate(25px, 35px) rotate(-10deg) scale(1.1);
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6));
+}
+
+.oraculo:hover {
+    color: #ff0000;
+    opacity: 1;
+    /* REPETIMOS su posición original y AGREGAMOS el scale */
+    transform: translateY(8px) scale(1.1);
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6));
+}
+
+.alianzas:hover {
+    color: #ff0000;
+    opacity: 1;
+    /* REPETIMOS su posición original y AGREGAMOS el scale */
+    transform: translate(-25px, 35px) rotate(10deg) scale(1.1);
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6));
+}
+/* --- SISTEMA DE CÓDICE DEFINITIVO --- */
+.capa-oscura {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(12px);
+    display: none; /* Se activa con JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 100000 !important; /* Por encima de todo */
+}
+
+.pergamino-quemado {
+    position: relative;
+    width: 700px;
+    height: 500px;
+    /* Forzamos la imagen que subiste */
+    background: url('img/pergamino.png') no-repeat center center !important;
+    background-size: contain !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 120px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Estilos de texto dentro del pergamino quemado */
+#codice-titulo {
+    font-family: 'Nosifer', cursive;
+    color: #4a0000;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    text-shadow: none; /* Quitamos brillos para que parezca tinta */
+}
+
+#codice-cuerpo {
+    font-family: 'Nosifer', serif;
+    color: #2a1b0a; /* Color tinta vieja */
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-weight: bold;
+}
+
+.boton-cerrar-codice {
+    margin-top: 30px;
+    font-family: 'Nosifer', cursive;
+    color: #600;
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.boton-cerrar-codice:hover { color: #ff0000; transform: scale(1.1); }
+
+/* ==========================================================================
+   EL ORÁCULO DE OBSIDIANA - RESET TOTAL Y ALINEACIÓN PERFECTA
+   ========================================================================== */
+
+/* Contenedor principal que se activa sobre la pantalla negra */
+#pantalla-oraculo {
+    display: none; /* Se controla con tu JS (flex) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9); /* Fondo oscuro del ritual */
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* EL ESPEJO: Volvemos a cargarlo directo en el contenedor para evitar desfases */
+.espejo-arcaico {
+    position: relative;
+    width: 1200px;  /* CRECE MAS: De 750px sube a 900px para que luzca imponente */
+    height: 1200px;
+    
+    /* Carga limpia de la imagen sin ::before fantasmas */
+    background: url('img/espejo.png') no-repeat center center !important;
+    background-size: contain !important;
+    
+    /* Iluminación balanceada: se nota la textura de piedra y humo perfectamente */
+    filter: brightness(0.7) contrast(1.2) !important; 
+    
+    /* Caja de alineación interna rígida */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    border: none !important;
+}
+
+/* CAJA DE CONTENIDO: Forzada a alinearse en el centro muerto del círculo */
+.oraculo-contenido {
+    width: 450px; /* Espacio ideal para que el texto flote sobre el humo central */
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: -20px; /* Ajuste milimétrico para equilibrar el marco superior */
+}
+
+/* --- TEXTOS ROJO SANGRE RÍGIDOS --- */
+
+.oraculo-titulo {
+    font-family: 'Nosifer', cursive !important;
+    color: #ff0000 !important; /* Rojo puro intenso */
+    font-size: 2.2rem !important;
+    text-shadow: 0 0 15px #ff0000, 3px 3px 5px #000000 !important;
+    margin: 0 0 15px 0 !important;
+}
+
+.oraculo-cuerpo p {
+    font-family: 'UnifrakturMaguntia', serif !important;
+    color: #ffffff !important; /* Texto blanco puro para que se lea perfecto sobre el humo negro */
+    font-size: 1.2rem !important;
+    text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important;
+    margin: 0 0 25px 0 !important;
+}
+
+/* El área donde escribe el usuario */
+#oraculo-input {
+    background: rgba(0, 0, 0, 0.6) !important; /* Fondo sutil para rescatar la lectura */
+    border: none !important;
+    border-bottom: 2px solid #ff0000 !important;
+    color: #ff0000 !important;
+    font-family: 'Nosifer', cursive !important;
+    font-size: 0.8rem !important;
+    text-align: center !important;
+    width: 320px !important;
+    height: 45px !important;
+    outline: none !important;
+    padding: 10px !important;
+    resize: none !important;
+    text-shadow: 0 0 8px #ff0000 !important;
+}
+
+/* Botón de Invocación */
+.btn-invocar {
+    margin-top: 30px !important;
+    background: #000000 !important;
+    color: #ff0000 !important;
+    border: 2px solid #ff0000 !important;
+    font-family: 'Nosifer', cursive !important;
+    font-size: 0.7rem !important;
+    padding: 12px 35px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-invocar:hover {
+    background: #ff0000 !important;
+    color: #000000 !important;
+    box-shadow: 0 0 20px #ff0000 !important;
+}
+
+/* Botón inferior para cerrar el ritual */
+.cerrar-pacto {
+    margin-top: 40px !important;
+    color: #ff0000 !important;
+    font-family: 'Metal Mania', cursive !important;
+    cursor: pointer !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important;
+    transition: transform 0.2s !important;
+}
+
+.cerrar-pacto:hover {
+    transform: scale(1.1);
+}
+/* El fondo oscuro que bloquea el resto de la pantalla */
+.modal-alerta-overlay {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Oscurece el cementerio de fondo */
+    z-index: 100000; /* Por encima de absolutamente todo */
+    align-items: center;
+    justify-content: center;
+}
+
+/* La caja del mensaje: Estilo gótico/neón igual a tus lápidas */
+.modal-alerta-caja {
+    background: #0d0d0d;
+    border: 2px solid #ff0000; /* Borde rojo neón */
+    box-shadow: 0 0 20px #ff0000, inset 0 0 15px rgba(255, 0, 0, 0.3);
+    padding: 30px;
+    width: 400px;
+    text-align: center;
+    border-radius: 5px;
+    animation: emergerMictlan 0.3s ease-out;
+}
+
+/* Animación para que aparezca desde el fondo del inframundo */
+@keyframes emergerMictlan {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Título de la advertencia */
+#alerta-titulo {
+    font-family: 'Nosifer', cursive !important;
+    color: #ff0000;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px #ff0000;
+}
+
+/* Cuerpo del mensaje */
+#alerta-mensaje {
+    font-family: 'UnifrakturMaguntia', serif !important;
+    color: #ffffff;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+/* Botón tétrico para cerrar */
+.btn-cerrar-alerta {
+    background: #000;
+    color: #ff0000;
+    border: 1px solid #ff0000;
+    font-family: 'Metal Mania', cursive !important;
+    padding: 8px 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cerrar-alerta:hover {
+    background: #ff0000;
+    color: #000;
+    box-shadow: 0 0 10px #ff0000;
+}

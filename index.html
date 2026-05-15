@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cementerio - El Umbral del Mictlán</title>
+    
+    <!-- Fuentes de terror -->
+    <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Filtro de goteo místico (SVG invisible) -->
+<svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="textura-terror">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
+    </filter>
+  </defs>
+</svg>
+
+<main class="universo-faucet">
+    <div id="escena-portal" onclick="entrarAlMictlan()">        
+        <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
+        <div class="resplandor-suelo"></div>
+    </div>
+
+    <section id="campo-santo">
+        <div id="contenedor-criptos"></div>
+
+        <div class="niebla-contenedor">
+            <div class="niebla-capa"></div>
+            <div class="niebla-trasera"></div>
+        </div>
+    </section>
+</main>
+<script src="script.js"></script>
+
+<div id="modal-ritual" class="modal-oculto">
+    <div class="contenido-ritual">
+        <h3 id="titulo-ritual">INICIANDO COSECHA</h3>
+        <p id="info-ritual"></p>
+        <input type="text" id="wallet-input" placeholder="Dirección de tu Wallet...">
+        <div class="botones-exchange">
+            <button onclick="procesarRetiro()">ENVIAR ALMA</button>
+            <button onclick="cerrarRitual()">CANCELAR</button>
+        </div>
+    </div>
+</div>
+<div class="candelabro-central">
+    <img src="img/candelabro.png" class="img-candelabro">
+    
+    <div class="menu-textos">
+    <span class="opcion leyes" onclick="mostrarPergamino('leyes')">LEYES</span>
+    <span class="opcion oraculo" style="transform: translateY(12px);" onclick="abrirSoporte()">ORÁCULO</span>
+    <span class="opcion alianzas" onclick="mostrarPergamino('alianzas')">ALIANZAS</span>
+</div>
+</div>
+<div id="pantalla-codice" class="capa-oscura">
+    <div class="pergamino-quemado">
+        <h2 id="codice-titulo"></h2>
+        <div id="codice-cuerpo"></div>
+        <div class="boton-cerrar-codice" onclick="cerrarCodice()">[ CERRAR PACTO ]</div>
+    </div>
+</div>
+<div id="pantalla-oraculo" class="capa-oscura">
+    <div class="espejo-arcaico">
+        <div class="espejo-superficie">
+            <div class="oraculo-contenido">
+                <h2 class="oraculo-titulo">EL ORÁCULO</h2>
+                <div class="oraculo-cuerpo">
+                    <p>Susurra tus dudas al Mictlán...</p>
+                    <textarea id="oraculo-input" placeholder="Escribe aquí..."></textarea>
+                    <button class="btn-invocar" onclick="enviarOfrendaOraculo()">INVOCAR</button>
+                </div>
+            </div>
+        </div>
+        <div class="cerrar-pacto" onclick="cerrarOraculo()">[ VOLVER A LAS SOMBRAS ]</div>
+    </div>
+</div>
+<div id="alerta-mictlan" class="modal-alerta-overlay">
+    <div class="modal-alerta-caja">
+        <h3 id="alerta-titulo">¡ADVERTENCIA MORTAL!</h3>
+        <p id="alerta-mensaje">El viento del norte rechaza tus acciones.</p>
+        <button class="btn-cerrar-alerta" onclick="cerrarAlertaMictlan()">RETROCEDE</button>
+    </div>
+</div>
+</body>
+</html>
