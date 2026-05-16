@@ -791,37 +791,47 @@ button,
         margin-top: 2px;
     }
 
-    /* --- HUD SOULGEIST EN MÓVILES (Fijo arriba a la izquierda) --- */
-    .zona-tumba.alma-maestra {
-        position: fixed !important;
-        top: 15px !important;
-        left: 15px !important;
-        width: auto !important;
-        max-width: none !important;
-        background: none !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        z-index: 101;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-    }
+   /* --- HUD SOULGEIST EN MÓVILES CORREGIDO --- */
+.zona-tumba.alma-maestra {
+    position: fixed !important;
+    top: 25px !important;       /* Lo bajamos más del borde superior (de 15px a 25px) */
+    left: 20px !important;      /* Lo separamos un poco más de la izquierda */
+    width: auto !important;
+    max-width: none !important;
+    background: rgba(10, 0, 0, 0.6) !important; /* Un fondo oscuro sutil para que resalte sobre la luna/nubes */
+    border: 1px solid rgba(0, 255, 255, 0.3) !important; /* Borde fantasmal muy fino */
+    border-radius: 8px !important;
+    padding: 8px 12px !important; /* ¡Clave! Le da colchón interno para que no se colapse ni se corte */
+    z-index: 2000 !important;    /* Forzamos que flote sobre cualquier otra capa del inframundo */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
 
-    .zona-tumba.alma-maestra .sigilo-soulgeist {
-        width: 45px;
-        height: 45px;
-        filter: drop-shadow(0 0 5px #00ffff);
-    }
-    
-    .zona-tumba.alma-maestra .nombre-cripto {
-        display: none !important; /* Oculta títulos redundantes */
-    }
-    
-    .zona-tumba.alma-maestra .balance-actual {
-        font-size: 0.85rem !important;
-        color: #00ffff;
-        margin-top: 5px;
-    }
+/* El icono circular (Sigilo) */
+.zona-tumba.alma-maestra .sigilo-soulgeist {
+    width: 40px !important;
+    height: 40px !important;
+    filter: drop-shadow(0 0 6px #00ffff) !important;
+    margin-bottom: 4px !important; /* Separa el icono del texto del balance */
+}
+
+.zona-tumba.alma-maestra .nombre-cripto {
+    display: none !important; /* Sigue oculto el título redundante */
+}
+
+/* El texto de los Soulgeists (Poder / Balance) */
+.zona-tumba.alma-maestra .balance-actual,
+.zona-tumba.alma-maestra .balance-proyectado {
+    font-size: 0.85rem !important;
+    color: #00ffff !important;
+    font-family: 'Metal Mania', var(--font-gothic, sans-serif) !important; /* Forzamos la fuente tétrica */
+    text-shadow: 0 0 4px #000, 0 0 8px #00ffff !important;
+    margin: 0 !important;
+    line-height: 1.2 !important; /* Evita que el interlineado lo empuje hacia arriba */
+}
 
     /* --- CANDELABRO CENTRAL (Fijo arriba a la derecha) --- */
     .candelabro-central {
