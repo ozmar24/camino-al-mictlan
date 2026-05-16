@@ -711,41 +711,79 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. DISPOSITIVOS MÓVILES (LIMPIEZA Y RECONSTRUCCIÓN SANTA)
+   8. DISPOSITIVOS MÓVILES (SISTEMA ANTICAOS: RESPETO AL FONDO Y SIMETRÍA)
    ========================================================================== */
 
 @media screen and (max-width: 768px) {
 
-    /* --- 8.1 CORRECCIÓN DE PILARES Y TEXTOS REBELDES DE PC --- 
-       Ocultamos los textos que andan volando por la pantalla y se desfasan */
-    .menu-textos,
-    .texto-ascender,
-    .texto-mictlan,
-    [class*="texto-vertical"] {
-        display: none !important;
+    /* --- 8.1 EL CANDELABRO COMO CABECERA FIJA (HUD) --- 
+       Lo sacamos del flujo para que no aplaste ni empuje a las criptas */
+    .candelabro-central {
+        position: fixed !important;
+        top: 10px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important; /* Centrado matemático perfecto */
+        width: 140px !important;  /* Ajustamos el tamaño para que sea un menú compacto */
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        z-index: 10000 !important; /* Por encima de todo el universo */
+        background: none !important;
     }
 
-    /* --- 8.2 AJUSTE DEL CONTENEDOR DE CRYPTOS --- */
+    .candelabro-central .img-candelabro {
+        width: 35px !important; /* El icono del candelabro se hace discreto */
+        height: auto !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* --- 8.2 ACOMODO DE LOS ENLACES (LEYES, ORÁCULO, ALIANZAS) --- */
+    .menu-textos {
+        display: flex !important;
+        flex-direction: row !important; /* En móviles los ponemos de lado a lado, no verticales */
+        justify-content: center !important;
+        gap: 12px !important;
+        width: auto !important;
+        transform: none !important;
+    }
+
+    .menu-textos .opcion {
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 0.75rem !important; /* Letra pequeña y legible */
+        letter-spacing: 1px !important;
+        color: #ff3333 !important; /* Rojo sangriento */
+        text-shadow: 0 0 4px #000, 0 0 6px rgba(255, 51, 51, 0.6) !important;
+        transform: none !important; /* Matamos el translateY(12px) de PC que desalineaba al Oráculo */
+        margin: 0 !important;
+    }
+    
+    /* Color especial para resaltar el Oráculo en el menú */
+    .menu-textos .opcion.oraculo {
+        color: #00ffcc !important;
+        text-shadow: 0 0 4px #000, 0 0 6px rgba(0, 255, 204, 0.6) !important;
+    }
+
+
+    /* --- 8.3 CONTENEDOR GENERAL DE CRIPTAS (EL CEMENTERIO) --- */
     #contenedor-criptos {
         position: relative !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 12px !important;              /* Espacio óptimo entre lápidas */
-        padding: 100px 10px 40px 10px !important; /* Libera el área superior del fondo */
+        gap: 12px !important;
+        /* Bajamos el inicio de las criptas para dejarle libre el espacio al menú superior */
+        padding: 95px 10px 40px 10px !important; 
         overflow-y: auto !important;
         height: auto !important;
         min-height: 100vh !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        transform: none !important;
-        top: 0 !important;
-        left: 0 !important;
     }
 
-    /* --- 8.3 CUADROS CORTOS Y UNIFICADOS ---
-       Forzamos a que TODAS las tarjetas inyectadas por JS midan exactamente lo mismo */
+
+    /* --- 8.4 BOTONES CORTOS, LIMPIOS Y SIMÉTRICOS --- */
     .zona-tumba, 
     .zona-tumba.alma-maestra {
         position: relative !important;
@@ -756,62 +794,55 @@ button,
         transform: none !important;
         margin: 0 auto !important;
         
-        /* Hacemos los cuadros considerablemente más cortos */
+        /* Cuadros más cortos para que no tapen la ilustración del fondo */
         width: 85% !important;
         max-width: 240px !important; 
-        height: 75px !important;    /* Altura simétrica estricta */
+        height: 70px !important; /* Altura compacta ideal */
         
-        /* Distribución interna obligatoria */
+        /* Contención estricta para evitar desbordes */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        padding: 10px 15px !important;
+        padding: 8px 12px !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
         
-        /* ¡BOMBA ATÓMICA RESETEADORA! 
-           Matamos el candelabro gigante y fondos deformados que mete el JS */
+        /* Limpieza de imágenes de fondo heredadas (como el candelabro gigante) */
         background-image: none !important; 
-        background: rgba(12, 3, 3, 0.92) !important;
-        border-radius: 10px !important;
+        background: rgba(10, 2, 2, 0.93) !important;
+        border-radius: 8px !important;
     }
 
-    /* Bordes de neón para las criptas estándar */
+    /* Bordes iluminados según cripto */
     .zona-tumba {
         border: 2px solid var(--color-cripto, #00ffff) !important;
         box-shadow: 0 0 8px var(--color-cripto) !important;
     }
-
-    /* Borde cian exclusivo para la cripta Soulgeist */
     .zona-tumba.alma-maestra {
         border: 2px solid #00ffff !important;
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.6) !important;
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.5) !important;
     }
 
-    /* --- 8.4 ICONOS TOTALMENTE DENTRO DEL BOTÓN --- */
+
+    /* --- 8.5 ICONOS INTERNOS CONTROLADOS --- */
     .zona-tumba img,
     .zona-tumba .moneda-flotante, 
     .zona-tumba .moneda-sustraer,
     .zona-tumba.alma-maestra .sigilo-soulgeist {
         position: relative !important;
-        top: auto !important;
-        left: auto !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        max-height: 34px !important;
+        margin: 0 12px 0 0 !important; /* Separación fija con el texto */
         transform: none !important;
-        
-        /* Dimensiones milimétricas para que no se salgan jamás */
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
-        max-height: 36px !important;
-        
-        margin: 0 14px 0 0 !important; /* Espacio limpio entre el icono y el texto */
         display: block !important;
         opacity: 1 !important;
     }
 
-    /* --- 8.5 REORGANIZAR CONTENEDORES DE TEXTO INTERNOS --- 
-       Buscamos cualquier div o contenedor de texto que genere tu script dentro del botón */
+
+    /* --- 8.6 TEXTOS INTERNOS EN DOS FILAS (SÍ O SÍ) --- */
     .zona-tumba .info-tumba,
     .zona-tumba.alma-maestra .info-tumba,
     .zona-tumba div { 
@@ -820,56 +851,34 @@ button,
         align-items: flex-start !important;
         justify-content: center !important;
         text-align: left !important;
-        width: calc(100% - 50px) !important;
+        width: calc(100% - 46px) !important;
         height: 100% !important;
-        background: none !important; /* Limpia sub-fondos raros */
     }
 
-    /* Títulos góticos (Ethereum, Litecoin, Soulgeist...) */
+    /* Nombres (Ethereum, Soulgeist...) */
     .zona-tumba .nombre-cripto,
     .zona-tumba.alma-maestra .nombre-cripto,
-    .zona-tumba span:first-of-type,
-    .zona-tumba h3 {
+    .zona-tumba span:first-of-type {
         display: block !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
         color: #ffffff !important;
-        margin: 0 0 2px 0 !important;
+        margin: 0 0 1px 0 !important;
         font-family: 'Metal Mania', sans-serif !important;
         line-height: 1.1 !important;
     }
 
-    /* El balance numérico por debajo del título */
+    /* Balances (+0.005, PODER: 100 SG) */
     .zona-tumba .balance-actual,
     .zona-tumba.alma-maestra .balance-actual,
-    .zona-tumba span:last-of-type,
-    .zona-tumba p {
+    .zona-tumba span:last-of-type {
         display: block !important;
-        font-size: 0.8rem !important;
+        font-size: 0.75rem !important;
         color: var(--color-cripto, #00ffff) !important;
         margin: 0 !important;
-        white-space: nowrap !important; /* Evita que los números se corten */
+        white-space: nowrap !important;
     }
     .zona-tumba.alma-maestra .balance-actual {
         color: #00ffff !important;
-    }
-
-    /* --- 8.6 EL CANDELABRO DEL HUD (EL COMPAÑERO DEL MENÚ) --- 
-       Controlamos el candelabro flotante general de la esquina para que se haga chiquito y no tape nada */
-    .candelabro-central {
-        position: fixed !important;
-        top: 15px !important;
-        right: 15px !important;
-        width: 35px !important;   /* Miniatura responsiva */
-        height: auto !important;
-        left: auto !important;
-        bottom: auto !important;
-        transform: none !important;
-        opacity: 0.5 !important;   /* Sutil transparencia para que luzca el cementerio */
-        z-index: 1000 !important;
-    }
-    .candelabro-central .img-candelabro {
-        width: 100% !important;
-        height: auto !important;
     }
 }
 
@@ -883,19 +892,22 @@ button,
         height: auto !important;
     }
 
-    /* Cambiamos a dos columnas muy delgadas y centradas */
+    .candelabro-central {
+        top: 5px !important;
+    }
+
     #contenedor-criptos {
         display: grid !important;
-        grid-template-columns: repeat(2, 200px) !important; 
+        grid-template-columns: repeat(2, 200px) !important; /* Dos columnas compactas */
         justify-content: center !important;
         gap: 10px !important;
-        padding: 65px 10px 25px 10px !important;
+        padding: 65px 10px 25px 10px !important; /* Espacio superior calibrado */
     }
 
     .zona-tumba, 
     .zona-tumba.alma-maestra {
         max-width: 200px !important;
-        height: 65px !important; /* Ultra compactos para que se aprecie tu fondo */
+        height: 60px !important;
         padding: 6px 12px !important;
     }
 }
