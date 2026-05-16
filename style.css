@@ -711,112 +711,110 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   10. CONTROL RESPONSIVO DE PILARES Y HUD (VERTICAL)
+   SECCIÓN MÓVIL DEFECTUOSA - LIMPIEZA TOTAL
    ========================================================================== */
+
+/* --- 1. MÓVIL VERTICAL (Portrait) --- */
 @media screen and (max-width: 768px) and (orientation: portrait) {
 
-    /* --- 10.1 MENÚ SUPERIOR Y CANDELABRO --- */
+    /* Quitamos cualquier fondo negro gigante que tape tus criptas */
     .candelabro-central {
-        position: fixed !important;
+        position: absolute !important;
         top: 15px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 100% !important;
-        max-width: 280px !important;
+        max-width: 290px !important;
+        background: transparent !important; /* Cero bloques negros encima */
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: center !important;
-        z-index: 99999 !important;
+        z-index: 9999 !important;
     }
 
-    /* Resucitamos la imagen del candelabro para que corone los textos */
+    /* El candelabro físico real (el que sale abajo en PC) aquí lo controlamos */
     .candelabro-central img,
     .img-candelabro {
         display: block !important;
         visibility: visible !important;
-        width: 35px !important;
+        width: 32px !important;
         height: auto !important;
-        margin: 0 auto 5px auto !important;
+        margin: 0 auto 8px auto !important;
     }
 
     .menu-textos {
         display: flex !important;
         flex-direction: row !important;
         justify-content: center !important;
-        gap: 12px !important;
+        gap: 14px !important;
         width: 100% !important;
         transform: none !important;
-        margin: 0 !important;
     }
 
     .menu-textos .opcion {
         font-family: 'Creepster', sans-serif !important;
         font-size: 0.8rem !important;
         color: #ff3333 !important;
-        text-shadow: 0 0 5px #000 !important;
+        text-shadow: 0 0 4px #000 !important;
+    }
+    .menu-textos .opcion.oraculo { color: #00ffcc !important; }
+
+    /* CAJA SOULGEIST / PODER EN VERTICAL (Alineación limpia arriba sin estorbar) */
+    .contenedor-poder, 
+    [class*="poder"], 
+    [class*="soulgeist"] {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 80px auto 15px auto !important; /* Le da espacio al menú de arriba */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        z-index: 100 !important;
     }
 
-    .menu-textos .opcion.oraculo {
-        color: #00ffcc !important;
-        text-shadow: 0 0 6px #000, 0 0 8px rgba(0, 255, 204, 0.8) !important;
-    }
-
-    /* --- 10.2 PILARES VERTICALES --- */
+    /* Ajuste milimétrico de letras góticas en los pilares verticales */
     .texto-ascender, 
     .texto-mictlan {
         position: absolute !important;
         font-family: 'Creepster', sans-serif !important;
         font-size: 0.85rem !important;
-        letter-spacing: 2px !important;
         width: 20px !important;
         word-wrap: break-word !important;
         line-height: 1.2 !important;
         top: 32% !important;
-        z-index: 10 !important;
+        z-index: 50 !important;
     }
-
-    .texto-ascender {
-        left: 5% !important;
-        color: #00ffcc !important;
-    }
-
-    .texto-mictlan {
-        right: 5% !important;
-        left: auto !important;
-        color: #ff3333 !important;
-    }
+    .texto-ascender { left: 4% !important; color: #00ffcc !important; }
+    .texto-mictlan { right: 4% !important; left: auto !important; color: #ff3333 !important; }
 }
 
-/* ==========================================================================
-   11. CONTROL RESPONSIVO (HORIZONTAL - EL VERDADERO RETO)
-   ========================================================================== */
-@media screen and (max-height: 600px) and (orientation: landscape) {
 
-    /* --- 11.1 HUD CENTRALIZADO ARRIBA --- */
+/* --- 2. MÓVIL HORIZONTAL (Landscape) --- */
+@media screen and (max-height: 550px) and (orientation: landscape) {
+
+    /* Destruimos la franja negra vertical que se ve en tus capturas de simulación */
     .candelabro-central {
-        position: fixed !important;
-        top: 8px !important;
+        position: absolute !important;
+        top: 5px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: auto !important;
+        height: auto !important;
+        background: rgba(0, 0, 0, 0.4) !important; /* Fondo ultra sutil solo para leer bien */
+        padding: 4px 12px !important;
+        border-radius: 15px !important;
         display: flex !important;
-        flex-direction: row !important; /* Todo en una sola línea horizontal */
+        flex-direction: row !important; /* Menú plano acostado */
         align-items: center !important;
-        justify-content: center !important;
-        gap: 10px !important;
+        gap: 12px !important;
         z-index: 99999 !important;
-        background: rgba(0, 0, 0, 0.6) !important; /* Fondo protector */
-        padding: 4px 15px !important;
-        border-radius: 20px !important;
     }
 
-    /* Forzamos a la imagen a ponerse a la izquierda de los textos */
     .candelabro-central img,
     .img-candelabro {
         display: block !important;
-        visibility: visible !important;
-        width: 24px !important;
+        width: 22px !important;
         height: auto !important;
         margin: 0 !important;
     }
@@ -824,21 +822,32 @@ button,
     .menu-textos {
         display: flex !important;
         flex-direction: row !important;
-        align-items: center !important;
-        gap: 15px !important;
+        gap: 12px !important;
         transform: none !important;
         margin: 0 !important;
     }
 
     .menu-textos .opcion {
         font-family: 'Creepster', sans-serif !important;
-        font-size: 0.75rem !important;
-        margin: 0 !important;
+        font-size: 0.7rem !important;
     }
 
-    /* --- 11.2 PILARES ACUESTADOS (Anclados al centro de la pantalla) ---
-       Como el fondo en horizontal se estira, calcular desde los lados (left/right) falla.
-       Usamos 'calc(50% +/- X píxeles)' para amarrarlos al ancho de la reja central. */
+    /* CAJA SOULGEIST / PODER EN HORIZONTAL */
+    /* La mandamos a la esquina superior derecha de forma limpia y fluida */
+    .contenedor-poder, 
+    [class*="poder"], 
+    [class*="soulgeist"] {
+        position: absolute !important;
+        top: 5px !important;
+        right: 10px !important;
+        left: auto !important;
+        transform: none !important;
+        max-width: 130px !important;
+        z-index: 9999 !important;
+    }
+
+    /* CLAVADO PERFECTO EN LOS PILARES HORIZONTALES (Basado en tu captura real de WhatsApp)
+       Como la reja se hace chica en el centro, los amarramos midiendo desde el centro (50%) */
     .texto-ascender, 
     .texto-mictlan {
         position: absolute !important;
@@ -848,18 +857,19 @@ button,
         width: 15px !important;
         word-wrap: break-word !important;
         line-height: 1.1 !important;
-        top: 36% !important; /* Bajamos el inicio para que no choquen con las ramas */
-        z-index: 100 !important;
+        top: 38% !important; /* Los bajamos para que liberen las ramas del árbol */
+        z-index: 2000 !important;
     }
 
+    /* Distancia exacta desde el centro hacia las columnas de cantera en horizontal */
     .texto-ascender {
-        left: calc(50% - 70px) !important; /* Lo clava en el pilar izquierdo de la reja central */
+        left: calc(50% - 62px) !important; /* Empuja directo a la piedra izquierda */
         color: #00ffcc !important;
         text-shadow: 0 0 4px #000, 0 0 6px rgba(0, 255, 204, 0.8) !important;
     }
 
     .texto-mictlan {
-        left: calc(50% + 55px) !important;  /* Lo clava en el pilar derecho de la reja central */
+        left: calc(50% + 48px) !important; /* Empuja directo a la piedra derecha */
         right: auto !important;
         color: #ff3333 !important;
         text-shadow: 0 0 4px #000, 0 0 6px rgba(255, 51, 51, 0.8) !important;
