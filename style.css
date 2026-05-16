@@ -711,74 +711,110 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. SISTEMA DE RESPONSIVIDAD REVISADO Y CORREGIDO
+   8. SISTEMA RESPONSIVO REVISADO - RESCATE DEL CANDELABRO
    ========================================================================== */
 
-/* Aseguramos que por defecto el candelabro esté oculto y no flote en el portal */
+/* Mantener el bloqueo inicial para el portal */
 .candelabro-central {
     display: none !important;
     opacity: 0;
 }
-
-/* Cuando tu JS le agregue la clase activa, se mostrará con el z-index correcto */
+/* Cuando el JS se active, rompemos cualquier restricción de PC */
 .candelabro-central.candelabro-visible {
     display: flex !important;
     opacity: 1 !important;
 }
 
-/* --- 8.1 AJUSTE GENERAL PARA MÓVILES Y COMPACTOS --- */
+/* --- 8.1 CORRECCIÓN GENERAL PARA MÓVILES (HASTA 900px) --- */
 @media screen and (max-width: 900px) {
 
-    /* En lugar de romper el layout, encogemos el contenedor completo proporcionalmente */
     #contenedor-criptos {
-        transform: scale(0.65) !important;
-        transform-origin: center center !important;
         width: 100vw !important;
         height: 100vh !important;
-        position: absolute !important;
-        top: 0;
-        left: 0;
+        position: relative !important;
+        overflow: hidden !important;
     }
 
-    /* Reajuste de los Pilares para que no vuelen con el cambio de escala */
-    .inscripcion-pilar {
-        font-size: 0.8rem !important;
-        letter-spacing: 3px !important;
-    }
-    .inscripcion-pilar span { font-size: 0.75rem !important; }
-    .inscripcion-pilar small { display: none !important; }
-
-    /* Forzamos al candelabro a mantenerse abajo en horizontal o pantallas bajas */
-    .candelabro-central {
+    /* --- FORZADO E INYECCIÓN DEL CANDELABRO ARRIBA --- */
+    .candelabro-central.candelabro-visible {
+        display: flex !important; /* Forzamos la aparición visual */
         position: fixed !important;
-        bottom: 5px !important;
-        top: auto !important;
+        top: 10px !important; /* Lo mudamos arriba para que nunca se pierda en el fondo */
+        bottom: auto !important; /* Cancelamos el bottom de PC */
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 110px !important;
-        z-index: 1500 !important; /* Menor que el portal (2000) para que no se filtre al inicio */
-    }
-
-    .img-candelabro {
         width: 100% !important;
+        max-width: 280px !important; /* Contenedor compacto */
+        flex-direction: column !important;
+        align-items: center !important;
+        z-index: 9999 !important; /* Por encima de la niebla y las tumbas, abajo del portal */
     }
 
+    /* La imagen física del candelabro */
+    .img-candelabro {
+        display: block !important;
+        width: 38px !important; /* Tamaño perfecto de icono místico */
+        height: auto !important;
+        margin: 0 auto 8px auto !important;
+    }
+
+    /* Ajuste de las opciones góticas del menú */
     .menu-textos {
-        top: -25px !important; /* Sube los textos tantito para que no tapen el candelabro chico */
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 18px !important;
     }
 
     .opcion {
-        font-size: 10px !important;
+        font-family: 'Nosifer', serif !important;
+        font-size: 11px !important; /* Mantiene el tamaño gótico original sin encogerse */
+        letter-spacing: 1px !important;
+        color: #8b0000 !important;
+        text-shadow: 2px 2px 4px #000 !important;
+    }
+    
+    /* Quitamos las inclinaciones pesadas de PC que desalinean el menú en pantallas chicas */
+    .leyes, .oraculo, .alianzas { 
+        transform: none !important; 
+    }
+    .leyes:hover, .oraculo:hover, .alianzas:hover { 
+        color: #ff0000 !important;
+        transform: scale(1.1) !important; 
+    }
+
+    /* --- PROTECCIÓN DE TEXTOS EN CRIPTAS --- */
+    .nombre-cripto,
+    .simbolo-cripto,
+    .balance-proyectado,
+    .balance-actual {
+        font-size: 12px !important; /* Evita que el navegador las vuelva enanas */
+        opacity: 1 !important; /* En móviles es mejor dejarlas visibles para que sea jugable */
     }
 }
 
-/* --- 8.2 OPTIMIZACIÓN ESTRICTA PARA VERTICAL (PORTRAIT) --- */
+/* --- 8.2 AJUSTE DE PILARES EN VISTA VERTICAL --- */
 @media screen and (max-width: 500px) and (orientation: portrait) {
-    #contenedor-criptos {
-        transform: scale(0.48) !important; /* Ajuste milimétrico para pantallas muy angostas */
+    /* Mapeo de tus enlaces reales de los pilares */
+    .inscripcion-pilar {
+        position: absolute !important;
+        top: 35% !important;
+        font-size: 11px !important;
+        letter-spacing: 3px !important;
+        z-index: 995 !important;
     }
-    
-    /* Reubicación de emergencia para los pilares text-sangre en pantallas ultra estrechas */
-    .pilar-izquierdo { left: 48% !important; }
-    .pilar-derecho { left: 66% !important; }
+    .inscripcion-pilar span { font-size: 10px !important; opacity: 1 !important; }
+    .inscripcion-pilar small { display: none !important; }
+
+    /* Clavado milimétrico sobre tus columnas grises */
+    .pilar-izquierdo { 
+        left: 4% !important; 
+    }
+    .pilar-derecho { 
+        left: auto !important;
+        right: 4% !important; 
+    }
 }
