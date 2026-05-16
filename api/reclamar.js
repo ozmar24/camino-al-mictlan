@@ -14,8 +14,11 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método no permitido en el inframundo' });
     }
 
-    // 3. Extraemos la wallet y la cripto elegida que vienen desde el frontend
+    // 3. Extraemos los datos del frontend y capturamos la IP real en Vercel
     const { wallet, cripto } = req.body;
+    
+    // Limpiamos la IP por si Vercel manda una cadena con múltiples proxies separados por comas
+    const ipLimpia = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress;
 
     if (!wallet || wallet.length < 10) {
         return res.status(400).json({ error: 'La dirección de la wallet es inválida para este ritual.' });
@@ -29,44 +32,50 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Las llaves del cofre de Redis no están configuradas.' });
     }
 
-    // La llave única en Redis combinando la wallet y la cripto elegida
-    const redisKey = `user:${wallet}:${cripto}`;
+    // Creamos DOS llaves de control independientes para el doble candado
+    const walletKey = `user:wallet:${wallet}:${cripto}`;
+    const ipKey = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`; 
 
     try {
-        // 5. PRIMER PASO: Revisar si la llave ya existe en Upstash (¿Está congelado?)
-        const checkResponse = await fetch(`${redisUrl}/get/${redisKey}`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
-        });
-        const checkData = await checkResponse.json();
+        // 5. PRIMER PASO: Consultar AMBAS llaves en Upstash en paralelo
+        const [resWallet, resIp] = await Promise.all([
+            fetch(`${redisUrl}/get/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json()),
+            fetch(`${redisUrl}/get/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json())
+        ]);
 
-        // Si el valor no es null, significa que el temporizador sigue activo
-        if (checkData.result !== null) {
-            // Le preguntamos a Redis cuántos segundos le quedan de vida a ese candado (TTL)
-            const ttlResponse = await fetch(`${redisUrl}/ttl/${redisKey}`, {
-                headers: { Authorization: `Bearer ${redisToken}` }
-            });
-            const ttlData = await ttlResponse.json();
-            const segundosRestantes = ttlData.result;
-
-            // Convertimos los segundos a horas y minutos para que el usuario entienda
-            const horas = Math.floor(segundosRestantes / 3600);
-            const minutos = Math.floor((segundosRestantes % 3600) / 60);
+        // REGLA A: Si la WALLET ya está registrada en las últimas 24 horas
+        if (resWallet.result !== null) {
+            const ttlRes = await fetch(`${redisUrl}/ttl/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
+            const horas = Math.floor(ttlRes.result / 3600);
+            const minutos = Math.floor((ttlRes.result % 3600) / 60);
 
             return res.status(403).json({ 
                 bloqueado: true,
-                error: `Tu alma aún no está lista para otra cosecha de ${cripto}. Regresa en ${horas}h y ${minutos}m.` 
+                error: `Tu billetera aún no está lista para otra cosecha de ${cripto}. Regresa en ${horas}h y ${minutos}m.` 
             });
         }
 
-        // 6. SEGUNDO PASO: Si el camino está libre, guardamos la wallet y le ponemos el temporizador de 24 horas
-        // 86400 segundos = 24 horas exactas
-        const tiempoDeVida = 86400; 
-        
-        await fetch(`${redisUrl}/set/${redisKey}/activo/EX/${tiempoDeVida}`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
-        });
+        // REGLA B: Si la IP ya realizó un reclamo de esta cripto en las últimas 24 horas
+        if (resIp.result !== null) {
+            const ttlRes = await fetch(`${redisUrl}/ttl/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
+            const horas = Math.floor(ttlRes.result / 3600);
+            const minutos = Math.floor((ttlRes.result % 3600) / 60);
 
-        // 7. RESPUESTA EXITOSA: El backend da luz verde para que el frontend mueva los saldos en la pantalla
+            return res.status(403).json({ 
+                bloqueado: true,
+                error: `Este dispositivo/red ya canalizó energía para ${cripto} recientemente. Espera ${horas}h y ${minutos}m o cambia de red.` 
+            });
+        }
+
+        // 6. SEGUNDO PASO: Si ambos candados están libres, activamos el bloqueo de 24 horas para AMBOS
+        const tiempoDeVida = 86400; // 24 horas exactas en segundos
+        
+        await Promise.all([
+            fetch(`${redisUrl}/set/${walletKey}/activo/EX/${tiempoDeVida}`, { headers: { Authorization: `Bearer ${redisToken}` } }),
+            fetch(`${redisUrl}/set/${ipKey}/activo/EX/${tiempoDeVida}`, { headers: { Authorization: `Bearer ${redisToken}` } })
+        ]);
+
+        // 7. RESPUESTA EXITOSA: El backend da luz verde
         return res.status(200).json({ 
             success: true, 
             mensaje: `Poder transferido. Cosecha de ${cripto} completada con éxito.` 

@@ -18,7 +18,7 @@ function entrarAlMictlan() {
         }
 
         generarCementerio();
-        iniciarAmbienteMictlan();
+        // El ambiente de criaturas fue desterrado para optimizar el rendimiento
     }, 1500);
 }
 
@@ -151,49 +151,6 @@ function notificacionGotica(titulo, mensaje, color, mostrarInput) {
     }
     
     modal.style.display = 'block';
-}
-
-function iniciarAmbienteMictlan() {
-    const randomPos = () => ({
-        x: Math.random() * (window.innerWidth - 100),
-        y: Math.random() * (window.innerHeight - 100)
-    });
-
-    setInterval(() => {
-        const bat = document.createElement('div');
-        bat.className = 'murcielago-3d';
-        bat.style.left = "-150px";
-        bat.style.top = randomPos().y + "px";
-        document.body.appendChild(bat);
-
-        setTimeout(() => {
-            const destino = randomPos();
-            bat.style.left = (window.innerWidth + 150) + "px"; 
-            bat.style.top = destino.y + "px"; 
-        }, 100);
-
-        setTimeout(() => bat.remove(), 6000);
-    }, 4000);
-
-    setInterval(() => {
-        const arana = document.createElement('div');
-        arana.className = 'arana-3d';
-        const inicio = randomPos();
-        arana.style.left = inicio.x + "px";
-        arana.style.top = "-100px"; 
-        document.body.appendChild(arana);
-
-        setTimeout(() => {
-            const destino = randomPos();
-            arana.style.top = destino.y + "px"; 
-            arana.style.left = destino.x + "px"; 
-        }, 100);
-
-        setTimeout(() => {
-            arana.style.top = window.innerHeight + 100 + "px"; 
-            setTimeout(() => arana.remove(), 3000);
-        }, 5000);
-    }, 7000);
 }
 
 function abrirModalRitual(pos) {
