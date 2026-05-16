@@ -723,9 +723,9 @@ button,
         flex-direction: column !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 20px !important;
-        padding: 100px 20px 40px 20px !important;
-        overflow-y: auto !important; /* Habilita scroll si se acumulan */
+        gap: 20px !important; /* Compactamos el espacio entre tumbas */
+        padding: 90px 15px 40px 15px !important; /* Reducimos padding superior para que no tape a Soulgeist */
+        overflow-y: auto !important; /* Habilita scroll real si el contenido supera la pantalla */
         height: auto !important;
         min-height: 100vh !important;
         width: 100% !important;
@@ -735,29 +735,29 @@ button,
         transform: none !important;
     }
 
-    /* Forzar que TODAS las tumbas se alineen perfectamente al centro sin escalonarse */
+    /* Forzar visibilidad y cancelar Pointer-Events Restrictivos en Móviles */
     .zona-tumba {
         position: relative !important;
         top: auto !important;
         left: auto !important;
         right: auto !important;
         transform: none !important; /* Rompe el desvío horizontal de escritorio */
-        margin: 0 auto !important; /* Las centra perfectamente */
+        margin: 0 auto !important; /* Centra perfectamente */
         width: 100% !important;
-        max-width: 320px !important;
+        max-width: 320px !important; /* Compactamos para que no se vean enormes */
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        padding: 12px !important;
-        background: rgba(10, 0, 0, 0.95) !important;
-        border: 2px solid var(--color-cripto, #00ffff) !important;
-        border-radius: 10px !important;
-        box-shadow: 0 0 12px var(--color-cripto) !important;
+        flex-direction: row !important; /* Diseño horizontal en lista */
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px 12px; /* Más compacto */
+        background: rgba(10, 0, 0, 0.95);
+        border: 2px solid var(--color-cripto, #00ffff);
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--color-cripto);
         pointer-events: auto !important;
     }
 
-    /* Cancelar efectos flotantes de escritorio */
+    /* Cancelamos los hovers de escritorio que desplazan las monedas */
     .zona-tumba:hover .moneda-flotante,
     .zona-tumba:hover .moneda-sustraer {
         transform: none !important;
@@ -766,31 +766,32 @@ button,
 
     .zona-tumba .moneda-flotante, 
     .zona-tumba .moneda-sustraer {
-        width: 45px !important;
+        width: 45px !important; /* Compactamos iconos */
         height: 45px !important;
         opacity: 1 !important;
         transform: none !important;
-        margin-right: 15px !important;
-        margin-bottom: 0 !important;
+        margin-right: 15px;
+        margin-bottom: 0;
     }
 
+    /* Contenedor de datos internos de la tumba */
     .info-tumba {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        text-align: left !important;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
     }
 
     .zona-tumba .nombre-cripto {
-        font-size: 1.1rem !important;
+        font-size: 1rem; /* Un poco más pequeña y estilizada */
     }
 
     .zona-tumba .balance-proyectado {
-        font-size: 0.9rem !important;
-        margin-top: 2px !important;
+        font-size: 0.85rem;
+        margin-top: 2px;
     }
 
-    /* --- HUD SOULGEIST EN MÓVILES (FIJO) --- */
+    /* --- HUD SOULGEIST EN MÓVILES (Fijo arriba a la izquierda) --- */
     .zona-tumba.alma-maestra {
         position: fixed !important;
         top: 15px !important;
@@ -801,60 +802,60 @@ button,
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
-        z-index: 101 !important;
+        z-index: 101;
         flex-direction: column !important;
         align-items: flex-start !important;
     }
 
     .zona-tumba.alma-maestra .sigilo-soulgeist {
-        width: 45px !important;
-        height: 45px !important;
-        filter: drop-shadow(0 0 5px #00ffff) !important;
+        width: 45px;
+        height: 45px;
+        filter: drop-shadow(0 0 5px #00ffff);
     }
     
     .zona-tumba.alma-maestra .nombre-cripto {
-        display: none !important; 
+        display: none !important; /* Oculta títulos redundantes */
     }
     
     .zona-tumba.alma-maestra .balance-actual {
         font-size: 0.85rem !important;
-        color: #00ffff !important;
-        margin-top: 5px !important;
+        color: #00ffff;
+        margin-top: 5px;
     }
 
-    /* --- CANDELABRO CENTRAL --- */
+    /* --- CANDELABRO CENTRAL (Fijo arriba a la derecha) --- */
     .candelabro-central {
-        position: fixed !important;
-        top: 15px !important;
-        right: 15px !important;
-        width: 50px !important;
-        opacity: 0.7 !important;
-        z-index: 100 !important;
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        width: 45px; /* Reducido para no estorbar el texto central */
+        opacity: 0.6;
+        z-index: 100;
         transform: none !important;
         left: auto !important;
         bottom: auto !important;
     }
 
     #campo-santo {
-        background-attachment: scroll !important;
-        background-position: center top !important;
+        background-attachment: scroll; /* Cambiado a scroll en móvil para evitar bugs visuales */
+        background-position: center top;
     }
 }
 
 /* --- 8.2 VISTA HORIZONTAL (Para cuando giran el celular) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Forzar scroll general del sitio web */
+    /* Forzamos a que el navegador permita scroll vertical general del sitio */
     html, body {
         overflow-y: auto !important;
         height: auto !important;
     }
 
-    /* Cambiar el contenedor a dos columnas para que quepan de lado y den espacio hacia abajo */
+    /* Cambiamos el contenedor a dos columnas para que quepan de lado y den espacio hacia abajo */
     #contenedor-criptos {
         position: relative !important;
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important; /* Dos columnas de tumbas */
+        grid-template-columns: repeat(2, 1fr) !important; /* Ponemos las tumbas en 2 columnas */
         gap: 15px !important;
         padding: 80px 20px 40px 20px !important;
         overflow-y: visible !important; /* El scroll lo maneja la pantalla principal */
@@ -864,35 +865,27 @@ button,
         box-sizing: border-box !important;
     }
 
-    /* Mantener las tumbas centradas y adaptables en sus columnas */
+    /* Volvemos las tumbas aún más delgadas en horizontal para aprovechar el ancho */
     .zona-tumba {
-        position: relative !important;
-        transform: none !important;
-        margin: 0 auto !important;
-        width: 100% !important;
-        max-width: 280px !important; /* Ligeramente más delgadas en horizontal */
-        display: flex !important;
-        padding: 10px !important;
-        background: rgba(10, 0, 0, 0.95) !important;
-        border: 2px solid var(--color-cripto, #00ffff) !important;
+        max-width: 100% !important;
+        padding: 8px 10px !important;
     }
 
-    /* Soulgeist se queda arriba fijo para que no desaparezca al bajar */
-    .zona-tumba.alma-maestra {
-        position: fixed !important;
-        top: 10px !important;
-        left: 15px !important;
-        z-index: 105 !important;
-        opacity: 0.9 !important;
-    }
-
-    /* El candelabro se vuelve pequeño y se fija a la derecha para no estorbar el flujo */
+    /* El candelabro y Soulgeist se quedan arriba fijos para no desaparecer al bajar */
     .candelabro-central {
         position: fixed !important;
         top: 10px !important;
         right: 15px !important;
         width: 35px !important;
-        opacity: 0.4 !important;
-        z-index: 104 !important;
+        opacity: 0.3 !important; /* Casi transparente para que no tape los botones */
+        z-index: 105 !important;
+    }
+
+    .zona-tumba.alma-maestra {
+        position: fixed !important;
+        top: 10px !important;
+        left: 15px !important;
+        z-index: 106 !important;
+        opacity: 0.9 !important;
     }
 }
