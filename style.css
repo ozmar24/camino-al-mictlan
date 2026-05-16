@@ -711,10 +711,10 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. SISTEMA RESPONSIVO CONTROLADO - MANTENIMIENTO DE ESTILO GÓTICO
+   8. AJUSTE DE PRECISIÓN QUIRÚRGICA PARA MÓVILES (REVISADO)
    ========================================================================== */
 
-/* Bloqueo base para evitar fugas del candelabro en el portal de bienvenida */
+/* Bloqueo inicial para el portal */
 .candelabro-central {
     display: none;
     opacity: 0;
@@ -724,7 +724,7 @@ button,
     opacity: 1 !important;
 }
 
-/* --- 8.1 VISTA HORIZONTAL COMPACTA (Ej. Celular acostado / Laptops chicas: max-height: 500px) --- */
+/* --- 8.1 CORRECCIÓN PARA HORIZONTAL (LANDSCAPE / PANTALLAS BAJAS) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
     #contenedor-criptos {
@@ -733,78 +733,53 @@ button,
         position: relative !important;
     }
 
-    /* RESTAURACIÓN DE TEXTOS, ILUMINACIÓN Y VIBRACIÓN */
-    .nombre-cripto, 
-    .texto-tumba, 
-    .monto-cripto {
-        font-size: 11px !important;
-        /* Conservamos el color tenue original y dejamos que el JS o tus clases manejen el brillo */
-        opacity: 0.75 !important; 
-        transition: all 0.3s ease-in-out !important;
-    }
-
-    /* Permitir que el estado activo/seleccionado resalte con fuerza */
-    .tumba-seleccionada .nombre-cripto,
-    .tumba-seleccionada .monto-cripto,
-    .opcion-activa {
-        opacity: 1 !important;
-        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000 !important;
-        animation: pulse 1.5s infinite alternate; /* Mantiene tu vibración si usas esa animación */
-    }
-
-    /* FIJACIÓN INALTERABLE DE LOS PILARES VERTICALES (ASCENSO / MICTLAN) */
+    /* --- CENTRADO MILIMÉTRICO DE LETRAS EN LOS PILARES --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
-        top: 38% !important; /* Ajuste para que bajen al centro del pasillo en horizontal */
+        top: 38% !important; /* Altura en el pasillo */
         display: flex !important;
-        flex-direction: column !important; /* Mantiene las letras en fila india hacia abajo */
+        flex-direction: column !important;
         align-items: center !important;
-        font-size: 12px !important;
-        line-height: 1.3 !important; /* Controla la separación entre cada letra */
-        letter-spacing: normal !important;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        z-index: 995 !important;
     }
     
-    /* Coordenadas milimétricas para que caigan justo sobre tus postes de piedra */
-    .pilar-izquierdo { left: 43.5% !important; }
-    .pilar-derecho   { left: 54.5% !important; }
+    /* Empujamos las coordenadas un poco a la derecha para montarse en la piedra */
+    .pilar-izquierdo { 
+        left: 45.2% !important; /* Antes 43.5%, movido a la derecha */
+    }
+    .pilar-derecho { 
+        left: 56.2% !important; /* Antes 54.5%, movido a la derecha */
+    }
 
-    /* EL CANDELABRO CENTRAL (Se queda abajo pero compacto para no tapar el fondo) */
+    /* --- MINIMIZACIÓN DEL CANDELABRO (Estilo Icono Discreto) --- */
     .candelabro-central.candelabro-visible {
         position: absolute !important;
-        bottom: -5px !important;
+        bottom: 5px !important; /* Lo regresamos abajo para que no mutile tus letras de arriba */
         top: auto !important;
-        left: 49% !important;
+        left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 75px !important;
+        width: 45px !important; /* Reducido drásticamente de 75px a 45px */
         z-index: 1000 !important;
     }
-    .img-candelabro { width: 100% !important; height: auto !important; }
+    
+    .img-candelabro { 
+        width: 100% !important; 
+        height: auto !important; 
+    }
 }
 
-/* --- 8.2 VISTA VERTICAL ESTRICTA (Ej. Celular parado: max-width: 500px) --- */
+/* --- 8.2 CORRECCIÓN PARA VERTICAL (PORTRAIT / CELULAR DE PIE) --- */
 @media screen and (max-width: 500px) and (orientation: portrait) {
 
     #contenedor-criptos {
         width: 100vw !important;
         height: 100vh !important;
-        background-size: cover !important; /* Evita que el fondo se mutile feo */
     }
 
-    /* Mantenemos el tamaño e iluminación tenue en vertical */
-    .nombre-cripto, .texto-tumba, .monto-cripto {
-        font-size: 10px !important;
-        opacity: 0.75 !important;
-    }
-
-    /* Resalte de selección en vertical */
-    .tumba-seleccionada .nombre-cripto,
-    .tumba-seleccionada .monto-cripto {
-        opacity: 1 !important;
-        text-shadow: 0 0 12px #ff0000 !important;
-    }
-
-    /* REALINEACIÓN DE LOS PILARES EN PANTALLA ANGOSTA */
+    /* --- PILARES EN VERTICAL --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
@@ -814,21 +789,30 @@ button,
         align-items: center !important;
         font-size: 11px !important;
         line-height: 1.2 !important;
+        z-index: 995 !important;
     }
     
-    /* En vertical el pasillo central se hace más angosto, cerramos las coordenadas */
-    .pilar-izquierdo { left: 38% !important; }
-    .pilar-derecho   { left: 59% !important; }
+    /* Empuje hacia la derecha en la vista angosta */
+    .pilar-izquierdo { 
+        left: 40.5% !important; /* Ajustado para centrar en la columna izq */
+    }
+    .pilar-derecho { 
+        left: 61.5% !important; /* Ajustado para centrar en la columna der */
+    }
 
-    /* CANDELABRO EN VERTICAL (Abajo bien estilizado) */
+    /* --- CANDELABRO SUPERIOR EN VERTICAL (COMPACTO) --- */
     .candelabro-central.candelabro-visible {
         position: absolute !important;
-        bottom: 10px !important;
-        top: auto !important;
+        top: 12px !important; /* Lo dejamos arriba en vertical para que no estorbe abajo */
+        bottom: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 85px !important;
-        z-index: 1000 !important;
+        width: 50px !important; /* Tamaño compacto, elegante y no invasivo */
+        z-index: 9999 !important;
     }
-    .img-candelabro { width: 100% !important; height: auto !important; }
+    
+    .img-candelabro { 
+        width: 100% !important; 
+        height: auto !important; 
+    }
 }
