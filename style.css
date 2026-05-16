@@ -711,10 +711,10 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN QUIRÚRGICA PARA MÓVILES (REVISADO)
+   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL CONSCIENTE
    ========================================================================== */
 
-/* Bloqueo inicial para el portal */
+/* Bloqueo inicial estricto para que no se filtre en el portal de bienvenida */
 .candelabro-central {
     display: none;
     opacity: 0;
@@ -724,44 +724,49 @@ button,
     opacity: 1 !important;
 }
 
-/* --- 8.1 CORRECCIÓN PARA HORIZONTAL (LANDSCAPE / PANTALLAS BAJAS) --- */
+/* --- 8.1 CORRECCIÓN OPTIMIZADA PARA HORIZONTAL (LANDSCAPE / MÓVIL ACOSTADO) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
+    /* Ocultamos el aviso de rotación forzada al estar acostado */
+    #aviso-rotar {
+        display: none !important;
+    }
+
     #contenedor-criptos {
         width: 100vw !important;
         height: 100vh !important;
         position: relative !important;
     }
 
-    /* --- CENTRADO MILIMÉTRICO DE LETRAS EN LOS PILARES --- */
+    /* --- CENTRADO MILIMÉTRICO Y COMPACTACIÓN DE PILARES (EVITA ROZAR CON DOGE) --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
-        top: 38% !important; /* Altura en el pasillo */
+        top: 38% !important; /* Altura perfecta en el pasillo */
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        font-size: 11px !important;
-        line-height: 1.3 !important;
+        font-size: 9px !important; /* Reducido para dar aire a Dogecoin y las criptas */
+        line-height: 1.2 !important;
         z-index: 995 !important;
     }
     
-    /* Empujamos las coordenadas un poco a la derecha para montarse en la piedra */
+    /* Empuje de precisión exacta hacia la derecha sobre las columnas de piedra */
     .pilar-izquierdo { 
-        left: 45.2% !important; /* Antes 43.5%, movido a la derecha */
+        left: 45.4% !important; 
     }
     .pilar-derecho { 
-        left: 56.2% !important; /* Antes 54.5%, movido a la derecha */
+        left: 56.4% !important; 
     }
 
-    /* --- MINIMIZACIÓN DEL CANDELABRO (Estilo Icono Discreto) --- */
+    /* --- MINIMIZACIÓN ESTRICTA DEL CANDELABRO (MICRO ICONO DISCRETO) --- */
     .candelabro-central.candelabro-visible {
         position: absolute !important;
-        bottom: 5px !important; /* Lo regresamos abajo para que no mutile tus letras de arriba */
+        bottom: 2px !important; /* Anclado abajo para limpiar el espacio aéreo del juego */
         top: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 45px !important; /* Reducido drásticamente de 75px a 45px */
+        width: 32px !important; /* Reducción máxima y estética para no tapar nada */
         z-index: 1000 !important;
     }
     
@@ -771,48 +776,79 @@ button,
     }
 }
 
-/* --- 8.2 CORRECCIÓN PARA VERTICAL (PORTRAIT / CELULAR DE PIE) --- */
-@media screen and (max-width: 500px) and (orientation: portrait) {
-
-    #contenedor-criptos {
-        width: 100vw !important;
-        height: 100vh !important;
+/* --- 8.2 BLOQUEO TOTAL Y AVISO DE ROTACIÓN EN VERTICAL (PORTRAIT) --- */
+@media screen and (max-width: 550px) and (orientation: portrait) {
+    
+    /* Escondemos los elementos del juego para evitar el desorden visual amontonado */
+    #contenedor-criptos, 
+    #campo-santo, 
+    .candelabro-central {
+        display: none !important;
     }
 
-    /* --- PILARES EN VERTICAL --- */
-    .pilar-izquierdo, 
-    .pilar-derecho {
-        position: absolute !important;
-        top: 32% !important;
+    /* Desplegamos la interfaz mística que exige girar el smartphone */
+    #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
+        justify-content: center !important;
         align-items: center !important;
-        font-size: 11px !important;
-        line-height: 1.2 !important;
-        z-index: 995 !important;
-    }
-    
-    /* Empuje hacia la derecha en la vista angosta */
-    .pilar-izquierdo { 
-        left: 40.5% !important; /* Ajustado para centrar en la columna izq */
-    }
-    .pilar-derecho { 
-        left: 61.5% !important; /* Ajustado para centrar en la columna der */
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #050505 !important; /* Fondo lúgubre base */
+        z-index: 999999 !important; /* Por encima de absolutamente todo */
+        color: #8b0000 !important;
+        text-align: center !important;
+        padding: 25px !important;
+        box-sizing: border-box !important;
     }
 
-    /* --- CANDELABRO SUPERIOR EN VERTICAL (COMPACTO) --- */
-    .candelabro-central.candelabro-visible {
-        position: absolute !important;
-        top: 12px !important; /* Lo dejamos arriba en vertical para que no estorbe abajo */
-        bottom: auto !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 50px !important; /* Tamaño compacto, elegante y no invasivo */
-        z-index: 9999 !important;
+    #aviso-rotar h2 {
+        font-family: 'Nosifer', sans-serif !important;
+        font-size: 15px !important;
+        text-shadow: 0 0 8px #ff0000 !important;
+        margin-bottom: 15px !important;
+        letter-spacing: 1px !important;
+    }
+
+    #aviso-rotar p {
+        font-family: 'Butcherman', 'Metal Mania', sans-serif !important;
+        font-size: 13px !important;
+        color: #bbb !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Pequeño marco animado que simula el giro del dispositivo */
+    .icono-giro {
+        width: 40px;
+        height: 65px;
+        margin-top: 25px;
+        border: 2px solid #8b0000;
+        border-radius: 6px;
+        position: relative;
+        animation: rotarDispositivo 2.5s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     }
     
-    .img-candelabro { 
-        width: 100% !important; 
-        height: auto !important; 
+    /* Botón simulado del home en el icono */
+    .icono-giro::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 6px;
+        border: 1px solid #8b0000;
+        border-radius: 50%;
     }
+}
+
+/* Animación de rotación continua para la guía de interfaz */
+@keyframes rotarDispositivo {
+    0% { transform: rotate(0deg); }
+    45%, 55% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
 }
