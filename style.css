@@ -781,52 +781,91 @@ button,
         text-align: left !important;
     }
 
-    /* --- EL RESCATE DE SOULGEIST (HUD FIJO) --- */
+   /* --- RESETEO Y POSICIONAMIENTO SUPREMO PARA SOULGEIST --- */
     .zona-tumba.alma-maestra {
+        /* 1. Forzamos el comportamiento fijo */
         position: fixed !important;
-        top: 25px !important;        /* Lo bajamos más de la orilla (de 15px a 25px) */
-        left: 20px !important;       /* Lo separamos del borde izquierdo */
+        
+        /* 2. Lo bajamos agresivamente para que libre cualquier notch o barra */
+        top: 35px !important;       
+        left: 20px !important;      
+        right: auto !important;
+        bottom: auto !important;
+
+        /* 3. ¡LA CLAVE! Matamos cualquier traslación o rotación heredada de escritorio */
+        transform: none !important; 
+        -webkit-transform: none !important;
+        
+        /* 4. Reseteamos márgenes que lo empujen hacia afuera */
+        margin: 0 !important;       
+        
+        /* 5. Le damos cuerpo físico real para que el navegador lo pinte completo */
         width: auto !important;
-        max-width: none !important;
-        background: rgba(5, 5, 5, 0.7) !important; /* Un fondo sutil para forzar dimensiones */
-        border: 1px solid rgba(0, 255, 255, 0.2) !important;
-        border-radius: 6px !important;
-        padding: 6px 10px !important; /* Evita que la caja colapse a 0 píxeles */
-        z-index: 9999 !important;     /* Capa suprema sobre todo el cementerio */
+        max-width: 180px !important;
+        height: auto !important;
+        padding: 10px 14px !important;
+        
+        /* 6. Estética del contenedor en el HUD móvil */
+        background: rgba(5, 5, 5, 0.85) !important;
+        border: 2px solid #00ffff !important;
+        border-radius: 8px !important;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
+        z-index: 99999 !important; /* Por encima de todo el cosmos */
+        
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        pointer-events: auto !important;
     }
 
+    /* Asegurar que el icono no colapse */
     .zona-tumba.alma-maestra .sigilo-soulgeist {
-        width: 38px !important;
-        height: 38px !important;
+        width: 35px !important;
+        height: 35px !important;
+        display: block !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 0 5px 0 !important;
         filter: drop-shadow(0 0 5px #00ffff) !important;
-        margin-bottom: 2px !important;
     }
-    
-    .zona-tumba.alma-maestra .nombre-cripto {
-        display: none !important; 
-    }
-    
+
+    /* El texto del balance (Poder: 100 SG) */
     .zona-tumba.alma-maestra .balance-actual {
         font-size: 0.85rem !important;
         color: #00ffff !important;
-        font-family: inherit !important;
-        text-shadow: 0 0 4px #000 !important;
-        margin-top: 2px !important;
+        font-family: 'Metal Mania', sans-serif !important;
+        text-shadow: 0 0 5px #000 !important;
         display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+        white-space: nowrap !important; /* Evita que el texto se rompa en dos líneas */
     }
 
-    /* Candelabro superior derecho */
+    /* Ocultar el nombre redundante de la cripto si existe */
+    .zona-tumba.alma-maestra .nombre-cripto {
+        display: none !important;
+    }
+
+    /* --- EL CANDELABRO (Esquina Superior Derecha) --- */
     .candelabro-central {
         position: fixed !important;
-        top: 20px !important;
+        top: 35px !important; /* Lo nivelamos a la misma altura que Soulgeist */
         right: 20px !important;
-        width: 45px !important;
-        opacity: 0.6 !important;
-        z-index: 9998 !important;
+        left: auto !important;
+        bottom: auto !important;
         transform: none !important;
+        width: 40px !important;
+        opacity: 0.6 !important;
+        z-index: 99998 !important;
     }
 }
 
