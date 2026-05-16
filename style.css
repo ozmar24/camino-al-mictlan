@@ -711,110 +711,124 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. SISTEMA RESPONSIVO REVISADO - RESCATE DEL CANDELABRO
+   8. SISTEMA RESPONSIVO CONTROLADO - MANTENIMIENTO DE ESTILO GÓTICO
    ========================================================================== */
 
-/* Mantener el bloqueo inicial para el portal */
+/* Bloqueo base para evitar fugas del candelabro en el portal de bienvenida */
 .candelabro-central {
-    display: none !important;
+    display: none;
     opacity: 0;
 }
-/* Cuando el JS se active, rompemos cualquier restricción de PC */
 .candelabro-central.candelabro-visible {
     display: flex !important;
     opacity: 1 !important;
 }
 
-/* --- 8.1 CORRECCIÓN GENERAL PARA MÓVILES (HASTA 900px) --- */
-@media screen and (max-width: 900px) {
-
+/* --- 8.1 VISTA HORIZONTAL COMPACTA (Ej. Celular acostado / Laptops chicas: max-height: 500px) --- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    
     #contenedor-criptos {
         width: 100vw !important;
         height: 100vh !important;
         position: relative !important;
-        overflow: hidden !important;
     }
 
-    /* --- FORZADO E INYECCIÓN DEL CANDELABRO ARRIBA --- */
-    .candelabro-central.candelabro-visible {
-        display: flex !important; /* Forzamos la aparición visual */
-        position: fixed !important;
-        top: 10px !important; /* Lo mudamos arriba para que nunca se pierda en el fondo */
-        bottom: auto !important; /* Cancelamos el bottom de PC */
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 100% !important;
-        max-width: 280px !important; /* Contenedor compacto */
-        flex-direction: column !important;
-        align-items: center !important;
-        z-index: 9999 !important; /* Por encima de la niebla y las tumbas, abajo del portal */
+    /* RESTAURACIÓN DE TEXTOS, ILUMINACIÓN Y VIBRACIÓN */
+    .nombre-cripto, 
+    .texto-tumba, 
+    .monto-cripto {
+        font-size: 11px !important;
+        /* Conservamos el color tenue original y dejamos que el JS o tus clases manejen el brillo */
+        opacity: 0.75 !important; 
+        transition: all 0.3s ease-in-out !important;
     }
 
-    /* La imagen física del candelabro */
-    .img-candelabro {
-        display: block !important;
-        width: 38px !important; /* Tamaño perfecto de icono místico */
-        height: auto !important;
-        margin: 0 auto 8px auto !important;
+    /* Permitir que el estado activo/seleccionado resalte con fuerza */
+    .tumba-seleccionada .nombre-cripto,
+    .tumba-seleccionada .monto-cripto,
+    .opcion-activa {
+        opacity: 1 !important;
+        text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000 !important;
+        animation: pulse 1.5s infinite alternate; /* Mantiene tu vibración si usas esa animación */
     }
 
-    /* Ajuste de las opciones góticas del menú */
-    .menu-textos {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
+    /* FIJACIÓN INALTERABLE DE LOS PILARES VERTICALES (ASCENSO / MICTLAN) */
+    .pilar-izquierdo, 
+    .pilar-derecho {
+        position: absolute !important;
+        top: 38% !important; /* Ajuste para que bajen al centro del pasillo en horizontal */
         display: flex !important;
-        justify-content: center !important;
-        gap: 18px !important;
-    }
-
-    .opcion {
-        font-family: 'Nosifer', serif !important;
-        font-size: 11px !important; /* Mantiene el tamaño gótico original sin encogerse */
-        letter-spacing: 1px !important;
-        color: #8b0000 !important;
-        text-shadow: 2px 2px 4px #000 !important;
+        flex-direction: column !important; /* Mantiene las letras en fila india hacia abajo */
+        align-items: center !important;
+        font-size: 12px !important;
+        line-height: 1.3 !important; /* Controla la separación entre cada letra */
+        letter-spacing: normal !important;
     }
     
-    /* Quitamos las inclinaciones pesadas de PC que desalinean el menú en pantallas chicas */
-    .leyes, .oraculo, .alianzas { 
-        transform: none !important; 
-    }
-    .leyes:hover, .oraculo:hover, .alianzas:hover { 
-        color: #ff0000 !important;
-        transform: scale(1.1) !important; 
-    }
+    /* Coordenadas milimétricas para que caigan justo sobre tus postes de piedra */
+    .pilar-izquierdo { left: 43.5% !important; }
+    .pilar-derecho   { left: 54.5% !important; }
 
-    /* --- PROTECCIÓN DE TEXTOS EN CRIPTAS --- */
-    .nombre-cripto,
-    .simbolo-cripto,
-    .balance-proyectado,
-    .balance-actual {
-        font-size: 12px !important; /* Evita que el navegador las vuelva enanas */
-        opacity: 1 !important; /* En móviles es mejor dejarlas visibles para que sea jugable */
+    /* EL CANDELABRO CENTRAL (Se queda abajo pero compacto para no tapar el fondo) */
+    .candelabro-central.candelabro-visible {
+        position: absolute !important;
+        bottom: -5px !important;
+        top: auto !important;
+        left: 49% !important;
+        transform: translateX(-50%) !important;
+        width: 75px !important;
+        z-index: 1000 !important;
     }
+    .img-candelabro { width: 100% !important; height: auto !important; }
 }
 
-/* --- 8.2 AJUSTE DE PILARES EN VISTA VERTICAL --- */
+/* --- 8.2 VISTA VERTICAL ESTRICTA (Ej. Celular parado: max-width: 500px) --- */
 @media screen and (max-width: 500px) and (orientation: portrait) {
-    /* Mapeo de tus enlaces reales de los pilares */
-    .inscripcion-pilar {
-        position: absolute !important;
-        top: 35% !important;
-        font-size: 11px !important;
-        letter-spacing: 3px !important;
-        z-index: 995 !important;
-    }
-    .inscripcion-pilar span { font-size: 10px !important; opacity: 1 !important; }
-    .inscripcion-pilar small { display: none !important; }
 
-    /* Clavado milimétrico sobre tus columnas grises */
-    .pilar-izquierdo { 
-        left: 4% !important; 
+    #contenedor-criptos {
+        width: 100vw !important;
+        height: 100vh !important;
+        background-size: cover !important; /* Evita que el fondo se mutile feo */
     }
-    .pilar-derecho { 
-        left: auto !important;
-        right: 4% !important; 
+
+    /* Mantenemos el tamaño e iluminación tenue en vertical */
+    .nombre-cripto, .texto-tumba, .monto-cripto {
+        font-size: 10px !important;
+        opacity: 0.75 !important;
     }
+
+    /* Resalte de selección en vertical */
+    .tumba-seleccionada .nombre-cripto,
+    .tumba-seleccionada .monto-cripto {
+        opacity: 1 !important;
+        text-shadow: 0 0 12px #ff0000 !important;
+    }
+
+    /* REALINEACIÓN DE LOS PILARES EN PANTALLA ANGOSTA */
+    .pilar-izquierdo, 
+    .pilar-derecho {
+        position: absolute !important;
+        top: 32% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
+    
+    /* En vertical el pasillo central se hace más angosto, cerramos las coordenadas */
+    .pilar-izquierdo { left: 38% !important; }
+    .pilar-derecho   { left: 59% !important; }
+
+    /* CANDELABRO EN VERTICAL (Abajo bien estilizado) */
+    .candelabro-central.candelabro-visible {
+        position: absolute !important;
+        bottom: 10px !important;
+        top: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 85px !important;
+        z-index: 1000 !important;
+    }
+    .img-candelabro { width: 100% !important; height: auto !important; }
 }
