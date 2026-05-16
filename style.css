@@ -711,20 +711,20 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. DISPOSITIVOS MÓVILES (ESTRUCTURA DE COMPACTACIÓN TOTAL)
+   8. DISPOSITIVOS MÓVILES (RECONSTRUCCIÓN DE CRIPTAS)
    ========================================================================== */
 
 @media screen and (max-width: 768px) {
 
-    /* --- 8.1 CONTENEDOR PRINCIPAL DEL CEMENTERIO --- */
+    /* --- 8.1 CONTENEDOR DE LAS CRIPTAS --- */
     #contenedor-criptos {
         position: relative !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        gap: 12px !important;              /* Espacio reducido entre lápidas */
-        padding: 90px 10px 30px 10px !important; 
+        gap: 14px !important;
+        padding: 110px 10px 40px 10px !important; /* Más espacio arriba para liberar los pilares */
         overflow-y: auto !important;
         height: auto !important;
         min-height: 100vh !important;
@@ -735,8 +735,7 @@ button,
         transform: none !important;
     }
 
-    /* --- 8.2 REGLA DE ORO: CUADROS CORTOS Y SIMÉTRICOS --- 
-       Forzamos a que TODOS los botones midan lo mismo y contengan sus elementos */
+    /* --- 8.2 CAJAS CORTAS UNIFICADAS --- */
     .zona-tumba, 
     .zona-tumba.alma-maestra {
         position: relative !important;
@@ -747,127 +746,132 @@ button,
         transform: none !important;
         margin: 0 auto !important;
         
-        /* Ajuste de dimensiones compactas para que no tapen el fondo */
-        width: 90% !important;
-        max-width: 250px !important;  /* Cuadros sustancialmente más cortos */
-        height: 75px !important;   /* Altura fija y estricta */
+        /* Dimensiones cortas idénticas para que no tapen el fondo */
+        width: 85% !important;
+        max-width: 240px !important; 
+        height: 75px !important;
         
-        /* Contención Flexbox Absoluta */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: flex-start !important;
-        padding: 8px 12px !important;
+        padding: 10px 15px !important;
         box-sizing: border-box !important;
-        overflow: hidden !important; /* Evita que cualquier balance se desborde */
-        
-        background: rgba(10, 0, 0, 0.88) !important;
+        overflow: hidden !important;
         border-radius: 10px !important;
     }
 
-    /* Bordes de neón individuales */
+    /* Estilo base de criptas normales */
     .zona-tumba {
+        background: rgba(10, 0, 0, 0.9) !important;
         border: 2px solid var(--color-cripto, #00ffff) !important;
         box-shadow: 0 0 8px var(--color-cripto) !important;
     }
+
+    /* --- 8.3 ¡DOMANDO EL CANDELABRO DE SOULGEIST! --- */
     .zona-tumba.alma-maestra {
+        /* Forzamos a que la imagen de fondo NO se estire de forma monstruosa */
+        background-image: url('tu-candelabro.png') !important; /* Mantén tu ruta original */
+        background-repeat: no-repeat !important;
+        background-position: right 10px center !important; /* Lo manda al rincón derecho de la tarjeta */
+        background-size: contain !important; /* Obliga a que la imagen quepa completa dentro del alto del botón */
+        background-color: rgba(15, 5, 5, 0.95) !important; /* Fondo oscuro base */
+        
         border: 2px solid #00ffff !important;
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.5) !important;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5) !important;
     }
 
-    /* --- 8.3 ICONOS SEGUROS DENTRO DEL BOTÓN --- */
+    /* --- 8.4 ICONOS INTERNOS CONTROLADOS --- */
     .zona-tumba .moneda-flotante, 
     .zona-tumba .moneda-sustraer,
     .zona-tumba.alma-maestra .sigilo-soulgeist {
         position: relative !important;
-        top: auto !important;
-        left: auto !important;
         transform: none !important;
-        
-        /* Tamaño controlado */
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        max-height: 38px !important;
-        
-        margin: 0 12px 0 0 !important; /* Separación fija del texto */
-        opacity: 1 !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        margin: 0 12px 0 0 !important;
         display: block !important;
+        opacity: 1 !important;
     }
 
-    /* --- 8.4 CAJA DE TEXTO UNIFICADA (Nombres y balances en su sitio) --- */
+    /* --- 8.5 CONTENEDOR DE TEXTO (Evita encimado) --- */
     .info-tumba,
-    .zona-tumba.alma-maestra .info-tumba,
-    .zona-tumba div:not([class]) { /* Por si no tienen la clase asignada en el HTML */
+    .zona-tumba.alma-maestra .info-tumba {
         display: flex !important;
-        flex-direction: column !important; /* Obliga a tirar el balance abajo */
+        flex-direction: column !important; /* Título arriba, balance abajo */
         align-items: flex-start !important;
         justify-content: center !important;
         text-align: left !important;
-        width: calc(100% - 50px) !important;
+        width: auto !important;
         height: 100% !important;
-        box-sizing: border-box !important;
     }
 
-    /* Títulos de las monedas (Ethereum, Soulgeist...) */
     .zona-tumba .nombre-cripto,
     .zona-tumba.alma-maestra .nombre-cripto {
         display: block !important;
         font-size: 0.95rem !important;
         color: #fff !important;
-        margin: 0 0 1px 0 !important;
-        padding: 0 !important;
+        margin: 0 0 2px 0 !important;
         font-family: 'Metal Mania', sans-serif !important;
-        line-height: 1.1 !important;
     }
 
-    /* Balances numéricos (+0.005, PODER: 100 SG...) */
     .zona-tumba .balance-actual,
     .zona-tumba.alma-maestra .balance-actual {
         display: block !important;
-        font-size: 0.78rem !important;
+        font-size: 0.8rem !important;
         color: var(--color-cripto, #00ffff) !important;
         margin: 0 !important;
-        padding: 0 !important;
-        text-shadow: 0 0 3px #000 !important;
         white-space: nowrap !important;
     }
+
     .zona-tumba.alma-maestra .balance-actual {
         color: #00ffff !important;
     }
 
-    /* --- 8.5 REPOSICIONAMIENTO DE LOS ENLACES VERTICALES (PILARES) --- */
+    /* --- 8.6 POSICIONAMIENTO DE ENLACES EN LOS PILARES --- */
     .texto-ascender, 
     .texto-mictlan {
         position: absolute !important;
         font-family: 'Creepster', sans-serif !important;
         font-size: 0.85rem !important;
-        letter-spacing: 4px !important;
+        letter-spacing: 2px !important;
         text-align: center !important;
-        width: 20px !important;
+        width: 25px !important;
         word-wrap: break-word !important;
-        line-height: 1.2 !important;
-        z-index: 10 !important;
+        line-height: 1.3 !important;
+        z-index: 5 !important;
+        top: 25px !important; /* Los subimos para que queden sobre la estructura de piedra superior */
     }
 
-    /* Ajuste milimétrico sobre los pilares reales de la reja trasera */
+    /* Moverlos hacia el centro de la pantalla, donde se junta la reja */
     .texto-ascender {
-        top: 38% !important;
-        left: 46% !important;   /* Centrado sobre el pilar izquierdo */
+        left: 38% !important; /* Ajuste para pilar izquierdo en móvil */
         color: #00ffcc !important;
-        text-shadow: 0 0 6px rgba(0,255,204,0.7) !important;
+        text-shadow: 0 0 5px #000, 0 0 8px rgba(0,255,204,0.6) !important;
     }
 
     .texto-mictlan {
-        top: 38% !important;
-        left: 52% !important;   /* Centrado sobre el pilar derecho */
+        right: 38% !important; /* Ajuste para pilar derecho en móvil */
+        left: auto !important;
         color: #ff3333 !important;
-        text-shadow: 0 0 6px rgba(255,51,51,0.7) !important;
+        text-shadow: 0 0 5px #000, 0 0 8px rgba(255,51,51,0.6) !important;
+    }
+
+    /* Candelabro general del HUD (si existe) lo hacemos discreto */
+    .candelabro-central {
+        position: fixed !important;
+        top: 15px !important;
+        right: 15px !important;
+        width: 35px !important;
+        opacity: 0.5 !important;
+        z-index: 100 !important;
+        transform: none !important;
     }
 }
 
 /* ==========================================================================
-   9. VISTA HORIZONTAL RESPONSIVE (REJILLA COMPACTA)
+   9. VISTA HORIZONTAL RESPONSIVE
    ========================================================================== */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
@@ -878,27 +882,19 @@ button,
 
     #contenedor-criptos {
         display: grid !important;
-        grid-template-columns: repeat(2, 220px) !important; /* Columnas cortas idénticas */
+        grid-template-columns: repeat(2, 210px) !important; /* Rejilla bien delgada */
         justify-content: center !important;
         gap: 10px !important;
-        padding: 65px 10px 25px 10px !important;
+        padding: 75px 10px 25px 10px !important;
     }
 
     .zona-tumba, 
     .zona-tumba.alma-maestra {
-        width: 100% !important; 
-        max-width: 220px !important;
-        height: 65px !important; /* Súper compactas para no tapar el arte de fondo */
-        padding: 6px 10px !important;
+        max-width: 210px !important;
+        height: 65px !important;
+        padding: 6px 12px !important;
     }
 
-    /* Reajuste de los pilares en la vista horizontal */
-    .texto-ascender {
-        top: 40% !important;
-        left: 47% !important;
-    }
-    .texto-mictlan {
-        top: 40% !important;
-        left: 51% !important;
-    }
+    .texto-ascender { top: 15px !important; left: 42% !important; }
+    .texto-mictlan { top: 15px !important; right: 42% !important; }
 }
