@@ -711,45 +711,53 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. DISPOSITIVOS MÓVILES (RESPONSIVE RITUAL CORREGIDO)
+   8. DISPOSITIVOS MÓVILES (RITUAL RESPONSIVE COMPLETO)
    ========================================================================== */
 
-/* --- 8.1 MÓVILES VERTICALES --- */
-@media screen and (max-width: 480px) {
+/* --- 8.1 VISTA VERTICAL (Para celulares en posición normal) --- */
+@media screen and (max-width: 600px) {
     
     #contenedor-criptos {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px; /* Reducido de 30px a 20px para compactar */
-        padding: 90px 15px 40px 15px; /* Bajamos el padding-top de 120px para ganar espacio */
-        overflow-y: auto !important; /* Asegura el scroll */
-        height: auto;
-        min-height: 100vh;
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 20px !important;
+        padding: 100px 20px 40px 20px !important;
+        overflow-y: auto !important; /* Habilita scroll si se acumulan */
+        height: auto !important;
+        min-height: 100vh !important;
         width: 100% !important;
-        box-sizing: border-box;
+        box-sizing: border-box !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
     }
 
-    /* Forzar visibilidad en las tumbas (Botones) */
+    /* Forzar que TODAS las tumbas se alineen perfectamente al centro sin escalonarse */
     .zona-tumba {
         position: relative !important;
-        width: 100%;
-        max-width: 290px; /* Reducido de 340px a 290px para que no se vean enormes */
-        margin: 0 auto;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important; /* Rompe el desvío horizontal de escritorio */
+        margin: 0 auto !important; /* Las centra perfectamente */
+        width: 100% !important;
+        max-width: 320px !important;
         display: flex !important;
         flex-direction: row !important;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 10px 12px; /* Más compacto */
-        background: rgba(10, 0, 0, 0.95);
-        border: 2px solid var(--color-cripto, #00ffff);
-        border-radius: 10px;
-        box-shadow: 0 0 10px var(--color-cripto);
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 12px !important;
+        background: rgba(10, 0, 0, 0.95) !important;
+        border: 2px solid var(--color-cripto, #00ffff) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 0 12px var(--color-cripto) !important;
         pointer-events: auto !important;
     }
 
-    /* Cancelamos los hovers de escritorio */
+    /* Cancelar efectos flotantes de escritorio */
     .zona-tumba:hover .moneda-flotante,
     .zona-tumba:hover .moneda-sustraer {
         transform: none !important;
@@ -758,31 +766,31 @@ button,
 
     .zona-tumba .moneda-flotante, 
     .zona-tumba .moneda-sustraer {
-        width: 40px !important; /* Reducido de 50px a 40px para quitar lo gigante */
-        height: 40px !important;
+        width: 45px !important;
+        height: 45px !important;
         opacity: 1 !important;
         transform: none !important;
-        margin-right: 12px;
+        margin-right: 15px !important;
+        margin-bottom: 0 !important;
     }
 
-    /* Contenedor de datos internos */
     .info-tumba {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: left !important;
     }
 
     .zona-tumba .nombre-cripto {
-        font-size: 1rem; /* Un poco más pequeña y estilizada */
+        font-size: 1.1rem !important;
     }
 
     .zona-tumba .balance-proyectado {
-        font-size: 0.8rem;
-        margin-top: 2px;
+        font-size: 0.9rem !important;
+        margin-top: 2px !important;
     }
 
-    /* HUD SOULGEIST (Esquina Superior Izquierda) */
+    /* --- HUD SOULGEIST EN MÓVILES (FIJO) --- */
     .zona-tumba.alma-maestra {
         position: fixed !important;
         top: 15px !important;
@@ -793,15 +801,15 @@ button,
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
-        z-index: 101;
+        z-index: 101 !important;
         flex-direction: column !important;
         align-items: flex-start !important;
     }
 
     .zona-tumba.alma-maestra .sigilo-soulgeist {
-        width: 45px;
-        height: 45px;
-        filter: drop-shadow(0 0 5px #00ffff);
+        width: 45px !important;
+        height: 45px !important;
+        filter: drop-shadow(0 0 5px #00ffff) !important;
     }
     
     .zona-tumba.alma-maestra .nombre-cripto {
@@ -809,64 +817,82 @@ button,
     }
     
     .zona-tumba.alma-maestra .balance-actual {
-        font-size: 0.8rem !important;
-        color: #00ffff;
-        margin-top: 3px;
+        font-size: 0.85rem !important;
+        color: #00ffff !important;
+        margin-top: 5px !important;
     }
 
-    /* CANDELABRO (Esquina Superior Derecha) */
+    /* --- CANDELABRO CENTRAL --- */
     .candelabro-central {
-        position: fixed;
-        top: 15px;
-        right: 15px;
-        width: 45px; /* Reducido de 60px a 45px para que no estorbe el texto */
-        opacity: 0.6;
-        z-index: 100;
+        position: fixed !important;
+        top: 15px !important;
+        right: 15px !important;
+        width: 50px !important;
+        opacity: 0.7 !important;
+        z-index: 100 !important;
         transform: none !important;
+        left: auto !important;
+        bottom: auto !important;
     }
 
     #campo-santo {
-        background-attachment: scroll; /* Cambiado a scroll en móvil para evitar bugs visuales de parpadeo */
-        background-position: center top;
+        background-attachment: scroll !important;
+        background-position: center top !important;
     }
 }
 
-/* --- 8.2 MÓVILES HORIZONTALES (EL ARREGLO PARA LA PANTALLA CHAPARRA) --- */
+/* --- 8.2 VISTA HORIZONTAL (Para cuando giran el celular) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Forzamos a que el contenedor use scroll vertical completo */
+    /* Forzar scroll general del sitio web */
+    html, body {
+        overflow-y: auto !important;
+        height: auto !important;
+    }
+
+    /* Cambiar el contenedor a dos columnas para que quepan de lado y den espacio hacia abajo */
     #contenedor-criptos {
         position: relative !important;
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important; /* Ponemos las tumbas en 2 columnas */
+        grid-template-columns: repeat(2, 1fr) !important; /* Dos columnas de tumbas */
         gap: 15px !important;
-        padding: 75px 15px 30px 15px !important;
-        overflow-y: scroll !important; 
+        padding: 80px 20px 40px 20px !important;
+        overflow-y: visible !important; /* El scroll lo maneja la pantalla principal */
         height: auto !important;
-        min-height: 100vh;
+        min-height: 100vh !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    /* Volvemos las tumbas aún más delgadas en horizontal para aprovechar el ancho */
+    /* Mantener las tumbas centradas y adaptables en sus columnas */
     .zona-tumba {
-        max-width: 100% !important;
-        padding: 8px 10px !important;
+        position: relative !important;
+        transform: none !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 280px !important; /* Ligeramente más delgadas en horizontal */
+        display: flex !important;
+        padding: 10px !important;
+        background: rgba(10, 0, 0, 0.95) !important;
+        border: 2px solid var(--color-cripto, #00ffff) !important;
     }
 
-    /* El candelabro y el logo estorban fijos si la pantalla es muy baja, 
-       así que les bajamos la opacidad y los mandamos bien al fondo */
+    /* Soulgeist se queda arriba fijo para que no desaparezca al bajar */
+    .zona-tumba.alma-maestra {
+        position: fixed !important;
+        top: 10px !important;
+        left: 15px !important;
+        z-index: 105 !important;
+        opacity: 0.9 !important;
+    }
+
+    /* El candelabro se vuelve pequeño y se fija a la derecha para no estorbar el flujo */
     .candelabro-central {
-        position: absolute !important;
+        position: fixed !important;
         top: 10px !important;
         right: 15px !important;
         width: 35px !important;
-        opacity: 0.3 !important; /* Casi transparente para que no tape los botones */
-        pointer-events: none;
-    }
-
-    .zona-tumba.alma-maestra {
-        position: absolute !important;
-        top: 10px !important;
-        left: 15px !important;
         opacity: 0.4 !important;
+        z-index: 104 !important;
     }
 }
