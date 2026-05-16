@@ -17,8 +17,9 @@ export default async function handler(req, res) {
     // 3. Extraemos los datos del frontend y capturamos la IP real en Vercel
     const { wallet, cripto } = req.body;
     
-    // Limpiamos la IP por si Vercel manda una cadena con múltiples proxies separados por comas
-    const ipLimpia = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress;
+    // Mejoramos la detección usando primero x-vercel-forwarded-for (nativo de Vercel)
+    const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
+    const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
 
     if (!wallet || wallet.length < 10) {
         return res.status(400).json({ error: 'La dirección de la wallet es inválida para este ritual.' });
@@ -55,7 +56,7 @@ export default async function handler(req, res) {
             });
         }
 
-        // REGLA B: Si la IP ya realizó un reclamo de esta cripto en las últimas 24 horas
+        // REGLA B: Si la IP ya realizó un reclamo (Frase corregida para evitar abusos)
         if (resIp.result !== null) {
             const ttlRes = await fetch(`${redisUrl}/ttl/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
             const horas = Math.floor(ttlRes.result / 3600);
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
 
             return res.status(403).json({ 
                 bloqueado: true,
-                error: `Este dispositivo/red ya canalizó energía para ${cripto} recientemente. Espera ${horas}h y ${minutos}m o cambia de red.` 
+                error: `Este dispositivo o dirección ya canalizó energía para ${cripto} recientemente. El umbral se abrirá de nuevo en ${horas}h y ${minutos}m.` 
             });
         }
 
