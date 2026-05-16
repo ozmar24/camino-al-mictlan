@@ -710,3 +710,158 @@ button,
 @keyframes resplandor-rojo { 0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #8b0000); } 50% { opacity: 0.9; filter: drop-shadow(0 0 12px #ff0000); } }
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
+/* ==========================================================================
+   10. CONTROL RESPONSIVO DE PILARES Y HUD (VERTICAL)
+   ========================================================================== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+
+    /* --- 10.1 MENÚ SUPERIOR Y CANDELABRO --- */
+    .candelabro-central {
+        position: fixed !important;
+        top: 15px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 280px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 99999 !important;
+    }
+
+    /* Resucitamos la imagen del candelabro para que corone los textos */
+    .candelabro-central img,
+    .img-candelabro {
+        display: block !important;
+        visibility: visible !important;
+        width: 35px !important;
+        height: auto !important;
+        margin: 0 auto 5px auto !important;
+    }
+
+    .menu-textos {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        gap: 12px !important;
+        width: 100% !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-textos .opcion {
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 0.8rem !important;
+        color: #ff3333 !important;
+        text-shadow: 0 0 5px #000 !important;
+    }
+
+    .menu-textos .opcion.oraculo {
+        color: #00ffcc !important;
+        text-shadow: 0 0 6px #000, 0 0 8px rgba(0, 255, 204, 0.8) !important;
+    }
+
+    /* --- 10.2 PILARES VERTICALES --- */
+    .texto-ascender, 
+    .texto-mictlan {
+        position: absolute !important;
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 2px !important;
+        width: 20px !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
+        top: 32% !important;
+        z-index: 10 !important;
+    }
+
+    .texto-ascender {
+        left: 5% !important;
+        color: #00ffcc !important;
+    }
+
+    .texto-mictlan {
+        right: 5% !important;
+        left: auto !important;
+        color: #ff3333 !important;
+    }
+}
+
+/* ==========================================================================
+   11. CONTROL RESPONSIVO (HORIZONTAL - EL VERDADERO RETO)
+   ========================================================================== */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+
+    /* --- 11.1 HUD CENTRALIZADO ARRIBA --- */
+    .candelabro-central {
+        position: fixed !important;
+        top: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: auto !important;
+        display: flex !important;
+        flex-direction: row !important; /* Todo en una sola línea horizontal */
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        z-index: 99999 !important;
+        background: rgba(0, 0, 0, 0.6) !important; /* Fondo protector */
+        padding: 4px 15px !important;
+        border-radius: 20px !important;
+    }
+
+    /* Forzamos a la imagen a ponerse a la izquierda de los textos */
+    .candelabro-central img,
+    .img-candelabro {
+        display: block !important;
+        visibility: visible !important;
+        width: 24px !important;
+        height: auto !important;
+        margin: 0 !important;
+    }
+
+    .menu-textos {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 15px !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+
+    .menu-textos .opcion {
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 0.75rem !important;
+        margin: 0 !important;
+    }
+
+    /* --- 11.2 PILARES ACUESTADOS (Anclados al centro de la pantalla) ---
+       Como el fondo en horizontal se estira, calcular desde los lados (left/right) falla.
+       Usamos 'calc(50% +/- X píxeles)' para amarrarlos al ancho de la reja central. */
+    .texto-ascender, 
+    .texto-mictlan {
+        position: absolute !important;
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 1px !important;
+        width: 15px !important;
+        word-wrap: break-word !important;
+        line-height: 1.1 !important;
+        top: 36% !important; /* Bajamos el inicio para que no choquen con las ramas */
+        z-index: 100 !important;
+    }
+
+    .texto-ascender {
+        left: calc(50% - 70px) !important; /* Lo clava en el pilar izquierdo de la reja central */
+        color: #00ffcc !important;
+        text-shadow: 0 0 4px #000, 0 0 6px rgba(0, 255, 204, 0.8) !important;
+    }
+
+    .texto-mictlan {
+        left: calc(50% + 55px) !important;  /* Lo clava en el pilar derecho de la reja central */
+        right: auto !important;
+        color: #ff3333 !important;
+        text-shadow: 0 0 4px #000, 0 0 6px rgba(255, 51, 51, 0.8) !important;
+    }
+}
