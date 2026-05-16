@@ -710,3 +710,170 @@ button,
 @keyframes resplandor-rojo { 0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #8b0000); } 50% { opacity: 0.9; filter: drop-shadow(0 0 12px #ff0000); } }
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
+/* ==========================================================================
+   8. SISTEMA DE RESPONSIVIDAD PARA MÓVILES (PRECISIÓN QUIRÚRGICA)
+   ========================================================================== */
+
+/* --- 8.1 VISTA MÓVIL VERTICAL (Teléfono normal) --- */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+
+    /* Reubicamos el candelabro fijo arriba al centro como un menú elegante */
+    .candelabro-central {
+        position: fixed !important;
+        top: 15px !important;
+        bottom: auto !important; /* Desactivamos el bottom de PC */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 270px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        background: transparent !important;
+        z-index: 99999 !important;
+        opacity: 1 !important;
+    }
+
+    .img-candelabro {
+        width: 35px !important; /* Escala perfecta de icono */
+        height: auto !important;
+        margin: 0 auto 5px auto !important;
+    }
+
+    .menu-textos {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 15px !important;
+    }
+
+    .opcion {
+        font-size: 10px !important;
+        transform: none !important; /* Quitamos las rotaciones desfasadas de PC */
+    }
+    .leyes, .oraculo, .alianzas { transform: none !important; }
+    .leyes:hover, .oraculo:hover, .alianzas:hover { transform: scale(1.1) !important; }
+
+    /* REDISEÑO DE PILARES EN VERTICAL (Clavados simétricamente a los bordes) */
+    .inscripcion-pilar {
+        position: absolute !important;
+        top: 36% !important; /* Altura ideal en la piedra lisa */
+        font-size: 0.8rem !important;
+        letter-spacing: 3px !important;
+        z-index: 999 !important;
+    }
+    .inscripcion-pilar span { font-size: 0.75rem !important; opacity: 1 !important; }
+    .inscripcion-pilar small { display: none !important; } /* Ocultamos el texto chico para no saturar */
+
+    .pilar-izquierdo {
+        left: 5% !important; /* Empuja "ASCENDER" directo al pilar de piedra izquierdo */
+    }
+
+    .pilar-derecho {
+        left: auto !important;
+        right: 5% !important; /* Empuja "MICTLAN" directo al pilar de piedra derecho */
+    }
+
+    /* ACOMODO DE CRIPTAS EN VERTICAL (Para que no se encimen) */
+    #contenedor-criptos {
+        padding-top: 100px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 10px !important;
+        overflow-y: auto !important;
+    }
+    
+    .zona-tumba {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin-bottom: 25px !important;
+    }
+}
+
+/* --- 8.2 VISTA MÓVIL HORIZONTAL (Teléfono acostado) --- */
+@media screen and (max-height: 550px) and (orientation: landscape) {
+
+    /* El menú superior se vuelve una barra plana horizontal para no pisar las tumbas */
+    .candelabro-central {
+        position: fixed !important;
+        top: 8px !important;
+        bottom: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: auto !important;
+        display: flex !important;
+        flex-direction: row !important; /* Candelabro e iconos en una sola fila */
+        align-items: center !important;
+        gap: 12px !important;
+        background: rgba(0, 0, 0, 0.6) !important; /* Fondo sutil protector */
+        padding: 4px 15px !important;
+        border-radius: 20px !important;
+        z-index: 99999 !important;
+        opacity: 1 !important;
+    }
+
+    .img-candelabro {
+        width: 22px !important; /* Miniatura compacta */
+        height: auto !important;
+        margin: 0 !important;
+    }
+
+    .menu-textos {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 12px !important;
+    }
+
+    .opcion {
+        font-size: 9px !important;
+        transform: none !important;
+    }
+    .leyes, .oraculo, .alianzas { transform: none !important; }
+    .leyes:hover, .oraculo:hover, .alianzas:hover { transform: scale(1.1) !important; }
+
+    /* CLAVADO MATEMÁTICO DE PILARES EN HORIZONTAL 
+       Como el fondo se encoge al centro, los anclamos midiendo desde el eje central (50%) */
+    .inscripcion-pilar {
+        position: absolute !important;
+        top: 34% !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 2px !important;
+        z-index: 999 !important;
+    }
+    .inscripcion-pilar span { font-size: 0.7rem !important; opacity: 1 !important; }
+    .inscripcion-pilar small { display: none !important; }
+
+    .pilar-izquierdo {
+        left: calc(50% - 66px) !important; /* Centrado milimétrico en la piedra izquierda */
+    }
+
+    .pilar-derecho {
+        left: calc(50% + 52px) !important; /* Centrado milimétrico en la piedra derecha */
+    }
+
+    /* REJILLA DE TUMBAS ADAPTADA EN RECUADRO INFERIOR */
+    #contenedor-criptos {
+        display: grid !important;
+        grid-template-columns: repeat(2, 160px) !important; /* Doble columna compacta */
+        justify-content: center !important;
+        gap: 8px !important;
+        padding-top: 55px !important;
+    }
+
+    .zona-tumba {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+    }
+}
