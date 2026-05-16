@@ -711,11 +711,11 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. DISPOSITIVOS MÓVILES (RITUAL RESPONSIVE RECONSTRUIDO)
+   8. DISPOSITIVOS MÓVILES (RITUAL RESPONSIVE COMPLETO)
    ========================================================================== */
 
 /* --- 8.1 VISTA VERTICAL (Celulares estándar) --- */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
     
     #contenedor-criptos {
         position: relative !important;
@@ -724,9 +724,8 @@ button,
         align-items: center !important;
         justify-content: flex-start !important;
         gap: 20px !important;
-        /* Bajamos el padding a 100px para dar espacio libre al menú superior */
-        padding: 100px 15px 40px 15px !important;
-        overflow-y: auto !important; /* Forzamos scroll vertical */
+        padding: 120px 15px 40px 15px !important; /* Espacio superior para el HUD */
+        overflow-y: auto !important;
         height: auto !important;
         min-height: 100vh !important;
         width: 100% !important;
@@ -736,13 +735,13 @@ button,
         transform: none !important;
     }
 
-    /* Lista perfecta de tumbas alineadas al centro */
+    /* Lista vertical de tumbas */
     .zona-tumba {
         position: relative !important;
         top: auto !important;
         left: auto !important;
         right: auto !important;
-        transform: none !important; /* Limpia desvases de escritorio */
+        transform: none !important;
         margin: 0 auto !important;
         width: 100% !important;
         max-width: 320px !important;
@@ -758,60 +757,25 @@ button,
         pointer-events: auto !important;
     }
 
-    .zona-tumba:hover .moneda-flotante,
-    .zona-tumba:hover .moneda-sustraer {
-        transform: none !important;
-        animation: none !important;
-    }
-
-    .zona-tumba .moneda-flotante, 
-    .zona-tumba .moneda-sustraer {
-        width: 45px !important;
-        height: 45px !important;
-        opacity: 1 !important;
-        transform: none !important;
-        margin-right: 15px !important;
-        margin-bottom: 0 !important;
-    }
-
-    .info-tumba {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        text-align: left !important;
-    }
-
-   /* --- RESETEO Y POSICIONAMIENTO SUPREMO PARA SOULGEIST --- */
+    /* --- HUD SOULGEIST (FIJO VERTICAL Y HORIZONTAL) --- */
     .zona-tumba.alma-maestra {
-        /* 1. Forzamos el comportamiento fijo */
         position: fixed !important;
-        
-        /* 2. Lo bajamos agresivamente para que libre cualquier notch o barra */
-        top: 35px !important;       
+        top: 25px !important;       /* Bajado del Viewport seguro */
         left: 20px !important;      
         right: auto !important;
         bottom: auto !important;
-
-        /* 3. ¡LA CLAVE! Matamos cualquier traslación o rotación heredada de escritorio */
-        transform: none !important; 
+        transform: none !important; /* Elimina desvíos de PC */
         -webkit-transform: none !important;
-        
-        /* 4. Reseteamos márgenes que lo empujen hacia afuera */
         margin: 0 !important;       
-        
-        /* 5. Le damos cuerpo físico real para que el navegador lo pinte completo */
         width: auto !important;
         max-width: 180px !important;
         height: auto !important;
         padding: 10px 14px !important;
-        
-        /* 6. Estética del contenedor en el HUD móvil */
-        background: rgba(5, 5, 5, 0.85) !important;
+        background: rgba(5, 5, 5, 0.9) !important; /* Fondo opaco para que resalte */
         border: 2px solid #00ffff !important;
         border-radius: 8px !important;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
-        z-index: 99999 !important; /* Por encima de todo el cosmos */
-        
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5) !important;
+        z-index: 99999 !important;   /* Prioridad absoluta */
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
@@ -820,45 +784,34 @@ button,
         pointer-events: auto !important;
     }
 
-    /* Asegurar que el icono no colapse */
     .zona-tumba.alma-maestra .sigilo-soulgeist {
         width: 35px !important;
         height: 35px !important;
         display: block !important;
         position: relative !important;
-        top: auto !important;
-        left: auto !important;
         transform: none !important;
         margin: 0 0 5px 0 !important;
         filter: drop-shadow(0 0 5px #00ffff) !important;
     }
 
-    /* El texto del balance (Poder: 100 SG) */
     .zona-tumba.alma-maestra .balance-actual {
         font-size: 0.85rem !important;
         color: #00ffff !important;
         font-family: 'Metal Mania', sans-serif !important;
         text-shadow: 0 0 5px #000 !important;
         display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
         margin: 0 !important;
-        white-space: nowrap !important; /* Evita que el texto se rompa en dos líneas */
+        white-space: nowrap !important;
     }
 
-    /* Ocultar el nombre redundante de la cripto si existe */
     .zona-tumba.alma-maestra .nombre-cripto {
         display: none !important;
     }
 
-    /* --- EL CANDELABRO (Esquina Superior Derecha) --- */
+    /* Candelabro fijo a la derecha */
     .candelabro-central {
         position: fixed !important;
-        top: 35px !important; /* Lo nivelamos a la misma altura que Soulgeist */
+        top: 25px !important;
         right: 20px !important;
         left: auto !important;
         bottom: auto !important;
@@ -869,25 +822,29 @@ button,
     }
 }
 
-/* --- 8.2 VISTA HORIZONTAL (Ajuste de rejilla y scroll total) --- */
+/* --- 8.2 VISTA HORIZONTAL (Forzar rejilla y arreglar caja colapsada) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Obligamos al HTML a desbloquear el scroll de escritorio */
+    /* Forzar scroll global de la página */
     html, body {
         overflow-y: auto !important;
         height: auto !important;
     }
 
+    /* Rejilla de dos columnas limpia para que las tumbas no se encimen */
     #contenedor-criptos {
         position: relative !important;
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important; /* Rejilla de 2 columnas */
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 15px !important;
-        padding: 95px 20px 40px 20px !important; /* Aumentamos espacio arriba en horizontal */
-        overflow-y: visible !important; /* El scroll lo maneja el body */
+        padding: 110px 20px 40px 20px !important; /* Buen espacio para que no tape a Soulgeist */
+        overflow-y: visible !important;
         height: auto !important;
         min-height: 100vh !important;
         width: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
     }
 
     .zona-tumba {
@@ -895,14 +852,16 @@ button,
         padding: 8px 12px !important;
     }
 
-    /* Soulgeist fijo arriba en horizontal */
+    /* Ajuste de precisión para Soulgeist acostado */
     .zona-tumba.alma-maestra {
         position: fixed !important;
-        top: 15px !important;
+        top: 20px !important; /* Forzar posición fija visible */
         left: 20px !important;
-        z-index: 9999 !important;
-        background: rgba(5, 5, 5, 0.8) !important;
+        transform: none !important;
+        background: rgba(5, 5, 5, 0.95) !important;
+        z-index: 99999 !important;
     }
+
 
     .candelabro-central {
         position: fixed !important;
