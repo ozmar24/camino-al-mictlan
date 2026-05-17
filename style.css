@@ -897,13 +897,13 @@ button,
     display: flex !important;
     background: url('img/grimorio.png') no-repeat center center !important;
     background-size: contain !important;
-    width: 850px !important;
-    height: 500px !important;
-    max-width: 95vw !important;
+    width: 1050px !important;
+    height: 620px !important;
+    max-width: 98vw !important;
     max-height: 95vh !important;
-    padding: 60px 85px 50px 85px !important; /* Espaciado interno para encerrar todo en el pergamino */
+    padding: 80px 110px 70px 110px !important; /* Espaciado interno para encerrar todo en el pergamino */
     box-sizing: border-box !important;
-    filter: drop-shadow(0 0 15px #000) !important;
+    filter: drop-shadow(0 0 20px #000) !important;
 }
 
 /* Forzar a las dos páginas a actuar como columnas independientes y limpias */
@@ -915,7 +915,7 @@ button,
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-evenly !important; /* Distribuye el contenido verticalmente a la perfección */
-    padding: 0 15px !important;
+    padding: 0 25px !important;
     box-sizing: border-box !important;
     position: relative !important;
 }
@@ -1034,62 +1034,24 @@ button,
     font-size: 0.75em !important;
     padding: 5px 10px !important;
 }
-/* ==================================================================
-   EXORCISMO DEFINITIVO: DESTRUCCIÓN DE COORDENADAS VIEJAS
-   ================================================================== */
-
-/* Forzar que los títulos se queden quietos en su columna y no floten */
 #auth-tagline, 
 #right-title {
     position: relative !important;
     top: auto !important;
     left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
     transform: none !important;
-    margin: 0 0 10px 0 !important;
-    padding: 0 !important;
-    display: block !important;
+    margin: 0 0 15px 0 !important;
+    font-size: 1.3rem !important; /* Ahora que hay espacio, el título puede lucir imponente */
+    color: #8B0000 !important;
     text-align: center !important;
     width: 100% !important;
-    white-space: nowrap !important; /* Evita que se rompa en dos renglones */
-}
-
-/* Forzar tamaños de letra pequeños para que quepan en el pergamino */
-#auth-tagline {
-    font-family: 'Butcherman' !important;
-    font-size: 1.1rem !important;
-    color: #8B0000 !important;
 }
 
 #right-title {
-    font-family: 'MedievalSharp' !important;
-    font-size: 1.1rem !important;
     color: #4a0000 !important;
+    font-family: 'MedievalSharp' !important;
 }
 
-/* Forzar que los textos descriptivos no se salgan del papel */
-#left-desc,
-#right-desc {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    margin: 0 0 15px 0 !important;
-    font-size: 0.72em !important;
-    line-height: 1.2 !important;
-    max-width: 85% !important;
-    display: block !important;
-}
-
-/* Controlar los contenedores de los botones de abajo para que no floten libres */
-#new-user-helper,
-.cambio-modo-contenedor {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    margin-top: auto !important; /* Los empuja al fondo de la hoja limpia */
-    width: 90% !important;
-    text-align: center !important;
+#auth-tagline {
+    font-family: 'Butcherman' !important;
 }
