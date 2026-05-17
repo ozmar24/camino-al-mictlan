@@ -907,37 +907,40 @@ button,
     filter: drop-shadow(0 0 20px #000) !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA: Registro tradicional clavado en su papel */
+/* ➡️ PÁGINA IZQUIERDA: Ajustada en porcentajes para que escale con el libro */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
-    top: 100px !important;      /* Baja los textos limpiamente del marco de cuero */
-    left: 115px !important;     /* Posición horizontal exacta en la hoja izquierda */
-    width: 350px !important;    /* El ancho de la zona clara del papel viejo */
-    height: 400px !important;   /* Encajona el contenido verticalmente */
+    top: 17% !important;        /* Baja proporcionalmente del lomo superior */
+    left: 11.5% !important;     /* Se clava exactamente en el tercio central de la hoja izquierda */
+    width: 33% !important;      /* El ancho exacto que mide el pergamino claro izquierdo */
+    height: 64% !important;     /* Altura interna útil para que nada toque el cuero inferior */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
     box-sizing: border-box !important;
     z-index: 20 !important;
+    /* padding-right opcional para no pegarse al doblez del centro del libro */
+    padding-right: 15px !important; 
 }
 
-/* ⬅️ PÁGINA DERECHA: Vinculación de Google clavada en su papel */
+/* ⬅️ PÁGINA DERECHA: Ajustada en porcentajes en perfecta simetría */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
-    top: 100px !important;      /* Misma altura simétrica */
-    right: 115px !important;    /* Posición horizontal exacta en la hoja derecha */
-    width: 350px !important;    /* Mismo ancho del pergamino claro */
-    height: 400px !important;
+    top: 17% !important;        /* Misma altura proporcional */
+    right: 11.5% !important;    /* Se clava exactamente en el tercio central de la hoja derecha */
+    width: 33% !important;      /* Mismo ancho proporcional útil */
+    height: 64% !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
     box-sizing: border-box !important;
     z-index: 20 !important;
+    /* padding-left opcional para alejarse del doblez central */
+    padding-left: 15px !important;
 }
 
-/* 📌 RESETEO COMPLETO DE TÍTULOS Y DESCRIPCIONES */
 #auth-tagline,
 #right-title {
     position: relative !important;
@@ -946,7 +949,7 @@ button,
     width: 100% !important;
     text-align: center !important;
     white-space: nowrap !important;
-    font-size: 1.15rem !important;
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem) !important; /* Escala dinámicamente */
 }
 #auth-tagline { font-family: 'Butcherman' !important; color: #8B0000 !important; }
 #right-title { font-family: 'MedievalSharp' !important; color: #4a0000 !important; }
