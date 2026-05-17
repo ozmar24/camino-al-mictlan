@@ -889,10 +889,10 @@ button,
     100% { transform: rotate(0deg); }
 }
 /* ==================================================================
-   REESTRUCTURACIÓN DEL GRIMORIO DEL MICTLÁN (SANEADO DE CSS)
+   REESTRUCTURACIÓN DE FUENTES Y ALINEACIÓN DE ELEMENTOS
    ================================================================== */
 
-/* Contenedor principal del libro: Grande y espacioso */
+/* Contenedor principal del libro: Mantiene el tamaño perfecto */
 .grimorio-container {
     display: flex !important;
     background: url('img/grimorio.png') no-repeat center center !important;
@@ -901,13 +901,12 @@ button,
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    /* Incrementamos el padding para empujar el texto más hacia el centro claro */
-    padding: 95px 125px 85px 125px !important; 
+    padding: 110px 135px 105px 135px !important; /* Ajuste milimétrico para bajar el contenido y alejarlo de los bordes oscuros */
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
 }
 
-/* Forzar a las dos páginas a actuar como columnas independientes y limpias */
+/* Columnas independientes para cada página */
 .grimorio-container .pagina-izquierda,
 .grimorio-container .pagina-derecha {
     flex: 1 !important;
@@ -915,22 +914,18 @@ button,
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important; /* Distribuye el contenido verticalmente sin amontonar */
-    padding: 0 30px !important; /* Más aire a los lados para no pisar bordes oscuros */
+    justify-content: space-between !important; /* Distribuye arriba, al centro y abajo de forma orgánica */
+    padding: 10px 25px !important; 
     box-sizing: border-box !important;
     position: relative !important;
 }
 
-/* Línea divisoria central del libro */
+/* Línea divisoria central sutil */
 .grimorio-container .pagina-izquierda {
-    border-right: 1px dashed rgba(74, 0, 0, 0.2) !important;
+    border-right: 1px dashed rgba(74, 0, 0, 0.15) !important;
 }
 
-/* DESTRUCCIÓN TOTAL DE ABSOLUTES Y REDUCCIÓN COMPACTA DE FUENTES */
-.grimorio-container h2#auth-tagline,
-.grimorio-container h2#right-title,
-.grimorio-container p#left-desc,
-.grimorio-container p#right-desc,
+/* 📌 CONTROL INDIVIDUAL DE TÍTULOS PRINCIPALES */
 #auth-tagline,
 #right-title {
     position: relative !important;
@@ -941,54 +936,41 @@ button,
     padding: 0 !important;
     width: 100% !important;
     text-align: center !important;
-    white-space: nowrap !important; /* Asegura que quepan en un solo renglón */
+    white-space: nowrap !important; /* Solo los h2 se quedan estrictamente en una línea */
+    font-size: 1.15rem !important;  /* Tamaño compacto y controlado */
 }
+#auth-tagline { font-family: 'Butcherman' !important; color: #8B0000 !important; }
+#right-title { font-family: 'MedievalSharp' !important; color: #4a0000 !important; }
 
-/* Fuentes calibradas pequeñas para que no se descontrolen */
-#auth-tagline {
-    font-family: 'Butcherman' !important;
-    color: #8B0000 !important;
-    font-size: 1.15rem !important; /* Compacto y elegante */
-}
-
-#right-title {
-    font-family: 'MedievalSharp' !important;
-    color: #4a0000 !important;
-    font-size: 1.15rem !important;
-}
-
-/* Textos secundarios ajustados para que no pisen las orillas */
-.grimorio-container p#left-desc, 
-#left-desc {
-    font-family: 'MedievalSharp' !important;
-    font-size: 0.72em !important;
-    color: #2a1b0a !important;
+/* 📌 CONTROL INDIVIDUAL DE TEXTOS DESCRIPTIVOS (Sueltan el nowrap) */
+#left-desc,
+#right-desc,
+.grimorio-container p#left-desc,
+.grimorio-container p#right-desc {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: block !important;
+    white-space: normal !important; /* Permite saltos de línea limpios */
+    text-align: center !important;
+    max-width: 85% !important;
+    margin: 0 auto !important;
     line-height: 1.2 !important;
-    white-space: normal !important;
-    max-width: 90% !important;
-    margin: 0 auto 10px auto !important;
 }
+#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72em !important; color: #2a1b0a !important; }
+#right-desc { font-family: 'Butcherman' !important; font-size: 0.62em !important; color: #555 !important; }
 
-.grimorio-container p#right-desc, 
-#right-desc {
-    font-family: 'Butcherman' !important;
-    font-size: 0.65em !important;
-    color: #555 !important;
-    line-height: 1.2 !important;
-    white-space: normal !important;
-    max-width: 90% !important;
-    margin: 0 auto 10px auto !important;
-}
-
-/* Contenedor del formulario tradicional (Más estrecho para no tocar el fondo) */
+/* 📌 CONTENEDOR DEL FORMULARIO TRADICIONAL */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
-    width: 75% !important; /* Al 75% se queda centradito en la hoja */
+    gap: 6px !important;
+    width: 80% !important;
+    margin: auto 0 !important; /* Lo centra perfectamente en el espacio medio de la página izquierda */
 }
 
-/* Inputs estilizados, limpios y contenidos */
+/* Inputs estilizados */
 .grimorio-container .input-pergamino-goth {
     font-size: 0.72em !important;
     padding: 6px !important;
@@ -1005,44 +987,48 @@ button,
     width: 100% !important;
 }
 
-/* Contenedor controlado para el botón de Google */
+/* 📌 SECCIÓN DE VINCULACIÓN CON GOOGLE (DERECHA) */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
-    min-height: 38px !important;
-    width: 80% !important; /* Evita que se estire a los extremos */
-    margin: 5px 0 !important;
+    align-items: center !important;
+    min-height: 40px !important;
+    width: 80% !important;
+    margin: auto 0 !important; /* Balancea el botón al centro vertical exacto */
 }
 
-/* Separador Arcano sutil */
+/* Separador Arcano */
 .grimorio-container .divisor-arcano {
     border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
     width: 55% !important;
-    margin: 5px 0 !important;
+    margin: 10px 0 !important;
 }
 
-/* Textos de ayuda y botones del pie de página */
+/* 📌 TEXTOS Y BOTONES DE RELEVOS (PIE DE PÁGINA) */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper,
 #new-user-helper {
-    font-family: 'MedievalSharp' !important;
-    font-size: 0.7rem !important;
-    color: #2a1b0a !important;
-    max-width: 90% !important;
     position: relative !important;
     top: auto !important;
-    margin-top: 5px !important;
+    left: auto !important;
+    transform: none !important;
+    font-family: 'MedievalSharp' !important;
+    font-size: 0.68rem !important;
+    color: #2a1b0a !important;
+    max-width: 85% !important;
+    text-align: center !important;
+    margin-top: auto !important; /* Clava el pie de página hasta abajo del papel pergamino */
+    padding-top: 5px !important;
 }
 
 .grimorio-container #toggle-auth-text {
     cursor: pointer !important;
     color: #8B0000 !important;
     text-decoration: underline !important;
-    line-height: 1.2 !important;
 }
 
 .grimorio-container .btn-ritual-secundario {
-    margin-top: 5px !important;
+    margin-top: 4px !important;
     font-size: 0.72em !important;
     padding: 4px 10px !important;
 }
