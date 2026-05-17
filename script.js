@@ -9,8 +9,9 @@ let esModoRegistro = false; // Alterna el formulario tradicional de la página i
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
 const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com";
 
+
 // ==================================================================
-// FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO
+// FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO (CORREGIDO)
 // ==================================================================
 function entrarAlMictlan() {
     const portal = document.getElementById('escena-portal');
@@ -25,9 +26,16 @@ function entrarAlMictlan() {
     setTimeout(() => {
         portal.style.display = 'none';
         
-        // Desplegamos el Grimorio usando Flexbox para que centre sus dos páginas
+        // El contenedor externo (la capa oscura) sí se vuelve flex para centrar el libro en tu pantalla
         modalContrato.style.display = 'flex';
         modalContrato.style.opacity = '1';
+        
+        // 📌 CORRECCIÓN ULTRA-CRUCIAL: Forzamos al libro interno a ser 'block' 
+        // para que no herede el comportamiento flex y respete sus coordenadas en píxeles.
+        const libroInterno = modalContrato.querySelector('.grimorio-container');
+        if (libroInterno) {
+            libroInterno.style.setProperty('display', 'block', 'important');
+        }
         
         // Invocamos el botón de Google justo ahora que el contenedor es visible en el DOM
         inicializarBotonGoogle();
@@ -72,9 +80,7 @@ function cambiarModoAuth() {
     }
 }
 
-// ==================================================================
-// FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
-// ==================================================================
+
 // ==================================================================
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================

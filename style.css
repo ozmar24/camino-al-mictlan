@@ -889,63 +889,60 @@ button,
     100% { transform: rotate(0deg); }
 }
 /* ==================================================================
-   POSICIONAMIENTO ABSOLUTO QUIRÚRGICO (SISTEMA ANTI-DESFASE)
+   COORDENADAS MILIMÉTRICAS ABSOLUTAS (ANTI-DESFASE)
    ================================================================== */
 
-/* Contenedor del Grimorio: Mantiene su tamaño base ideal */
+/* Contenedor principal del libro */
 .grimorio-container {
-    background: url('img/grimorio1.png') no-repeat center center !important;
+    background: url('img/grimorio.png') no-repeat center center !important;
     background-size: 100% 100% !important;
     width: 1050px !important;
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    position: relative !important; /* Eje central de las coordenadas */
-    padding: 0 !important;          /* Eliminamos paddings que muevan las cosas */
+    position: relative !important; /* Base sagrada de coordenadas para las hojas */
+    display: block !important;     /* ¡Estrictamente bloque! */
+    padding: 0 !important;
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
 }
 
-/* ➡️ CUADRANTE IZQUIERDO (Registro de Almas) 
-   Centrado milimétricamente en la hoja izquierda del pergamino */
+/* ➡️ PÁGINA IZQUIERDA: Registro tradicional clavado en su papel */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
-    top: 110px !important;     /* Margen seguro desde el lomo de cuero superior */
-    left: 110px !important;    /* Distancia exacta desde el borde izquierdo del libro */
-    width: 360px !important;   /* El ancho justo de la zona clara del papel */
-    height: 380px !important;  /* Altura perfecta para que el pie de página no se salga */
+    top: 100px !important;      /* Baja los textos limpiamente del marco de cuero */
+    left: 115px !important;     /* Posición horizontal exacta en la hoja izquierda */
+    width: 350px !important;    /* El ancho de la zona clara del papel viejo */
+    height: 400px !important;   /* Encajona el contenido verticalmente */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
     box-sizing: border-box !important;
-    z-index: 10 !important;
+    z-index: 20 !important;
 }
 
-/* ⬅️ CUADRANTE DERECHO (Vinculación Rápida)
-   Centrado milimétricamente en la hoja derecha del pergamino */
+/* ⬅️ PÁGINA DERECHA: Vinculación de Google clavada en su papel */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
-    top: 110px !important;     /* Misma altura para perfecta simetría */
-    right: 110px !important;   /* Distancia exacta desde el borde derecho del libro */
-    width: 360px !important;   /* Mismo ancho de zona clara */
-    height: 380px !important;
+    top: 100px !important;      /* Misma altura simétrica */
+    right: 115px !important;    /* Posición horizontal exacta en la hoja derecha */
+    width: 350px !important;    /* Mismo ancho del pergamino claro */
+    height: 400px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
     box-sizing: border-box !important;
-    z-index: 10 !important;
+    z-index: 20 !important;
 }
 
-/* 📌 LIMPIEZA TOTAL DE REGLAS DE TEXTO VIEJAS */
+/* 📌 RESETEO COMPLETO DE TÍTULOS Y DESCRIPCIONES */
 #auth-tagline,
 #right-title {
     position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
     margin: 0 0 5px 0 !important;
+    padding: 0 !important;
     width: 100% !important;
     text-align: center !important;
     white-space: nowrap !important;
@@ -960,16 +957,16 @@ button,
 .grimorio-container p#right-desc {
     position: relative !important;
     display: block !important;
-    white-space: normal !important;
+    white-space: normal !important; /* Rompe el nowrap infinito */
     text-align: center !important;
-    max-width: 95% !important;
+    max-width: 90% !important;
     margin: 0 auto !important;
     line-height: 1.2 !important;
 }
-#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72em !important; color: #2a1b0a !important; }
-#right-desc { font-family: 'Butcherman' !important; font-size: 0.65em !important; color: #555 !important; }
+#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72rem !important; color: #2a1b0a !important; }
+#right-desc { font-family: 'Butcherman' !important; font-size: 0.65rem !important; color: #555 !important; }
 
-/* 📌 CAJA DEL FORMULARIO TRADICIONAL */
+/* 📌 DISEÑO DEL FORMULARIO TRADICIONAL */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
@@ -979,7 +976,7 @@ button,
 }
 
 .grimorio-container .input-pergamino-goth {
-    font-size: 0.72em !important;
+    font-size: 0.75rem !important;
     padding: 6px !important;
     text-align: center !important;
     width: 100% !important;
@@ -987,28 +984,28 @@ button,
 }
 
 .grimorio-container .btn-ritual-grimorio {
-    font-size: 0.72em !important;
+    font-size: 0.75rem !important;
     padding: 7px !important;
     width: 100% !important;
 }
 
-/* 📌 CAJA DEL BOTÓN NATIVO DE GOOGLE */
+/* 📌 DISEÑO DEL BOTÓN DE GOOGLE DERECHO */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 40px !important;
+    min-height: 45px !important;
     width: 85% !important;
     margin: auto 0 !important;
 }
 
 .grimorio-container .divisor-arcano {
-    border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
+    border-top: 1px solid rgba(139, 0, 0, 0.2) !important;
     width: 60% !important;
-    margin: 8px 0 !important;
+    margin: 10px 0 !important;
 }
 
-/* 📌 COMPACTACIÓN DE PIES DE PÁGINA INTERNOS */
+/* 📌 PIES DE PÁGINA (SUBIDOS AL PERGAMINO) */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper,
 #new-user-helper {
@@ -1019,6 +1016,7 @@ button,
     max-width: 95% !important;
     text-align: center !important;
     margin-top: auto !important;
+    padding-bottom: 5px !important;
 }
 
 #toggle-auth-text {
@@ -1029,6 +1027,6 @@ button,
 
 .grimorio-container .btn-ritual-secundario {
     margin-top: 4px !important;
-    font-size: 0.72em !important;
+    font-size: 0.72rem !important;
     padding: 4px 10px !important;
 }
