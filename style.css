@@ -17,7 +17,7 @@ html, body, #campo-santo {
     color: #fff;
     min-height: 100vh;
     overflow-x: hidden;
-    font-family: 'Metal Mania', cursive;
+    font-family: 'Nosifer', cursive;
     cursor: url('./img/daga.png') 5 28, auto !important;
 }
 
@@ -67,7 +67,7 @@ button,
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #111 url('img/Sin rejas.png') no-repeat center center;
+    background: #111 url('img/entrada.png') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -79,7 +79,7 @@ button,
 }
 
 .titulo-mictlan {
-    font-family: 'Metal Mania', cursive; 
+    font-family: 'Nosifer', cursive; 
     font-size: 5rem;
     color: #00ffff;
     text-align: center;
