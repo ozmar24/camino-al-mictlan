@@ -894,7 +894,7 @@ button,
 
 /* Forzamos el contenedor del grimorio a ser un bloque rígido y estable */
 .grimorio-container {
-    background: url('img/grimorio1.png') no-repeat center center !important;
+    background: url('img/grimorio.png') no-repeat center center !important;
     background-size: 100% 100% !important;
     width: 1050px !important;
     height: 620px !important;
@@ -905,6 +905,16 @@ button,
     padding: 0 !important;
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
+}
+/* Base para el cursor del pentáculo en todos los botones e interactivos del grimorio */
+.grimorio-container button, 
+.grimorio-container .input-pergamino-goth,
+.grimorio-container #google-btn-container iframe, /* Asegura el cursor dentro del iframe de Google */
+.grimorio-container .btn-ritual-grimorio,
+.grimorio-container .btn-ritual-secundario,
+.grimorio-container #toggle-auth-text,
+.pentaculo-cursor {
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
 /* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
@@ -968,14 +978,15 @@ button,
     margin-top: 5px !important;
 }
 
-/* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    width: 100% !important;
     min-height: 45px !important;
-    margin: 10px 0 0 0 !important;
+    width: 90% !important;
+    margin-top: 30px !important;
+    margin-bottom: 15px !important;
+    /* Se hereda el cursor pentáculo de la regla global superior */
 }
 
 /* El divisor sutil del lado derecho */
@@ -1011,7 +1022,8 @@ button,
 
 /* Corrección de enlaces de intercambio */
 #toggle-auth-text {
-    cursor: pointer !important;
+    
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
     color: #7a1c1c !important;
     text-decoration: underline !important;
     font-weight: bold !important;
