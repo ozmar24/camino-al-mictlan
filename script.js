@@ -465,3 +465,45 @@ function cerrarAlertaMictlan() {
     const modal = document.getElementById('alerta-mictlan');
     if (modal) modal.style.display = 'none';
 }
+async function videoCompletado() {
+    // Si el usuario no ha ingresado una wallet aún, detenemos el ritual
+    if (!window.userWallet) {
+        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
+        });
+
+        const resultado = await respuesta.json();
+
+        // Si Redis detecta que no ha pasado el tiempo reglamentario (Cooldown activo)
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+            return;
+        }
+
+        // 1. Sincronizamos la variable global con el balance real del servidor
+        balanceUsuarioSG = resultado.nuevoBalance;
+        
+        // 2. Actualizamos el marcador visual de la tumba maestra de Soulgeist
+        const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
+        if (selectorBalance) {
+            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+        }
+        
+        // 3. Volvemos a renderizar el cementerio para que los balances de las criptas
+        // reflejen el aumento proporcional de ganancias en tiempo real (+0.0012 LTC, etc.)
+        generarCementerio();
+        
+        lanzarAlertaMictlan(resultado.mensaje, "ENERGÍA ABSORBIDA");
+
+    } catch (error) {
+        console.error("Error en la transmisión de almas:", error);
+        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
+    }
+}
