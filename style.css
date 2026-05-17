@@ -711,10 +711,10 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL CONSCIENTE
+   8. AJUSTE DE PRECISIÓN QUIRÚRGICA PARA MÓVILES (REVISADO)
    ========================================================================== */
 
-/* Bloqueo inicial estricto para que no se filtre en el portal de bienvenida */
+/* Bloqueo inicial para el portal */
 .candelabro-central {
     display: none;
     opacity: 0;
@@ -724,69 +724,81 @@ button,
     opacity: 1 !important;
 }
 
-/* --- 8.1 CORRECCIÓN OPTIMIZADA PARA HORIZONTAL (LANDSCAPE / MÓVIL ACOSTADO) --- */
+/* --- 8.1 CORRECCIÓN PARA HORIZONTAL (LANDSCAPE / PANTALLAS BAJAS) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Ocultamos el aviso de rotación forzada al estar acostado */
-    #aviso-rotar {
-        display: none !important;
-    }
-
     #contenedor-criptos {
         width: 100vw !important;
         height: 100vh !important;
         position: relative !important;
     }
 
-    /* --- CENTRADO MILIMÉTRICO Y COMPACTACIÓN DE PILARES (EVITA ROZAR CON DOGE) --- */
-    .pilar-izquierdo, 
-    .pilar-derecho {
-        position: absolute !important;
-        top: 38% !important; /* Altura perfecta en el pasillo */
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        font-size: 9px !important; /* Reducido para dar aire a Dogecoin y las criptas */
-        line-height: 1.2 !important;
-        z-index: 995 !important;
-    }
-    
-    /* Empuje de precisión exacta hacia la derecha sobre las columnas de piedra */
-    .pilar-izquierdo { 
-        left: 45.4% !important; 
-    }
-    .pilar-derecho { 
-        left: 56.4% !important; 
-    }
-
-    /* --- MINIMIZACIÓN ESTRICTA DEL CANDELABRO (MICRO ICONO DISCRETO) --- */
+    /* --- RESET DE ANCHOS PARA EL CANDELABRO (EVITA QUE TAPE LAS CRIPTOS) --- */
     .candelabro-central.candelabro-visible {
         position: absolute !important;
-        bottom: 2px !important; /* Anclado abajo para limpiar el espacio aéreo del juego */
+        bottom: 2px !important; 
         top: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 32px !important; /* Reducción máxima y estética para no tapar nada */
+        width: 35px !important; /* Ahora sí encoge de verdad */
+        height: auto !important;
         z-index: 1000 !important;
     }
-    
+
     .img-candelabro { 
         width: 100% !important; 
         height: auto !important; 
     }
+
+    /* Matamos el width de 200% de PC que causaba el desborde sobre las tumbas */
+    .menu-textos {
+        position: absolute !important;
+        top: -15px !important; /* Sube las opciones para alejarlas de las criptos */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 260px !important; /* Ancho fijo y controlado para móvil */
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    .opcion {
+        font-size: 9px !important; /* Letras más pequeñas para que no estorben */
+        transform: none !important; /* Quitamos rotaciones que estiran el layout */
+    }
+
+    /* --- CORRECCIÓN DE PILARES: EMPUJE A LA DERECHA Y TEXTO PEQUEÑO --- */
+    .pilar-izquierdo, 
+    .pilar-derecho {
+        position: absolute !important;
+        top: 38% !important; 
+        display: flex !important;
+        flex-direction: column !important; /* Fuerza la fila india estricta hacia abajo */
+        align-items: center !important;
+        font-size: 8px !important; /* Texto micro para que no roce a Dogecoin */
+        line-height: 1.1 !important; /* Letras bien compactas */
+        z-index: 995 !important;
+    }
+    
+    /* Coordenadas movidas más a la derecha para clavarse en la piedra */
+    .pilar-izquierdo { 
+        left: 45.8% !important; 
+    }
+    .pilar-derecho { 
+        left: 56.8% !important; 
+    }
 }
 
-/* --- 8.2 BLOQUEO TOTAL Y AVISO DE ROTACIÓN EN VERTICAL (PORTRAIT) --- */
+/* --- 8.2 CORTINA DE BLOQUEO EN VERTICAL (OBLIGA A GIRAR EL CELULAR) --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
-    /* Escondemos los elementos del juego para evitar el desorden visual amontonado */
+    /* Escondemos el desorden del cementerio en vertical */
     #contenedor-criptos, 
     #campo-santo, 
     .candelabro-central {
         display: none !important;
     }
 
-    /* Desplegamos la interfaz mística que exige girar el smartphone */
+    /* Desplegamos el aviso a pantalla completa */
     #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
@@ -797,58 +809,40 @@ button,
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        background: #050505 !important; /* Fondo lúgubre base */
-        z-index: 999999 !important; /* Por encima de absolutamente todo */
+        background: #000000 !important;
+        z-index: 999999 !important;
         color: #8b0000 !important;
         text-align: center !important;
-        padding: 25px !important;
+        padding: 30px !important;
         box-sizing: border-box !important;
     }
 
     #aviso-rotar h2 {
         font-family: 'Nosifer', sans-serif !important;
-        font-size: 15px !important;
+        font-size: 14px !important;
         text-shadow: 0 0 8px #ff0000 !important;
         margin-bottom: 15px !important;
-        letter-spacing: 1px !important;
     }
 
     #aviso-rotar p {
-        font-family: 'Butcherman', 'Metal Mania', sans-serif !important;
+        font-family: 'Metal Mania', sans-serif !important;
         font-size: 13px !important;
-        color: #bbb !important;
-        line-height: 1.4 !important;
+        color: #fff !important;
+        letter-spacing: 1px !important;
     }
 
-    /* Pequeño marco animado que simula el giro del dispositivo */
     .icono-giro {
-        width: 40px;
-        height: 65px;
+        width: 35px;
+        height: 55px;
         margin-top: 25px;
         border: 2px solid #8b0000;
-        border-radius: 6px;
-        position: relative;
-        animation: rotarDispositivo 2.5s infinite ease-in-out;
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-    }
-    
-    /* Botón simulado del home en el icono */
-    .icono-giro::after {
-        content: '';
-        position: absolute;
-        bottom: 4px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 6px;
-        height: 6px;
-        border: 1px solid #8b0000;
-        border-radius: 50%;
+        border-radius: 5px;
+        animation: rotarMictlan 2s infinite ease-in-out;
     }
 }
 
-/* Animación de rotación continua para la guía de interfaz */
-@keyframes rotarDispositivo {
+@keyframes rotarMictlan {
     0% { transform: rotate(0deg); }
-    45%, 55% { transform: rotate(-90deg); }
+    50% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
 }
