@@ -911,9 +911,9 @@ button,
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
     top: 18% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
-    left: 11% !important;       /* Margen exacto desde el borde izquierdo del libro */
-    width: 34% !important;      /* Ancho perfecto limitando con el centro del libro */
-    height: 62% !important;     /* Altura máxima para no pisar el fondo */
+    left: 25% !important;       /* Margen exacto desde el borde izquierdo del libro */
+    width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
+    height: 70% !important;     /* Altura máxima para no pisar el fondo */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -927,10 +927,10 @@ button,
 /* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
-    top: 18% !important;        
-    right: 11% !important;      /* Margen exacto desde el borde derecho del libro */
-    width: 34% !important;      
-    height: 62% !important;     
+    top: 15% !important;        
+    right: 25% !important;      /* Margen exacto desde el borde derecho del libro */
+    width: 25% !important;      
+    height: 70% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
