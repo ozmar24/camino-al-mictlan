@@ -711,10 +711,10 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN QUIRÚRGICA PARA MÓVILES (REVISADO)
+   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (EXTINCIÓN CANDELABRO)
    ========================================================================== */
 
-/* Bloqueo inicial para el portal */
+/* Bloqueo base por defecto para el portal */
 .candelabro-central {
     display: none;
     opacity: 0;
@@ -724,81 +724,91 @@ button,
     opacity: 1 !important;
 }
 
-/* --- 8.1 CORRECCIÓN PARA HORIZONTAL (LANDSCAPE / PANTALLAS BAJAS) --- */
+/* --- 8.1 OPTIMIZACIÓN ABSOLUTA EN VISTA HORIZONTAL (LANDSCAPE) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
+    /* Ocultamos el aviso de rotación forzada */
+    #aviso-rotar {
+        display: none !important;
+    }
+
     #contenedor-criptos {
         width: 100vw !important;
         height: 100vh !important;
         position: relative !important;
     }
 
-    /* --- RESET DE ANCHOS PARA EL CANDELABRO (EVITA QUE TAPE LAS CRIPTOS) --- */
-    .candelabro-central.candelabro-visible {
-        position: absolute !important;
-        bottom: 2px !important; 
-        top: auto !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 35px !important; /* Ahora sí encoge de verdad */
-        height: auto !important;
-        z-index: 1000 !important;
+    /* --- EXTINCIÓN RADICAL DEL CANDELABRO EN MÓVIL --- */
+    .candelabro-central.candelabro-visible,
+    .img-candelabro {
+        display: none !important; /* Desaparece del plano para liberar el suelo */
+        opacity: 0 !important;
+        visibility: hidden !important;
     }
 
-    .img-candelabro { 
-        width: 100% !important; 
-        height: auto !important; 
-    }
-
-    /* Matamos el width de 200% de PC que causaba el desborde sobre las tumbas */
+    /* --- REUBICACIÓN DEL MENÚ EN LA PARTE SUPERIOR (BARRA LIMPIA) --- */
     .menu-textos {
-        position: absolute !important;
-        top: -15px !important; /* Sube las opciones para alejarlas de las criptos */
+        position: fixed !important;
+        top: 10px !important; /* Lo anclamos arriba como corona del juego */
+        bottom: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 260px !important; /* Ancho fijo y controlado para móvil */
+        width: 100% !important;
+        max-width: 320px !important; /* Contenedor ideal para que no se disperse */
         display: flex !important;
         justify-content: space-between !important;
+        gap: 15px !important;
+        z-index: 9999 !important; /* Por encima del cementerio */
     }
 
+    /* Estilizado horizontal de las opciones */
     .opcion {
-        font-size: 9px !important; /* Letras más pequeñas para que no estorben */
-        transform: none !important; /* Quitamos rotaciones que estiran el layout */
+        font-family: 'Nosifer', serif !important;
+        font-size: 10px !important; /* Tamaño legible sin saturar */
+        color: #8b0000 !important;
+        text-shadow: 2px 2px 4px #000 !important;
+        transform: none !important; /* Matamos inclinaciones raras de PC */
+        letter-spacing: 1px !important;
     }
 
-    /* --- CORRECCIÓN DE PILARES: EMPUJE A LA DERECHA Y TEXTO PEQUEÑO --- */
+    .leyes, .oraculo, .alianzas { 
+        transform: none !important; 
+    }
+
+    /* --- PILARES EN FILA INDIA ULTRA AJUSTADOS A LA DERECHA --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
-        top: 38% !important; 
+        top: 40% !important; /* Centrado vertical en el pasillo */
         display: flex !important;
-        flex-direction: column !important; /* Fuerza la fila india estricta hacia abajo */
+        flex-direction: column !important; /* Letras una debajo de otra estricto */
         align-items: center !important;
-        font-size: 8px !important; /* Texto micro para que no roce a Dogecoin */
-        line-height: 1.1 !important; /* Letras bien compactas */
+        font-size: 8px !important; /* Micro tipografía para no rozar a Dogecoin */
+        line-height: 1.1 !important;
         z-index: 995 !important;
     }
     
-    /* Coordenadas movidas más a la derecha para clavarse en la piedra */
+    /* Coordenadas precisas desplazadas a la derecha para pisar la roca */
     .pilar-izquierdo { 
-        left: 45.8% !important; 
+        left: 45.6% !important; 
     }
     .pilar-derecho { 
-        left: 56.8% !important; 
+        left: 56.6% !important; 
     }
 }
 
-/* --- 8.2 CORTINA DE BLOQUEO EN VERTICAL (OBLIGA A GIRAR EL CELULAR) --- */
+/* --- 8.2 INTERFÁZ DE BLOQUEO EN VISTA VERTICAL (PORTRAIT) --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
-    /* Escondemos el desorden del cementerio en vertical */
+    /* Escondemos el juego completo para que no haya colisiones */
     #contenedor-criptos, 
     #campo-santo, 
-    .candelabro-central {
+    .candelabro-central,
+    .menu-textos {
         display: none !important;
     }
 
-    /* Desplegamos el aviso a pantalla completa */
+    /* Desplegamos el aviso ritual de rotación */
     #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
@@ -809,7 +819,7 @@ button,
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        background: #000000 !important;
+        background: #050505 !important;
         z-index: 999999 !important;
         color: #8b0000 !important;
         text-align: center !important;
@@ -822,27 +832,43 @@ button,
         font-size: 14px !important;
         text-shadow: 0 0 8px #ff0000 !important;
         margin-bottom: 15px !important;
-    }
-
-    #aviso-rotar p {
-        font-family: 'Metal Mania', sans-serif !important;
-        font-size: 13px !important;
-        color: #fff !important;
         letter-spacing: 1px !important;
     }
 
+    #aviso-rotar p {
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 14px !important;
+        color: #bbb !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Animación del smartphone girando */
     .icono-giro {
         width: 35px;
         height: 55px;
         margin-top: 25px;
         border: 2px solid #8b0000;
         border-radius: 5px;
-        animation: rotarMictlan 2s infinite ease-in-out;
+        position: relative;
+        animation: rotarMictlan 2.3s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
+    }
+    
+    .icono-giro::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 5px;
+        height: 5px;
+        border: 1px solid #8b0000;
+        border-radius: 50%;
     }
 }
 
 @keyframes rotarMictlan {
     0% { transform: rotate(0deg); }
-    50% { transform: rotate(-90deg); }
+    40%, 60% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
 }
