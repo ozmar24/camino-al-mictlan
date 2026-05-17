@@ -711,20 +711,21 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (REVISADO DE RAÍZ)
+   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (MENÚ INYECTADO ARRIBA)
    ========================================================================== */
 
-/* Bloqueo inicial estricto para el candelabro */
+/* Bloqueo inicial estricto para el candelabro en el flujo general */
 .candelabro-central {
     display: none !important;
     opacity: 0 !important;
 }
 
-/* --- 8.1 VISTA HORIZONTAL (LANDSCAPE): MENÚ SUPERIOR VISIBLE Y LIMPIO --- */
+/* --- 8.1 VISTA HORIZONTAL (LANDSCAPE): FORZAR MENÚ SUPERIOR --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Forzamos que el aviso de rotación se oculte si ya está acostado */
-    body #aviso-rotar {
+    /* Ocultamos el aviso de rotación si el cel ya está acostado */
+    body #aviso-rotar,
+    #aviso-rotar {
         display: none !important;
     }
 
@@ -734,7 +735,7 @@ button,
         position: relative !important;
     }
 
-    /* MATAMOS TOTALMENTE EL CANDELABRO EN MÓVILES */
+    /* MATAMOS EL CANDELABRO PARA QUE NO SATURE EL SUELO */
     .candelabro-central.candelabro-visible,
     body .candelabro-central,
     img.img-candelabro {
@@ -743,46 +744,57 @@ button,
         visibility: hidden !important;
     }
 
-    /* --- REUBICACIÓN INYECTADA DEL MENÚ EN LA PARTE SUPERIOR --- */
-    body .menu-textos {
+    /* --- ENRAIZADO ULTRA ESTRICTO DEL MENÚ EN LA PARTE SUPERIOR --- */
+    html body .menu-textos,
+    body .menu-textos,
+    .menu-textos {
         display: flex !important;
-        flex-direction: row !important; /* Fuerza la alineación horizontal */
+        visibility: visible !important;
+        opacity: 1 !important;
+        flex-direction: row !important; /* Fuerza fila horizontal */
         justify-content: center !important;
         align-items: center !important;
-        gap: 30px !important; /* Espaciado perfecto entre palabras */
+        gap: 35px !important; /* Separación limpia entre las tres opciones */
         
+        /* Lo clavamos arriba en la pantalla de forma fija */
         position: fixed !important;
-        top: 15px !important; /* Lo baja un poco del borde superior para que se vea impecable */
+        top: 12px !important; 
         left: 50% !important;
         transform: translateX(-50%) !important;
         
-        width: auto !important;
-        min-width: 280px !important;
+        /* Reseteamos cualquier deformación de tamaño heredada de PC */
+        width: 320px !important;
+        max-width: 90vw !important;
         height: auto !important;
         bottom: auto !important;
-        margin: 0 !important;
+        right: auto !important;
+        margin: 0 auto !important;
         padding: 0 !important;
-        z-index: 99999 !important; /* Se superpone a las nubes y pirámides */
+        z-index: 999999 !important; /* Por encima de cualquier capa del cementerio */
     }
 
-    /* Reseteo y visualización de cada opción gótica */
+    /* --- REPARACIÓN DE ESTILO PARA LAS OPCIONES --- */
+    html body .menu-textos .opcion,
     body .menu-textos .opcion,
-    body .opcion {
+    .opcion {
         display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
         font-family: 'Nosifer', sans-serif !important;
-        font-size: 10px !important; /* Tamaño ideal scannable */
-        color: #8b0000 !important;
-        text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
+        font-size: 10px !important; /* Tamaño ideal para que no estorbe */
+        color: #ff0000 !important; /* Rojo vivo para que resalte en el cielo oscuro */
+        text-shadow: 0px 0px 8px #000000, 2px 2px 2px #000000 !important;
         text-decoration: none !important;
         letter-spacing: 1px !important;
         
-        /* Eliminamos las inclinaciones o posiciones absolutas individuales de PC */
+        /* Matamos posiciones absolutas o rotaciones individuales de PC */
         position: static !important;
         transform: none !important;
         margin: 0 !important;
+        padding: 0 !important;
     }
 
-    /* --- PILARES EN VERTICAL (SE ALINEAN A LA DERECHA DE LA PIEDRA) --- */
+    /* --- PILARES EN VERTICAL (FIJADOS EN LA PIEDRA) --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
@@ -799,19 +811,21 @@ button,
     .pilar-derecho   { left: 56.6% !important; }
 }
 
-/* --- 8.2 VISTA VERTICAL (PORTRAIT): INTERRUPTOR DE SEGURIDAD ESTRICTO --- */
+/* --- 8.2 VISTA VERTICAL (PORTRAIT): PANTALLA DE BLOQUEO --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
-    /* Escondemos absolutamente todo el entorno del cementerio */
+    /* Escondemos el juego entero para evitar amontonamientos */
     #contenedor-criptos, 
     #campo-santo, 
     body .menu-textos,
+    .menu-textos,
     .candelabro-central {
         display: none !important;
     }
 
-    /* Forzamos el despliegue de la cortina de bloqueo */
-    body #aviso-rotar {
+    /* Desplegamos la cortina de aviso */
+    body #aviso-rotar,
+    #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
@@ -822,8 +836,8 @@ button,
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        background: #050505 !important; /* Fondo negro profundo */
-        z-index: 999999 !important; /* Absolutamente arriba de todo */
+        background: #050505 !important;
+        z-index: 9999999 !important;
         color: #8b0000 !important;
         text-align: center !important;
         padding: 30px !important;
@@ -835,7 +849,6 @@ button,
         font-size: 14px !important;
         text-shadow: 0 0 8px #ff0000 !important;
         margin-bottom: 15px !important;
-        letter-spacing: 1px !important;
     }
 
     body #aviso-rotar p {
