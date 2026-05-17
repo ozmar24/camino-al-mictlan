@@ -711,90 +711,63 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (MENÚ INYECTADO ARRIBA)
+   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (SEGURO PARA PC)
    ========================================================================== */
 
-/* Bloqueo inicial estricto para el candelabro en el flujo general */
-.candelabro-central {
-    display: none !important;
-    opacity: 0 !important;
-}
-
-/* --- 8.1 VISTA HORIZONTAL (LANDSCAPE): FORZAR MENÚ SUPERIOR --- */
+/* --- 8.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Ocultamos el aviso de rotación si el cel ya está acostado */
-    body #aviso-rotar,
     #aviso-rotar {
         display: none !important;
     }
 
-    #contenedor-criptos {
-        width: 100vw !important;
-        height: 100vh !important;
-        position: relative !important;
-    }
-
-    /* MATAMOS EL CANDELABRO PARA QUE NO SATURE EL SUELO */
-    .candelabro-central.candelabro-visible,
-    body .candelabro-central,
+    /* OCULTAMOS ÚNICAMENTE LA IMAGEN DEL CANDELABRO (EL CONTENEDOR SE QUEDA) */
+    .candelabro-central img,
     img.img-candelabro {
         display: none !important;
         opacity: 0 !important;
         visibility: hidden !important;
     }
 
-    /* --- ENRAIZADO ULTRA ESTRICTO DEL MENÚ EN LA PARTE SUPERIOR --- */
-    html body .menu-textos,
-    body .menu-textos,
-    .menu-textos {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        flex-direction: row !important; /* Fuerza fila horizontal */
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 35px !important; /* Separación limpia entre las tres opciones */
-        
-        /* Lo clavamos arriba en la pantalla de forma fija */
+    /* FORZAMOS EL CONTENEDOR A COMORTARSE COMO BARRA FLOTANTE SUPERIOR */
+    .candelabro-central {
         position: fixed !important;
-        top: 12px !important; 
+        top: 0 !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        
-        /* Reseteamos cualquier deformación de tamaño heredada de PC */
-        width: 320px !important;
-        max-width: 90vw !important;
+        width: 100% !important;
+        max-width: 340px !important;
         height: auto !important;
-        bottom: auto !important;
-        right: auto !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        z-index: 999999 !important; /* Por encima de cualquier capa del cementerio */
+        background: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        z-index: 999999 !important;
     }
 
-    /* --- REPARACIÓN DE ESTILO PARA LAS OPCIONES --- */
-    html body .menu-textos .opcion,
-    body .menu-textos .opcion,
+    /* ALINEACIÓN HORIZONTAL DE LEYES, ORÁCULO Y ALIANZAS */
+    .menu-textos {
+        display: flex !important;
+        flex-direction: row !important; /* Fila recta horizontal */
+        justify-content: space-between !important;
+        width: 100% !important;
+        position: static !important; /* Rompe el absoluto de PC */
+        transform: none !important;
+        margin-top: 15px !important; /* Lo despega del borde del celular */
+    }
+
+    /* FORMATEO ESTRICTO DE LAS LETRAS GÓTICAS */
     .opcion {
         display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
         font-family: 'Nosifer', sans-serif !important;
-        font-size: 10px !important; /* Tamaño ideal para que no estorbe */
-        color: #ff0000 !important; /* Rojo vivo para que resalte en el cielo oscuro */
-        text-shadow: 0px 0px 8px #000000, 2px 2px 2px #000000 !important;
-        text-decoration: none !important;
-        letter-spacing: 1px !important;
-        
-        /* Matamos posiciones absolutas o rotaciones individuales de PC */
+        font-size: 10px !important;
+        color: #ff0000 !important; /* Rojo intenso para el cielo */
+        text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
         position: static !important;
         transform: none !important;
         margin: 0 !important;
-        padding: 0 !important;
     }
 
-    /* --- PILARES EN VERTICAL (FIJADOS EN LA PIEDRA) --- */
+    /* --- PILARES EN FILA INDIA (PEGADOS A LA PIEDRA) --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
@@ -811,26 +784,21 @@ button,
     .pilar-derecho   { left: 56.6% !important; }
 }
 
-/* --- 8.2 VISTA VERTICAL (PORTRAIT): PANTALLA DE BLOQUEO --- */
+/* --- 8.2 VISTA VERTICAL EN MÓVILES (PORTRAIT) --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
-    /* Escondemos el juego entero para evitar amontonamientos */
     #contenedor-criptos, 
     #campo-santo, 
-    body .menu-textos,
-    .menu-textos,
     .candelabro-central {
         display: none !important;
     }
 
-    /* Desplegamos la cortina de aviso */
-    body #aviso-rotar,
+    /* CORTINA DE BLOQUEO DE SEGURIDAD */
     #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
-        
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -844,22 +812,21 @@ button,
         box-sizing: border-box !important;
     }
 
-    body #aviso-rotar h2 {
+    #aviso-rotar h2 {
         font-family: 'Nosifer', sans-serif !important;
         font-size: 14px !important;
         text-shadow: 0 0 8px #ff0000 !important;
         margin-bottom: 15px !important;
     }
 
-    body #aviso-rotar p {
+    #aviso-rotar p {
         font-family: 'Creepster', sans-serif !important;
         font-size: 15px !important;
         color: #fff !important;
         line-height: 1.4 !important;
     }
 
-    /* Icono animado del celular girando */
-    body #aviso-rotar .icono-giro {
+    .icono-giro {
         display: block !important;
         width: 35px;
         height: 55px;
@@ -868,10 +835,9 @@ button,
         border-radius: 5px;
         position: relative;
         animation: rotarMictlanFinal 2.3s infinite ease-in-out;
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     }
     
-    body #aviso-rotar .icono-giro::after {
+    .icono-giro::after {
         content: '' !important;
         position: absolute !important;
         bottom: 3px !important;
