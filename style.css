@@ -17,7 +17,7 @@ html, body, #campo-santo {
     color: #fff;
     min-height: 100vh;
     overflow-x: hidden;
-    font-family: 'Nosifer', cursive;
+    font-family: 'Metal Mania', cursive;
     cursor: url('./img/daga.png') 5 28, auto !important;
 }
 
@@ -79,7 +79,7 @@ button,
 }
 
 .titulo-mictlan {
-    font-family: 'Nosifer', cursive; 
+    font-family: 'Metal Mania', cursive; 
     font-size: 5rem;
     color: #00ffff;
     text-align: center;
