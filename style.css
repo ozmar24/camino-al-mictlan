@@ -922,6 +922,7 @@ button,
     box-sizing: border-box !important;
     padding: 10px 20px !important;
     z-index: 30 !important;
+    color: #7a1c1c !important;
 }
 
 /* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
@@ -939,6 +940,7 @@ button,
     box-sizing: border-box !important;
     padding: 10px 20px !important;
     z-index: 30 !important;
+    color: #7a1c1c !important;
 }
 
 /* 📌 CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
@@ -956,6 +958,7 @@ button,
     text-align: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    color: #7a1c1c !important;
 }
 
 .grimorio-container .btn-ritual-grimorio {
@@ -988,16 +991,16 @@ button,
     position: relative !important;
     font-family: 'nosifer', cursive !important;
     font-size: 0.7rem !important;
-    color: #2a1b0a !important;
+    color: #7a1c1c !important;
     text-align: center !important;
     width: 100% !important;
-    margin-top: auto !important; /* Empuja el texto al fondo de la hoja de manera segura */
-    padding-bottom: 5px !important;
+    margin-top: 15px !important; /* Empuja el texto al fondo de la hoja de manera segura */
+    padding-bottom: 0 !important;
 }
 
 .grimorio-container #new-user-helper p {
-    margin-bottom: 8px !important;
-    color: #2a1b0a !important;
+    margin-bottom: 5px !important;
+    color: #7a1c1c !important;
 }
 
 .grimorio-container .btn-ritual-secundario {
@@ -1009,7 +1012,7 @@ button,
 /* Corrección de enlaces de intercambio */
 #toggle-auth-text {
     cursor: pointer !important;
-    color: #8B0000 !important;
+    color: #7a1c1c !important;
     text-decoration: underline !important;
     font-weight: bold !important;
 }
