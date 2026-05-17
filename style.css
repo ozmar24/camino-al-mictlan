@@ -892,16 +892,17 @@ button,
    REESTRUCTURACIÓN DEL GRIMORIO DEL MICTLÁN (SANEADO DE CSS)
    ================================================================== */
 
-/* Contenedor principal del libro */
+/* Contenedor principal del libro: Grande y espacioso */
 .grimorio-container {
     display: flex !important;
     background: url('img/grimorio.png') no-repeat center center !important;
-    background-size: contain !important;
+    background-size: 100% 100% !important;
     width: 1050px !important;
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    padding: 80px 110px 70px 110px !important; /* Espaciado interno para encerrar todo en el pergamino */
+    /* Incrementamos el padding para empujar el texto más hacia el centro claro */
+    padding: 95px 125px 85px 125px !important; 
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
 }
@@ -914,8 +915,8 @@ button,
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-evenly !important; /* Distribuye el contenido verticalmente a la perfección */
-    padding: 0 25px !important;
+    justify-content: space-evenly !important; /* Distribuye el contenido verticalmente sin amontonar */
+    padding: 0 30px !important; /* Más aire a los lados para no pisar bordes oscuros */
     box-sizing: border-box !important;
     position: relative !important;
 }
@@ -925,101 +926,112 @@ button,
     border-right: 1px dashed rgba(74, 0, 0, 0.2) !important;
 }
 
-/* DESTRUCCIÓN DE POSICIONES ABSOLUTAS EN LOS TÍTULOS Y TEXTOS */
+/* DESTRUCCIÓN TOTAL DE ABSOLUTES Y REDUCCIÓN COMPACTA DE FUENTES */
 .grimorio-container h2#auth-tagline,
 .grimorio-container h2#right-title,
 .grimorio-container p#left-desc,
-.grimorio-container p#right-desc {
+.grimorio-container p#right-desc,
+#auth-tagline,
+#right-title {
     position: relative !important;
-    top: 0 !important;
-    left: 0 !important;
+    top: auto !important;
+    left: auto !important;
     transform: none !important;
-    margin: 0 !important;
+    margin: 0 0 5px 0 !important;
     padding: 0 !important;
-    width: auto !important;
-    white-space: nowrap !important; /* Evita que los títulos se rompan en dos renglones */
+    width: 100% !important;
+    text-align: center !important;
+    white-space: nowrap !important; /* Asegura que quepan en un solo renglón */
 }
 
-/* Estilos de fuentes específicos para los Encabezados */
-.grimorio-container h2#auth-tagline {
+/* Fuentes calibradas pequeñas para que no se descontrolen */
+#auth-tagline {
     font-family: 'Butcherman' !important;
     color: #8B0000 !important;
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important; /* Compacto y elegante */
 }
 
-.grimorio-container h2#right-title {
+#right-title {
     font-family: 'MedievalSharp' !important;
     color: #4a0000 !important;
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important;
 }
 
-/* Textos secundarios ajustados para que no pisen el lomo o las orillas */
-.grimorio-container p#left-desc {
+/* Textos secundarios ajustados para que no pisen las orillas */
+.grimorio-container p#left-desc, 
+#left-desc {
     font-family: 'MedievalSharp' !important;
-    font-size: 0.75em !important;
+    font-size: 0.72em !important;
     color: #2a1b0a !important;
     line-height: 1.2 !important;
     white-space: normal !important;
     max-width: 90% !important;
+    margin: 0 auto 10px auto !important;
 }
 
-.grimorio-container p#right-desc {
+.grimorio-container p#right-desc, 
+#right-desc {
     font-family: 'Butcherman' !important;
     font-size: 0.65em !important;
     color: #555 !important;
     line-height: 1.2 !important;
     white-space: normal !important;
     max-width: 90% !important;
+    margin: 0 auto 10px auto !important;
 }
 
-/* Contenedor del formulario tradicional */
+/* Contenedor del formulario tradicional (Más estrecho para no tocar el fondo) */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
-    width: 85% !important;
+    width: 75% !important; /* Al 75% se queda centradito en la hoja */
 }
 
-/* Inputs estilizados y centrados */
+/* Inputs estilizados, limpios y contenidos */
 .grimorio-container .input-pergamino-goth {
-    font-size: 0.75em !important;
+    font-size: 0.72em !important;
     padding: 6px !important;
     text-align: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
 
-/* Botón de acceso */
+/* Botón de acceso ritual */
 .grimorio-container .btn-ritual-grimorio {
-    font-size: 0.75em !important;
-    padding: 8px !important;
-    margin-top: 4px !important;
+    font-size: 0.72em !important;
+    padding: 7px !important;
+    margin-top: 2px !important;
     width: 100% !important;
 }
 
-/* Contenedor del botón nativo de Google */
+/* Contenedor controlado para el botón de Google */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
-    min-height: 40px !important;
-    width: 100% !important;
+    min-height: 38px !important;
+    width: 80% !important; /* Evita que se estire a los extremos */
     margin: 5px 0 !important;
 }
 
-/* Separador Arcano */
+/* Separador Arcano sutil */
 .grimorio-container .divisor-arcano {
-    border-top: 1px solid rgba(139, 0, 0, 0.2) !important;
-    width: 60% !important;
+    border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
+    width: 55% !important;
     margin: 5px 0 !important;
 }
 
-/* Textos de ayuda del pie de página */
+/* Textos de ayuda y botones del pie de página */
 .grimorio-container .cambio-modo-contenedor,
-.grimorio-container #new-user-helper {
+.grimorio-container #new-user-helper,
+#new-user-helper {
     font-family: 'MedievalSharp' !important;
-    font-size: 0.72rem !important;
+    font-size: 0.7rem !important;
     color: #2a1b0a !important;
     max-width: 90% !important;
+    position: relative !important;
+    top: auto !important;
+    margin-top: 5px !important;
 }
 
 .grimorio-container #toggle-auth-text {
@@ -1030,28 +1042,7 @@ button,
 }
 
 .grimorio-container .btn-ritual-secundario {
-    margin-top: 6px !important;
-    font-size: 0.75em !important;
-    padding: 5px 10px !important;
-}
-#auth-tagline, 
-#right-title {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    margin: 0 0 15px 0 !important;
-    font-size: 1.3rem !important; /* Ahora que hay espacio, el título puede lucir imponente */
-    color: #8B0000 !important;
-    text-align: center !important;
-    width: 100% !important;
-}
-
-#right-title {
-    color: #4a0000 !important;
-    font-family: 'MedievalSharp' !important;
-}
-
-#auth-tagline {
-    font-family: 'Butcherman' !important;
+    margin-top: 5px !important;
+    font-size: 0.72em !important;
+    padding: 4px 10px !important;
 }
