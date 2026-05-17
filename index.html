@@ -10,6 +10,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<body>
+    <div id="aviso-rotar" style="display: none;">
+        <h2>SABIDURÍA DEL INFRAMUNDO</h2>
+        <p>Por favor, gira tu dispositivo horizontalmente para visualizar el Campo Santo.</p>
+        <div class="icono-giro"></div>
+    </div>
+
+    ```
+
+### ¿Por qué este cambio sí va a funcionar?
+1. **`body .menu-textos`**: Al anteponer la palabra `body` al selector en el CSS móvil, le ganamos por completo en prioridad a cualquier regla declarada en la sección general de PC. Forzamos a que vuelva a tener comportamiento en línea (`flex-direction: row`) y se clave arriba en `top: 15px`.
+2. **Eliminación de herencia**: Le quitamos explícitamente las posiciones individuales que tenían las clases de las leyes para evitar que se dispersen o floten en coordenadas erróneas.
+3. **`body #aviso-rotar`**: Asegura que el contenedor de bloqueo tome prioridad sobre el layout adaptativo principal al ponerse el celular de pie.
+
+Aplica este reemplazo directo, guarda los archivos en tu repositorio y haz la recarga en caliente en la consola de Vercel. ¡Con esto el espacio superior quedará impecable y el bloqueo vertical activo!
 
 <!-- Filtro de goteo místico (SVG invisible) -->
 <svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
