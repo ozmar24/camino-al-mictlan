@@ -13,21 +13,28 @@
 <body>
 
     <div id="aviso-rotar" style="display: none;">
-        <h2>SABIDURÍA DEL INFRAMUNDO</h2>
-        <p>Por favor, gira tu dispositivo horizontalmente para visualizar el Campo Santo.</p>
-        <div class="icono-giro"></div>
+    <h2>SABIDURÍA DEL INFRAMUNDO</h2>
+    <p>Por favor, gira tu dispositivo horizontalmente para visualizar el Campo Santo.</p>
+    <div class="icono-giro"></div>
+</div>
+
+<svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="textura-terror">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
+    </filter>
+  </defs>
+</svg>
+
+<main class="universo-faucet">
+    
+    <div id="escena-portal" onclick="avanzarAlRegistro()">        
+        <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
+        <div class="resplandor-suelo"></div>
     </div>
 
-    <svg style="position: absolute; width: 0; height: 0;" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="textura-terror">
-          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
-        </filter>
-      </defs>
-    </svg>
-
-    <div id="auth-container" class="capa-oscura" style="display: flex; justify-content: center; align-items: center; z-index: 10000;">
+    <div id="auth-container" class="capa-oscura" style="display: none; justify-content: center; align-items: center; z-index: 10000;">
         <div class="pergamino-quemado auth-card" style="text-align: center; max-width: 400px; width: 90%;">
             <h2 id="auth-tagline" style="font-family: 'Butcherman'; color: #8B0000; font-size: 1.5rem; margin-bottom: 15px;">REGISTRO DE ALMAS</h2>
             <p style="font-family: 'MedievalSharp'; font-size: 0.9em; margin-bottom: 20px; color: #bbb;">Debes identificar tu rastro en el libro de los muertos antes de pisar el Campo Santo.</p>
@@ -41,7 +48,7 @@
             
             <button id="btn-auth" onclick="manejarAuth()" style="background:#4a0000; color:#fff; border:none; padding:10px 20px; font-family:'Metal Mania'; cursor:pointer; width:100%;">ACCEDER AL CEMENTERIO</button>
 
-            <div id="google-btn-container" style="margin-top: 20px; display: flex; justify-content: center;"></div>
+            <div id="google-btn-container" style="margin-top: 20px; display: flex; justify-content: center; min-height: 40px;"></div>
 
             <div class="auth-footer" style="margin-top: 20px; font-size: 0.8em; font-family: 'MedievalSharp';">
                 <p id="toggle-auth-text" style="cursor:pointer; color: #8B0000;" onclick="cambiarModoAuth()">¿Eres un nuevo espíritu? Sella tu identidad aquí</p>
@@ -49,32 +56,26 @@
         </div>
     </div>
 
-    <main class="universo-faucet" id="main-content" style="display: none;">
+    <section id="campo-santo" style="display: none;">
         <div class="alma-maestra" style="position: absolute; top: 60px; left: 20px; z-index: 100; font-family: 'Metal Mania'; color: #fff; text-shadow: 0 0 5px #8B0000;">
             <span class="balance-actual" style="font-size: 1.3rem; letter-spacing: 2px;">Poder: 0 SG</span>
         </div>
 
-        <div id="escena-portal" onclick="entrarAlMictlan()">        
-            <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
-            <div class="resplandor-suelo"></div>
+        <div class="zona-patrocinadores" style="position: absolute; top: 60px; right: 20px; z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px;">
+            <p style="font-family: 'MedievalSharp'; color: #8B0000; font-size: 0.7rem; margin: 0 0 5px 0;">ABSORBER ENERGÍA</p>
+            <div id="reproductor-ad" style="width: 160px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="videoCompletado()">
+                <span style="font-size: 0.6rem; color: #666; font-family: 'MedievalSharp';">[ VER VIDEO ADS ]</span>
+            </div>
         </div>
 
-        <section id="campo-santo">
-            <div class="zona-patrocinadores" style="position: absolute; top: 60px; right: 20px; z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px;">
-                <p style="font-family: 'MedievalSharp'; color: #8B0000; font-size: 0.7rem; margin: 0 0 5px 0;">ABSORBER ENERGÍA</p>
-                <div id="reproductor-ad" style="width: 160px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="videoCompletado()">
-                    <span style="font-size: 0.6rem; color: #666; font-family: 'MedievalSharp';">[ VER VIDEO ADS ]</span>
-                </div>
-            </div>
+        <div id="contenedor-criptos"></div>
 
-            <div id="contenedor-criptos"></div>
-
-            <div class="niebla-contenedor">
-                <div class="niebla-capa"></div>
-                <div class="niebla-trasera"></div>
-            </div>
-        </section>
-    </main>
+        <div class="niebla-contenedor">
+            <div class="niebla-capa"></div>
+            <div class="niebla-trasera"></div>
+        </div>
+    </section>
+</main>
 
     <div id="modal-ritual" class="modal-oculto">
         <div class="contenido-ritual">
