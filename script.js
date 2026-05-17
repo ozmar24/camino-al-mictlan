@@ -1,8 +1,9 @@
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
-let balanceUsuarioSG = 0; // Controlará el poder acumulado real desde Redis
-let tumbaSeleccionada = null; // Una sola declaración global limpia
+let balanceUsuarioSG = 0; // Controlará tu balance dinámico desde Redis
+let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
+let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 
 function entrarAlMictlan() {
     const portal = document.getElementById('escena-portal');
@@ -34,13 +35,13 @@ function generarCementerio() {
 
     const configuracion = [
         { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
-        { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.000045 },
-        { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012 },
-        { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 150000 },
-        { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008 },
-        { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5 }, 
-        { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25 }, 
-        { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002 }
+        { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.15 },
+        { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.15 },
+        { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.15 },
+        { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.15 },
+        { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.15 }, 
+        { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.15 }, 
+        { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.15 }
     ];
 
     configuracion.forEach(pos => {
@@ -57,8 +58,6 @@ function generarCementerio() {
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
         } else {
-            // Usamos una base de 100 para la proyección visual si el usuario tiene 0,
-            // garantizando que las lápidas muestren recompensas atractivas desde el inicio.
             const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 100;
             const gananciaEstimada = (baseCalculo * pos.tasa).toLocaleString();
             
@@ -79,16 +78,31 @@ function generarCementerio() {
             `;
         }
 
-        div.onclick = async (e) => {
+        // ==================================================================
+        // GESTIÓN DE CLICS CON EL FLUJO DEL VIDEO
+        // ==================================================================
+        div.onclick = (e) => {
             e.stopPropagation();
             
             if (pos.especial) {
-                notificacionGotica("RITUAL DE COSECHA", "Ingresa tu wallet para extraer almas del Mictlán.", pos.color, true);
-                window.currentCripto = "Soulgeist"; 
-                tumbaSeleccionada = e.currentTarget; 
+                ritualActivo = true;
+                window.currentCripto = "Soulgeist";
+                notificacionGotica("RITUAL INICIADO", "Selecciona una tumba de destino para canalizar tu Poder SG.", pos.color, false);
             } 
             else {
-                abrirModalRitual(pos);
+                if (ritualActivo) {
+                    ritualActivo = false; 
+                    cerrarRitual(); 
+                    
+                    const tumbaOrigen = document.querySelector('.alma-maestra');
+                    tumbaSeleccionada = e.currentTarget;
+                    window.currentCripto = pos.nombre; 
+
+                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 100;
+                    lanzarAlma(tumbaOrigen, tumbaSeleccionada, pos.color, baseCalculo * pos.tasa, pos);
+                } else {
+                    abrirModalRitual(pos);
+                }
             }
         };
 
@@ -105,12 +119,8 @@ function generarCementerio() {
         enlace.href = p.link;
         enlace.className = `inscripcion-pilar ${p.clase}`;
         enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`;
-        
         if(p.clase === "pilar-derecho") {
-            enlace.onclick = (e) => {
-                e.preventDefault();
-                mostrarContratoMictlan();
-            };
+            enlace.onclick = (e) => { e.preventDefault(); mostrarContratoMictlan(); };
         }
         contenedor.appendChild(enlace);
     });
@@ -154,7 +164,23 @@ function notificacionGotica(titulo, mensaje, color, mostrarInput) {
     modal.style.display = 'block';
 }
 
+// ==================================================================
+// ABRE EL MODAL DE RECLAMO E INTEGRA EL FILTRO ANTI-FUGAS ($0.15 USD)
+// ==================================================================
 function abrirModalRitual(pos) {
+    // Definimos arbitrariamente que 1 Alma SG equivale a $0.001 USD
+    // Por lo tanto, 100 almas recolectadas en el día = $0.10 USD.
+    const valorUsuarioUSD = balanceUsuarioSG * 0.001;
+
+    // Si el valor acumulado en dólares es inferior al mínimo requerido ($0.15 USD)
+    if (valorUsuarioUSD < pos.usdMinimo) {
+        lanzarAlertaMictlan(
+            `El umbral de esta cripta exige un valor mínimo de $${pos.usdMinimo} USD en almas. Actualmente posees el equivalente a $${valorUsuarioUSD.toFixed(3)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
+            "REQUISITO INCUMPLIDO"
+        );
+        return; 
+    }
+
     const modal = document.getElementById('modal-ritual');
     const titulo = document.getElementById('titulo-ritual');
     const info = document.getElementById('info-ritual');
@@ -193,7 +219,7 @@ function cerrarRitual() {
     cementerio.style.filter = "none"; 
 }
 
-function lanzarAlma(origenElemento, destinoElemento, color, cantidad) {
+function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCripto) {
     const rectOrigen = origenElemento.getBoundingClientRect();
     const rectDestino = destinoElemento.getBoundingClientRect();
 
@@ -210,14 +236,11 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad) {
             const nube = document.createElement('div');
             nube.className = 'rastro-niebla';
             nube.style.setProperty('--color-alma', color);
-            
             const size = Math.random() * 30 + 10;
             nube.style.width = size + 'px';
             nube.style.height = size + 'px';
-            
             nube.style.left = (parseFloat(alma.style.left) + (Math.random() - 0.5) * 20) + 'px';
             nube.style.top = (parseFloat(alma.style.top) + (Math.random() - 0.5) * 20) + 'px';
-            
             document.body.appendChild(nube);
 
             nube.animate([
@@ -243,6 +266,9 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad) {
         clearInterval(intervaloNiebla);
         alma.remove();
         actualizarSumaVisual(destinoElemento, cantidad);
+        
+        // Al terminar el trayecto del video, mandamos llamar a abrirModalRitual pasándole la info de la cripto
+        abrirModalRitual(datosCripto);
     };
 }
 
@@ -392,18 +418,12 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada) {
             return;
         }
 
-        // ==================================================================
-        // ¡ACTUALIZACIÓN ACUMULATIVA DE ALMAS REALES!
-        // ==================================================================
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
             if (selectorBalance) {
                 selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
             }
-            
-            // Volvemos a regenerar para que las demás lápidas calculen la proyección real
-            // en base al balance de almas que acaba de bajar de Redis.
             generarCementerio();
         }
 
