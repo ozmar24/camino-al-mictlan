@@ -58,29 +58,25 @@ function generarCementerio() {
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
         } else {
-    // 🚨 AJUSTE EN CEROS: Si el usuario tiene 0 almas, la ganancia proyectada es 0 redondo.
-    const gananciaEstimada = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa).toLocaleString() : "0";
-    
-    div.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
-            <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
-                <span class="simbolo-cripto">${pos.sim}</span>
-            </div>
-            <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
-                <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
-                    ${pos.nombre}
+            const gananciaEstimada = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa).toLocaleString() : "0";
+            
+            div.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
+                    <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
+                        <span class="simbolo-cripto">${pos.sim}</span>
+                    </div>
+                    <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
+                        <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
+                            ${pos.nombre}
+                        </div>
+                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
+                            +${gananciaEstimada} ${pos.sim}
+                        </div>
+                    </div>
                 </div>
-                <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
-                    +${gananciaEstimada} ${pos.sim}
-                </div>
-            </div>
-        </div>
-    `;
-}
+            `;
+        }
 
-        // ==================================================================
-        // GESTIÓN DE CLICS CON EL FLUJO DEL VIDEO
-        // ==================================================================
         div.onclick = (e) => {
             e.stopPropagation();
             
@@ -98,7 +94,8 @@ function generarCementerio() {
                     tumbaSeleccionada = e.currentTarget;
                     window.currentCripto = pos.nombre; 
 
-                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 100;
+                    // Corrección del cálculo base en cero para la animación
+                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
                     lanzarAlma(tumbaOrigen, tumbaSeleccionada, pos.color, baseCalculo * pos.tasa, pos);
                 } else {
                     abrirModalRitual(pos);
@@ -116,13 +113,14 @@ function generarCementerio() {
 
     pilares.forEach(p => {
         const enlace = document.createElement('a');
+        const contenedorPilar = document.getElementById('contenedor-criptos'); // Asegurando contenedor
         enlace.href = p.link;
         enlace.className = `inscripcion-pilar ${p.clase}`;
         enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`;
         if(p.clase === "pilar-derecho") {
             enlace.onclick = (e) => { e.preventDefault(); mostrarContratoMictlan(); };
         }
-        contenedor.appendChild(enlace);
+        if(contenedorPilar) contenedorPilar.appendChild(enlace);
     });
 }
 
@@ -152,71 +150,145 @@ function notificacionGotica(titulo, mensaje, color, mostrarInput) {
     document.getElementById('titulo-ritual').innerText = titulo;
     document.getElementById('info-ritual').innerText = mensaje;
     
-    if (mostrarInput) {
-        input.style.display = 'block';
-        if(btnEnviar) btnEnviar.style.display = 'block';
-        input.value = ""; 
-    } else {
-        input.style.display = 'none';
-        if(btnEnviar) btnEnviar.style.display = 'none';
+    if (input) {
+        if (mostrarInput) {
+            input.style.display = 'block';
+            if(btnEnviar) btnEnviar.style.display = 'block';
+            input.value = ""; 
+        } else {
+            input.style.display = 'none';
+            if(btnEnviar) btnEnviar.style.display = 'none';
+        }
     }
     
     modal.style.display = 'block';
 }
 
-// ==================================================================
-// ABRE EL MODAL DE RECLAMO E INTEGRA EL FILTRO ANTI-FUGAS ($0.15 USD)
-// ==================================================================
 function abrirModalRitual(pos) {
-    // Definimos arbitrariamente que 1 Alma SG equivale a $0.001 USD
-    // Por lo tanto, 100 almas recolectadas en el día = $0.10 USD.
     const valorUsuarioUSD = balanceUsuarioSG * 0.001;
 
-    // Si el valor acumulado en dólares es inferior al mínimo requerido ($0.15 USD)
+    // Validación estricta con los espacios corregidos para fuentes góticas
     if (valorUsuarioUSD < pos.usdMinimo) {
-    lanzarAlertaMictlan(
-        `El umbral de esta cripta exige un valor mínimo de $ ${pos.usdMinimo.toFixed(2)} USD en almas. Actualmente posees el equivalente a $ ${valorUsuarioUSD.toFixed(2)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
-        "REQUISITO INCUMPLIDO"
-    );
-    return; 
-}
+        lanzarAlertaMictlan(
+            `El umbral de esta cripta exige un valor mínimo de $ ${pos.usdMinimo.toFixed(2)} USD en almas. Actualmente posees el equivalente a $ ${valorUsuarioUSD.toFixed(2)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
+            "REQUISITO INCUMPLIDO"
+        );
+        return; 
+    }
+
+    // Reactivamos el filtro de fondo para mantener consistencia visual
+    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
 
     const modal = document.getElementById('modal-ritual');
     const titulo = document.getElementById('titulo-ritual');
     const info = document.getElementById('info-ritual');
-    const input = document.getElementById('wallet-input');
-    const btnEnviar = document.getElementById('btn-enviar-alma') || document.querySelector('.botones-exchange button:first-child');
-
-    input.value = "";
+    
     modal.style.setProperty('--color-ritmo', pos.color);
     modal.style.display = 'block';
-    
     titulo.innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
-    info.innerText = `Ingresa tu dirección de Wallet externa para recibir tus ${pos.sim}.`;
     
-    input.style.display = 'block';
-    if(btnEnviar) btnEnviar.style.display = 'block';
+    // Selector Multi-Billetera integrado limpiamente
+    info.innerHTML = `
+        <p style="margin-bottom: 15px; color: #ccc;">Selecciona la pasarela de destino para canalizar tus ${pos.sim}:</p>
+        
+        <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px; font-family: 'MedievalSharp', cursive; margin-bottom: 15px; cursor: pointer;">
+            <option value="faucetpay">FaucetPay (Micro-Wallet)</option>
+            ${pos.nombre === "Bitcoin" ? '<option value="bitso_lightning">Bitso (Red Lightning ⚡)</option>' : ''}
+            <option value="bitso">Bitso (Red Principal)</option>
+            <option value="coinbase">Coinbase</option>
+            <option value="binance">Binance Exchange</option>
+        </select>
+
+        <input type="text" id="wallet-input" placeholder="Correo vinculado a FaucetPay o Dirección" style="display: block; width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center; font-size: 14px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px;">
+    `;
     
     window.currentCripto = pos.nombre;
 }
 
-function procesarRetiro() {
-    const wallet = document.getElementById('wallet-input').value;
+function adaptarPlaceholderPasarela(criptoId) {
+    const pasarela = document.getElementById('pasarela-select').value;
+    const input = document.getElementById('wallet-input');
+    if (!input) return;
     
-    if (wallet.length < 10) {
-        lanzarAlertaMictlan("El viento del norte rechaza esa dirección. Tu wallet es demasiado corta.", "ERROR DE RITUAL");
+    if (pasarela === 'faucetpay') {
+        input.placeholder = "Correo vinculado a FaucetPay o Dirección";
+    } else if (pasarela === 'bitso_lightning') {
+        input.placeholder = "Ingresa tu Invoice de Lightning (lnbc...)";
+    } else {
+        input.placeholder = `Dirección de depósito de ${criptoId} (on-chain)`;
+    }
+}
+
+function procesarRetiro() {
+    const inputWallet = document.getElementById('wallet-input');
+    const selectPasarela = document.getElementById('pasarela-select');
+    
+    if(!inputWallet || !selectPasarela) return;
+    
+    const wallet = inputWallet.value.trim();
+    const pasarelaElegida = selectPasarela.value;
+    
+    if (wallet.length < 8) {
+        lanzarAlertaMictlan("La dirección o credencial del portal es demasiado corta.", "ERROR DE RITUAL");
         return;
     }
     
     cerrarRitual();
-    procesarCosecha(wallet, window.currentCripto);
+    procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
+}
+
+// Función Cosecha Definitiva Unificada con soporte Multi-Billetera
+async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
+    if (!walletUsuario || walletUsuario.length < 8) {
+        lanzarAlertaMictlan("El viento del norte rechaza esa dirección. Es inválida para procesar el pacto.", "ERROR DE RITUAL");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/api/reclamar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                wallet: walletUsuario, 
+                cripto: criptoSeleccionada, 
+                pasarela: pasarela 
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.status === 403 || respuesta.status === 429) {
+            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO / SEGURIDAD");
+            return;
+        }
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL");
+            return;
+        }
+
+        if (resultado.balanceAlmas !== undefined) {
+            balanceUsuarioSG = resultado.balanceAlmas;
+            const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
+            if (selectorBalance) {
+                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+            }
+            generarCementerio();
+        }
+
+        lanzarAlertaMictlan(resultado.mensaje, "RITUAL COMPLETADO");
+
+    } catch (error) {
+        console.error("Error en el portal:", error);
+        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
+    }
 }
 
 function cerrarRitual() {
     const modal = document.getElementById('modal-ritual');
     const cementerio = document.getElementById('campo-santo');
-    modal.style.display = 'none';
-    cementerio.style.filter = "none"; 
+    if(modal) modal.style.display = 'none';
+    if(cementerio) cementerio.style.filter = "none"; // Limpia el blur correctamente siempre
 }
 
 function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCripto) {
@@ -234,13 +306,16 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCript
     const intervaloNiebla = setInterval(() => {
         for(let i = 0; i < 2; i++) { 
             const nube = document.createElement('div');
+            const almaElemento = document.querySelector('.alma-viajera');
+            if (!almaElemento) return;
+
             nube.className = 'rastro-niebla';
             nube.style.setProperty('--color-alma', color);
             const size = Math.random() * 30 + 10;
             nube.style.width = size + 'px';
             nube.style.height = size + 'px';
-            nube.style.left = (parseFloat(alma.style.left) + (Math.random() - 0.5) * 20) + 'px';
-            nube.style.top = (parseFloat(alma.style.top) + (Math.random() - 0.5) * 20) + 'px';
+            nube.style.left = (parseFloat(almaElemento.style.left) + (Math.random() - 0.5) * 20) + 'px';
+            nube.style.top = (parseFloat(almaElemento.style.top) + (Math.random() - 0.5) * 20) + 'px';
             document.body.appendChild(nube);
 
             nube.animate([
@@ -266,8 +341,6 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCript
         clearInterval(intervaloNiebla);
         alma.remove();
         actualizarSumaVisual(destinoElemento, cantidad);
-        
-        // Al terminar el trayecto del video, mandamos llamar a abrirModalRitual pasándole la info de la cripto
         abrirModalRitual(datosCripto);
     };
 }
@@ -391,46 +464,4 @@ function lanzarAlertaMictlan(mensaje, titulo = "¡ADVERTENCIA MORTAL!") {
 function cerrarAlertaMictlan() {
     const modal = document.getElementById('alerta-mictlan');
     if (modal) modal.style.display = 'none';
-}
-
-async function procesarCosecha(walletUsuario, criptoSeleccionada) {
-    if (!walletUsuario || walletUsuario.length < 10) {
-        lanzarAlertaMictlan("El viento del norte rechaza esa dirección. Tu wallet es demasiado corta para procesar el pacto.", "ERROR DE RITUAL");
-        return;
-    }
-
-    try {
-        const respuesta = await fetch('/api/reclamar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wallet: walletUsuario, cripto: criptoSeleccionada })
-        });
-
-        const resultado = await respuesta.json();
-
-        if (respuesta.status === 403 || respuesta.status === 429) {
-            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO / SEGURIDAD");
-            return;
-        }
-
-        if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL");
-            return;
-        }
-
-        if (resultado.balanceAlmas !== undefined) {
-            balanceUsuarioSG = resultado.balanceAlmas;
-            const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
-            if (selectorBalance) {
-                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
-            }
-            generarCementerio();
-        }
-
-        lanzarAlertaMictlan(resultado.mensaje, "RITUAL COMPLETADO");
-
-    } catch (error) {
-        console.error("Error en el portal:", error);
-        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
-    }
 }
