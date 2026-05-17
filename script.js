@@ -58,25 +58,25 @@ function generarCementerio() {
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
         } else {
-            const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 100;
-            const gananciaEstimada = (baseCalculo * pos.tasa).toLocaleString();
-            
-            div.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
-                    <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
-                        <span class="simbolo-cripto">${pos.sim}</span>
-                    </div>
-                    <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
-                        <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
-                            ${pos.nombre}
-                        </div>
-                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
-                            +${gananciaEstimada} ${pos.sim}
-                        </div>
-                    </div>
+    // 🚨 AJUSTE EN CEROS: Si el usuario tiene 0 almas, la ganancia proyectada es 0 redondo.
+    const gananciaEstimada = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa).toLocaleString() : "0";
+    
+    div.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
+            <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
+                <span class="simbolo-cripto">${pos.sim}</span>
+            </div>
+            <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
+                <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
+                    ${pos.nombre}
                 </div>
-            `;
-        }
+                <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
+                    +${gananciaEstimada} ${pos.sim}
+                </div>
+            </div>
+        </div>
+    `;
+}
 
         // ==================================================================
         // GESTIÓN DE CLICS CON EL FLUJO DEL VIDEO
@@ -174,12 +174,12 @@ function abrirModalRitual(pos) {
 
     // Si el valor acumulado en dólares es inferior al mínimo requerido ($0.15 USD)
     if (valorUsuarioUSD < pos.usdMinimo) {
-        lanzarAlertaMictlan(
-            `El umbral de esta cripta exige un valor mínimo de $${pos.usdMinimo} USD en almas. Actualmente posees el equivalente a $${valorUsuarioUSD.toFixed(3)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
-            "REQUISITO INCUMPLIDO"
-        );
-        return; 
-    }
+    lanzarAlertaMictlan(
+        `El umbral de esta cripta exige un valor mínimo de $ ${pos.usdMinimo.toFixed(2)} USD en almas. Actualmente posees el equivalente a $ ${valorUsuarioUSD.toFixed(2)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
+        "REQUISITO INCUMPLIDO"
+    );
+    return; 
+}
 
     const modal = document.getElementById('modal-ritual');
     const titulo = document.getElementById('titulo-ritual');
