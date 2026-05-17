@@ -35,39 +35,40 @@
         </div>
 
         <div id="modal-contrato" class="capa-oscura interface-mictlan" style="display: none; justify-content: center; align-items: center; z-index: 10000;">
-            <div class="grimorio-container" style="display: flex; background: url('img/grimorio.png') no-repeat center center; background-size: contain; width: 850px; height: 500px; max-width: 95vw; max-height: 95vh; padding: 40px; box-sizing: border-box; filter: drop-shadow(0 0 10px #000);">
+    <div class="grimorio-container" style="display: flex; background: url('img/grimorio.png') no-repeat center center; background-size: contain; width: 850px; height: 500px; max-width: 95vw; max-height: 95vh; padding: 55px 75px; box-sizing: border-box; filter: drop-shadow(0 0 10px #000);">
+        
+        <div class="pagina-izquierda" style="flex: 1; padding: 10px 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; border-right: 1px dashed rgba(74, 0, 0, 0.2); text-align: center; height: 100%; box-sizing: border-box;">
+            <h2 id="auth-tagline" style="font-family: 'Butcherman'; color: #8B0000; font-size: 1.15rem; margin: 0 0 5px 0; letter-spacing: 1px;">REGISTRO DE ALMAS</h2>
+            <p id="left-desc" style="font-family: 'MedievalSharp'; font-size: 0.75em; color: #2a1b0a; line-height: 1.2; margin: 0 0 15px 0;">Sella tu rastro en el Mictlán con credenciales directas.</p>
+            
+            <div class="formulario-goth" style="display: flex; flex-direction: column; gap: 8px; width: 85%;">
+                <input type="email" id="email" placeholder="CORREO DEL PACTO" class="input-pergamino-goth" style="font-size: 0.75em; padding: 6px; text-align: center;">
+                <input type="password" id="password" placeholder="LLAVE SECRETA" class="input-pergamino-goth" style="font-size: 0.75em; padding: 6px; text-align: center;">
                 
-                <div class="pagina-izquierda" style="flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; border-right: 1px dashed rgba(74, 0, 0, 0.4); text-align: center;">
-                    <h2 id="auth-tagline" style="font-family: 'Butcherman'; color: #8B0000; font-size: 1.4rem; margin: 0 0 10px 0;">REGISTRO DE ALMAS</h2>
-                    <p id="left-desc" style="font-family: 'MedievalSharp'; font-size: 0.85em; color: #2a1b0a; line-height: 1.3; margin: 0 0 20px 0;">Sella tu rastro en el Mictlán con credenciales directas.</p>
-                    
-                    <div class="formulario-goth" style="display: flex; flex-direction: column; gap: 10px; width: 80%;">
-                        <input type="email" id="email" placeholder="CORREO DEL PACTO" class="input-pergamino-goth" style="font-size: 0.8em; padding: 8px;">
-                        <input type="password" id="password" placeholder="LLAVE SECRETA" class="input-pergamino-goth" style="font-size: 0.8em; padding: 8px;">
-                        
-                        <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
-                    </div>
-                    
-                    <div style="margin-top: 15px; font-family: 'MedievalSharp'; font-size: 0.8em;">
-                        <span id="toggle-auth-text" onclick="cambiarModoAuth()" style="cursor: pointer; color: #8B0000; text-decoration: underline;">¿Eres un nuevo espíritu? Sella tu identidad aquí</span>
-                    </div>
-                </div>
-
-                <div class="pagina-derecha" style="flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                    <h2 id="right-title" style="font-family: 'MedievalSharp'; color: #4a0000; font-size: 1.2rem; margin: 0 0 15px 0;">VINCULACIÓN RÁPIDA</h2>
-                    <p style="font-family: 'Butcherman'; font-size: 0.75em; color: #bbb; line-height: 1.3; margin: 0 0 20px 0; font-weight: normal; letter-spacing: 1px;">GRABA TU RASTRO MÍSTICO PARA ENTRAR.</p>
-
-                    <div id="google-btn-container" style="display: flex; justify-content: center; min-height: 44px; width: 100%; margin-bottom: 25px;"></div>
-                    
-                    <div class="divisor-arcano" style="margin: 20px 0; border-top: 1px solid rgba(139, 0, 0, 0.3); width: 60%;"></div>
-
-                    <div id="new-user-helper" style="margin-top: 20px; font-family: 'MedievalSharp'; font-size: 0.8rem; color: #2a1b0a;">
-                        <p>Si eres un nuevo espíritu, firma el contrato de Google arriba ó</p>
-                        <button onclick="cambiarModoAuth()" class="btn-ritual-secundario pentaculo-cursor" style="margin-top: 10px; font-size: 0.9em; padding: 8px 15px;">CREA UNA IDENTIDAD TRADICIONAL</button>
-                    </div>
-                </div>
+                <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor" style="font-size: 0.75em; padding: 8px; margin-top: 5px; width: 100%;">ACCEDER AL CEMENTERIO</button>
+            </div>
+            
+            <div style="margin-top: 10px; font-family: 'MedievalSharp'; font-size: 0.75em;">
+                <span id="toggle-auth-text" onclick="cambiarModoAuth()" style="cursor: pointer; color: #8B0000; text-decoration: underline;">¿Eres un nuevo espíritu? Sella tu identidad aquí</span>
             </div>
         </div>
+
+        <div class="pagina-derecha" style="flex: 1; padding: 10px 15px; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; text-align: center; height: 100%; box-sizing: border-box;">
+            <h2 id="right-title" style="font-family: 'MedievalSharp'; color: #4a0000; font-size: 1.1rem; margin: 0 0 5px 0;">VINCULACIÓN RÁPIDA</h2>
+            <p style="font-family: 'Butcherman'; font-size: 0.7em; color: #555; line-height: 1.2; margin: 0 0 10px 0; font-weight: normal; letter-spacing: 1px;">GRABA TU RASTRO MÍSTICO PARA ENTRAR.</p>
+
+            <div id="google-btn-container" style="display: flex; justify-content: center; min-height: 40px; width: 100%; margin-bottom: 10px;"></div>
+            
+            <div class="divisor-arcano" style="margin: 5px 0; border-top: 1px solid rgba(139, 0, 0, 0.2); width: 60%;"></div>
+
+            <div id="new-user-helper" style="margin-top: 5px; font-family: 'MedievalSharp'; font-size: 0.75rem; color: #2a1b0a;">
+                <p style="margin: 0; line-height: 1.2;">Si eres un nuevo espíritu, firma el contrato de Google arriba ó</p>
+                <button onclick="cambiarModoAuth()" class="btn-ritual-secundario pentaculo-cursor" style="margin-top: 8px; font-size: 0.8em; padding: 6px 12px;">CREA UNA IDENTIDAD TRADICIONAL</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
         <section id="campo-santo" style="display: none;">
             <div class="alma-maestra" style="position: absolute; top: 60px; left: 20px; z-index: 100; font-family: 'Metal Mania'; color: #fff; text-shadow: 0 0 5px #8B0000;">
