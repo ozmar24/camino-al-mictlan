@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&display=swap');
+/* ==========================================================================
+   1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO (Se añade Creepster y MedievalSharp)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&family=Creepster&family=Cinzel:wght@700&display=swap');
 
 /* ==========================================================================
-   1. RESET, CONFIGURACIÓN BASE Y CURSORES
+   2. RESET, CONFIGURACIÓN BASE Y CURSORES
    ========================================================================== */
 * { 
     margin: 0; 
@@ -18,7 +21,7 @@ html, body, #campo-santo {
     cursor: url('./img/daga.png') 5 28, auto !important;
 }
 
-/* --- SISTEMA DE CURSORES --- */
+/* --- SISTEMA DE CURSORES MÍSTICOS --- */
 #escena-portal, 
 #escena-portal *, 
 .titulo-mictlan, 
@@ -32,11 +35,16 @@ html, body, #campo-santo {
 #luna-soulgeist, 
 a, 
 button,
-.opcion {
+.opcion,
+.btn-ritual-grimorio,
+.btn-ritual-secundario,
+.boton-cerrar-codice,
+.cerrar-pacto,
+.pentaculo-cursor {
     cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
-#wallet-input {
+#wallet-input, #email, #password, #oraculo-input {
     cursor: url('./img/pentaculo.png') 16 16, text !important;
 }
 
@@ -51,7 +59,7 @@ button,
 }
 
 /* ==========================================================================
-   2. PORTAL DE ENTRADA Y ESCENA PRINCIPAL
+   3. PORTAL DE ENTRADA Y ESCENA PRINCIPAL
    ========================================================================== */
 #escena-portal {
     position: fixed;
@@ -134,7 +142,7 @@ button,
 }
 
 /* ==========================================================================
-   3. LAS TUMBAS (ZONA CRIPTO) - DESKTOP
+   4. LAS TUMBAS (ZONA CRIPTO FARCET) - DESKTOP
    ========================================================================== */
 .zona-tumba {
     overflow: visible !important;
@@ -236,7 +244,7 @@ button,
     font-weight: bold;
 }
 
-/* --- EFECTOS HOVER (DESKTOP) --- */
+/* --- EFECTOS HOVER --- */
 .zona-tumba:hover .moneda-sustraer {
     opacity: 1;
     transform: translateY(-60px) scale(1.2);
@@ -260,7 +268,7 @@ button,
 }
 
 /* ==========================================================================
-   4. ALMA MAESTRA (SOULGEIST) Y PILARES
+   5. ALMA MAESTRA (SOULGEIST SYSTEM) Y PILARES
    ========================================================================== */
 .zona-tumba.alma-maestra {
     position: absolute !important;
@@ -393,7 +401,7 @@ button,
 }
 
 /* ==========================================================================
-   5. EFECTOS DE AMBIENTACIÓN (NIEBLA, VELAS Y RASTROS)
+   6. EFECTOS DE AMBIENTACIÓN (NIEBLA, VELAS Y RASTROS)
    ========================================================================== */
 .niebla-contenedor {
     position: absolute;
@@ -425,7 +433,7 @@ button,
     filter: blur(60px);
 }
 
-.almaviajera { /* Corregido espacio */
+.almaviajera { 
     position: fixed;
     width: 25px;
     height: 25px;
@@ -504,7 +512,7 @@ button,
 .alianzas:hover { color: #ff0000; opacity: 1; transform: translate(-25px, 35px) rotate(10deg) scale(1.1); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
 
 /* ==========================================================================
-   6. VENTANAS MODALES, INTERFACES Y RITUALES
+   7. VENTANAS MODALES, INTERFACES Y RITUALES
    ========================================================================== */
 #modal-ritual {
     position: fixed;
@@ -543,7 +551,7 @@ button,
 .botones-exchange button { background: transparent; color: #fff; border: 1px solid #fff; padding: 10px 15px; font-family: 'Metal Mania', cursive; flex: 1; transition: 0.3s; }
 .botones-exchange button:hover { background: #fff; color: #000; box-shadow: 0 0 10px #fff; }
 
-/* --- CONTRATO PERGAMINO --- */
+/* --- CONTRATO PERGAMINO DE ENTIDADES --- */
 .modal-pergamino {
     position: fixed;
     top: 50%;
@@ -561,14 +569,14 @@ button,
     padding: 60px;
 }
 
-.pergamino-content { width: 80%; margin-top: 35px; text-align: center; color: #2a1b0a; font-family: 'Nosifer', 'Metal+Mania'; }
+.pergamino-content { width: 80%; margin-top: 35px; text-align: center; color: #2a1b0a; font-family: 'Nosifer', 'Metal Mania'; }
 .pergamino-titulo { font-size: 1.5rem; margin-bottom: 15px; color: #4a0000; }
 .pergamino-texto { color: #2a1b0a; font-size: 0.8rem; line-height: 1.3; font-weight: bold; padding: 0 10px; text-align: center; }
 .pergamino-botones { margin-top: 40px; display: flex; gap: 20px; }
 .btn-ritual { padding: 10px 20px; border: none; font-family: 'Nosifer', cursive; background: #4a0000; color: #e0c097; box-shadow: 2px 2px 5px #000; transition: 0.3s; }
 .btn-ritual:hover { transform: scale(1.1); background: #ff0000; color: #fff; }
 
-/* --- CÓDICE Y PERGAMINO QUEMADO --- */
+/* --- CÓDICE Y INTERFAZ GRIMORIO GENERAL --- */
 .capa-oscura {
     position: fixed !important;
     top: 0 !important;
@@ -603,7 +611,38 @@ button,
 .boton-cerrar-codice { margin-top: 30px; font-family: 'Nosifer', cursive; color: #600; font-size: 0.6rem; transition: 0.3s; }
 .boton-cerrar-codice:hover { color: #ff0000; transform: scale(1.1); }
 
-/* --- ORÁCULO DE OBSIDIANA --- */
+/* --- ESTILOS COMPLEMENTARIOS PARA EL GRIMORIO DE LOGIN --- */
+.input-pergamino-goth {
+    background: rgba(42, 27, 10, 0.05);
+    border: 1px solid rgba(74, 0, 0, 0.4);
+    font-family: 'MedievalSharp', serif;
+    color: #4a0000;
+    text-align: center;
+    border-radius: 2px;
+    outline: none;
+}
+.input-pergamino-goth::placeholder {
+    color: rgba(74, 0, 0, 0.5);
+}
+.btn-ritual-grimorio {
+    background: #4a0000;
+    color: #fff;
+    border: none;
+    font-family: 'Metal Mania', cursive;
+    letter-spacing: 1px;
+    padding: 10px 15px;
+    width: 100%;
+    filter: drop-shadow(0 0 5px #000);
+}
+.btn-ritual-secundario {
+    background: transparent;
+    color: #8B0000;
+    border: 1px solid #8B0000;
+    font-family: 'MedievalSharp', serif;
+    border-radius: 3px;
+}
+
+/* --- ORÁCULO DE OBSIDIANA (SOPORTE) --- */
 #pantalla-oraculo {
     display: none;
     position: fixed;
@@ -697,7 +736,7 @@ button,
 .btn-cerrar-alerta:hover { background: #ff0000; color: #000; box-shadow: 0 0 10px #ff0000; }
 
 /* ==========================================================================
-   7. ANIMACIONES (TIMELINES DE CONFIGURACIÓN)
+   8. ANIMACIONES Y TIMELINES
    ========================================================================== */
 @keyframes cieloMictlan { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes pulsoEspectral { from { filter: brightness(0.5) blur(1px); } to { filter: brightness(1.2) blur(0px); } }
@@ -711,17 +750,16 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (SEGURO PARA PC)
+   9. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL MÓVIL
    ========================================================================== */
 
-/* --- 8.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
+/* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
     #aviso-rotar {
         display: none !important;
     }
 
-    /* OCULTAMOS ÚNICAMENTE LA IMAGEN DEL CANDELABRO (EL CONTENEDOR SE QUEDA) */
     .candelabro-central img,
     img.img-candelabro {
         display: none !important;
@@ -729,7 +767,6 @@ button,
         visibility: hidden !important;
     }
 
-    /* FORZAMOS EL CONTENEDOR A COMORTARSE COMO BARRA FLOTANTE SUPERIOR */
     .candelabro-central {
         position: fixed !important;
         top: 0 !important;
@@ -744,30 +781,27 @@ button,
         z-index: 999999 !important;
     }
 
-    /* ALINEACIÓN HORIZONTAL DE LEYES, ORÁCULO Y ALIANZAS */
     .menu-textos {
         display: flex !important;
-        flex-direction: row !important; /* Fila recta horizontal */
+        flex-direction: row !important;
         justify-content: space-between !important;
         width: 100% !important;
-        position: static !important; /* Rompe el absoluto de PC */
+        position: static !important;
         transform: none !important;
-        margin-top: 15px !important; /* Lo despega del borde del celular */
+        margin-top: 15px !important;
     }
 
-    /* FORMATEO ESTRICTO DE LAS LETRAS GÓTICAS */
     .opcion {
         display: inline-block !important;
         font-family: 'Nosifer', sans-serif !important;
         font-size: 10px !important;
-        color: #ff0000 !important; /* Rojo intenso para el cielo */
+        color: #ff0000 !important;
         text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
         position: static !important;
         transform: none !important;
         margin: 0 !important;
     }
 
-    /* --- PILARES EN FILA INDIA (PEGADOS A LA PIEDRA) --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
@@ -784,7 +818,7 @@ button,
     .pilar-derecho   { left: 56.6% !important; }
 }
 
-/* --- 8.2 VISTA VERTICAL EN MÓVILES (PORTRAIT) --- */
+/* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT - CORTINA BLOQUEO) --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
     #contenedor-criptos, 
@@ -793,7 +827,6 @@ button,
         display: none !important;
     }
 
-    /* CORTINA DE BLOQUEO DE SEGURIDAD */
     #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;

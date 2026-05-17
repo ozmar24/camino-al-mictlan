@@ -4,30 +4,162 @@
 let balanceUsuarioSG = 0; // Controlará tu balance dinámico desde Redis
 let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
+let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
 
+// CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
+const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com";
+
+// ==================================================================
+// FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO
+// ==================================================================
 function entrarAlMictlan() {
     const portal = document.getElementById('escena-portal');
-    const cementerio = document.getElementById('campo-santo');
-    const candelabro = document.querySelector('.candelabro-central');
+    const modalContrato = document.getElementById('modal-contrato');
     
-    if (!portal || !cementerio) return;
+    if (!portal || !modalContrato) return;
 
-    portal.style.transition = "opacity 1.5s ease";
+    // Desvanecimiento suave del portal de las rejas
+    portal.style.transition = "opacity 0.8s ease";
     portal.style.opacity = '0';
     
     setTimeout(() => {
         portal.style.display = 'none';
-        cementerio.style.display = 'block';
         
-        if (candelabro) {
-            candelabro.style.display = 'block';
-            setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
-        }
-
-        generarCementerio();
-    }, 1500);
+        // Desplegamos el Grimorio usando Flexbox para que centre sus dos páginas
+        modalContrato.style.display = 'flex';
+        modalContrato.style.opacity = '1';
+        
+        // Invocamos el botón de Google justo ahora que el contenedor es visible en el DOM
+        inicializarBotonGoogle();
+    }, 800);
 }
 
+// Inicialización segura del botón nativo de Google en la página derecha
+function inicializarBotonGoogle() {
+    const contenedorGoogle = document.getElementById("google-btn-container");
+    if (!contenedorGoogle) return;
+
+    if (typeof google !== 'undefined') {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: manejarLoginGoogle
+        });
+        
+        google.accounts.id.renderButton(
+            contenedorGoogle,
+            { theme: "dark", size: "large", type: "standard", text: "signin_with", width: "240" }
+        );
+    } else {
+        console.error("El grimorio de Google no ha cargado correctamente en el Head.");
+    }
+}
+
+// Alternar el formulario de la PÁGINA IZQUIERDA entre Login y Registro tradicional
+function cambiarModoAuth() {
+    esModoRegistro = !esModoRegistro;
+    const tagline = document.getElementById('auth-tagline');
+    const btnAuth = document.getElementById('btn-auth');
+    const toggleText = document.getElementById('toggle-auth-text');
+
+    if (esModoRegistro) {
+        tagline.innerText = "REGISTRO DE ESPÍRITUS";
+        btnAuth.innerText = "SELLAR NUEVA IDENTIDAD";
+        toggleText.innerText = "¿Ya tienes un rastro registrado? Accede aquí";
+    } else {
+        tagline.innerText = "REGISTRO DE ALMAS";
+        btnAuth.innerText = "ACCEDER AL CEMENTERIO";
+        toggleText.innerText = "¿Eres un nuevo espíritu? Sella tu identidad aquí";
+    }
+}
+
+// ==================================================================
+// FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
+// ==================================================================
+// ==================================================================
+// FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
+// ==================================================================
+async function manejarAuth() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    
+    if (!email || !password) {
+        lanzarAlertaMictlan("Debes completar ambos campos para alterar el libro de los muertos.", "CAMPOS INCOMPLETOS");
+        return;
+    }
+
+    // Determinamos si es un registro de alma nueva o un login tradicional
+    const accionMistica = esModoRegistro ? 'registro' : 'login';
+
+    try {
+        const btnAuth = document.getElementById('btn-auth');
+        const textoOriginal = btnAuth.innerText;
+        btnAuth.innerText = "PROCESANDO PACTO...";
+        btnAuth.disabled = true;
+
+        // Mandamos los datos al backend. Fieles al plan: ¡Sin pedir wallets en la entrada!
+        const respuesta = await fetch('/api/pacto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                accion: accionMistica,
+                email: email,
+                password: password
+            })
+        });
+
+        const resultado = await respuesta.json();
+        
+        btnAuth.innerText = textoOriginal;
+        btnAuth.disabled = false;
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Las deidades del inframundo han rechazado tu ofrenda.", "RITUAL RECHAZADO");
+            return;
+        }
+
+        if (accionMistica === 'registro') {
+            lanzarAlertaMictlan(resultado.message, "ALMA REGISTRADA");
+            cambiarModoAuth(); // Lo manda directo al Login para que use su nueva cuenta
+        } 
+        else if (accionMistica === 'login') {
+            // Guardamos el rastro del correo en la sesión del navegador
+            window.userWallet = resultado.usuario.email; 
+            localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
+
+            // Entramos al cementerio con el balance real que el usuario tenga en Redis
+            entrarAlCampoSanto({ balanceSG: resultado.usuario.balance });
+        }
+
+    } catch (error) {
+        console.error("Fallo de conexión con el Mictlán:", error);
+        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
+    }
+}
+
+async function manejarLoginGoogle(response) {
+    console.log("Token místico de Google recibido:", response.credential);
+}
+
+function entrarAlCampoSanto(perfil) {
+    const modalContrato = document.getElementById('modal-contrato');
+    const cementerio = document.getElementById('campo-santo');
+    const candelabro = document.querySelector('.candelabro-central');
+    
+    if (modalContrato) modalContrato.style.display = 'none';
+    if (cementerio) cementerio.style.display = 'block';
+    
+    if (candelabro) {
+        candelabro.style.display = 'block';
+        setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
+    }
+
+    balanceUsuarioSG = perfil.balanceSG || 0;
+    generarCementerio();
+}
+
+// ==================================================================
+// MECÁNICAS ETERNAS DEL CEMENTERIO (CRIPTAS Y FILTROS)
+// ==================================================================
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
     if (!contenedor) return;
@@ -94,7 +226,6 @@ function generarCementerio() {
                     tumbaSeleccionada = e.currentTarget;
                     window.currentCripto = pos.nombre; 
 
-                    // Corrección del cálculo base en cero para la animación
                     const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
                     lanzarAlma(tumbaOrigen, tumbaSeleccionada, pos.color, baseCalculo * pos.tasa, pos);
                 } else {
@@ -112,15 +243,17 @@ function generarCementerio() {
     ];
 
     pilares.forEach(p => {
+        const pilarExistente = document.querySelector(`.${p.clase}`);
+        if (pilarExistente) pilarExistente.remove();
+
         const enlace = document.createElement('a');
-        const contenedorPilar = document.getElementById('contenedor-criptos'); // Asegurando contenedor
         enlace.href = p.link;
         enlace.className = `inscripcion-pilar ${p.clase}`;
         enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`;
         if(p.clase === "pilar-derecho") {
             enlace.onclick = (e) => { e.preventDefault(); mostrarContratoMictlan(); };
         }
-        if(contenedorPilar) contenedorPilar.appendChild(enlace);
+        contenedor.appendChild(enlace);
     });
 }
 
@@ -146,7 +279,11 @@ function notificacionGotica(titulo, mensaje, color, mostrarInput) {
     const input = document.getElementById('wallet-input');
     const btnEnviar = document.getElementById('btn-enviar-alma') || document.querySelector('.botones-exchange button:first-child');
     
-    modal.style.setProperty('--color-ritmo', color);
+    if(modal) {
+        modal.style.setProperty('--color-ritmo', color);
+        modal.style.display = 'block';
+    }
+    
     document.getElementById('titulo-ritual').innerText = titulo;
     document.getElementById('info-ritual').innerText = mensaje;
     
@@ -160,14 +297,11 @@ function notificacionGotica(titulo, mensaje, color, mostrarInput) {
             if(btnEnviar) btnEnviar.style.display = 'none';
         }
     }
-    
-    modal.style.display = 'block';
 }
 
 function abrirModalRitual(pos) {
     const valorUsuarioUSD = balanceUsuarioSG * 0.001;
 
-    // Validación estricta con los espacios corregidos para fuentes góticas
     if (valorUsuarioUSD < pos.usdMinimo) {
         lanzarAlertaMictlan(
             `El umbral de esta cripta exige un valor mínimo de $ ${pos.usdMinimo.toFixed(2)} USD en almas. Actualmente posees el equivalente a $ ${valorUsuarioUSD.toFixed(2)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
@@ -176,18 +310,19 @@ function abrirModalRitual(pos) {
         return; 
     }
 
-    // Reactivamos el filtro de fondo para mantener consistencia visual
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
 
     const modal = document.getElementById('modal-ritual');
     const titulo = document.getElementById('titulo-ritual');
     const info = document.getElementById('info-ritual');
     
-    modal.style.setProperty('--color-ritmo', pos.color);
-    modal.style.display = 'block';
+    if(modal) {
+        modal.style.setProperty('--color-ritmo', pos.color);
+        modal.style.display = 'block';
+    }
+    
     titulo.innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
     
-    // Selector Multi-Billetera integrado limpiamente
     info.innerHTML = `
         <p style="margin-bottom: 15px; color: #ccc;">Selecciona la pasarela de destino para canalizar tus ${pos.sim}:</p>
         
@@ -237,13 +372,7 @@ function procesarRetiro() {
     procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
 }
 
-// Función Cosecha Definitiva Unificada con soporte Multi-Billetera
 async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
-    if (!walletUsuario || walletUsuario.length < 8) {
-        lanzarAlertaMictlan("El viento del norte rechaza esa dirección. Es inválida para procesar el pacto.", "ERROR DE RITUAL");
-        return;
-    }
-
     try {
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
@@ -288,7 +417,7 @@ function cerrarRitual() {
     const modal = document.getElementById('modal-ritual');
     const cementerio = document.getElementById('campo-santo');
     if(modal) modal.style.display = 'none';
-    if(cementerio) cementerio.style.filter = "none"; // Limpia el blur correctamente siempre
+    if(cementerio) cementerio.style.filter = "none";
 }
 
 function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCripto) {
@@ -345,6 +474,48 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCript
     };
 }
 
+// ==================================================================
+// ABSORCIÓN DE VIDEOS MONETIZADOS
+// ==================================================================
+async function videoCompletado() {
+    if (!window.userWallet) {
+        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+            return;
+        }
+
+        balanceUsuarioSG = resultado.nuevoBalance;
+        
+        const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
+        if (selectorBalance) {
+            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+        }
+        
+        generarCementerio();
+        lanzarAlertaMictlan(resultado.mensaje, "ENERGÍA ABSORBIDA");
+
+    } catch (error) {
+        console.error("Error en la transmisión de almas:", error);
+        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
+    }
+}
+
+// ==================================================================
+// EXTRAS Y MODALES SECUNDARIOS
+// ==================================================================
 function mostrarContratoMictlan() {
     const overlay = document.createElement('div');
     overlay.className = 'overlay-contrato';
@@ -355,13 +526,11 @@ function mostrarContratoMictlan() {
     <div class="pergamino-content">
         <h2 class="pergamino-titulo">Contrato del Mictlán</h2>
         <div class="pergamino-texto">
-            <p style="margin-bottom: 12px;">
-                Yo, buscador de tesoros, ligo mi alma a estos dominios sagrados...
-            </p>
+            <p style="margin-bottom: 12px;">Yo, buscador de tesoros, ligo mi alma a estos dominios sagrados...</p>
         </div>
         <div class="pergamino-botones">
-            <button class="btn-ritual" id="pacto-si">ACEPTAR PACTO</button>
-            <button class="btn-ritual" style="background:#222;" id="pacto-no">HUIR</button>
+            <button class="btn-ritual pentaculo-cursor" id="pacto-si">ACEPTAR PACTO</button>
+            <button class="btn-ritual pentaculo-cursor" style="background:#222;" id="pacto-no">HUIR</button>
         </div>
     </div>`;
     
@@ -395,8 +564,8 @@ function abrirConfirmacionFinal() {
         <h2 style="color:#ff0000; font-family:'Nosifer', serif;">PACTO SELLADO</h2>
         <p style="color:#fff; font-family:'MedievalSharp', cursive;">Tu alma ahora pertenece al Mictlán.</p>
         <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
-            <button id="final-si" class="btn-ritual" style="background:#4a0000; color:white; padding:10px 20px; border:1px solid #ff0000; cursor:pointer;">DESCENDER</button>
-            <button id="final-no" class="btn-ritual" style="background:#222; color:white; padding:10px 20px; border:1px solid #555; cursor:pointer;">CANCELAR</button>
+            <button id="final-si" class="btn-ritual pentaculo-cursor" style="background:#4a0000; color:white; padding:10px 20px; border:1px solid #ff0000;">DESCENDER</button>
+            <button id="final-no" class="btn-ritual pentaculo-cursor" style="background:#222; color:white; padding:10px 20px; border:1px solid #555;">CANCELAR</button>
         </div>
     `;
 
@@ -405,6 +574,18 @@ function abrirConfirmacionFinal() {
 
     document.getElementById('final-si').onclick = () => { window.location.href = "https://void-onyx-web.vercel.app"; };
     document.getElementById('final-no').onclick = () => { modalFinal.remove(); overlayFinal.remove(); };
+}
+
+function lanzarAlertaMictlan(mensaje, titulo = "¡ADVERTENCIA MORTAL!") {
+    document.getElementById('alerta-titulo').innerText = titulo;
+    document.getElementById('alerta-mensaje').innerText = mensaje;
+    const modal = document.getElementById('alerta-mictlan');
+    if(modal) modal.style.display = 'flex';
+}
+
+function cerrarAlertaMictlan() {
+    const modal = document.getElementById('alerta-mictlan');
+    if (modal) modal.style.display = 'none';
 }
 
 function mostrarPergamino(tipo) {
@@ -426,7 +607,11 @@ function mostrarPergamino(tipo) {
     }
 }
 
+// ==================================================================
+// CARGA INICIAL Y PERSISTENCIA DE ALMAS (CORREGIDO)
+// ==================================================================
 function cerrarCodice() { document.getElementById('pantalla-codice').style.display = 'none'; }
+
 function abrirSoporte() {
     const pantalla = document.getElementById('pantalla-oraculo');
     if (pantalla) {
@@ -435,159 +620,64 @@ function abrirSoporte() {
     }
 }
 
+// Vinculación automática del portal y recuperación de sesión al cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    const portalElement = document.getElementById('escena-portal');
+    if(portalElement) {
+        portalElement.onclick = entrarAlMictlan;
+    }
+
+
+    // Comprobamos si el alma ya tiene un pacto activo en este navegador
+    const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
+    if (usuarioGuardado) {
+        window.userWallet = usuarioGuardado;
+        
+        // Ejecutamos la entrada automática para saltarnos el login manual
+        // Nota: Si vas a consultar el balance de Redis en el arranque, 
+        // aquí puedes añadir un fetch rápido o enviar un balance inicial.
+        entrarAlCampoSanto({ balanceSG: 0 }); 
+    }
+});
+// Vinculación automática del portal y recuperación de sesión al cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    const portalElement = document.getElementById('escena-portal');
+    if(portalElement) {
+        portalElement.onclick = entrarAlMictlan;
+    }
+// Cierra la pantalla del espejo arcaico
 function cerrarOraculo() {
     const pantalla = document.getElementById('pantalla-oraculo');
-    if (pantalla) {
-        pantalla.style.opacity = '0';
-        setTimeout(() => { pantalla.style.display = 'none'; }, 500);
-    }
+    if (pantalla) pantalla.style.display = 'none';
 }
 
-function enviarOfrendaOraculo() {
-    const msg = document.getElementById('oraculo-input').value;
-    if(msg.trim()) {
-        alert("Tu susurro ha sido entregado a los ancestros...");
-        document.getElementById('oraculo-input').value = ""; 
-        cerrarOraculo();
-    } else {
-        alert("El Oráculo requiere una ofrenda de palabras.");
-    }
-}
+// Envía el susurro del usuario al soporte del inframundo
+async function enviarOfrendaOraculo() {
+    const inputMensaje = document.getElementById('oraculo-input');
+    const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
+    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima";
 
-function lanzarAlertaMictlan(mensaje, titulo = "¡ADVERTENCIA MORTAL!") {
-    document.getElementById('alerta-titulo').innerText = titulo;
-    document.getElementById('alerta-mensaje').innerText = mensaje;
-    const modal = document.getElementById('alerta-mictlan');
-    if(modal) modal.style.display = 'flex';
-}
-
-function cerrarAlertaMictlan() {
-    const modal = document.getElementById('alerta-mictlan');
-    if (modal) modal.style.display = 'none';
-}
-async function videoCompletado() {
-    // Si el usuario no ha ingresado una wallet aún, detenemos el ritual
-    if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO");
+    if (!mensaje) {
+        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO");
         return;
     }
 
-    try {
-        const respuesta = await fetch('/api/acumular-sg', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wallet: window.userWallet })
-        });
+    // Aquí capturas el mensaje. En el futuro puedes mandarlo a tu API de Telegram.
+    console.log(`Invocación de soporte recibida de [${usuarioActivo}]: ${mensaje}`);
+    
+    lanzarAlertaMictlan("Tu mensaje ha cruzado el umbral. Las deidades responderán pronto.", "INVOCACIÓN ENVIADA");
+    if (inputMensaje) inputMensaje.value = ""; // Limpiamos el área de texto
+    cerrarOraculo();
+}
 
-        const resultado = await respuesta.json();
-
-        // Si Redis detecta que no ha pasado el tiempo reglamentario (Cooldown activo)
-        if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
-            return;
-        }
-
-        // 1. Sincronizamos la variable global con el balance real del servidor
-        balanceUsuarioSG = resultado.nuevoBalance;
+    // Comprobamos si el alma ya tiene un pacto activo en este navegador
+    const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
+    if (usuarioGuardado) {
+        window.userWallet = usuarioGuardado;
         
-        // 2. Actualizamos el marcador visual de la tumba maestra de Soulgeist
-        const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
-        if (selectorBalance) {
-            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
-        }
-        
-        // 3. Volvemos a renderizar el cementerio para que los balances de las criptas
-        // reflejen el aumento proporcional de ganancias en tiempo real (+0.0012 LTC, etc.)
-        generarCementerio();
-        
-        lanzarAlertaMictlan(resultado.mensaje, "ENERGÍA ABSORBIDA");
-
-    } catch (error) {
-        console.error("Error en la transmisión de almas:", error);
-        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
+        // Ejecutamos la entrada automática para saltarnos el login manual
+        // Nota: Si vas a consultar el balance de Redis en el arranque, 
+        // aquí puedes añadir un fetch rápido o enviar un balance inicial.
+        entrarAlCampoSanto({ balanceSG: 0 }); 
     }
-}
-// Variable para alternar entre Login y Registro tradicional
-let esModoRegistro = false;
-
-// CLIENT ID DE TU PROYECTO EN GOOGLE CONSOLE (Reemplázalo por el tuyo de Void Onyx)
-const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com";
-
-// FASE 1 -> FASE 2: El usuario hace clic en "Camino al Mictlán"
-function avanzarAlRegistro() {
-    // 1. Ocultamos el portal de bienvenida
-    document.getElementById('escena-portal').style.display = 'none';
-    
-    // 2. Activamos el contenedor de Autenticación con Flexbox para centrarlo
-    const authContainer = document.getElementById('auth-container');
-    authContainer.style.display = 'flex';
-    
-    // 3. ¡Invocamos a Google justo ahora que el contenedor ya es visible!
-    inicializarBotonGoogle();
-}
-
-// Inicialización segura del botón nativo de Google
-function inicializarBotonGoogle() {
-    if (typeof google !== 'undefined') {
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: manejarLoginGoogle // La función que procesará el token devuelto
-        });
-        
-        // Renderiza el botón oficial dentro de tu caja del pergamino
-        google.accounts.id.renderButton(
-            document.getElementById("google-btn-container"),
-            { theme: "dark", size: "large", type: "standard", text: "signin_with" }
-        );
-    } else {
-        console.error("El grimorio de Google no ha cargado correctamente.");
-    }
-}
-
-// Cambiar el formulario entre Entrar (Login) y Sellar Identidad (Registro)
-function cambiarModoAuth() {
-    esModoRegistro = !esModoRegistro;
-    const tagline = document.getElementById('auth-tagline');
-    const btnAuth = document.getElementById('btn-auth');
-    const toggleText = document.getElementById('toggle-auth-text');
-    const inputWallet = document.getElementById('wallet-registro');
-
-    if (esModoRegistro) {
-        tagline.innerText = "REGISTRO DE ESPÍRITUS";
-        btnAuth.innerText = "SELLAR NUEVA IDENTIDAD";
-        toggleText.innerText = "¿Ya tienes un rastro registrado? Accede aquí";
-        inputWallet.style.display = "block"; // Mostramos el campo de la wallet
-    } else {
-        tagline.innerText = "REGISTRO DE ALMAS";
-        btnAuth.innerText = "ACCEDER AL CEMENTERIO";
-        toggleText.innerText = "¿Eres un nuevo espíritu? Sella tu identidad aquí";
-        inputWallet.style.display = "none";  // Escondemos la wallet para login directo
-    }
-}
-
-// Función que se ejecuta cuando Google autentica con éxito al usuario
-async function manejarLoginGoogle(response) {
-    console.log("Token místico de Google recibido:", response.credential);
-    
-    // Aquí mandas el token response.credential a tu backend en Vercel para desencriptar el correo
-    // Si el usuario es completamente nuevo, abres el modo registro para que asocie su Wallet.
-    // Si ya existe, saltas directo a la Fase 3:
-    // entrarAlCampoSanto(datosDelUsuario);
-}
-
-// FASE 2 -> FASE 3: El usuario se autentica correctamente y entra al juego
-function entrarAlCampoSanto(perfil) {
-    // Ocultamos el pergamino de autenticación
-    document.getElementById('auth-container').style.display = 'none';
-    
-    // Mostramos el cementerio con las criptas por fin
-    document.getElementById('campo-santo').style.display = 'block';
-    
-    // Sincronizamos los balances cargados desde Upstash Redis
-    document.querySelector('.balance-actual').innerText = `Poder: ${perfil.balanceSG || 0} SG`;
-    
-    // Llamas a tu función nativa que dibuja las tumbas
-    if (typeof generarCementerio === 'function') {
-        generarCementerio();
-    }
-}
+});
