@@ -889,96 +889,70 @@ button,
     100% { transform: rotate(0deg); }
 }
 /* ==================================================================
-   COORDENADAS MILIMÉTRICAS ABSOLUTAS (ANTI-DESFASE)
+   COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
    ================================================================== */
 
+/* Forzamos el contenedor del grimorio a ser un bloque rígido y estable */
 .grimorio-container {
     background: url('img/grimorio.png') no-repeat center center !important;
-    background-size: contain !important; /* Cambiado de 100% 100% a contain para que no se estire como chicle */
+    background-size: 100% 100% !important;
     width: 1050px !important;
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    position: relative !important;
-    display: block !important;
+    position: relative !important; /* Base sagrada de coordenadas */
+    display: block !important;     /* Estrictamente bloque para evitar herencias flex */
     padding: 0 !important;
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA */
+/* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
-    top: 15% !important;        /* Controla la altura inicial desde el marco superior */
-    left: 11.5% !important;     
-    width: 33% !important;      
-    height: 70% !important;     
+    top: 18% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
+    left: 11% !important;       /* Margen exacto desde el borde izquierdo del libro */
+    width: 34% !important;      /* Ancho perfecto limitando con el centro del libro */
+    height: 62% !important;     /* Altura máxima para no pisar el fondo */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* ¡CAMBIADO! Alinea todo desde arriba de forma natural */
+    justify-content: flex-start !important; /* Alineación limpia desde arriba */
+    gap: 15px !important;       /* Separación balanceada y constante entre elementos */
     box-sizing: border-box !important;
-    z-index: 20 !important;
-    padding-right: 15px !important;
+    padding: 10px 20px !important;
+    z-index: 30 !important;
 }
 
-/* ⬅️ PÁGINA DERECHA */
+/* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
-    top: 15% !important;        
-    right: 11.5% !important;    
-    width: 33% !important;      
-    height: 70% !important;
+    top: 18% !important;        
+    right: 11% !important;      /* Margen exacto desde el borde derecho del libro */
+    width: 34% !important;      
+    height: 62% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* ¡CAMBIADO! Alinea todo desde arriba de forma natural */
+    justify-content: flex-start !important; 
+    gap: 15px !important;       
     box-sizing: border-box !important;
-    z-index: 20 !important;
-    padding-left: 15px !important;
+    padding: 10px 20px !important;
+    z-index: 30 !important;
 }
 
-#auth-tagline,
-#right-title {
-    position: relative !important;
-    margin: 0 0 5px 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    font-size: clamp(0.95rem, 1.8vw, 1.15rem) !important; /* Escala dinámicamente */
-}
-#auth-tagline { font-family: 'Butcherman' !important; color: #8B0000 !important; }
-#right-title { font-family: 'MedievalSharp' !important; color: #4a0000 !important; }
-
-#left-desc,
-#right-desc,
-.grimorio-container p#left-desc,
-.grimorio-container p#right-desc {
-    position: relative !important;
-    display: block !important;
-    white-space: normal !important; /* Rompe el nowrap infinito */
-    text-align: center !important;
-    max-width: 90% !important;
-    margin: 0 auto !important;
-    line-height: 1.2 !important;
-}
-#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72rem !important; color: #2a1b0a !important; }
-#right-desc { font-family: 'Butcherman' !important; font-size: 0.65rem !important; color: #555 !important; }
-
-/* 📌 DISEÑO DEL FORMULARIO TRADICIONAL */
+/* 📌 CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
+    gap: 10px !important;       /* Separación interna de los inputs */
     width: 90% !important;
-    margin-top: 25px !important; /* Separa los inputs del título superior */
-    margin-bottom: 20px !important;
+    margin: 0 !important;
 }
 
 .grimorio-container .input-pergamino-goth {
-    font-size: 0.75rem !important;
-    padding: 6px !important;
+    font-size: 0.8rem !important;
+    padding: 8px !important;
     text-align: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -986,48 +960,56 @@ button,
 
 .grimorio-container .btn-ritual-grimorio {
     font-size: 0.75rem !important;
-    padding: 7px !important;
+    padding: 10px !important;
     width: 100% !important;
+    margin-top: 5px !important;
 }
 
-/* 📌 DISEÑO DEL BOTÓN DE GOOGLE DERECHO */
+/* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    width: 100% !important;
     min-height: 45px !important;
-    width: 90% !important;
-    margin-top: 30px !important; /* Baja el botón de Google para centrarlo en la hoja */
-    margin-bottom: 15px !important;
+    margin: 10px 0 0 0 !important;
 }
 
+/* El divisor sutil del lado derecho */
 .grimorio-container .divisor-arcano {
-    border-top: 1px solid rgba(139, 0, 0, 0.2) !important;
-    width: 60% !important;
-    margin: 10px 0 !important;
+    border-top: 1px solid rgba(139, 0, 0, 0.25) !important;
+    width: 70% !important;
+    margin: 5px 0 !important;
 }
 
-/* 📌 PIES DE PÁGINA (SUBIDOS AL PERGAMINO) */
+/* 📌 PIES DE PÁGINA ACOMODADOS */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper {
     position: relative !important;
-    font-family: 'MedievalSharp' !important;
-    font-size: 0.68rem !important;
+    font-family: 'MedievalSharp', cursive !important;
+    font-size: 0.7rem !important;
     color: #2a1b0a !important;
-    max-width: 95% !important;
     text-align: center !important;
-    margin-top: auto !important; /* Esto los mantiene abajo, pero sin romper el flujo */
-    padding-bottom: 10px !important;
+    width: 100% !important;
+    margin-top: auto !important; /* Empuja el texto al fondo de la hoja de manera segura */
+    padding-bottom: 5px !important;
 }
 
+.grimorio-container #new-user-helper p {
+    margin-bottom: 8px !important;
+    color: #2a1b0a !important;
+}
+
+.grimorio-container .btn-ritual-secundario {
+    font-size: 0.7rem !important;
+    padding: 5px 12px !important;
+    cursor: pointer !important;
+}
+
+/* Corrección de enlaces de intercambio */
 #toggle-auth-text {
     cursor: pointer !important;
     color: #8B0000 !important;
     text-decoration: underline !important;
-}
-
-.grimorio-container .btn-ritual-secundario {
-    margin-top: 4px !important;
-    font-size: 0.72rem !important;
-    padding: 4px 10px !important;
+    font-weight: bold !important;
 }
