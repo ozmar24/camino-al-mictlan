@@ -1,3 +1,9 @@
+// ==================================================================
+// VARIABLES GLOBALES DEL INFRAMUNDO
+// ==================================================================
+let balanceUsuarioSG = 0; // Controlará el poder acumulado real desde Redis
+let tumbaSeleccionada = null; // Una sola declaración global limpia
+
 function entrarAlMictlan() {
     const portal = document.getElementById('escena-portal');
     const cementerio = document.getElementById('campo-santo');
@@ -18,11 +24,8 @@ function entrarAlMictlan() {
         }
 
         generarCementerio();
-        // El ambiente de criaturas fue desterrado para optimizar el rendimiento
     }, 1500);
 }
-
-let tumbaSeleccionada = null;
 
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
@@ -40,8 +43,6 @@ function generarCementerio() {
         { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002 }
     ];
 
-    const balanceUsuarioSG = 100;
-
     configuracion.forEach(pos => {
         const div = document.createElement('div');
         div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba';
@@ -56,7 +57,11 @@ function generarCementerio() {
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
         } else {
-            const gananciaEstimada = (balanceUsuarioSG * pos.tasa).toLocaleString();
+            // Usamos una base de 100 para la proyección visual si el usuario tiene 0,
+            // garantizando que las lápidas muestren recompensas atractivas desde el inicio.
+            const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 100;
+            const gananciaEstimada = (baseCalculo * pos.tasa).toLocaleString();
+            
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
                     <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
@@ -74,17 +79,13 @@ function generarCementerio() {
             `;
         }
 
-        div.onclick = (e) => {
+        div.onclick = async (e) => {
             e.stopPropagation();
+            
             if (pos.especial) {
-                notificacionGotica("RITUAL INICIADO", "Selecciona una tumba de destino para canalizar tu Poder SG.", pos.color, false);
+                notificacionGotica("RITUAL DE COSECHA", "Ingresa tu wallet para extraer almas del Mictlán.", pos.color, true);
+                window.currentCripto = "Soulgeist"; 
                 tumbaSeleccionada = e.currentTarget; 
-            } 
-            else if (tumbaSeleccionada && tumbaSeleccionada instanceof HTMLElement) {
-                const cantidadASumar = (balanceUsuarioSG * pos.tasa);
-                lanzarAlma(tumbaSeleccionada, e.currentTarget, pos.color, cantidadASumar);
-                notificacionGotica("PODER TRANSFERIDO", `¡La tumba de ${pos.nombre} ha recibido energía!`, pos.color, false);
-                tumbaSeleccionada = null; 
             } 
             else {
                 abrirModalRitual(pos);
@@ -381,14 +382,29 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada) {
 
         const resultado = await respuesta.json();
 
-        if (respuesta.status === 403) {
-            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO");
+        if (respuesta.status === 403 || respuesta.status === 429) {
+            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO / SEGURIDAD");
             return;
         }
 
         if (!respuesta.ok) {
             lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL");
             return;
+        }
+
+        // ==================================================================
+        // ¡ACTUALIZACIÓN ACUMULATIVA DE ALMAS REALES!
+        // ==================================================================
+        if (resultado.balanceAlmas !== undefined) {
+            balanceUsuarioSG = resultado.balanceAlmas;
+            const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
+            if (selectorBalance) {
+                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+            }
+            
+            // Volvemos a regenerar para que las demás lápidas calculen la proyección real
+            // en base al balance de almas que acaba de bajar de Redis.
+            generarCementerio();
         }
 
         lanzarAlertaMictlan(resultado.mensaje, "RITUAL COMPLETADO");
