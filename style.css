@@ -889,70 +889,71 @@ button,
     100% { transform: rotate(0deg); }
 }
 /* ==================================================================
-   REESTRUCTURACIÓN FINAL VERTICAL DEL GRIMORIO
+   POSICIONAMIENTO ABSOLUTO QUIRÚRGICO (SISTEMA ANTI-DESFASE)
    ================================================================== */
 
-/* Contenedor principal del libro */
+/* Contenedor del Grimorio: Mantiene su tamaño base ideal */
 .grimorio-container {
-    display: flex !important;
-    background: url('img/grimorio.png') no-repeat center center !important;
+    background: url('img/grimorio1.png') no-repeat center center !important;
     background-size: 100% 100% !important;
     width: 1050px !important;
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    /* Recortamos el espacio de abajo (145px) para levantar los pies de página por la fuerza */
-    padding: 0 0 145px 0 !important; 
+    position: relative !important; /* Eje central de las coordenadas */
+    padding: 0 !important;          /* Eliminamos paddings que muevan las cosas */
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
-    position: relative !important;
 }
 
-/* Forzamos a las páginas a alinear todo hacia el centro, no a los extremos */
-.grimorio-container .pagina-izquierda,
-.grimorio-container .pagina-derecha {
-    flex: 1 !important;
-    height: 100% !important;
+/* ➡️ CUADRANTE IZQUIERDO (Registro de Almas) 
+   Centrado milimétricamente en la hoja izquierda del pergamino */
+.grimorio-container .pagina-izquierda {
+    position: absolute !important;
+    top: 110px !important;     /* Margen seguro desde el lomo de cuero superior */
+    left: 110px !important;    /* Distancia exacta desde el borde izquierdo del libro */
+    width: 360px !important;   /* El ancho justo de la zona clara del papel */
+    height: 380px !important;  /* Altura perfecta para que el pie de página no se salga */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important; /* Alineación central pura */
+    justify-content: space-between !important;
     box-sizing: border-box !important;
-    position: relative !important;
+    z-index: 10 !important;
 }
 
-/* Coordenadas de márgenes para la Página Izquierda */
-.grimorio-container .pagina-izquierda {
-    border-right: 1px dashed rgba(74, 0, 0, 0.15) !important;
-    padding-left: 140px !important;
-    padding-right: 40px !important;
-}
-
-/* Coordenadas de márgenes para la Página Derecha */
+/* ⬅️ CUADRANTE DERECHO (Vinculación Rápida)
+   Centrado milimétricamente en la hoja derecha del pergamino */
 .grimorio-container .pagina-derecha {
-    padding-left: 40px !important;
-    padding-right: 140px !important;
+    position: absolute !important;
+    top: 110px !important;     /* Misma altura para perfecta simetría */
+    right: 110px !important;   /* Distancia exacta desde el borde derecho del libro */
+    width: 360px !important;   /* Mismo ancho de zona clara */
+    height: 380px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    z-index: 10 !important;
 }
 
-/* 📌 SEPARACIÓN VERTICAL DE LOS TÍTULOS (Los bajamos del cuero oscuro) */
+/* 📌 LIMPIEZA TOTAL DE REGLAS DE TEXTO VIEJAS */
 #auth-tagline,
 #right-title {
     position: relative !important;
     top: auto !important;
     left: auto !important;
     transform: none !important;
-    /* Un margin-top de 115px los empuja exactamente al inicio de las hojas limpias */
-    margin: 115px 0 5px 0 !important; 
-    padding: 0 !important;
+    margin: 0 0 5px 0 !important;
     width: 100% !important;
     text-align: center !important;
     white-space: nowrap !important;
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important;
 }
 #auth-tagline { font-family: 'Butcherman' !important; color: #8B0000 !important; }
 #right-title { font-family: 'MedievalSharp' !important; color: #4a0000 !important; }
 
-/* 📌 PÁRRAFOS DESCRIPTIVOS BAJO EL TÍTULO */
 #left-desc,
 #right-desc,
 .grimorio-container p#left-desc,
@@ -961,20 +962,20 @@ button,
     display: block !important;
     white-space: normal !important;
     text-align: center !important;
-    max-width: 90% !important;
-    margin: 0 auto 15px auto !important; /* Espacio controlado con lo que sigue */
+    max-width: 95% !important;
+    margin: 0 auto !important;
     line-height: 1.2 !important;
 }
 #left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72em !important; color: #2a1b0a !important; }
-#right-desc { font-family: 'Butcherman' !important; font-size: 0.62em !important; color: #555 !important; }
+#right-desc { font-family: 'Butcherman' !important; font-size: 0.65em !important; color: #555 !important; }
 
-/* 📌 COMPACTACIÓN DEL FORMULARIO */
+/* 📌 CAJA DEL FORMULARIO TRADICIONAL */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
     gap: 6px !important;
-    width: 95% !important;
-    margin: 0 0 auto 0 !important; /* Consume el espacio sobrante abajo para centrarse */
+    width: 85% !important;
+    margin: auto 0 !important;
 }
 
 .grimorio-container .input-pergamino-goth {
@@ -988,27 +989,26 @@ button,
 .grimorio-container .btn-ritual-grimorio {
     font-size: 0.72em !important;
     padding: 7px !important;
-    margin-top: 2px !important;
     width: 100% !important;
 }
 
-/* 📌 COMPACTACIÓN DEL ÁREA DE GOOGLE */
+/* 📌 CAJA DEL BOTÓN NATIVO DE GOOGLE */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     min-height: 40px !important;
-    width: 100% !important;
-    margin: 10px 0 auto 0 !important; /* Empuja el espacio libre hacia abajo */
+    width: 85% !important;
+    margin: auto 0 !important;
 }
 
 .grimorio-container .divisor-arcano {
     border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
     width: 60% !important;
-    margin: 10px 0 !important;
+    margin: 8px 0 !important;
 }
 
-/* 📌 PIES DE PÁGINA (Subidos al papel pergamino por la fuerza) */
+/* 📌 COMPACTACIÓN DE PIES DE PÁGINA INTERNOS */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper,
 #new-user-helper {
@@ -1018,8 +1018,7 @@ button,
     color: #2a1b0a !important;
     max-width: 95% !important;
     text-align: center !important;
-    margin-top: auto !important; /* Se amarra al borde del padding-bottom del grimorio */
-    margin-bottom: 5px !important;
+    margin-top: auto !important;
 }
 
 #toggle-auth-text {
@@ -1029,7 +1028,7 @@ button,
 }
 
 .grimorio-container .btn-ritual-secundario {
-    margin-top: 5px !important;
+    margin-top: 4px !important;
     font-size: 0.72em !important;
     padding: 4px 10px !important;
 }
