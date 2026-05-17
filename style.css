@@ -711,24 +711,20 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (EXTINCIÓN CANDELABRO)
+   8. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL (REVISADO DE RAÍZ)
    ========================================================================== */
 
-/* Bloqueo base por defecto para el portal */
+/* Bloqueo inicial estricto para el candelabro */
 .candelabro-central {
-    display: none;
-    opacity: 0;
-}
-.candelabro-central.candelabro-visible {
-    display: flex !important;
-    opacity: 1 !important;
+    display: none !important;
+    opacity: 0 !important;
 }
 
-/* --- 8.1 OPTIMIZACIÓN ABSOLUTA EN VISTA HORIZONTAL (LANDSCAPE) --- */
+/* --- 8.1 VISTA HORIZONTAL (LANDSCAPE): MENÚ SUPERIOR VISIBLE Y LIMPIO --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     
-    /* Ocultamos el aviso de rotación forzada */
-    #aviso-rotar {
+    /* Forzamos que el aviso de rotación se oculte si ya está acostado */
+    body #aviso-rotar {
         display: none !important;
     }
 
@@ -738,96 +734,103 @@ button,
         position: relative !important;
     }
 
-    /* --- EXTINCIÓN RADICAL DEL CANDELABRO EN MÓVIL --- */
+    /* MATAMOS TOTALMENTE EL CANDELABRO EN MÓVILES */
     .candelabro-central.candelabro-visible,
-    .img-candelabro {
-        display: none !important; /* Desaparece del plano para liberar el suelo */
+    body .candelabro-central,
+    img.img-candelabro {
+        display: none !important;
         opacity: 0 !important;
         visibility: hidden !important;
     }
 
-    /* --- REUBICACIÓN DEL MENÚ EN LA PARTE SUPERIOR (BARRA LIMPIA) --- */
-    .menu-textos {
+    /* --- REUBICACIÓN INYECTADA DEL MENÚ EN LA PARTE SUPERIOR --- */
+    body .menu-textos {
+        display: flex !important;
+        flex-direction: row !important; /* Fuerza la alineación horizontal */
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 30px !important; /* Espaciado perfecto entre palabras */
+        
         position: fixed !important;
-        top: 10px !important; /* Lo anclamos arriba como corona del juego */
-        bottom: auto !important;
+        top: 15px !important; /* Lo baja un poco del borde superior para que se vea impecable */
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 100% !important;
-        max-width: 320px !important; /* Contenedor ideal para que no se disperse */
-        display: flex !important;
-        justify-content: space-between !important;
-        gap: 15px !important;
-        z-index: 9999 !important; /* Por encima del cementerio */
+        
+        width: auto !important;
+        min-width: 280px !important;
+        height: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 99999 !important; /* Se superpone a las nubes y pirámides */
     }
 
-    /* Estilizado horizontal de las opciones */
-    .opcion {
-        font-family: 'Nosifer', serif !important;
-        font-size: 10px !important; /* Tamaño legible sin saturar */
+    /* Reseteo y visualización de cada opción gótica */
+    body .menu-textos .opcion,
+    body .opcion {
+        display: inline-block !important;
+        font-family: 'Nosifer', sans-serif !important;
+        font-size: 10px !important; /* Tamaño ideal scannable */
         color: #8b0000 !important;
-        text-shadow: 2px 2px 4px #000 !important;
-        transform: none !important; /* Matamos inclinaciones raras de PC */
+        text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
+        text-decoration: none !important;
         letter-spacing: 1px !important;
+        
+        /* Eliminamos las inclinaciones o posiciones absolutas individuales de PC */
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
     }
 
-    .leyes, .oraculo, .alianzas { 
-        transform: none !important; 
-    }
-
-    /* --- PILARES EN FILA INDIA ULTRA AJUSTADOS A LA DERECHA --- */
+    /* --- PILARES EN VERTICAL (SE ALINEAN A LA DERECHA DE LA PIEDRA) --- */
     .pilar-izquierdo, 
     .pilar-derecho {
         position: absolute !important;
-        top: 40% !important; /* Centrado vertical en el pasillo */
+        top: 38% !important;
         display: flex !important;
-        flex-direction: column !important; /* Letras una debajo de otra estricto */
+        flex-direction: column !important;
         align-items: center !important;
-        font-size: 8px !important; /* Micro tipografía para no rozar a Dogecoin */
+        font-size: 8px !important;
         line-height: 1.1 !important;
         z-index: 995 !important;
     }
     
-    /* Coordenadas precisas desplazadas a la derecha para pisar la roca */
-    .pilar-izquierdo { 
-        left: 45.6% !important; 
-    }
-    .pilar-derecho { 
-        left: 56.6% !important; 
-    }
+    .pilar-izquierdo { left: 45.6% !important; }
+    .pilar-derecho   { left: 56.6% !important; }
 }
 
-/* --- 8.2 INTERFÁZ DE BLOQUEO EN VISTA VERTICAL (PORTRAIT) --- */
+/* --- 8.2 VISTA VERTICAL (PORTRAIT): INTERRUPTOR DE SEGURIDAD ESTRICTO --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
-    /* Escondemos el juego completo para que no haya colisiones */
+    /* Escondemos absolutamente todo el entorno del cementerio */
     #contenedor-criptos, 
     #campo-santo, 
-    .candelabro-central,
-    .menu-textos {
+    body .menu-textos,
+    .candelabro-central {
         display: none !important;
     }
 
-    /* Desplegamos el aviso ritual de rotación */
-    #aviso-rotar {
+    /* Forzamos el despliegue de la cortina de bloqueo */
+    body #aviso-rotar {
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
+        
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        background: #050505 !important;
-        z-index: 999999 !important;
+        background: #050505 !important; /* Fondo negro profundo */
+        z-index: 999999 !important; /* Absolutamente arriba de todo */
         color: #8b0000 !important;
         text-align: center !important;
         padding: 30px !important;
         box-sizing: border-box !important;
     }
 
-    #aviso-rotar h2 {
+    body #aviso-rotar h2 {
         font-family: 'Nosifer', sans-serif !important;
         font-size: 14px !important;
         text-shadow: 0 0 8px #ff0000 !important;
@@ -835,39 +838,40 @@ button,
         letter-spacing: 1px !important;
     }
 
-    #aviso-rotar p {
+    body #aviso-rotar p {
         font-family: 'Creepster', sans-serif !important;
-        font-size: 14px !important;
-        color: #bbb !important;
+        font-size: 15px !important;
+        color: #fff !important;
         line-height: 1.4 !important;
     }
 
-    /* Animación del smartphone girando */
-    .icono-giro {
+    /* Icono animado del celular girando */
+    body #aviso-rotar .icono-giro {
+        display: block !important;
         width: 35px;
         height: 55px;
         margin-top: 25px;
         border: 2px solid #8b0000;
         border-radius: 5px;
         position: relative;
-        animation: rotarMictlan 2.3s infinite ease-in-out;
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
+        animation: rotarMictlanFinal 2.3s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     }
     
-    .icono-giro::after {
-        content: '';
-        position: absolute;
-        bottom: 3px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 5px;
-        height: 5px;
-        border: 1px solid #8b0000;
-        border-radius: 50%;
+    body #aviso-rotar .icono-giro::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: 3px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 5px !important;
+        height: 5px !important;
+        border: 1px solid #8b0000 !important;
+        border-radius: 50% !important;
     }
 }
 
-@keyframes rotarMictlan {
+@keyframes rotarMictlanFinal {
     0% { transform: rotate(0deg); }
     40%, 60% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
