@@ -889,7 +889,7 @@ button,
     100% { transform: rotate(0deg); }
 }
 /* ==================================================================
-   CALIBRACIÓN DE COORDENADAS DEL GRIMORIO DEL MICTLÁN
+   REESTRUCTURACIÓN FINAL VERTICAL DEL GRIMORIO
    ================================================================== */
 
 /* Contenedor principal del libro */
@@ -901,14 +901,14 @@ button,
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    /* Ajustamos el padding superior e inferior; dejamos que los laterales se controlen en las páginas */
-    padding: 115px 0 105px 0 !important; 
+    /* Recortamos el espacio de abajo (145px) para levantar los pies de página por la fuerza */
+    padding: 0 0 145px 0 !important; 
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
     position: relative !important;
 }
 
-/* Base común para ambas páginas */
+/* Forzamos a las páginas a alinear todo hacia el centro, no a los extremos */
 .grimorio-container .pagina-izquierda,
 .grimorio-container .pagina-derecha {
     flex: 1 !important;
@@ -916,42 +916,43 @@ button,
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important; /* Alineación central pura */
     box-sizing: border-box !important;
     position: relative !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA: Empujada hacia la derecha para centrarla en su hoja */
+/* Coordenadas de márgenes para la Página Izquierda */
 .grimorio-container .pagina-izquierda {
     border-right: 1px dashed rgba(74, 0, 0, 0.15) !important;
-    padding-left: 140px !important;  /* Empuja todo el bloque de registro hacia la derecha */
-    padding-right: 40px !important;  /* Margen seguro con el lomo central */
+    padding-left: 140px !important;
+    padding-right: 40px !important;
 }
 
-/* ⬅️ PÁGINA DERECHA: Empujada hacia la izquierda para centrarla en su hoja */
+/* Coordenadas de márgenes para la Página Derecha */
 .grimorio-container .pagina-derecha {
-    padding-left: 40px !important;   /* Margen seguro con el lomo central */
-    padding-right: 140px !important; /* Empuja todo el bloque de Google hacia la izquierda */
+    padding-left: 40px !important;
+    padding-right: 140px !important;
 }
 
-/* 📌 COMPACTACIÓN EXTRACTA DE TÍTULOS */
+/* 📌 SEPARACIÓN VERTICAL DE LOS TÍTULOS (Los bajamos del cuero oscuro) */
 #auth-tagline,
 #right-title {
     position: relative !important;
     top: auto !important;
     left: auto !important;
     transform: none !important;
-    margin: 0 0 5px 0 !important;
+    /* Un margin-top de 115px los empuja exactamente al inicio de las hojas limpias */
+    margin: 115px 0 5px 0 !important; 
     padding: 0 !important;
     width: 100% !important;
     text-align: center !important;
     white-space: nowrap !important;
-    font-size: 1.1rem !important; /* Reducido para que no sature visualmente */
+    font-size: 1.1rem !important;
 }
 #auth-tagline { font-family: 'Butcherman' !important; color: #8B0000 !important; }
 #right-title { font-family: 'MedievalSharp' !important; color: #4a0000 !important; }
 
-/* 📌 PÁRRAFOS DESCRIPTIVOS COMPACTOS */
+/* 📌 PÁRRAFOS DESCRIPTIVOS BAJO EL TÍTULO */
 #left-desc,
 #right-desc,
 .grimorio-container p#left-desc,
@@ -961,66 +962,64 @@ button,
     white-space: normal !important;
     text-align: center !important;
     max-width: 90% !important;
-    margin: 0 auto !important;
+    margin: 0 auto 15px auto !important; /* Espacio controlado con lo que sigue */
     line-height: 1.2 !important;
 }
-#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.7rem !important; color: #2a1b0a !important; }
-#right-desc { font-family: 'Butcherman' !important; font-size: 0.6rem !important; color: #555 !important; }
+#left-desc { font-family: 'MedievalSharp' !important; font-size: 0.72em !important; color: #2a1b0a !important; }
+#right-desc { font-family: 'Butcherman' !important; font-size: 0.62em !important; color: #555 !important; }
 
-/* 📌 FORMULARIO TRADICIONAL DE REGISTRO */
+/* 📌 COMPACTACIÓN DEL FORMULARIO */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
     gap: 6px !important;
-    width: 90% !important; /* Aprovecha mejor el nuevo espacio centrado */
-    margin: auto 0 !important;
+    width: 95% !important;
+    margin: 0 0 auto 0 !important; /* Consume el espacio sobrante abajo para centrarse */
 }
 
-/* Inputs y botones de la izquierda reducidos */
 .grimorio-container .input-pergamino-goth {
-    font-size: 0.7rem !important; /* Letra un poco más pequeña */
-    padding: 5px !important;
+    font-size: 0.72em !important;
+    padding: 6px !important;
     text-align: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
 
 .grimorio-container .btn-ritual-grimorio {
-    font-size: 0.7rem !important;
-    padding: 6px !important;
+    font-size: 0.72em !important;
+    padding: 7px !important;
     margin-top: 2px !important;
     width: 100% !important;
 }
 
-/* 📌 CONTENEDOR DEL BOTÓN DE GOOGLE */
+/* 📌 COMPACTACIÓN DEL ÁREA DE GOOGLE */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     min-height: 40px !important;
-    width: 95% !important; 
-    margin: auto 0 !important;
+    width: 100% !important;
+    margin: 10px 0 auto 0 !important; /* Empuja el espacio libre hacia abajo */
 }
 
-/* Divisor sutil */
 .grimorio-container .divisor-arcano {
     border-top: 1px solid rgba(139, 0, 0, 0.15) !important;
     width: 60% !important;
-    margin: 8px 0 !important;
+    margin: 10px 0 !important;
 }
 
-/* 📌 PIES DE PÁGINA COORDENADOS */
+/* 📌 PIES DE PÁGINA (Subidos al papel pergamino por la fuerza) */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper,
 #new-user-helper {
     position: relative !important;
     font-family: 'MedievalSharp' !important;
-    font-size: 0.65rem !important; /* Reducción general de los textos de abajo */
+    font-size: 0.68rem !important;
     color: #2a1b0a !important;
     max-width: 95% !important;
     text-align: center !important;
-    margin-top: auto !important; 
-    padding-top: 5px !important;
+    margin-top: auto !important; /* Se amarra al borde del padding-bottom del grimorio */
+    margin-bottom: 5px !important;
 }
 
 #toggle-auth-text {
@@ -1030,7 +1029,7 @@ button,
 }
 
 .grimorio-container .btn-ritual-secundario {
-    margin-top: 4px !important;
-    font-size: 0.7rem !important;
-    padding: 4px 8px !important;
+    margin-top: 5px !important;
+    font-size: 0.72em !important;
+    padding: 4px 10px !important;
 }
