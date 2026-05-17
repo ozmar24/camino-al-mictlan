@@ -507,3 +507,87 @@ async function videoCompletado() {
         lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
     }
 }
+// Variable para alternar entre Login y Registro tradicional
+let esModoRegistro = false;
+
+// CLIENT ID DE TU PROYECTO EN GOOGLE CONSOLE (Reemplázalo por el tuyo de Void Onyx)
+const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com";
+
+// FASE 1 -> FASE 2: El usuario hace clic en "Camino al Mictlán"
+function avanzarAlRegistro() {
+    // 1. Ocultamos el portal de bienvenida
+    document.getElementById('escena-portal').style.display = 'none';
+    
+    // 2. Activamos el contenedor de Autenticación con Flexbox para centrarlo
+    const authContainer = document.getElementById('auth-container');
+    authContainer.style.display = 'flex';
+    
+    // 3. ¡Invocamos a Google justo ahora que el contenedor ya es visible!
+    inicializarBotonGoogle();
+}
+
+// Inicialización segura del botón nativo de Google
+function inicializarBotonGoogle() {
+    if (typeof google !== 'undefined') {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: manejarLoginGoogle // La función que procesará el token devuelto
+        });
+        
+        // Renderiza el botón oficial dentro de tu caja del pergamino
+        google.accounts.id.renderButton(
+            document.getElementById("google-btn-container"),
+            { theme: "dark", size: "large", type: "standard", text: "signin_with" }
+        );
+    } else {
+        console.error("El grimorio de Google no ha cargado correctamente.");
+    }
+}
+
+// Cambiar el formulario entre Entrar (Login) y Sellar Identidad (Registro)
+function cambiarModoAuth() {
+    esModoRegistro = !esModoRegistro;
+    const tagline = document.getElementById('auth-tagline');
+    const btnAuth = document.getElementById('btn-auth');
+    const toggleText = document.getElementById('toggle-auth-text');
+    const inputWallet = document.getElementById('wallet-registro');
+
+    if (esModoRegistro) {
+        tagline.innerText = "REGISTRO DE ESPÍRITUS";
+        btnAuth.innerText = "SELLAR NUEVA IDENTIDAD";
+        toggleText.innerText = "¿Ya tienes un rastro registrado? Accede aquí";
+        inputWallet.style.display = "block"; // Mostramos el campo de la wallet
+    } else {
+        tagline.innerText = "REGISTRO DE ALMAS";
+        btnAuth.innerText = "ACCEDER AL CEMENTERIO";
+        toggleText.innerText = "¿Eres un nuevo espíritu? Sella tu identidad aquí";
+        inputWallet.style.display = "none";  // Escondemos la wallet para login directo
+    }
+}
+
+// Función que se ejecuta cuando Google autentica con éxito al usuario
+async function manejarLoginGoogle(response) {
+    console.log("Token místico de Google recibido:", response.credential);
+    
+    // Aquí mandas el token response.credential a tu backend en Vercel para desencriptar el correo
+    // Si el usuario es completamente nuevo, abres el modo registro para que asocie su Wallet.
+    // Si ya existe, saltas directo a la Fase 3:
+    // entrarAlCampoSanto(datosDelUsuario);
+}
+
+// FASE 2 -> FASE 3: El usuario se autentica correctamente y entra al juego
+function entrarAlCampoSanto(perfil) {
+    // Ocultamos el pergamino de autenticación
+    document.getElementById('auth-container').style.display = 'none';
+    
+    // Mostramos el cementerio con las criptas por fin
+    document.getElementById('campo-santo').style.display = 'block';
+    
+    // Sincronizamos los balances cargados desde Upstash Redis
+    document.querySelector('.balance-actual').innerText = `Poder: ${perfil.balanceSG || 0} SG`;
+    
+    // Llamas a tu función nativa que dibuja las tumbas
+    if (typeof generarCementerio === 'function') {
+        generarCementerio();
+    }
+}
