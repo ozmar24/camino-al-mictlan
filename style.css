@@ -921,7 +921,7 @@ button,
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
     top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
-    left: 25% !important;       /* Margen exacto desde el borde izquierdo del libro */
+    left: 23% !important;       /* Margen exacto desde el borde izquierdo del libro */
     width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
     height: 70% !important;     /* Altura máxima para no pisar el fondo */
     display: flex !important;
@@ -978,15 +978,28 @@ button,
     margin-top: 5px !important;
 }
 
+/* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO CON CURSOR FORZADO */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    width: 100% !important;
     min-height: 45px !important;
-    width: 90% !important;
-    margin-top: 30px !important;
-    margin-bottom: 15px !important;
-    /* Se hereda el cursor pentáculo de la regla global superior */
+    margin: 10px 0 0 0 !important;
+    position: relative !important; /* Permite posicionar la capa encima */
+}
+
+/* Capa transparente superior que fuerza el cursor del pentáculo */
+#google-btn-container::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 10 !important;
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+    pointer-events: none !important; /* 🔥 Hace que el clic ignore esta capa y presione el botón real de Google */
 }
 
 /* El divisor sutil del lado derecho */
