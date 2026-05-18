@@ -181,6 +181,10 @@ function entrarAlCampoSanto(perfil) {
     generarCementerio();
 }
 
+// ==================================================================
+// CONTROL DE FLUJO REESTRUCTURADO Y SEGURO
+// ==================================================================
+
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
@@ -238,28 +242,23 @@ function generarCementerio() {
         div.onclick = (e) => {
             e.stopPropagation();
             
-            // Traemos los elementos estructurales de tu HTML por ID
             const modalBotonesNativos = document.getElementById('botones-exchange'); 
             const inputContenedor = document.getElementById('wallet-input')?.parentElement;
             const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
 
-            // Selección inteligente de botones basada en sus atributos para evitar fallos por índice
             let btnPrincipal = null;
             let btnCancelar = null;
             
             if (modalBotonesNativos) {
                 const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
-                
-                // El botón de cancelar siempre es el que tiene la función de cerrar en su onclick
                 btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
-                // El botón principal es el otro botón activo del contenedor
                 btnPrincipal = listaBotones.find(b => b !== btnCancelar);
             }
 
             if (pos.especial) {
-                // ==========================================
-                // PASO 1: CLIC EN SOULGEIST (ENVIAR ALMA)
-                // ==========================================
+                // ========================================================
+                // CORRECCIÓN FLUJO SOULGEIST (CON O SIN SALDO)
+                // ========================================================
                 document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                 const modal = document.getElementById('modal-ritual');
                 if(modal) {
@@ -267,11 +266,8 @@ function generarCementerio() {
                     modal.style.display = 'block';
                 }
                 
-                // Ocultamos cajas de inputs de retiro
                 if(inputContenedor) inputContenedor.style.display = 'none';
                 if(selectContenedor) selectContenedor.style.display = 'none';
-                
-                // Hacemos visible el bloque nativo de botones
                 if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
 
                 document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
@@ -279,29 +275,40 @@ function generarCementerio() {
                     <p style="margin-bottom: 5px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
                 `;
                 
-                // Forzamos los textos y la acción de clic en el botón principal nativo
                 if (btnPrincipal) {
                     btnPrincipal.style.display = 'block';
                     btnPrincipal.innerText = "ENVIAR ALMA";
                     btnPrincipal.style.background = "#00ffff";
                     btnPrincipal.style.color = "#000";
+                    
+                    // Sobrescribimos el click de manera limpia y forzada
                     btnPrincipal.onclick = () => {
-                        cerrarRitual();
-                        ritualActivo = true; // Habilita la selección de la tumba destino
+                        if (balanceUsuarioSG <= 0) {
+                            // Si no hay saldo, evitamos el bug visual avisando al usuario con tu alerta nativa
+                            cerrarRitual();
+                            lanzarAlertaMictlan("Tu medidor de Soulgeist está extinto. Ofrece un tributo para acumular poder.", "SIN ENERGÍA");
+                        } else {
+                            // Si tiene saldo, iniciamos el ritual correctamente
+                            cerrarRitual();
+                            ritualActivo = true; 
+                        }
                     };
                 }
                 if (btnCancelar) {
                     btnCancelar.style.display = 'block';
                     btnCancelar.innerText = "CANCELAR";
-                    btnCancelar.onclick = cerrarRitual;
+                    btnCancelar.onclick = () => {
+                        ritualActivo = false; // Reset de seguridad al cancelar
+                        cerrarRitual();
+                    };
                 }
             } 
             else {
                 if (ritualActivo) {
-                    // ==========================================
-                    // PASO 2: SELECCIONAR LA TUMBA DE DESTINO (ACEPTAR)
-                    // ==========================================
-                    ritualActivo = false;
+                    // ========================================================
+                    // PASO 2: SELECCIÓN DE TUMBA DESTINO CON RITUAL ACTIVO
+                    // ========================================================
+                    ritualActivo = false; 
                     window.tumbasConSaldo[pos.nombre] = true;
 
                     const tumbaOrigen = document.querySelector('.alma-maestra');
@@ -323,7 +330,6 @@ function generarCementerio() {
                         <p style="margin-bottom: 5px; color: #ccc;">El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas consumar el pacto?</p>
                     `;
                     
-                    // Modificamos el botón para el paso de confirmación
                     if (btnPrincipal) {
                         btnPrincipal.style.display = 'block';
                         btnPrincipal.innerText = "ACEPTAR";
@@ -338,21 +344,19 @@ function generarCementerio() {
                         };
                     }
                     if (btnCancelar) {
-                        // Ocultamos el botón secundario para dejar solo el botón único de "ACEPTAR"
-                        btnCancelar.style.display = 'none';
+                        btnCancelar.style.display = 'none'; // Deja únicamente la opción mística de ACEPTAR
                     }
                 } 
                 else {
-                    // ==========================================
-                    // PASO 3: RETIRO NORMAL (YA TIENE SALDO FÍSICO)
-                    // ==========================================
+                    // ========================================================
+                    // PASO 3: RETIRO TRADICIONAL DEL TOKEN EN LA LISTA
+                    // ========================================================
                     if(inputContenedor) inputContenedor.style.display = 'block';
                     if(selectContenedor) selectContenedor.style.display = 'block';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
 
                     document.getElementById('info-ritual').innerHTML = ''; 
                     
-                    // Devolvemos el comportamiento original para procesar los cobros hacia Redis/Base de datos
                     if (btnPrincipal) {
                         btnPrincipal.style.display = 'block';
                         btnPrincipal.innerText = "TOMAR ALMA";
@@ -374,7 +378,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
-    // Pilares
+    // Pilares Estructura
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
