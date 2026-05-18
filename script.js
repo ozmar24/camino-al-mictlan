@@ -7,8 +7,7 @@ let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
-const GOOGLE_CLIENT_ID = "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com";
-
+const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com";
 
 // ==================================================================
 // FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO (CORREGIDO)
@@ -49,7 +48,7 @@ function inicializarBotonGoogle() {
 
     if (typeof google !== 'undefined') {
         google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com",
             callback: manejarLoginGoogle
         });
         
