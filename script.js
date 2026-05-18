@@ -334,7 +334,7 @@ function generarCementerio() {
                             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
                         }, 50);
                     };
-                }
+                
                     document.getElementById('btn-cancelar-2').onclick = () => {
                         cerrarRitual();
                     };
