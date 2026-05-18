@@ -243,31 +243,35 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
-                // ACTIVAR EL RITUAL DE SOULGEIST
+                // ACTIVAR RITUAL DESDE SOULGEIST
                 ritualActivo = true;
                 window.currentCripto = "Soulgeist";
                 
-                // USAMOS TU FUNCIÓN DE ALERTA GOTICA EN LUGAR DE ABRIR EL MODAL GRANDOTE
-                // Esto evita que se quede abierto el cuadro con botones falsos.
-                if (typeof notificacionGotica === 'function') {
-                    notificacionGotica("RITUAL INICIADO", "El poder del Mictlán fluye. Selecciona ahora una tumba de destino para canalizar tu Poder SG.", pos.color, false);
-                } else {
-                    lanzarAlertaMictlan("El poder del Mictlán fluye. Selecciona una tumba de destino para canalizar tu Poder SG.", "RITUAL INICIADO");
-                }
+                // Usamos tu función nativa para dar el aviso gótico en pantalla
+                notificacionGotica(
+                    "RITUAL INICIADO", 
+                    "El poder de las almas fluye. Selecciona una tumba de destino (BTC, LTC, PEPE...) para canalizar tu Poder SG.", 
+                    pos.color, 
+                    false
+                );
             } 
             else {
-                // CLIC EN UNA TUMBA DE DESTINO (Criptomonedas normales)
+                // CLIC EN UNA MONEDA DE DESTINO
                 if (ritualActivo) {
-                    // Guardamos la tumba seleccionada para usarla después de rellenar la wallet
+                    // Si el ritual estaba activo, recordamos a qué tumba le dieron clic
                     window.tumbaDestinoElement = e.currentTarget;
                     window.tumbaDestinoData = pos;
 
-                    // Abrimos el formulario limpio de la moneda destino (Pepe, Litecoin, etc.)
+                    // Cambiamos la cripto activa global a la de destino (ej: Pepe)
+                    window.currentCripto = pos.nombre;
+
+                    // Abrimos el formulario limpio de la moneda destino para que pongan su wallet
                     abrirModalRitual(pos); 
                 } else {
-                    // Clic normal sin ritual de Soulgeist previo
+                    // Clic normal sin ritual previo (Retiro directo)
                     window.tumbaDestinoElement = null;
                     window.tumbaDestinoData = null;
+                    window.currentCripto = pos.nombre;
                     abrirModalRitual(pos);
                 }
             }
@@ -400,36 +404,39 @@ function procesarRetiro() {
     if(!inputWallet) return;
     
     const wallet = inputWallet.value.trim();
-    // Validamos pasarela si existe el select en tu HTML
-    const pasarelaElegida = selectPasarela ? selectPasarela.value : "FaucetPay";
+    const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
     
     if (wallet.length < 8) {
         lanzarAlertaMictlan("La dirección o credencial del portal es demasiado corta.", "ERROR DE RITUAL");
         return;
     }
     
-    // Cerramos el modal del formulario
+    // Cerramos el modal del formulario para que se pueda ver la animación en el cementerio
     cerrarRitual();
 
-    // SI VENÍAMOS DE UN RITUAL ACTIVO DE SOULGEIST -> DISPARAMOS TU ANIMACIÓN
+    // === CONTROL DE CANALIZACIÓN DE ALMAS (SOULGEIST -> DESTINO) ===
     if (ritualActivo && window.tumbaDestinoElement && window.tumbaDestinoData) {
         const tumbaOrigen = document.querySelector('.alma-maestra');
         const tumbaDestino = window.tumbaDestinoElement;
         const datos = window.tumbaDestinoData;
+        
+        // Calculamos la cantidad basándonos en tu lógica original
         const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
+        const cantidadTransmutada = baseCalculo * datos.tasa;
 
-        // Apagamos el estado del ritual para futuras transacciones
+        // Apagamos el seguro del ritual
         ritualActivo = false;
 
-        // Dispara el viaje visual del alma hacia la tumba destino
-        lanzarAlma(tumbaOrigen, tumbaDestino, datos.color, baseCalculo * datos.tasa, datos);
+        // Disparamos la animación física (parábola, niebla y actualización visual)
+        lanzarAlma(tumbaOrigen, tumbaDestino, datos.color, cantidadTransmutada, datos);
 
-        // Limpiamos referencias globales
+        // Limpiamos los contenedores temporales de memoria
         window.tumbaDestinoElement = null;
         window.tumbaDestinoData = null;
     }
 
-    // Enviamos los datos de forma segura al backend de Upstash/Vercel
+    // Enviamos los datos de la reclamación al backend de la API
+    // (Nota que window.currentCripto ahora vale la cripto de destino, ej: "Pepe" o "Litecoin")
     procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
 }
 
