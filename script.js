@@ -123,7 +123,7 @@ async function manejarAuth() {
 
     } catch (error) {
         console.error("Fallo de conexión con el Mictlán:", error); 
-        lanzarAlertaMictlan("No se pudo establishcer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN"); 
+        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN"); 
     }
 }
 
@@ -171,15 +171,9 @@ if (typeof window.tumbasConSaldo === 'undefined') {
 }
 
 // ==================================================================
-// DISPARADOR GLOBAL ESTILO VIDEOJUEGO (PASO 1 Y 2 DEL VIDEO)
+// DISPARADOR GLOBAL DEL RITUAL (PASO 1 Y 2 ESTILO VIDEO ORIGINAL)
 // ==================================================================
 function dispararInicioRitualGlobal() {
-    if (balanceUsuarioSG <= 0) {
-        lanzarAlertaMictlan("Tu medidor de Soulgeist está extinto. Reclama energía en el video antes de consumar un pacto.", "SIN ENERGÍA");
-        return;
-    }
-
-    // 1. Atenuamos el fondo del Campo Santo
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
     const modal = document.getElementById('modal-ritual');
     if (modal) {
@@ -187,15 +181,15 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    // Ocultamos inputs del modal provisionalmente
+    // Ocultamos inputs y selectores del modal temporalmente
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
     if (inputContenedor) inputContenedor.style.display = 'none';
     if (selectContenedor) selectContenedor.style.display = 'none';
 
-    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+    document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
     document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SG.</p>
+        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.</p>
     `;
 
     const modalBotonesNativos = document.getElementById('botones-exchange');
@@ -210,7 +204,7 @@ function dispararInicioRitualGlobal() {
 
     if (btnPrincipal) {
         btnPrincipal.style.display = 'block';
-        btnPrincipal.innerText = "ACEPTAR PACTO";
+        btnPrincipal.innerText = "FUMAR ALMA";
         btnPrincipal.style.background = "#00ffff";
         btnPrincipal.style.color = "#000";
 
@@ -218,18 +212,24 @@ function dispararInicioRitualGlobal() {
         btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
         btnPrincipal = clonBtn;
 
-        // PASO 2: Al dar clic en Aceptar Pacto se cierra el modal y se activa el mapa receptivo
         btnPrincipal.onclick = (event) => {
             event.preventDefault();
-            cerrarRitual(); 
-            ritualActivo = true; 
-            lanzarAlertaMictlan("El poder está latente. Toca cualquier cripta en el Campo Santo para inyectar tus almas.", "MAPA RECEPTIVO");
+            cerrarRitual();
+            
+            if (balanceUsuarioSG <= 0) {
+                // Si no tiene energía, el botón simula la obtención del video
+                setTimeout(() => { videoCompletado(); }, 300);
+            } else {
+                // Si cuenta con almas, el mapa queda en modo de selección interactiva
+                ritualActivo = true; 
+                lanzarAlertaMictlan("El poder está latente. Toca cualquier cripta en el Campo Santo para inyectar tus almas.", "MAPA RECEPTIVO");
+            }
         };
     }
 
     if (btnCancelar) {
         btnCancelar.style.display = 'block';
-        btnCancelar.innerText = "HUIR";
+        btnCancelar.innerText = "CANCELAR";
         btnCancelar.onclick = () => { ritualActivo = false; cerrarRitual(); };
     }
 }
@@ -296,7 +296,7 @@ function generarCementerio() {
             }
 
             // ==================================================================
-            // CONTROL DE CLIC BAJO EL RITUAL ACTIVO (PARTÍCULA -> MODAL INTERMEDIO)
+            // INTERCEPCIÓN DEL CLIC: VIAJE MÍSTICO -> AVISO INTERMEDIO
             // ==================================================================
             if (ritualActivo) {
                 ritualActivo = false; 
@@ -306,10 +306,10 @@ function generarCementerio() {
                 const tumbaDestino = e.currentTarget;
                 const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-                // PASO 3: Desatamos el viaje místico
+                // Lanzamos la animación física del alma viajera
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                     
-                    // PASO 4: Se ejecuta en milisegundos EXACTOS cuando la partícula llega a la cripta
+                    // Al impactar la cripta, emerge inmediatamente el modal intermedio
                     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                     const modal = document.getElementById('modal-ritual');
                     if (modal) {
@@ -339,7 +339,7 @@ function generarCementerio() {
 
                     if (btnPrincipal) {
                         btnPrincipal.style.display = 'block';
-                        btnPrincipal.innerText = "CONTINUAR";
+                        btnPrincipal.innerText = "TOMAR ALMA";
                         btnPrincipal.style.background = pos.color;
                         btnPrincipal.style.color = "#000";
 
@@ -363,7 +363,7 @@ function generarCementerio() {
         contenedor.appendChild(div); 
     });
 
-    // Pilares
+    // Pilares de navegación lateral
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" }, 
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" } 
@@ -384,6 +384,68 @@ function generarCementerio() {
     });
 }
 
+function lanzarAlma(origenElemento, destinoElemento, color, cantidad, onImpactoCallback) {
+    const rectOrigen = origenElemento.getBoundingClientRect();
+    const rectDestino = destinoElemento.getBoundingClientRect();
+
+    const alma = document.createElement('div');
+    alma.className = 'alma-viajera';
+    alma.style.setProperty('--color-alma', color);
+    
+    alma.style.position = "fixed";
+    alma.style.zIndex = "9999";
+    alma.style.pointerEvents = "none";
+    document.body.appendChild(alma);
+
+    let posX = rectOrigen.left + rectOrigen.width / 2;
+    let posY = rectOrigen.top + rectOrigen.height / 2;
+
+    const intervaloNiebla = setInterval(() => {
+        const almaElemento = document.querySelector('.alma-viajera');
+        if (!almaElemento) return;
+
+        for (let i = 0; i < 2; i++) { 
+            const nube = document.createElement('div');
+            nube.className = 'rastro-niebla';
+            nube.style.setProperty('--color-alma', color);
+            const size = Math.random() * 30 + 10;
+            nube.style.width = size + 'px';
+            nube.style.height = size + 'px';
+            nube.style.left = (parseFloat(almaElemento.style.left) + (Math.random() - 0.5) * 20) + 'px';
+            nube.style.top = (parseFloat(almaElemento.style.top) + (Math.random() - 0.5) * 20) + 'px';
+            document.body.appendChild(nube);
+
+            nube.animate([
+                { transform: 'scale(1) translateY(0)', opacity: 0.4 },
+                { transform: `scale(2) translateY(${(Math.random() - 0.5) * 30}px)`, opacity: 0 }
+            ], { duration: 800, easing: 'ease-out' }).onfinish = () => nube.remove();
+        }
+    }, 30);
+
+    const anim = alma.animate([
+        { left: `${posX}px`, top: `${posY}px` },
+        { 
+            left: `${(posX + (rectDestino.left + rectDestino.width / 2)) / 2 + (Math.random() * 140 - 70)}px`, 
+            top: `${(posY + (rectDestino.top + rectDestino.height / 2)) / 2 - 120}px` 
+        },
+        { left: `${rectDestino.left + rectDestino.width / 2}px`, top: `${rectDestino.top + rectDestino.height / 2}px` }
+    ], {
+        duration: 1000,
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    });
+
+    anim.onfinish = () => {
+        clearInterval(intervaloNiebla);
+        alma.remove();
+        
+        actualizarSumaVisual(destinoElemento, cantidad);
+        
+        if (typeof onImpactoCallback === 'function') {
+            onImpactoCallback();
+        }
+    };
+}
+
 function actualizarSumaVisual(elementoTumba, cantidad) {
     const texto = elementoTumba.querySelector('.balance-proyectado'); 
     if (texto) {
@@ -400,33 +462,6 @@ function actualizarSumaVisual(elementoTumba, cantidad) {
     }
 }
 
-function notificacionGotica(titulo, mensaje, color, mostrarInput) {
-    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)"; 
-    const modal = document.getElementById('modal-ritual'); 
-    const input = document.getElementById('wallet-input'); 
-    const btnEnviar = document.getElementById('btn-enviar-alma') || document.querySelector('.botones-exchange button:first-child'); 
-    
-    if(modal) {
-        modal.style.setProperty('--color-ritmo', color); 
-        modal.style.display = 'block'; 
-    }
-    
-    document.getElementById('titulo-ritual').innerText = titulo; 
-    document.getElementById('info-ritual').innerText = mensaje; 
-    
-    if (input) {
-        if (mostrarInput) {
-            input.style.display = 'block'; 
-            if(btnEnviar) btnEnviar.style.display = 'block'; 
-            input.value = "";  
-        } else {
-            input.style.display = 'none'; 
-            if(btnEnviar) btnEnviar.style.display = 'none'; 
-        }
-    }
-}
-
-// FASE 4: ABRE LA COSECHA DE LA CRIPTA SELECCIONADA CON EL CAMPO DE WALLET
 function abrirModalCosechaFinal(pos) {
     const valorUsuarioUSD = balanceUsuarioSG * 0.001; 
 
@@ -585,11 +620,11 @@ function cerrarRitual() {
 }
 
 // ==================================================================
-// ABSORCIÓN DE VIDEOS MONETIZADOS
+// ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
 async function videoCompletado() {
     if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligan tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO"); 
+        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO"); 
         return; 
     }
 
@@ -762,7 +797,7 @@ document.addEventListener("DOMContentLoaded", () => {
         portalElement.onclick = entrarAlMictlan;
     }
 
-    // Vinculamos de una vez el disparador global del ritual en el botón flotante si existe
+    // Vinculamos de forma segura el disparador global de la ventana interactiva
     const btnRitualFlotante = document.getElementById('btn-iniciar-ritual-faucet') || document.querySelector('.btn-invocar-ritual');
     if (btnRitualFlotante) {
         btnRitualFlotante.onclick = dispararInicioRitualGlobal;
