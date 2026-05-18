@@ -143,25 +143,31 @@ async function manejarAuth() {
 
 async function manejarLoginGoogle(response) {
     console.log("Token místico de Google recibido:", response.credential);
-}
+    
+    try {
+        // Lanzamos la petición a nuestra Serverless Function de Vercel
+        const res = await fetch('/api/auth-google', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token: response.credential })
+        });
 
-function entrarAlCampoSanto(perfil) {
-    const modalContrato = document.getElementById('modal-contrato');
-    const cementerio = document.getElementById('campo-santo');
-    const candelabro = document.querySelector('.candelabro-central');
-    
-    if (modalContrato) modalContrato.style.display = 'none';
-    if (cementerio) cementerio.style.display = 'block';
-    
-    if (candelabro) {
-        candelabro.style.display = 'block';
-        setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
+        const datos = await res.json();
+
+        if (res.ok && datos.success) {
+            console.log("Pacto verificado en backend para:", datos.perfil.email);
+            // Rompemos el sello y entramos con los datos del perfil devueltos
+            entrarAlCampoSanto(datos.perfil);
+        } else {
+            console.error("El backend rechazó el token:", datos.error);
+            alert("Tu rastro místico no pudo ser sellado en el servidor.");
+        }
+    } catch (error) {
+        console.error("Error en la conexión con la API del Mictlán:", error);
     }
-
-    balanceUsuarioSG = perfil.balanceSG || 0;
-    generarCementerio();
 }
-
 // ==================================================================
 // MECÁNICAS ETERNAS DEL CEMENTERIO (CRIPTAS Y FILTROS)
 // ==================================================================
