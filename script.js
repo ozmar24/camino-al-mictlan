@@ -181,9 +181,11 @@ function entrarAlCampoSanto(perfil) {
     generarCementerio();
 }
 
-// ==================================================================
-// MECÁNICAS ETERNOS DEL CEMENTERIO (CRIPTAS Y FILTROS)
-// ==================================================================
+// Variable global para rastrear qué tumbas ya recibieron saldo durante la sesión
+if (typeof window.tumbasConSaldo === 'undefined') {
+    window.tumbasConSaldo = {};
+}
+
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
     if (!contenedor) return;
@@ -213,14 +215,9 @@ function generarCementerio() {
                 <div class="nombre-cripto">${pos.nombre}</div>
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
-       } else {
-            // Si el balance es mayor a 0, calcula la tasa; si es 0, la ganancia es 0
+        } else {
             const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
-            
-            // Si es 0, mostramos "0", si es mayor, le damos formato con su signo +
-            const textoBalance = gananciaDecimal > 0 
-                ? `+${gananciaDecimal.toLocaleString()}` 
-                : `0`;
+            const textoBalance = gananciaDecimal > 0 ? `+${gananciaDecimal.toLocaleString()}` : `0`;
             
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
@@ -243,35 +240,48 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
-                // ACTIVAR RITUAL DESDE SOULGEIST
-                ritualActivo = true;
-                window.currentCripto = "Soulgeist";
+                // PASO 1: Clic en Soulgeist -> Abre modal para activar el modo de envío
+                document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+                const modal = document.getElementById('modal-ritual');
+                if(modal) {
+                    modal.style.setProperty('--color-ritmo', pos.color);
+                    modal.style.display = 'block';
+                }
                 
-                // Usamos tu función nativa para dar el aviso gótico en pantalla
-                notificacionGotica(
-                    "RITUAL INICIADO", 
-                    "El poder de las almas fluye. Selecciona una tumba de destino (BTC, LTC, PEPE...) para canalizar tu Poder SG.", 
-                    pos.color, 
-                    false
-                );
+                document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
+                document.getElementById('info-ritual').innerHTML = `
+                    <p style="margin-bottom: 20px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
+                    <button id="btn-preparar-ritual" class="btn-ritual pentaculo-cursor" style="width:100%; padding:12px; background:${pos.color}; color:#000; font-weight:bold; border:none; font-family:'MedievalSharp', cursive; font-size:16px;">
+                        ENVIAR ALMA
+                    </button>
+                `;
+                
+                // Al darle clic a ENVIAR ALMA, se cierra el modal y se activa la selección
+                document.getElementById('btn-preparar-ritual').onclick = () => {
+                    cerrarRitual();
+                    ritualActivo = true;
+                };
             } 
             else {
-                // CLIC EN UNA MONEDA DE DESTINO
+                // PASO 2: Si el ritual de Soulgeist ya está activo y se selecciona la tumba de destino
                 if (ritualActivo) {
-                    // Si el ritual estaba activo, recordamos a qué tumba le dieron clic
-                    window.tumbaDestinoElement = e.currentTarget;
-                    window.tumbaDestinoData = pos;
+                    ritualActivo = false; // Consumimos el estado
+                    window.tumbasConSaldo[pos.nombre] = true; // Marcamos que esta tumba ya tiene saldo activo
 
-                    // Cambiamos la cripto activa global a la de destino (ej: Pepe)
-                    window.currentCripto = pos.nombre;
-
-                    // Abrimos el formulario limpio de la moneda destino para que pongan su wallet
-                    abrirModalRitual(pos); 
-                } else {
-                    // Clic normal sin ritual previo (Retiro directo)
-                    window.tumbaDestinoElement = null;
-                    window.tumbaDestinoData = null;
-                    window.currentCripto = pos.nombre;
+                    // Abrimos el modal intermedio de "RITUAL INICIADO"
+                    notificacionGotica("RITUAL INICIADO", `Canalizando energía mística hacia la cripta de ${pos.nombre}...`, pos.color, false);
+                    
+                    // Disparamos la animación del viaje del alma
+                    const tumbaOrigen = document.querySelector('.alma-maestra');
+                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
+                    lanzarAlma(tumbaOrigen, e.currentTarget, pos.color, baseCalculo * pos.tasa, pos);
+                } 
+                // PASO 3: Clic normal sobre una tumba que YA recibió saldo
+                else if (window.tumbasConSaldo[pos.nombre]) {
+                    abrirModalRitual(pos); // Abre el modal original con pasarelas e input de billetera
+                }
+                // Si no tiene saldo ni ritual activo, mostramos el aviso original de requisitos
+                else {
                     abrirModalRitual(pos);
                 }
             }
@@ -280,6 +290,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
+    // Código original de tus pilares (se mantiene intacto)
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
