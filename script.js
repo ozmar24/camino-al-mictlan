@@ -397,6 +397,27 @@ function procesarRetiro() {
     }
     
     cerrarRitual();
+
+    // === AQUÍ SE INYECTA LA MAGIA VISUAL ===
+    // Si veníamos de un ritual activo de Soulgeist, disparamos la animación antes del fetch
+    if (ritualActivo && window.tumbaDestinoElement && window.tumbaDestinoData) {
+        const tumbaOrigen = document.querySelector('.alma-maestra');
+        const tumbaDestino = window.tumbaDestinoElement;
+        const datos = window.tumbaDestinoData;
+        const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
+
+        // Desactivamos el ritual para limpiar el estado
+        ritualActivo = false;
+
+        // Lanzamos la animación que viaja a la tumba
+        lanzarAlma(tumbaOrigen, tumbaDestino, datos.color, baseCalculo * datos.tasa, datos);
+
+        // Limpiamos referencias
+        window.tumbaDestinoElement = null;
+        window.tumbaDestinoData = null;
+    }
+
+    // Ejecuta tu petición original al backend de Upstash/FaucetPay de manera segura
     procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
 }
 
