@@ -240,8 +240,8 @@ function generarCementerio() {
         div.onclick = (e) => {
             e.stopPropagation();
             
-            // Traemos los elementos nativos de tu HTML para controlarlos
-            const modalBotonesNativos = document.querySelector('.botones-exchange'); 
+            // CORREGIDO: Mapeo exacto por ID según tu archivo index.html original
+            const modalBotonesNativos = document.getElementById('botones-exchange'); 
             const inputContenedor = document.getElementById('wallet-input')?.parentElement;
             const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
 
@@ -256,14 +256,14 @@ function generarCementerio() {
                     modal.style.display = 'block';
                 }
                 
-                // Ocultamos los inputs y botones nativos para pintar los de este paso
+                // Ocultamos los elementos de retiro pero dejamos la caja contenedora de botones libre
                 if(inputContenedor) inputContenedor.style.display = 'none';
                 if(selectContenedor) selectContenedor.style.display = 'none';
                 if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
 
                 document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
                 document.getElementById('info-ritual').innerHTML = `
-                    <p style="margin-bottom: 20px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
+                    <p style="margin-bottom: 25px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
                     <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
                         <button id="btn-activar-envio" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 24px; border: none; font-family: 'MedievalSharp', cursive; font-size: 15px;">
                             ENVIAR ALMA
@@ -290,7 +290,6 @@ function generarCementerio() {
                     ritualActivo = false;
                     window.tumbasConSaldo[pos.nombre] = true;
 
-                    // Capturamos las posiciones físicas antes del desenfoque
                     const tumbaOrigen = document.querySelector('.alma-maestra');
                     const tumbaDestino = e.currentTarget;
 
@@ -301,14 +300,13 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
                     
-                    // Aseguramos que todo lo nativo esté completamente oculto
                     if(inputContenedor) inputContenedor.style.display = 'none';
                     if(selectContenedor) selectContenedor.style.display = 'none';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
 
                     document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
                     
-                    // Inyectamos el texto limpio y de forma segura ÚNICAMENTE el botón de Aceptar centrado
+                    // Inyectamos el texto limpio junto con el botón central de ACEPTAR de forma nativa e independiente
                     document.getElementById('info-ritual').innerHTML = `
                         <p style="margin-bottom: 25px; color: #ccc; font-size: 15px; line-height: 1.5;">
                             El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas transmutar tu Poder SG en esta tumba?
@@ -320,7 +318,6 @@ function generarCementerio() {
                         </div>
                     `;
                     
-                    // Al dar clic en Aceptar, cerramos el modal y viaja el alma
                     document.getElementById('btn-confirmar-viaje').onclick = () => {
                         cerrarRitual();
                         
@@ -329,8 +326,6 @@ function generarCementerio() {
                             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
                         }, 50);
                     };
-                    
-                    // 🔥 SE REMOVIÓ LA LÍNEA QUE CAUSABA EL ERROR SINTÁCTICO CON 'btn-cancelar-2'
                 } 
                 else if (window.tumbasConSaldo[pos.nombre]) {
                     // ==========================================
@@ -356,7 +351,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
-    // Código original de los pilares (Intacto)
+    // Pilares
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
