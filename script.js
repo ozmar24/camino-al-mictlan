@@ -797,11 +797,15 @@ async function enviarOfrendaOraculo() {
 // CARGA INICIAL Y PERSISTENCIA DE ALMAS (CORREGIDO)
 // ==================================================================
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Inicializamos de inmediato el botón y el cliente místico de Google
+    inicializarBotonGoogle();
+
     const portalElement = document.getElementById('escena-portal');
     if(portalElement) {
         portalElement.onclick = entrarAlMictlan;
     }
 
+    // 2. Comprobamos si el alma ya tiene un pacto activo en este navegador
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
