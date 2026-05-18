@@ -169,8 +169,10 @@ if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {}; //
 }
 
+// ... Aquí hacia arriba están las funciones de login, google auth, etc.
+
 // ==================================================================
-// DISPARADOR GLOBAL ESTILO VIDEOJUEGO (PASO 1 DEL VIDEO)
+// DISPARADOR GLOBAL ESTILO VIDEOJUEGO (PASO 1 Y 2 DEL VIDEO)
 // ==================================================================
 function dispararInicioRitualGlobal() {
     if (balanceUsuarioSG <= 0) {
@@ -178,6 +180,7 @@ function dispararInicioRitualGlobal() {
         return;
     }
 
+    // 1. Atenuamos el fondo del Campo Santo
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
     const modal = document.getElementById('modal-ritual');
     if (modal) {
@@ -185,22 +188,22 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    const modalBotonesNativos = document.getElementById('botones-exchange');
+    // Ocultamos inputs del modal provisionalmente
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
-
     if (inputContenedor) inputContenedor.style.display = 'none';
     if (selectContenedor) selectContenedor.style.display = 'none';
-    if (modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
 
     document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
     document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive;">SELECOIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SG.</p>
+        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SG.</p>
     `;
 
+    const modalBotonesNativos = document.getElementById('botones-exchange');
     let btnPrincipal = null;
     let btnCancelar = null;
     if (modalBotonesNativos) {
+        modalBotonesNativos.style.display = 'flex';
         const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
         btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
         btnPrincipal = listaBotones.find(b => b !== btnCancelar);
@@ -216,10 +219,11 @@ function dispararInicioRitualGlobal() {
         btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
         btnPrincipal = clonBtn;
 
+        // PASO 2: Al dar clic en Aceptar Pacto se cierra el modal y se activa el mapa receptivo
         btnPrincipal.onclick = (event) => {
             event.preventDefault();
-            cerrarRitual();
-            ritualActivo = true; // Habilitamos que al dar clic en una cripta se haga la transferencia directa
+            cerrarRitual(); 
+            ritualActivo = true; 
             lanzarAlertaMictlan("El poder está latente. Toca cualquier cripta en el Campo Santo para inyectar tus almas.", "MAPA RECEPTIVO");
         };
     }
@@ -230,6 +234,12 @@ function dispararInicioRitualGlobal() {
         btnCancelar.onclick = () => { ritualActivo = false; cerrarRitual(); };
     }
 }
+
+// ==================================================================
+// RENDERIZADO DEL MAPA Y MANEJO DINÁMICO DE MODALES (MÉTODO INMUNE)
+// ==================================================================
+function generarCementerio() {
+    // ... Aquí dejas todo el código de generarCementerio() con el onclick modificado
 
 // ==================================================================
 // RENDERIZADO DEL MAPA Y MANEJO DINÁMICO DE MODALES (MÉTODO INMUNE)
@@ -285,54 +295,51 @@ function generarCementerio() {
         }
 
         div.onclick = (e) => {
-            e.stopPropagation(); //
+            e.stopPropagation();
             
-            // Si el usuario toca el centro de Soulgeist directamente, lanzamos el inicio del ritual
             if (pos.especial) {
                 dispararInicioRitualGlobal();
                 return;
             }
 
             // ==================================================================
-            // COMPORTAMIENTO PARA LAS CRIPTAS COMPAÑERAS (CON O SIN RITUAL ACTIVO)
+            // CONTROL DE CLIC BAJO EL RITUAL ACTIVO (PARTÍCULA -> MODAL INTERMEDIO)
             // ==================================================================
             if (ritualActivo) {
-                // FASE 2 Y 3: SELECCIÓN EXITOSA DE CRIPTA DESTINO
-                ritualActivo = false; 
-                window.tumbasConSaldo[pos.nombre] = true; //
+                ritualActivo = false; // Consumimos el token del ritual
+                window.tumbasConSaldo[pos.nombre] = true;
 
-                const tumbaOrigen = document.querySelector('.alma-maestra'); //
-                const tumbaDestino = e.currentTarget; //
-                const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0; //
+                const tumbaOrigen = document.querySelector('.alma-maestra');
+                const tumbaDestino = e.currentTarget;
+                const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-                // Desatamos de inmediato el viaje místico de las partículas
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos);
-
-                // Mostramos el anuncio emergente intermedio de Poder Transferido como en Firefox
-                setTimeout(() => {
+                // PASO 3: Desatamos el viaje místico. Pasamos una función que se ejecutará AL IMPACTAR
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
+                    
+                    // PASO 4: Esta sección se ejecuta en milisegundos EXACTOS cuando la partícula llega a la cripta
                     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                     const modal = document.getElementById('modal-ritual');
-                    if(modal) {
+                    if (modal) {
                         modal.style.setProperty('--color-ritmo', pos.color);
                         modal.style.display = 'block';
                     }
 
-                    const modalBotonesNativos = document.getElementById('botones-exchange');
+                    // Ocultamos inputs por ahora para mostrar solo la confirmación intermedia
                     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
                     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
-
-                    if(inputContenedor) inputContenedor.style.display = 'none';
-                    if(selectContenedor) selectContenedor.style.display = 'none';
-                    if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
+                    if (inputContenedor) inputContenedor.style.display = 'none';
+                    if (selectContenedor) selectContenedor.style.display = 'none';
 
                     document.getElementById('titulo-ritual').innerText = "PODER TRANSFERIDO";
                     document.getElementById('info-ritual').innerHTML = `
                         <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive;">¡LA TUMBA DE CANALIZACIÓN HA RECIBIDO LA ENERGÍA EN ${pos.nombre.toUpperCase()}!</p>
                     `;
 
+                    const modalBotonesNativos = document.getElementById('botones-exchange');
                     let btnPrincipal = null;
                     let btnCancelar = null;
                     if (modalBotonesNativos) {
+                        modalBotonesNativos.style.display = 'flex';
                         const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
                         btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
                         btnPrincipal = listaBotones.find(b => b !== btnCancelar);
@@ -348,16 +355,17 @@ function generarCementerio() {
                         btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
                         btnPrincipal = clonBtn;
 
-                        // Al dar clic en continuar, pasamos directo al paso 4 (Formulario de Cosecha)
+                        // Al dar clic en continuar, pasamos directo al Paso 5 (Cosecha e inputs de Wallets)
                         btnPrincipal.onclick = () => {
                             cerrarRitual();
                             setTimeout(() => { abrirModalCosechaFinal(pos); }, 50);
                         };
                     }
-                    if (btnCancelar) btnCancelar.style.display = 'none';
-                }, 1050); // Se levanta justo después de que la partícula impacte la tumba
+                    if (btnCancelar) btnCancelar.style.display = 'none'; // Ocultamos cancelar en este paso intermedio
+                });
+
             } else {
-                // Si la tumba es cliqueada sin un ritual activo de antemano, abre su panel de cosecha normal
+                // Si el mapa no está en modo ritual y se toca directamente, abre la cosecha final normal
                 abrirModalCosechaFinal(pos);
             }
         };
@@ -587,57 +595,69 @@ function cerrarRitual() {
     if(cementerio) cementerio.style.filter = "none"; //
 }
 
-function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCripto) {
-    const rectOrigen = origenElemento.getBoundingClientRect(); //
-    const rectDestino = destinoElemento.getBoundingClientRect(); //
+function lanzarAlma(origenElemento, destinoElemento, color, cantidad, onImpactoCallback) {
+    const rectOrigen = origenElemento.getBoundingClientRect();
+    const rectDestino = destinoElemento.getBoundingClientRect();
 
-    const alma = document.createElement('div'); //
-    alma.className = 'alma-viajera'; //
-    alma.style.setProperty('--color-alma', color); //
-    document.body.appendChild(alma); //
+    const alma = document.createElement('div');
+    alma.className = 'alma-viajera';
+    alma.style.setProperty('--color-alma', color);
+    
+    // Posicionamiento inicial dinámico sobre la pantalla
+    alma.style.position = "fixed";
+    alma.style.zIndex = "9999";
+    alma.style.pointerEvents = "none";
+    document.body.appendChild(alma);
 
-    let posX = rectOrigen.left + rectOrigen.width / 2; //
-    let posY = rectOrigen.top + rectOrigen.height / 2; //
+    let posX = rectOrigen.left + rectOrigen.width / 2;
+    let posY = rectOrigen.top + rectOrigen.height / 2;
 
     const intervaloNiebla = setInterval(() => {
-        for(let i = 0; i < 2; i++) { 
-            const nube = document.createElement('div'); //
-            const almaElemento = document.querySelector('.alma-viajera'); //
-            if (!almaElemento) return; //
+        const almaElemento = document.querySelector('.alma-viajera');
+        if (!almaElemento) return;
 
-            nube.className = 'rastro-niebla'; //
-            nube.style.setProperty('--color-alma', color); //
-            const size = Math.random() * 30 + 10; //
-            nube.style.width = size + 'px'; //
-            nube.style.height = size + 'px'; //
-            nube.style.left = (parseFloat(almaElemento.style.left) + (Math.random() - 0.5) * 20) + 'px'; //
-            nube.style.top = (parseFloat(almaElemento.style.top) + (Math.random() - 0.5) * 20) + 'px'; //
-            document.body.appendChild(nube); //
+        for (let i = 0; i < 2; i++) { 
+            const nube = document.createElement('div');
+            nube.className = 'rastro-niebla';
+            nube.style.setProperty('--color-alma', color);
+            const size = Math.random() * 30 + 10;
+            nube.style.width = size + 'px';
+            nube.style.height = size + 'px';
+            nube.style.left = (parseFloat(almaElemento.style.left) + (Math.random() - 0.5) * 20) + 'px';
+            nube.style.top = (parseFloat(almaElemento.style.top) + (Math.random() - 0.5) * 20) + 'px';
+            document.body.appendChild(nube);
 
             nube.animate([
                 { transform: 'scale(1) translateY(0)', opacity: 0.4 },
                 { transform: `scale(2) translateY(${(Math.random() - 0.5) * 30}px)`, opacity: 0 }
-            ], { duration: 800, easing: 'ease-out' }).onfinish = () => nube.remove(); //
+            ], { duration: 800, easing: 'ease-out' }).onfinish = () => nube.remove();
         }
-    }, 30); //
+    }, 30);
 
+    // Animación de trayectoria curva tipo parábola hacia la tumba destino
     const anim = alma.animate([
-        { left: `${posX}px`, top: `${posY}px` }, //
+        { left: `${posX}px`, top: `${posY}px` },
         { 
-            left: `${(posX + (rectDestino.left + rectDestino.width / 2)) / 2 + (Math.random() * 100 - 50)}px`,  //
-            top: `${(posY + (rectDestino.top + rectDestino.height / 2)) / 2 - 80}px`  //
+            left: `${(posX + (rectDestino.left + rectDestino.width / 2)) / 2 + (Math.random() * 140 - 70)}px`, 
+            top: `${(posY + (rectDestino.top + rectDestino.height / 2)) / 2 - 120}px` 
         },
-        { left: `${rectDestino.left + rectDestino.width / 2}px`, top: `${rectDestino.top + rectDestino.height / 2}px` } //
+        { left: `${rectDestino.left + rectDestino.width / 2}px`, top: `${rectDestino.top + rectDestino.height / 2}px` }
     ], {
         duration: 1000,
-        easing: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)'
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
     });
 
     anim.onfinish = () => {
-        clearInterval(intervaloNiebla); //
-        alma.remove(); //
+        clearInterval(intervaloNiebla);
+        alma.remove();
         
-        actualizarSumaVisual(destinoElemento, cantidad); //
+        // Ejecuta la vibración y suma visual del saldo en la tumba compañera
+        actualizarSumaVisual(destinoElemento, cantidad);
+        
+        // EJECUCIÓN INMEDIATA DEL MODAL INTERMEDIO AL IMPACTAR
+        if (typeof onImpactoCallback === 'function') {
+            onImpactoCallback();
+        }
     };
 }
 
