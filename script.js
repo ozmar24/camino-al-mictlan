@@ -293,7 +293,7 @@ function generarCementerio() {
                     ritualActivo = false;
                     window.tumbasConSaldo[pos.nombre] = true;
 
-                    // Guardamos la posición física exacta de las tumbas antes del blur
+                    // Capturamos las posiciones físicas del cementerio antes del blur
                     const tumbaOrigen = document.querySelector('.alma-maestra');
                     const tumbaDestino = e.currentTarget;
 
@@ -304,31 +304,37 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
                     
+                    // Aseguramos que todo lo nativo del HTML de retiros esté oculto
                     if(inputContenedor) inputContenedor.style.display = 'none';
                     if(selectContenedor) selectContenedor.style.display = 'none';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
 
+                    // Definimos el título del ritual
                     document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+                    
+                    // AGREGAMOS ÚNICAMENTE EL BOTÓN DE ACEPTAR EN EL CONTENEDOR DINÁMICO
                     document.getElementById('info-ritual').innerHTML = `
-                        <p style="margin-bottom: 20px; color: #ccc;">El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas consumar el pacto?</p>
-                        <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
-                            <button id="btn-aceptar-viaje" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 24px; border: none; font-family: 'MedievalSharp', cursive; font-size: 15px;">
+                        <p style="margin-bottom: 25px; color: #ccc; font-size: 15px; line-height: 1.5;">
+                            El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas transmutar tu Poder SG en esta tumba?
+                        </p>
+                        <div style="display: flex; justify-content: center; width: 100%;">
+                            <button id="btn-confirmar-viaje" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 35px; border: none; font-family: 'MedievalSharp', cursive; font-size: 16px; letter-spacing: 1px; box-shadow: 0 0 10px #00ffff;">
                                 ACEPTAR
-                            </button>
-                            <button id="btn-cancelar-2" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 12px 24px; border: 1px solid #555; font-family: 'MedievalSharp', cursive; font-size: 15px;">
-                                CANCELAR
                             </button>
                         </div>
                     `;
                     
-                    document.getElementById('btn-aceptar-viaje').onclick = () => {
+                    // Al dar clic en Aceptar, cerramos el modal y viaja el alma
+                    document.getElementById('btn-confirmar-viaje').onclick = () => {
                         cerrarRitual();
-                        // Forzamos un respiro al renderizador para que el alma viaje sin trabarse arriba a la izquierda
+                        
+                        // Pequeño retardo para que el navegador recalcule posiciones sin el blur de fondo
                         setTimeout(() => {
                             const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
                             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
-                        }, 60);
+                        }, 50);
                     };
+                }
                     document.getElementById('btn-cancelar-2').onclick = () => {
                         cerrarRitual();
                     };
