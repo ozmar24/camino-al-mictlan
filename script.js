@@ -186,6 +186,11 @@ if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
 
+// Variable global para controlar qué tumbas ya fueron cargadas con saldo en la sesión
+if (typeof window.tumbasConSaldo === 'undefined') {
+    window.tumbasConSaldo = {};
+}
+
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
     if (!contenedor) return;
@@ -240,7 +245,9 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
-                // PASO 1: Clic en Soulgeist -> Abre modal para activar el modo de envío
+                // ==========================================
+                // PASO 1: CLIC EN SOULGEIST (PRIMERA IMAGEN)
+                // ==========================================
                 document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                 const modal = document.getElementById('modal-ritual');
                 if(modal) {
@@ -249,39 +256,79 @@ function generarCementerio() {
                 }
                 
                 document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
+                
+                // Modificado: Solo el botón azul original de tu HTML y el de cancelar
                 document.getElementById('info-ritual').innerHTML = `
                     <p style="margin-bottom: 20px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
-                    <button id="btn-preparar-ritual" class="btn-ritual pentaculo-cursor" style="width:100%; padding:12px; background:${pos.color}; color:#000; font-weight:bold; border:none; font-family:'MedievalSharp', cursive; font-size:16px;">
-                        ENVIAR ALMA
-                    </button>
+                    <div class="botones-exchange" style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="btn-activar-envio" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; font-family: 'MedievalSharp', cursive;">
+                            ENVIAR ALMA
+                        </button>
+                        <button onclick="cerrarRitual()" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; font-family: 'MedievalSharp', cursive;">
+                            CANCELAR
+                        </button>
+                    </div>
                 `;
                 
-                // Al darle clic a ENVIAR ALMA, se cierra el modal y se activa la selección
-                document.getElementById('btn-preparar-ritual').onclick = () => {
+                document.getElementById('btn-activar-envio').onclick = () => {
                     cerrarRitual();
-                    ritualActivo = true;
+                    ritualActivo = true; // El juego queda esperando la tumba destino
                 };
             } 
             else {
-                // PASO 2: Si el ritual de Soulgeist ya está activo y se selecciona la tumba de destino
+                // ==========================================
+                // PASO 2: CLIC EN LA TUMBA DESTINO (RITUAL ACTIVO)
+                // ==========================================
                 if (ritualActivo) {
-                    ritualActivo = false; // Consumimos el estado
-                    window.tumbasConSaldo[pos.nombre] = true; // Marcamos que esta tumba ya tiene saldo activo
+                    ritualActivo = false;
+                    window.tumbasConSaldo[pos.nombre] = true; // Registramos que ya tiene saldo
 
-                    // Abrimos el modal intermedio de "RITUAL INICIADO"
-                    notificacionGotica("RITUAL INICIADO", `Canalizando energía mística hacia la cripta de ${pos.nombre}...`, pos.color, false);
-                    
-                    // Disparamos la animación del viaje del alma
+                    // CAPTURAMOS LAS COORDENADAS ANTES DE LEVANTAR EL DESENFOQUE O MODALES
                     const tumbaOrigen = document.querySelector('.alma-maestra');
-                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
-                    lanzarAlma(tumbaOrigen, e.currentTarget, pos.color, baseCalculo * pos.tasa, pos);
+                    const tumbaDestino = e.currentTarget;
+                    
+                    // Levantamos el modal de "Ritual Iniciado" (SEGUNDA IMAGEN)
+                    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+                    const modal = document.getElementById('modal-ritual');
+                    if(modal) {
+                        modal.style.setProperty('--color-ritmo', pos.color);
+                        modal.style.display = 'block';
+                    }
+                    
+                    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+                    
+                    // Modificado: Quitamos botón repetido de enviar, dejamos "ACEPTAR" (azul) y "CANCELAR"
+                    document.getElementById('info-ritual').innerHTML = `
+                        <p style="margin-bottom: 20px; color: #ccc;">El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas consumar el pacto?</p>
+                        <div class="botones-exchange" style="display: flex; gap: 10px; justify-content: center;">
+                            <button id="btn-aceptar-viaje" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; font-family: 'MedievalSharp', cursive;">
+                                ACEPTAR
+                            </button>
+                            <button onclick="cerrarRitual()" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; font-family: 'MedievalSharp', cursive;">
+                                CANCELAR
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Al dar clic en Aceptar, cerramos el fondo místico y vuela el alma directo a las coordenadas guardadas
+                    document.getElementById('btn-aceptar-viaje').onclick = () => {
+                        cerrarRitual();
+                        
+                        const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
+                        // Forzamos un mini timeout para asegurar que el DOM recalculó su posición real sin filtros
+                        setTimeout(() => {
+                            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
+                        }, 50);
+                    };
                 } 
-                // PASO 3: Clic normal sobre una tumba que YA recibió saldo
+                // ==========================================
+                // PASO 3: RETIRO NORMAL (CUANDO YA TIENE SALDO)
+                // ==========================================
                 else if (window.tumbasConSaldo[pos.nombre]) {
-                    abrirModalRitual(pos); // Abre el modal original con pasarelas e input de billetera
+                    abrirModalRitual(pos); // Despliega el formulario final de pasarelas y wallet
                 }
-                // Si no tiene saldo ni ritual activo, mostramos el aviso original de requisitos
                 else {
+                    // Si no se ha iniciado ritual ni tiene saldo, pide los requisitos mínimos
                     abrirModalRitual(pos);
                 }
             }
@@ -290,7 +337,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
-    // Código original de tus pilares (se mantiene intacto)
+    // Pilares (Se mantiene tu código intacto)
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
