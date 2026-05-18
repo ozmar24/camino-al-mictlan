@@ -170,9 +170,6 @@ if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {}; 
 }
 
-// ==================================================================
-// DISPARADOR GLOBAL DEL RITUAL (PASO 1 Y 2 ESTILO VIDEO ORIGINAL)
-// ==================================================================
 function dispararInicioRitualGlobal() {
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
     const modal = document.getElementById('modal-ritual');
@@ -181,7 +178,6 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    // Ocultamos inputs y selectores del modal temporalmente
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
     if (inputContenedor) inputContenedor.style.display = 'none';
@@ -189,54 +185,38 @@ function dispararInicioRitualGlobal() {
 
     document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
     document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.</p>
+        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.</p>
     `;
 
-    const modalBotonesNativos = document.getElementById('botones-exchange');
-    let btnPrincipal = null;
-    let btnCancelar = null;
-    if (modalBotonesNativos) {
-        modalBotonesNativos.style.display = 'flex';
-        const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
-        btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
-        btnPrincipal = listaBotones.find(b => b !== btnCancelar);
-    }
+    const contenedorBotones = document.getElementById('botones-exchange');
+    if (contenedorBotones) {
+        contenedorBotones.style.display = 'flex';
+        contenedorBotones.innerHTML = `
+            <button id="btn-ritual-fumar" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">FUMAR ALMA</button>
+            <button id="btn-ritual-cancelar" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; border-radius: 4px; cursor: pointer;">CANCELAR</button>
+        `;
 
-    if (btnPrincipal) {
-        btnPrincipal.style.display = 'block';
-        btnPrincipal.innerText = "FUMAR ALMA";
-        btnPrincipal.style.background = "#00ffff";
-        btnPrincipal.style.color = "#000";
-
-        const clonBtn = btnPrincipal.cloneNode(true);
-        btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
-        btnPrincipal = clonBtn;
-
-        btnPrincipal.onclick = (event) => {
+        document.getElementById('btn-ritual-fumar').onclick = (event) => {
             event.preventDefault();
             cerrarRitual();
             
             if (balanceUsuarioSG <= 0) {
-                // Si no tiene energía, el botón simula la obtención del video
+                // Si no tiene energía, actúa como reclamo e invoca el video
                 setTimeout(() => { videoCompletado(); }, 300);
             } else {
-                // Si cuenta con almas, el mapa queda en modo de selección interactiva
+                // Si tiene energía, desata el estado receptivo del mapa
                 ritualActivo = true; 
                 lanzarAlertaMictlan("El poder está latente. Toca cualquier cripta en el Campo Santo para inyectar tus almas.", "MAPA RECEPTIVO");
             }
         };
-    }
 
-    if (btnCancelar) {
-        btnCancelar.style.display = 'block';
-        btnCancelar.innerText = "CANCELAR";
-        btnCancelar.onclick = () => { ritualActivo = false; cerrarRitual(); };
+        document.getElementById('btn-ritual-cancelar').onclick = () => {
+            ritualActivo = false; 
+            cerrarRitual();
+        };
     }
 }
 
-// ==================================================================
-// RENDERIZADO DEL MAPA Y MANEJO DINÁMICO DE MODALES (MÉTODO INMUNE)
-// ==================================================================
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos'); 
     if (!contenedor) return; 
@@ -255,10 +235,12 @@ function generarCementerio() {
 
     configuracion.forEach(pos => {
         const div = document.createElement('div'); 
+        // Forzamos la clase alma-maestra en la tumba central para que lanzarAlma la encuentre siempre
         div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba'; 
         div.style.top = pos.top; 
         div.style.left = pos.left; 
         div.style.setProperty('--color-cripto', pos.color); 
+        div.setAttribute('data-nombre', pos.nombre); // Atributo de respaldo
 
         if (pos.especial) {
             div.innerHTML = `
@@ -296,20 +278,24 @@ function generarCementerio() {
             }
 
             // ==================================================================
-            // INTERCEPCIÓN DEL CLIC: VIAJE MÍSTICO -> AVISO INTERMEDIO
+            // FLUJO DEL VIDEO: VIAJE DE PARTÍCULAS -> MODAL INTERMEDIO
             // ==================================================================
             if (ritualActivo) {
                 ritualActivo = false; 
                 window.tumbasConSaldo[pos.nombre] = true;
 
-                const tumbaOrigen = document.querySelector('.alma-maestra');
+                // Buscador de respaldo para la tumba origen
+                let tumbaOrigen = document.querySelector('.alma-maestra') || 
+                                  document.querySelector('[data-nombre="Soulgeist"]') || 
+                                  contenedor.firstElementChild;
+                
                 const tumbaDestino = e.currentTarget;
                 const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-                // Lanzamos la animación física del alma viajera
+                // Forzamos el disparo de la animación pasándole los nodos válidos
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                     
-                    // Al impactar la cripta, emerge inmediatamente el modal intermedio
+                    // ESTO SE EJECUTA AL IMPACTAR: Abre el modal intermedio "PODER TRANSFERIDO"
                     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                     const modal = document.getElementById('modal-ritual');
                     if (modal) {
@@ -317,6 +303,7 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
 
+                    // Ocultamos inputs viejos para que se vea limpio como en el video
                     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
                     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
                     if (inputContenedor) inputContenedor.style.display = 'none';
@@ -324,38 +311,29 @@ function generarCementerio() {
 
                     document.getElementById('titulo-ritual').innerText = "PODER TRANSFERIDO";
                     document.getElementById('info-ritual').innerHTML = `
-                        <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive;">¡LA TUMBA DE CANALIZACIÓN HA RECIBIDO LA ENERGÍA EN ${pos.nombre.toUpperCase()}!</p>
+                        <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center;">¡LA TUMBA DE CANALIZACIÓN HA RECIBIDO LA ENERGÍA EN ${pos.nombre.toUpperCase()}!</p>
                     `;
 
-                    const modalBotonesNativos = document.getElementById('botones-exchange');
-                    let btnPrincipal = null;
-                    let btnCancelar = null;
-                    if (modalBotonesNativos) {
-                        modalBotonesNativos.style.display = 'flex';
-                        const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
-                        btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
-                        btnPrincipal = listaBotones.find(b => b !== btnCancelar);
-                    }
+                    // Forzar botones: TOMAR ALMA a la izquierda, CANCELAR a la derecha
+                    const contenedorBotones = document.getElementById('botones-exchange');
+                    if (contenedorBotones) {
+                        contenedorBotones.style.display = 'flex';
+                        contenedorBotones.innerHTML = `
+                            <button id="btn-dinamico-tomar" class="btn-ritual pentaculo-cursor" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">TOMAR ALMA</button>
+                            <button id="btn-dinamico-cancelar" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; border-radius: 4px; cursor: pointer;">CANCELAR</button>
+                        `;
 
-                    if (btnPrincipal) {
-                        btnPrincipal.style.display = 'block';
-                        btnPrincipal.innerText = "TOMAR ALMA";
-                        btnPrincipal.style.background = pos.color;
-                        btnPrincipal.style.color = "#000";
-
-                        const clonBtn = btnPrincipal.cloneNode(true);
-                        btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
-                        btnPrincipal = clonBtn;
-
-                        btnPrincipal.onclick = () => {
+                        document.getElementById('btn-dinamico-tomar').onclick = () => {
                             cerrarRitual();
                             setTimeout(() => { abrirModalCosechaFinal(pos); }, 50);
                         };
+
+                        document.getElementById('btn-dinamico-cancelar').onclick = cerrarRitual;
                     }
-                    if (btnCancelar) btnCancelar.style.display = 'none'; 
                 });
 
             } else {
+                // Si haces clic directo sin presionar el botón flotante, va a la cosecha
                 abrirModalCosechaFinal(pos);
             }
         };
@@ -363,7 +341,7 @@ function generarCementerio() {
         contenedor.appendChild(div); 
     });
 
-    // Pilares de navegación lateral
+    // Pilares laterales
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" }, 
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" } 
@@ -462,80 +440,50 @@ function actualizarSumaVisual(elementoTumba, cantidad) {
     }
 }
 
-function abrirModalCosechaFinal(pos) {
-    const valorUsuarioUSD = balanceUsuarioSG * 0.001; 
-
-    if (valorUsuarioUSD < pos.usdMinimo) {
-        lanzarAlertaMictlan( 
-            `El umbral de esta cripta exige un valor mínimo de $ ${pos.usdMinimo.toFixed(2)} USD en almas. Actualmente posees el equivalente a $ ${valorUsuarioUSD.toFixed(2)} USD (${balanceUsuarioSG} SG). Sigue cosechando en Soulgeist para romper el sello.`, 
-            "REQUISITO INCUMPLIDO"
-        );
-        return; 
+function dispararInicioRitualGlobal() {
+    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+    const modal = document.getElementById('modal-ritual');
+    if (modal) {
+        modal.style.setProperty('--color-ritmo', "#00ffff");
+        modal.style.display = 'block';
     }
 
-    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)"; 
-
-    const modal = document.getElementById('modal-ritual'); 
-    const titulo = document.getElementById('titulo-ritual'); 
-    const info = document.getElementById('info-ritual'); 
-    
-    if(modal) {
-        modal.style.setProperty('--color-ritmo', pos.color); 
-        modal.style.display = 'block'; 
-    }
-    
-    titulo.innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
-    
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
-    if(inputContenedor) inputContenedor.style.display = 'block';
-    if(selectContenedor) selectContenedor.style.display = 'block';
+    if (inputContenedor) inputContenedor.style.display = 'none';
+    if (selectContenedor) selectContenedor.style.display = 'none';
 
-    info.innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc;">Selecciona la pasarela de destino para canalizar tus ${pos.sim}:</p>
-        
-        <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px; font-family: 'MedievalSharp', cursive; margin-bottom: 15px; cursor: pointer;">
-            <option value="faucetpay">FaucetPay (Micro-Wallet)</option>
-            ${pos.nombre === "Bitcoin" ? '<option value="bitso_lightning">Bitso (Red Lightning ⚡)</option>' : ''}
-            <option value="bitso">Bitso (Red Principal)</option>
-            <option value="coinbase">Coinbase</option>
-            <option value="binance">Binance Exchange</option>
-        </select>
+    document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
+    document.getElementById('info-ritual').innerHTML = `
+        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.</p>
+    `;
 
-        <input type="text" id="wallet-input" placeholder="Correo vinculado a FaucetPay o Dirección" style="display: block; width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center; font-size: 14px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px;">
-    `; 
-    
-    window.currentCripto = pos.nombre; 
+    const contenedorBotones = document.getElementById('botones-exchange');
+    if (contenedorBotones) {
+        contenedorBotones.style.display = 'flex';
+        contenedorBotones.innerHTML = `
+            <button id="btn-ritual-fumar" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">FUMAR ALMA</button>
+            <button id="btn-ritual-cancelar" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; border-radius: 4px; cursor: pointer;">CANCELAR</button>
+        `;
 
-    const modalBotonesNativos = document.getElementById('botones-exchange');
-    let btnPrincipal = null;
-    let btnCancelar = null;
-    if (modalBotonesNativos) {
-        modalBotonesNativos.style.display = 'flex';
-        const listaBotones = Array.from(modalBotonesNativos.getElementsByTagName('button'));
-        btnCancelar = listaBotones.find(b => b.getAttribute('onclick')?.includes('cerrar') || b.innerText.toLowerCase().includes('cancelar'));
-        btnPrincipal = listaBotones.find(b => b !== btnCancelar);
-    }
-
-    if (btnPrincipal) {
-        btnPrincipal.style.display = 'block';
-        btnPrincipal.innerText = "ENVIAR ALMA";
-        btnPrincipal.style.background = pos.color;
-        btnPrincipal.style.color = "#000";
-
-        const clonBtn = btnPrincipal.cloneNode(true);
-        btnPrincipal.parentNode.replaceChild(clonBtn, btnPrincipal);
-        btnPrincipal = clonBtn;
-
-        btnPrincipal.onclick = () => {
-            if (typeof procesarRetiro !== 'undefined') procesarRetiro();
+        document.getElementById('btn-ritual-fumar').onclick = (event) => {
+            event.preventDefault();
+            cerrarRitual();
+            
+            if (balanceUsuarioSG <= 0) {
+                // Si no tiene energía, actúa como reclamo e invoca el video
+                setTimeout(() => { videoCompletado(); }, 300);
+            } else {
+                // Si tiene energía, desata el estado receptivo del mapa
+                ritualActivo = true; 
+                lanzarAlertaMictlan("El poder está latente. Toca cualquier cripta en el Campo Santo para inyectar tus almas.", "MAPA RECEPTIVO");
+            }
         };
-    }
 
-    if (btnCancelar) {
-        btnCancelar.style.display = 'block';
-        btnCancelar.innerText = "CANCELAR";
-        btnCancelar.onclick = cerrarRitual;
+        document.getElementById('btn-ritual-cancelar').onclick = () => {
+            ritualActivo = false; 
+            cerrarRitual();
+        };
     }
 }
 
