@@ -243,22 +243,22 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
+                // 1. INICIAR RITUAL: Se activa la canalización desde la tumba maestra
                 ritualActivo = true;
                 window.currentCripto = "Soulgeist";
                 notificacionGotica("RITUAL INICIADO", "Selecciona una tumba de destino para canalizar tu Poder SG.", pos.color, false);
             } 
             else {
+                // 2. SELECCIÓN DE DESTINO: Si el ritual está activo, abre el modal de confirmación primero
                 if (ritualActivo) {
-                    ritualActivo = false; 
-                    cerrarRitual(); 
-                    
-                    const tumbaOrigen = document.querySelector('.alma-maestra');
-                    tumbaSeleccionada = e.currentTarget;
-                    window.currentCripto = pos.nombre; 
+                    // Guardamos temporalmente los datos de la tumba seleccionada para usarlos al confirmar
+                    window.tumbaDestinoData = pos;
+                    window.elementTumbaDestino = e.currentTarget;
 
-                    const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
-                    lanzarAlma(tumbaOrigen, tumbaSeleccionada, pos.color, baseCalculo * pos.tasa, pos);
+                    // Abrimos el modal de confirmación (el que se ve en tu imagen con el botón "Enviar Alma")
+                    abrirModalRitualConfirmacion(pos); 
                 } else {
+                    // Si le da clic directo sin activar Soulgeist, abre su info normal o advertencia
                     abrirModalRitual(pos);
                 }
             }
@@ -450,6 +450,75 @@ function cerrarRitual() {
     if(cementerio) cementerio.style.filter = "none";
 }
 
+// ==================================================================
+// CONFIRMACIÓN Y DISPARO DEL RITUAL DE CANALIZACIÓN
+// ==================================================================
+
+// 1. Abre el modal modificado mostrando el botón místico de confirmación
+function abrirModalRitualConfirmacion(pos) {
+    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+
+    const modal = document.getElementById('modal-ritual');
+    const titulo = document.getElementById('titulo-ritual');
+    const info = document.getElementById('info-ritual');
+    
+    if(modal) {
+        modal.style.setProperty('--color-ritmo', pos.color);
+        modal.style.display = 'block';
+    }
+    
+    // Convertimos temporalmente el valor acumulado para mostrarlo en el texto del pacto
+    const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+
+    titulo.innerText = `PÁCTO CON ${pos.nombre.toUpperCase()}`;
+    
+    info.innerHTML = `
+        <p style="margin-bottom: 20px; color: #fff; font-size: 15px; text-shadow: 0 0 5px #000;">
+            ¿Deseas desatar tu poder acumulado y transmutarlo en la cripta?
+        </p>
+        <div style="background: rgba(0,0,0,0.6); padding: 15px; border: 1px dashed ${pos.color}; border-radius: 4px; margin-bottom: 20px;">
+            <span style="color: #ccc; font-size: 13px; display: block;">Energía a Canalizar:</span>
+            <span style="color: ${pos.color}; font-size: 20px; font-weight: bold;">
+                +${gananciaDecimal.toLocaleString()} ${pos.sim}
+            </span>
+        </div>
+        
+        <button onclick="confirmarYDispararAlma()" class="btn-ritual pentaculo-cursor" style="background: ${pos.color}; color: #000; font-weight: bold; width: 100%; padding: 12px; border: none; border-radius: 4px; font-family: 'MedievalSharp', cursive; font-size: 16px; cursor: pointer; box-shadow: 0 0 15px ${pos.color};">
+            ENVIAR ALMA
+        </button>
+    `;
+    
+    window.currentCripto = pos.nombre;
+}
+
+// 2. Ejecuta la animación mística tras presionar el botón del modal
+function confirmarYDispararAlma() {
+    const tumbaOrigen = document.querySelector('.alma-maestra');
+    const tumbaDestino = window.elementTumbaDestino;
+    const datos = window.tumbaDestinoData;
+
+    if (!tumbaOrigen || !tumbaDestino || !datos) {
+        cerrarRitual();
+        return;
+    }
+
+    // Cerramos el modal primero para limpiar la pantalla antes de la ráfaga
+    cerrarRitual();
+    
+    // Desactivamos el estado del ritual para permitir nuevas selecciones
+    ritualActivo = false;
+
+    // Calculamos el valor de transferencia exacto
+    const cantidadCalcular = balanceUsuarioSG > 0 ? (balanceUsuarioSG * datos.tasa) : 0;
+
+    // Disparamos tu ráfaga de partículas y niebla
+    lanzarAlma(tumbaOrigen, tumbaDestino, datos.color, cantidadCalcular, datos);
+    
+    // Limpiamos los rastros de las variables globales dinámicas de control
+    window.tumbaDestinoData = null;
+    window.elementTumbaDestino = null;
+}
+
 function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCripto) {
     const rectOrigen = origenElemento.getBoundingClientRect();
     const rectDestino = destinoElemento.getBoundingClientRect();
@@ -499,11 +568,22 @@ function lanzarAlma(origenElemento, destinoElemento, color, cantidad, datosCript
     anim.onfinish = () => {
         clearInterval(intervaloNiebla);
         alma.remove();
+        
+        // 1. Hace el destello numérico en la tumba afectada
         actualizarSumaVisual(destinoElemento, cantidad);
-        abrirModalRitual(datosCripto);
+        
+        // 2. EN LUGAR DE ABRIR EL MODAL: Mostramos la alerta gótica de que el pacto se consumó
+        notificacionGotica(
+            "ALMA CANALIZADA", 
+            `Has transferido con éxito tu poder a la cripta de ${datosCripto.nombre}.`, 
+            color, 
+            false
+        );
+
+        // 3. Opcional: Aquí puedes meter tu fetch() al backend para guardar los cambios reales
+        // registrarRitualEnBackend(datosCripto.nombre, cantidad);
     };
 }
-
 // ==================================================================
 // ABSORCIÓN DE VIDEOS MONETIZADOS
 // ==================================================================
