@@ -213,8 +213,14 @@ function generarCementerio() {
                 <div class="nombre-cripto">${pos.nombre}</div>
                 <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
             `;
-        } else {
-            const gananciaEstimada = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa).toLocaleString() : "0";
+       } else {
+            // Si el balance es mayor a 0, calcula la tasa; si es 0, la ganancia es 0
+            const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+            
+            // Si es 0, mostramos "0", si es mayor, le damos formato con su signo +
+            const textoBalance = gananciaDecimal > 0 
+                ? `+${gananciaDecimal.toLocaleString()}` 
+                : `0`;
             
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
@@ -226,7 +232,7 @@ function generarCementerio() {
                             ${pos.nombre}
                         </div>
                         <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
-                            +${gananciaEstimada} ${pos.sim}
+                            ${textoBalance} ${pos.sim}
                         </div>
                     </div>
                 </div>
