@@ -171,11 +171,9 @@ if (typeof window.tumbasConSaldo === 'undefined') {
 }
 
 // ==================================================================
-// CONTROL DE MODALES Y RITUALES (REPLICADO EXACTO DEL VIDEO)
+// PASO 1: CLICK EN SOULGEIST (0 BALANCE) -> MODAL INFORMATIVO CON "CERRAR"
 // ==================================================================
-
 function dispararInicioRitualGlobal() {
-    // 1. Difuminamos el fondo tal como en el video
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
     const modal = document.getElementById('modal-ritual');
     if (modal) {
@@ -183,47 +181,41 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    // Aseguramos que los inputs de cosecha normales no se muestren aquí
+    // Ocultamos inputs del formulario final para mantener la estética limpia de aviso
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
     if (inputContenedor) inputContenedor.style.display = 'none';
     if (selectContenedor) selectContenedor.style.display = 'none';
 
-    // Texto exacto del video (Paso 2)
-    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+    document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
     document.getElementById('info-ritual').innerHTML = `
         <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
-            SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.
+            EL PODER ESTÁ LATENTE. SELECCIONA UNA CRIPTA EN EL CAMPO SANTO PARA INYECTAR TUS ALMAS.
         </p>
     `;
 
-    // Botones idénticos al video: "ENVIAR ALMA" y "CANCELAR"
     const contenedorBotones = document.getElementById('botones-exchange');
     if (contenedorBotones) {
         contenedorBotones.style.display = 'flex';
         contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
-            <button id="btn-ritual-enviar-unico" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-family:'MedievalSharp', cursive;">ENVIAR ALMA</button>
-            <button id="btn-ritual-cancelar-primer-paso" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 30px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp', cursive;">CANCELAR</button>
+            <button id="btn-ritual-cerrar-inicial" class="btn-ritual" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 35px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">CERRAR</button>
         `;
 
-        // REPLICACIÓN DEL VIDEO: "ENVIAR ALMA" no cierra el modal, activa la fase de selección en segundo plano
-        document.getElementById('btn-ritual-enviar-unico').onclick = (event) => {
+        // Al presionar Cerrar, habilitamos el mapa para escuchar el click de destino
+        document.getElementById('btn-ritual-cerrar-inicial').onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
             
-            ritualActivo = true; // El sistema ahora espera que des clic a una lápida destino
-            
-            // Ocultamos temporalmente el modal CON un desvanecimiento o cierre directo para poder dar clic en el mapa
-            modal.style.display = 'none'; 
-            document.getElementById('campo-santo').style.filter = "none";
-            console.log("Canalización activada. Elige tu cripta en el cementerio.");
+            ritualActivo = true; // Activa el estado místico receptor
+            cerrarRitual();      // Cierra el modal y quita el blur
         };
-
-        document.getElementById('btn-ritual-cancelar-primer-paso').onclick = cerrarRitual;
     }
 }
 
+// ==================================================================
+// PASO 2 Y 3: GENERACIÓN DE CRIPTAS -> ANIMACIÓN VIAJERA -> MODAL "RITUAL INICIADO"
+// ==================================================================
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos'); 
     if (!contenedor) return; 
@@ -283,18 +275,24 @@ function generarCementerio() {
                 return;
             }
 
-            // PASO 3 DEL VIDEO: SI EL RITUAL ESTABA EN CURSO
+            // ==================================================================
+            // PASO 2: EL RITUAL ESTÁ ACTIVO -> SE DISPARA LANZARALMA AL INSTANTE
+            // ==================================================================
             if (ritualActivo) {
-                ritualActivo = false; // Consumimos el estado místico
+                ritualActivo = false; // Consumimos el estado inmediatamente
                 window.tumbasConSaldo[pos.nombre] = true;
 
+                // Buscamos nodos HTML reales para el cálculo de píxeles
                 let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-                const tumbaDestino = e.currentTarget;
+                const tumbaDestino = e.currentTarget; 
+                const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-                // Lanzamos la animación visual de la esfera/alma
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, balanceUsuarioSG * pos.tasa, () => {
+                // AQUÍ ENTRA LA FUNCIÓN DIRECTAMENTE: El usuario ve viajar el alma por el mapa
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                     
-                    // AL IMPACTAR: Reaparece el modal mutado exactamente como en tu video de Firefox
+                    // ==============================================================
+                    // PASO 3: AL IMPACTAR APARECE EL MODAL "RITUAL INICIADO" + "ACEPTAR"
+                    // ==============================================================
                     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                     const modal = document.getElementById('modal-ritual');
                     if (modal) {
@@ -302,11 +300,10 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
 
-                    // Textos y botones del paso "PODER TRANSFERIDO" del video original
-                    document.getElementById('titulo-ritual').innerText = "PODER TRANSFERIDO";
+                    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
                     document.getElementById('info-ritual').innerHTML = `
-                        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
-                            EL TRASPIL DE LIQUIDACIÓN FUE REGISTRADO CON ÉXITO EN EL LIBRO DEL MICTLÁN.
+                        <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
+                            ¡EL ALMA DE LA TUMBA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
                         </p>
                     `;
 
@@ -315,23 +312,24 @@ function generarCementerio() {
                         contenedorBotones.style.display = 'flex';
                         contenedorBotones.style.justifyContent = 'center';
                         contenedorBotones.innerHTML = `
-                            <button id="btn-ritual-cancelar-mutado" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 40px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp', cursive;">CANCELAR</button>
+                            <button id="btn-ritual-aceptar-unico" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 40px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
                         `;
 
-                        // Al dar clic en "CANCELAR" dentro de PODER TRANSFERIDO, refresca el mapa con los nuevos saldos
-                        document.getElementById('btn-ritual-cancelar-mutado').onclick = () => {
+                        document.getElementById('btn-ritual-aceptar-unico').onclick = () => {
                             cerrarRitual();
-                            generarCementerio(); // Renderiza de nuevo para que la tumba seleccionada muestre su saldo final
+                            generarCementerio(); // Regenera los marcadores de saldo "+X CRIPTO" en verde en el mapa
                         };
                     }
                 });
 
             } else {
-                // PASO 4 DEL VIDEO: Clic a una tumba que ya tiene saldo transferido -> Abre Cosecha/Retiro
+                // ==============================================================
+                // PASO 4: CLIC SEGUNDO A UNA CRIPTA CON SALDO -> MODAL DE BILLETERA
+                // ==============================================================
                 if (window.tumbasConSaldo[pos.nombre]) {
                     abrirModalCosechaFinal(pos);
                 } else {
-                    console.log(`Esta tumba (${pos.nombre}) no posee almas canalizadas todavía.`);
+                    console.log("Esta cripta está sellada. Inicia la canalización desde la tumba Soulgeist.");
                 }
             }
         };
@@ -339,7 +337,7 @@ function generarCementerio() {
         contenedor.appendChild(div); 
     });
 
-    // Inscripciones fijas de los pilares del inframundo
+    // Pilares de navegación del Inframundo
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" }, 
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" } 
@@ -360,7 +358,9 @@ function generarCementerio() {
     });
 }
 
-// NUEVA FUNCIÓN COSECHA: Diseñada idéntica al layout de la pantalla final del video
+// ==================================================================
+// PASO 4: FORMULARIO DE COSECHA DE CRIPTO (BILLETERAS / PASARELAS)
+// ==================================================================
 function abrirModalCosechaFinal(pos) {
     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)"; 
 
@@ -373,19 +373,21 @@ function abrirModalCosechaFinal(pos) {
     document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
     window.currentCripto = pos.nombre; 
 
-    // Estructura de formulario limpia y compacta con los estilos místico-oscuros originales
+    // Aquí se renderiza el combo-box y la caja para escribir la wallet de destino
     document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; text-align:center; font-family:'MedievalSharp';">Ingresa tu dirección de wallet o correo místico para reclamar tus almas:</p>
+        <p style="margin-bottom: 15px; color: #ccc; text-align:center; font-family:'MedievalSharp';">Selecciona la pasarela de destino para transferir tus almas:</p>
         
         <div style="margin-bottom: 15px;">
             <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px; font-family:'MedievalSharp';">
                 <option value="faucetpay">FaucetPay (Micro-Wallet)</option>
-                <option value="directa">Dirección Directa (On-Chain)</option>
+                <option value="bitso">Bitso Exchange</option>
+                <option value="coinbase">Coinbase Wallet</option>
+                <option value="binance">Binance</option>
             </select>
         </div>
 
         <div style="margin-bottom: 15px;">
-            <input type="text" id="wallet-input" placeholder="Correo de FaucetPay o dirección de destino" style="display: block; width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center; border-radius: 4px; box-sizing: border-box; font-family: monospace;">
+            <input type="text" id="wallet-input" placeholder="Correo vinculado a FaucetPay o dirección de destino" style="display: block; width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center; border-radius: 4px; box-sizing: border-box;">
         </div>
     `; 
 
@@ -394,7 +396,7 @@ function abrirModalCosechaFinal(pos) {
         contenedorBotones.style.display = 'flex';
         contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
-            <button id="btn-cosecha-enviar" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-family:'MedievalSharp';">FORJAR RECLAMO</button>
+            <button id="btn-cosecha-enviar" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-family:'MedievalSharp';">ENVIAR ALMA</button>
             <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">CANCELAR</button>
         `;
 
