@@ -119,7 +119,7 @@ button,
     left: 0;
     width: 100%;
     height: 100vh;
-    background: url('img/Criptos.png') no-repeat center center;
+    background: url('img/criptos.png') no-repeat center center;
     background-size: cover;
     z-index: 100;
     display: none; 

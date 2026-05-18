@@ -181,13 +181,13 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    // Ocultamos elementos de formulario para este aviso inicial
+    // Limpiamos selectores e inputs para que no se muestren en este paso
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
     if (inputContenedor) inputContenedor.style.display = 'none';
     if (selectContenedor) selectContenedor.style.display = 'none';
 
-    // Texto descriptivo del grimorio
+    // Título y mensaje descriptivo idéntico al video
     document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
     document.getElementById('info-ritual').innerHTML = `
         <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
@@ -195,7 +195,7 @@ function dispararInicioRitualGlobal() {
         </p>
     `;
 
-    // UN SOLO BOTÓN: "CERRAR" tal como especificas
+    // UN SOLO BOTÓN: Cerrar
     const contenedorBotones = document.getElementById('botones-exchange');
     if (contenedorBotones) {
         contenedorBotones.style.display = 'flex';
@@ -208,8 +208,8 @@ function dispararInicioRitualGlobal() {
             event.preventDefault();
             event.stopPropagation();
             
-            ritualActivo = true; // Dejamos el mapa listo en modo escucha
-            cerrarRitual();      // Oculta el modal de aviso
+            ritualActivo = true; // Habilita el estado para recibir el clic en la tumba destino
+            cerrarRitual();      // Oculta el modal de aviso y quita el blur
         };
     }
 }
@@ -268,65 +268,66 @@ function generarCementerio() {
             `; 
         }
 
-        div.onclick = (e) => {
-            e.stopPropagation();
+        // Dentro del configuracion.forEach(pos => { ... }) de tu generarCementerio:
+div.onclick = (e) => {
+    e.stopPropagation();
+    
+    if (pos.especial) {
+        dispararInicioRitualGlobal();
+        return;
+    }
+
+    // SI EL RITUAL ESTÁ ACTIVO -> VIAJA EL ALMA PRIMERO
+    if (ritualActivo) {
+        ritualActivo = false; // Consumimos el estado inmediatamente para evitar dobles clics
+        window.tumbasConSaldo[pos.nombre] = true;
+
+        let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
+        const tumbaDestino = e.currentTarget; 
+        const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+
+        // La animación ocurre en vivo sobre el cementerio sin interferencias
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
             
-            if (pos.especial) {
-                dispararInicioRitualGlobal();
-                return;
+            // AL IMPACTAR EL ALMA: Abre automáticamente el modal "RITUAL INICIADO"
+            document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+            const modal = document.getElementById('modal-ritual');
+            if (modal) {
+                modal.style.setProperty('--color-ritmo', pos.color);
+                modal.style.display = 'block';
             }
 
-            // PASO 2: SE ACTIVA LANZARALMA EN VIVO AL DAR CLICK EN LA CRIPTA
-            if (ritualActivo) {
-                ritualActivo = false; 
-                window.tumbasConSaldo[pos.nombre] = true;
+            document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+            document.getElementById('info-ritual').innerHTML = `
+                <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
+                    ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
+                </p>
+            `;
 
-                let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-                const tumbaDestino = e.currentTarget; 
-                const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+            const contenedorBotones = document.getElementById('botones-exchange');
+            if (contenedorBotones) {
+                contenedorBotones.style.display = 'flex';
+                contenedorBotones.style.justifyContent = 'center';
+                contenedorBotones.innerHTML = `
+                    <button id="btn-ritual-aceptar-unico" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 40px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
+                `;
 
-                // El alma viaja visiblemente por el mapa limpio sin que el modal estorbe
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
-                    
-                    // PASO 3: CUANDO EL ALMA IMPACTA, SE ABRE EL MODAL CON "RITUAL INICIADO" Y UN BOTÓN DE "ACEPTAR"
-                    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
-                    const modal = document.getElementById('modal-ritual');
-                    if (modal) {
-                        modal.style.setProperty('--color-ritmo', pos.color);
-                        modal.style.display = 'block';
-                    }
-
-                    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
-                    document.getElementById('info-ritual').innerHTML = `
-                        <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
-                            ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
-                        </p>
-                    `;
-
-                    const contenedorBotones = document.getElementById('botones-exchange');
-                    if (contenedorBotones) {
-                        contenedorBotones.style.display = 'flex';
-                        contenedorBotones.style.justifyContent = 'center';
-                        contenedorBotones.innerHTML = `
-                            <button id="btn-ritual-aceptar-unico" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 40px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
-                        `;
-
-                        document.getElementById('btn-ritual-aceptar-unico').onclick = () => {
-                            cerrarRitual();
-                            generarCementerio(); // Redibuja el cementerio reflejando el saldo
-                        };
-                    }
-                });
-
-            } else {
-                // PASO 4: CLIC ORDINARIO POSTERIOR A UNA CRIPTA CON SALDO -> FORMULARIO BILLETERA
-                if (window.tumbasConSaldo[pos.nombre]) {
-                    abrirModalCosechaFinal(pos);
-                } else {
-                    console.log("Inicia la canalización desde la tumba central de Soulgeist.");
-                }
+                document.getElementById('btn-ritual-aceptar-unico').onclick = () => {
+                    cerrarRitual();
+                    generarCementerio(); // Redibuja el mapa para pintar permanentemente el saldo (+X) en verde
+                };
             }
-        };
+        });
+
+    } else {
+        // SI SE CLIQUEA NORMAL UNA TUMBA QUE YA TIENE SALDO -> FORMULARIO DE COSECHA
+        if (window.tumbasConSaldo[pos.nombre]) {
+            abrirModalCosechaFinal(pos);
+        } else {
+            console.log("Inicia la canalización desde la tumba central de Soulgeist.");
+        }
+    }
+};
 
         contenedor.appendChild(div); 
     });
@@ -367,7 +368,7 @@ function abrirModalCosechaFinal(pos) {
     document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
     window.currentCripto = pos.nombre; 
 
-    // Re-inyectamos los inputs limpios del formulario místico de cobro
+    // Renderizado del formulario místico para la wallet
     document.getElementById('info-ritual').innerHTML = `
         <p style="margin-bottom: 15px; color: #ccc; text-align:center; font-family:'MedievalSharp';">Elige tu billetera de destino para reclamar tus almas:</p>
         
