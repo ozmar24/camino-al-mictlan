@@ -79,7 +79,6 @@ function cambiarModoAuth() {
     }
 }
 
-
 // ==================================================================
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
@@ -92,7 +91,6 @@ async function manejarAuth() {
         return;
     }
 
-    // Determinamos si es un registro de alma nueva o un login tradicional
     const accionMistica = esModoRegistro ? 'registro' : 'login';
 
     try {
@@ -101,7 +99,6 @@ async function manejarAuth() {
         btnAuth.innerText = "PROCESANDO PACTO...";
         btnAuth.disabled = true;
 
-        // Mandamos los datos al backend. Fieles al plan: ¡Sin pedir wallets en la entrada!
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -124,14 +121,11 @@ async function manejarAuth() {
 
         if (accionMistica === 'registro') {
             lanzarAlertaMictlan(resultado.message, "ALMA REGISTRADA");
-            cambiarModoAuth(); // Lo manda directo al Login para que use su nueva cuenta
+            cambiarModoAuth();
         } 
         else if (accionMistica === 'login') {
-            // Guardamos el rastro del correo en la sesión del navegador
             window.userWallet = resultado.usuario.email; 
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
-
-            // Entramos al cementerio con el balance real que el usuario tenga en Redis
             entrarAlCampoSanto({ balanceSG: resultado.usuario.balance });
         }
 
@@ -145,12 +139,9 @@ async function manejarLoginGoogle(response) {
     console.log("Token místico de Google recibido:", response.credential);
     
     try {
-        // Lanzamos la petición a nuestra Serverless Function de Vercel
         const res = await fetch('/api/auth-google', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: response.credential })
         });
 
@@ -158,18 +149,40 @@ async function manejarLoginGoogle(response) {
 
         if (res.ok && datos.success) {
             console.log("Pacto verificado en backend para:", datos.perfil.email);
-            // Rompemos el sello y entramos con los datos del perfil devueltos
-            entrarAlCampoSanto(datos.perfil);
+            // Guardamos persistencia igual que en el login tradicional
+            window.userWallet = datos.perfil.email;
+            localStorage.setItem('soulgeist_user_email', datos.perfil.email);
+            
+            // Invocamos la función restaurada
+            entrarAlCampoSanto(datos.perfil); 
         } else {
             console.error("El backend rechazó el token:", datos.error);
-            alert("Tu rastro místico no pudo ser sellado en el servidor.");
         }
     } catch (error) {
         console.error("Error en la conexión con la API del Mictlán:", error);
     }
 }
+
+// NUEVA FUNCIÓN AGREGADA DE FORMA GLOBAL
+function entrarAlCampoSanto(perfil) {
+    const modalContrato = document.getElementById('modal-contrato');
+    const cementerio = document.getElementById('campo-santo');
+    const candelabro = document.querySelector('.candelabro-central');
+    
+    if (modalContrato) modalContrato.style.display = 'none';
+    if (cementerio) cementerio.style.display = 'block';
+    
+    if (candelabro) {
+        candelabro.style.display = 'block';
+        setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
+    }
+
+    balanceUsuarioSG = perfil.balanceSG || 0;
+    generarCementerio();
+}
+
 // ==================================================================
-// MECÁNICAS ETERNAS DEL CEMENTERIO (CRIPTAS Y FILTROS)
+// MECÁNICAS ETERNOS DEL CEMENTERIO (CRIPTAS Y FILTROS)
 // ==================================================================
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
@@ -272,7 +285,7 @@ function actualizarSumaVisual(elementoTumba, cantidad) {
     const texto = elementoTumba.querySelector('.balance-proyectado');
     if (texto) {
         let actual = parseFloat(texto.innerText.replace(/[^0-9.]/g, '')) || 0;
-        let nuevo = actual + cantidad;
+        let nuevo = actual + Math.max(0, cantidad);
         texto.innerText = `+${nuevo.toFixed(6)} ${texto.innerText.split(' ').pop()}`;
         
         texto.style.transform = "scale(1.2)";
@@ -618,9 +631,6 @@ function mostrarPergamino(tipo) {
     }
 }
 
-// ==================================================================
-// CARGA INICIAL Y PERSISTENCIA DE ALMAS (CORREGIDO)
-// ==================================================================
 function cerrarCodice() { document.getElementById('pantalla-codice').style.display = 'none'; }
 
 function abrirSoporte() {
@@ -631,31 +641,6 @@ function abrirSoporte() {
     }
 }
 
-// Vinculación automática del portal y recuperación de sesión al cargar el DOM
-document.addEventListener("DOMContentLoaded", () => {
-    const portalElement = document.getElementById('escena-portal');
-    if(portalElement) {
-        portalElement.onclick = entrarAlMictlan;
-    }
-
-
-    // Comprobamos si el alma ya tiene un pacto activo en este navegador
-    const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
-    if (usuarioGuardado) {
-        window.userWallet = usuarioGuardado;
-        
-        // Ejecutamos la entrada automática para saltarnos el login manual
-        // Nota: Si vas a consultar el balance de Redis en el arranque, 
-        // aquí puedes añadir un fetch rápido o enviar un balance inicial.
-        entrarAlCampoSanto({ balanceSG: 0 }); 
-    }
-});
-// Vinculación automática del portal y recuperación de sesión al cargar el DOM
-document.addEventListener("DOMContentLoaded", () => {
-    const portalElement = document.getElementById('escena-portal');
-    if(portalElement) {
-        portalElement.onclick = entrarAlMictlan;
-    }
 // Cierra la pantalla del espejo arcaico
 function cerrarOraculo() {
     const pantalla = document.getElementById('pantalla-oraculo');
@@ -673,22 +658,27 @@ async function enviarOfrendaOraculo() {
         return;
     }
 
-    // Aquí capturas el mensaje. En el futuro puedes mandarlo a tu API de Telegram.
     console.log(`Invocación de soporte recibida de [${usuarioActivo}]: ${mensaje}`);
     
     lanzarAlertaMictlan("Tu mensaje ha cruzado el umbral. Las deidades responderán pronto.", "INVOCACIÓN ENVIADA");
-    if (inputMensaje) inputMensaje.value = ""; // Limpiamos el área de texto
+    if (inputMensaje) inputMensaje.value = ""; 
     cerrarOraculo();
 }
+
+// ==================================================================
+// CARGA INICIAL Y PERSISTENCIA DE ALMAS (CORREGIDO)
+// ==================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const portalElement = document.getElementById('escena-portal');
+    if(portalElement) {
+        portalElement.onclick = entrarAlMictlan;
+    }
 
     // Comprobamos si el alma ya tiene un pacto activo en este navegador
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        
         // Ejecutamos la entrada automática para saltarnos el login manual
-        // Nota: Si vas a consultar el balance de Redis en el arranque, 
-        // aquí puedes añadir un fetch rápido o enviar un balance inicial.
         entrarAlCampoSanto({ balanceSG: 0 }); 
     }
 });
