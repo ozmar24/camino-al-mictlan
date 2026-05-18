@@ -181,10 +181,7 @@ function entrarAlCampoSanto(perfil) {
     generarCementerio();
 }
 
-// Variable global para rastrear qué tumbas ya recibieron saldo durante la sesión
-if (typeof window.tumbasConSaldo === 'undefined') {
-    window.tumbasConSaldo = {};
-}
+
 
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
@@ -259,7 +256,7 @@ function generarCementerio() {
                     modal.style.display = 'block';
                 }
                 
-                // Ocultamos los inputs de billetera y los botones viejos del HTML para que no estorben
+                // Ocultamos los inputs y botones nativos para pintar los de este paso
                 if(inputContenedor) inputContenedor.style.display = 'none';
                 if(selectContenedor) selectContenedor.style.display = 'none';
                 if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
@@ -293,7 +290,7 @@ function generarCementerio() {
                     ritualActivo = false;
                     window.tumbasConSaldo[pos.nombre] = true;
 
-                    // Capturamos las posiciones físicas del cementerio antes del blur
+                    // Capturamos las posiciones físicas antes del desenfoque
                     const tumbaOrigen = document.querySelector('.alma-maestra');
                     const tumbaDestino = e.currentTarget;
 
@@ -304,15 +301,14 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
                     
-                    // Aseguramos que todo lo nativo del HTML de retiros esté oculto
+                    // Aseguramos que todo lo nativo esté completamente oculto
                     if(inputContenedor) inputContenedor.style.display = 'none';
                     if(selectContenedor) selectContenedor.style.display = 'none';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
 
-                    // Definimos el título del ritual
                     document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
                     
-                    // AGREGAMOS ÚNICAMENTE EL BOTÓN DE ACEPTAR EN EL CONTENEDOR DINÁMICO
+                    // Inyectamos el texto limpio y de forma segura ÚNICAMENTE el botón de Aceptar centrado
                     document.getElementById('info-ritual').innerHTML = `
                         <p style="margin-bottom: 25px; color: #ccc; font-size: 15px; line-height: 1.5;">
                             El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas transmutar tu Poder SG en esta tumba?
@@ -328,33 +324,26 @@ function generarCementerio() {
                     document.getElementById('btn-confirmar-viaje').onclick = () => {
                         cerrarRitual();
                         
-                        // Pequeño retardo para que el navegador recalcule posiciones sin el blur de fondo
                         setTimeout(() => {
                             const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
                             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
                         }, 50);
                     };
-                
-                    document.getElementById('btn-cancelar-2').onclick = () => {
-                        cerrarRitual();
-                    };
+                    
+                    // 🔥 SE REMOVIÓ LA LÍNEA QUE CAUSABA EL ERROR SINTÁCTICO CON 'btn-cancelar-2'
                 } 
                 else if (window.tumbasConSaldo[pos.nombre]) {
                     // ==========================================
                     // CAPTURA 3: RETIRO (YA TIENE SALDO)
                     // ==========================================
-                    // Aquí volvemos a mostrar tus inputs y tus botones nativos del HTML
                     if(inputContenedor) inputContenedor.style.display = 'block';
                     if(selectContenedor) selectContenedor.style.display = 'block';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
 
-                    // Reseteamos el info-ritual para que no queden textos arrastrados de los pasos anteriores
                     document.getElementById('info-ritual').innerHTML = ''; 
-                    
                     abrirModalRitual(pos);
                 }
                 else {
-                    // Si entra sin saldo previo, abrimos el modal normal reactivando el layout original
                     if(inputContenedor) inputContenedor.style.display = 'block';
                     if(selectContenedor) selectContenedor.style.display = 'block';
                     if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
@@ -387,7 +376,6 @@ function generarCementerio() {
         contenedor.appendChild(enlace);
     });
 }
-
 function actualizarSumaVisual(elementoTumba, cantidad) {
     const texto = elementoTumba.querySelector('.balance-proyectado');
     if (texto) {
