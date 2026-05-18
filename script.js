@@ -186,7 +186,6 @@ if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
 
-// Variable global para controlar qué tumbas ya fueron cargadas con saldo en la sesión
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
@@ -244,9 +243,14 @@ function generarCementerio() {
         div.onclick = (e) => {
             e.stopPropagation();
             
+            // Traemos los elementos nativos de tu HTML para controlarlos
+            const modalBotonesNativos = document.querySelector('.botones-exchange'); 
+            const inputContenedor = document.getElementById('wallet-input')?.parentElement;
+            const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
+
             if (pos.especial) {
                 // ==========================================
-                // PASO 1: CLIC EN SOULGEIST (PRIMERA IMAGEN)
+                // CAPTURA 1: CLIC EN SOULGEIST
                 // ==========================================
                 document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                 const modal = document.getElementById('modal-ritual');
@@ -255,16 +259,19 @@ function generarCementerio() {
                     modal.style.display = 'block';
                 }
                 
+                // Ocultamos los inputs de billetera y los botones viejos del HTML para que no estorben
+                if(inputContenedor) inputContenedor.style.display = 'none';
+                if(selectContenedor) selectContenedor.style.display = 'none';
+                if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
+
                 document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
-                
-                // Modificado: Solo el botón azul original de tu HTML y el de cancelar
                 document.getElementById('info-ritual').innerHTML = `
                     <p style="margin-bottom: 20px; color: #ccc;">¿Deseas liberar el Poder de Soulgeist para transmutarlo en el Campo Santo?</p>
-                    <div class="botones-exchange" style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="btn-activar-envio" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; font-family: 'MedievalSharp', cursive;">
+                    <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                        <button id="btn-activar-envio" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 24px; border: none; font-family: 'MedievalSharp', cursive; font-size: 15px;">
                             ENVIAR ALMA
                         </button>
-                        <button onclick="cerrarRitual()" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; font-family: 'MedievalSharp', cursive;">
+                        <button id="btn-cancelar-1" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 12px 24px; border: 1px solid #555; font-family: 'MedievalSharp', cursive; font-size: 15px;">
                             CANCELAR
                         </button>
                     </div>
@@ -272,22 +279,24 @@ function generarCementerio() {
                 
                 document.getElementById('btn-activar-envio').onclick = () => {
                     cerrarRitual();
-                    ritualActivo = true; // El juego queda esperando la tumba destino
+                    ritualActivo = true;
+                };
+                document.getElementById('btn-cancelar-1').onclick = () => {
+                    cerrarRitual();
                 };
             } 
             else {
-                // ==========================================
-                // PASO 2: CLIC EN LA TUMBA DESTINO (RITUAL ACTIVO)
-                // ==========================================
                 if (ritualActivo) {
+                    // ==========================================
+                    // CAPTURA 2: SELECCIONAR LA TUMBA DE DESTINO
+                    // ==========================================
                     ritualActivo = false;
-                    window.tumbasConSaldo[pos.nombre] = true; // Registramos que ya tiene saldo
+                    window.tumbasConSaldo[pos.nombre] = true;
 
-                    // CAPTURAMOS LAS COORDENADAS ANTES DE LEVANTAR EL DESENFOQUE O MODALES
+                    // Guardamos la posición física exacta de las tumbas antes del blur
                     const tumbaOrigen = document.querySelector('.alma-maestra');
                     const tumbaDestino = e.currentTarget;
-                    
-                    // Levantamos el modal de "Ritual Iniciado" (SEGUNDA IMAGEN)
+
                     document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
                     const modal = document.getElementById('modal-ritual');
                     if(modal) {
@@ -295,40 +304,55 @@ function generarCementerio() {
                         modal.style.display = 'block';
                     }
                     
+                    if(inputContenedor) inputContenedor.style.display = 'none';
+                    if(selectContenedor) selectContenedor.style.display = 'none';
+                    if(modalBotonesNativos) modalBotonesNativos.style.display = 'none';
+
                     document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
-                    
-                    // Modificado: Quitamos botón repetido de enviar, dejamos "ACEPTAR" (azul) y "CANCELAR"
                     document.getElementById('info-ritual').innerHTML = `
                         <p style="margin-bottom: 20px; color: #ccc;">El poder del Mictlán fluye hacia la cripta de ${pos.nombre}. ¿Deseas consumar el pacto?</p>
-                        <div class="botones-exchange" style="display: flex; gap: 10px; justify-content: center;">
-                            <button id="btn-aceptar-viaje" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 10px 20px; border: none; font-family: 'MedievalSharp', cursive;">
+                        <div style="display: flex; gap: 15px; justify-content: center; width: 100%;">
+                            <button id="btn-aceptar-viaje" class="btn-ritual pentaculo-cursor" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 24px; border: none; font-family: 'MedievalSharp', cursive; font-size: 15px;">
                                 ACEPTAR
                             </button>
-                            <button onclick="cerrarRitual()" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 10px 20px; border: 1px solid #555; font-family: 'MedievalSharp', cursive;">
+                            <button id="btn-cancelar-2" class="btn-ritual pentaculo-cursor" style="background: #222; color: #fff; padding: 12px 24px; border: 1px solid #555; font-family: 'MedievalSharp', cursive; font-size: 15px;">
                                 CANCELAR
                             </button>
                         </div>
                     `;
                     
-                    // Al dar clic en Aceptar, cerramos el fondo místico y vuela el alma directo a las coordenadas guardadas
                     document.getElementById('btn-aceptar-viaje').onclick = () => {
                         cerrarRitual();
-                        
-                        const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
-                        // Forzamos un mini timeout para asegurar que el DOM recalculó su posición real sin filtros
+                        // Forzamos un respiro al renderizador para que el alma viaje sin trabarse arriba a la izquierda
                         setTimeout(() => {
+                            const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
                             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, baseCalculo * pos.tasa, pos);
-                        }, 50);
+                        }, 60);
+                    };
+                    document.getElementById('btn-cancelar-2').onclick = () => {
+                        cerrarRitual();
                     };
                 } 
-                // ==========================================
-                // PASO 3: RETIRO NORMAL (CUANDO YA TIENE SALDO)
-                // ==========================================
                 else if (window.tumbasConSaldo[pos.nombre]) {
-                    abrirModalRitual(pos); // Despliega el formulario final de pasarelas y wallet
+                    // ==========================================
+                    // CAPTURA 3: RETIRO (YA TIENE SALDO)
+                    // ==========================================
+                    // Aquí volvemos a mostrar tus inputs y tus botones nativos del HTML
+                    if(inputContenedor) inputContenedor.style.display = 'block';
+                    if(selectContenedor) selectContenedor.style.display = 'block';
+                    if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
+
+                    // Reseteamos el info-ritual para que no queden textos arrastrados de los pasos anteriores
+                    document.getElementById('info-ritual').innerHTML = ''; 
+                    
+                    abrirModalRitual(pos);
                 }
                 else {
-                    // Si no se ha iniciado ritual ni tiene saldo, pide los requisitos mínimos
+                    // Si entra sin saldo previo, abrimos el modal normal reactivando el layout original
+                    if(inputContenedor) inputContenedor.style.display = 'block';
+                    if(selectContenedor) selectContenedor.style.display = 'block';
+                    if(modalBotonesNativos) modalBotonesNativos.style.display = 'flex';
+                    document.getElementById('info-ritual').innerHTML = '';
                     abrirModalRitual(pos);
                 }
             }
@@ -337,7 +361,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
-    // Pilares (Se mantiene tu código intacto)
+    // Código original de los pilares (Intacto)
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
