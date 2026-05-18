@@ -243,20 +243,31 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
+                // ACTIVAR EL RITUAL DE SOULGEIST
                 ritualActivo = true;
                 window.currentCripto = "Soulgeist";
-                notificacionGotica("RITUAL INICIADO", "Selecciona una tumba de destino para canalizar tu Poder SG.", pos.color, false);
+                
+                // USAMOS TU FUNCIÓN DE ALERTA GOTICA EN LUGAR DE ABRIR EL MODAL GRANDOTE
+                // Esto evita que se quede abierto el cuadro con botones falsos.
+                if (typeof notificacionGotica === 'function') {
+                    notificacionGotica("RITUAL INICIADO", "El poder del Mictlán fluye. Selecciona ahora una tumba de destino para canalizar tu Poder SG.", pos.color, false);
+                } else {
+                    lanzarAlertaMictlan("El poder del Mictlán fluye. Selecciona una tumba de destino para canalizar tu Poder SG.", "RITUAL INICIADO");
+                }
             } 
             else {
+                // CLIC EN UNA TUMBA DE DESTINO (Criptomonedas normales)
                 if (ritualActivo) {
-                    // 1. Guardamos temporalmente los elementos de la animación en variables globales virtuales
+                    // Guardamos la tumba seleccionada para usarla después de rellenar la wallet
                     window.tumbaDestinoElement = e.currentTarget;
                     window.tumbaDestinoData = pos;
 
-                    // 2. Abrimos TU modal original con el formulario listo
+                    // Abrimos el formulario limpio de la moneda destino (Pepe, Litecoin, etc.)
                     abrirModalRitual(pos); 
                 } else {
-                    // Si dan clic directo sin activar Soulgeist, abre el flujo normal
+                    // Clic normal sin ritual de Soulgeist previo
+                    window.tumbaDestinoElement = null;
+                    window.tumbaDestinoData = null;
                     abrirModalRitual(pos);
                 }
             }
@@ -386,38 +397,39 @@ function procesarRetiro() {
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
     
-    if(!inputWallet || !selectPasarela) return;
+    if(!inputWallet) return;
     
     const wallet = inputWallet.value.trim();
-    const pasarelaElegida = selectPasarela.value;
+    // Validamos pasarela si existe el select en tu HTML
+    const pasarelaElegida = selectPasarela ? selectPasarela.value : "FaucetPay";
     
     if (wallet.length < 8) {
         lanzarAlertaMictlan("La dirección o credencial del portal es demasiado corta.", "ERROR DE RITUAL");
         return;
     }
     
+    // Cerramos el modal del formulario
     cerrarRitual();
 
-    // === AQUÍ SE INYECTA LA MAGIA VISUAL ===
-    // Si veníamos de un ritual activo de Soulgeist, disparamos la animación antes del fetch
+    // SI VENÍAMOS DE UN RITUAL ACTIVO DE SOULGEIST -> DISPARAMOS TU ANIMACIÓN
     if (ritualActivo && window.tumbaDestinoElement && window.tumbaDestinoData) {
         const tumbaOrigen = document.querySelector('.alma-maestra');
         const tumbaDestino = window.tumbaDestinoElement;
         const datos = window.tumbaDestinoData;
         const baseCalculo = balanceUsuarioSG > 0 ? balanceUsuarioSG : 0;
 
-        // Desactivamos el ritual para limpiar el estado
+        // Apagamos el estado del ritual para futuras transacciones
         ritualActivo = false;
 
-        // Lanzamos la animación que viaja a la tumba
+        // Dispara el viaje visual del alma hacia la tumba destino
         lanzarAlma(tumbaOrigen, tumbaDestino, datos.color, baseCalculo * datos.tasa, datos);
 
-        // Limpiamos referencias
+        // Limpiamos referencias globales
         window.tumbaDestinoElement = null;
         window.tumbaDestinoData = null;
     }
 
-    // Ejecuta tu petición original al backend de Upstash/FaucetPay de manera segura
+    // Enviamos los datos de forma segura al backend de Upstash/Vercel
     procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
 }
 
