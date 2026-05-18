@@ -33,24 +33,26 @@ function entrarAlMictlan() {
 }
 
 function inicializarBotonGoogle() {
-    const contenedorGoogle = document.getElementById("google-btn-container"); //
-    if (!contenedorGoogle) return; //
+    const contenedorGoogle = document.getElementById("google-btn-container");
+    if (!contenedorGoogle) return;
 
-    if (typeof google !== 'undefined') { //
-        google.accounts.id.initialize({ //
-            client_id: GOOGLE_CLIENT_ID, //
-            callback: manejarLoginGoogle //
-        }); //
-        
-        google.accounts.id.renderButton( //
-            contenedorGoogle, //
-            { theme: "dark", size: "large", type: "standard", text: "signin_with", width: "240" } //
-        ); //
-    } else {
-        console.error("El grimorio de Google no ha cargado correctamente en el Head."); //
+    // Si Google aún no despierta, esperamos 100ms y reintentamos
+    if (typeof google === 'undefined') {
+        setTimeout(inicializarBotonGoogle, 100);
+        return;
     }
-}
 
+    // Una vez que existe, ejecutamos el ritual normal
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: manejarLoginGoogle
+    });
+    
+    google.accounts.id.renderButton(
+        contenedorGoogle,
+        { theme: "dark", size: "large", type: "standard", text: "signin_with", width: "240" }
+    );
+}
 function cambiarModoAuth() {
     esModoRegistro = !esModoRegistro; //
     const tagline = document.getElementById('auth-tagline'); //
