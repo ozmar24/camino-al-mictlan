@@ -243,22 +243,20 @@ function generarCementerio() {
             e.stopPropagation();
             
             if (pos.especial) {
-                // 1. INICIAR RITUAL: Se activa la canalización desde la tumba maestra
                 ritualActivo = true;
                 window.currentCripto = "Soulgeist";
                 notificacionGotica("RITUAL INICIADO", "Selecciona una tumba de destino para canalizar tu Poder SG.", pos.color, false);
             } 
             else {
-                // 2. SELECCIÓN DE DESTINO: Si el ritual está activo, abre el modal de confirmación primero
                 if (ritualActivo) {
-                    // Guardamos temporalmente los datos de la tumba seleccionada para usarlos al confirmar
+                    // 1. Guardamos temporalmente los elementos de la animación en variables globales virtuales
+                    window.tumbaDestinoElement = e.currentTarget;
                     window.tumbaDestinoData = pos;
-                    window.elementTumbaDestino = e.currentTarget;
 
-                    // Abrimos el modal de confirmación (el que se ve en tu imagen con el botón "Enviar Alma")
-                    abrirModalRitualConfirmacion(pos); 
+                    // 2. Abrimos TU modal original con el formulario listo
+                    abrirModalRitual(pos); 
                 } else {
-                    // Si le da clic directo sin activar Soulgeist, abre su info normal o advertencia
+                    // Si dan clic directo sin activar Soulgeist, abre el flujo normal
                     abrirModalRitual(pos);
                 }
             }
