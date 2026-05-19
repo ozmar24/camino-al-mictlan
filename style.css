@@ -1096,55 +1096,45 @@ button,
 }
 
 /* ====================== BOTONES DEL MODAL COSECHA ====================== */
+/* ====================== BOTONES MODAL - VERSIÓN LIMPIA ====================== */
 .botones-exchange {
-    gap: 15px !important;
+    gap: 16px !important;
     margin-top: 25px !important;
-    justify-content: center !important;
 }
 
 .botones-exchange button {
-    position: relative !important;
-    padding: 12px 28px !important;
-    font-size: 1rem !important;
+    padding: 12px 26px !important;
+    font-size: 0.97rem !important;
     font-family: 'Nosifer', cursive !important;
-    letter-spacing: 1.5px !important;
-    border: 2px solid #4a0000 !important;
-    background: linear-gradient(145deg, #1a0f0a, #2c1a12) !important;
-    color: #e8c9a0 !important;
-    text-shadow: 0 0 8px #000 !important;
-    overflow: hidden !important;
-    transition: all 0.4s ease !important;
-    box-shadow: 0 0 10px rgba(0,0,0,0.8),
-                inset 0 2px 4px rgba(255,255,255,0.05) !important;
+    letter-spacing: 1px !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
 }
 
+/* Botón principal (Extraer Alma) */
 #btn-cosecha-enviar {
-    background: var(--color-ritmo, #f7931a) !important;
-    color: #000 !important;
+    background: #b34d00 !important;
+    color: #fff !important;
+    border: 2px solid #ff8800 !important;
     font-weight: bold !important;
 }
 
 #btn-cosecha-enviar:hover {
-    background: linear-gradient(145deg, #3a1a00, #5c2a0a) !important;
-    color: #ffddaa !important;
-    border-color: #ff6600 !important;
-    transform: translateY(-2px) scale(1.03) !important;
-    box-shadow: 0 0 20px #ff6600 !important;
+    background: #ff6600 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 18px #ff8800 !important;
 }
 
+/* Botón cancelar */
 #btn-cosecha-cancelar {
     background: #1f1f1f !important;
-    color: #aaa !important;
+    color: #ccc !important;
+    border: 2px solid #4a0000 !important;
 }
 
 #btn-cosecha-cancelar:hover {
-    background: linear-gradient(145deg, #1f0a0a, #330f0f) !important;
-    color: #ddd !important;
-    border-color: #660000 !important;
-    transform: translateY(-2px) !important;
-}
-
-/* Texto más quemado */
-.botones-exchange button {
-    text-transform: uppercase !important;
+    background: #330000 !important;
+    color: #fff !important;
+    border-color: #8b0000 !important;
 }
