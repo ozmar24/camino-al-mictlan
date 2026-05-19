@@ -1068,38 +1068,61 @@ button,
 .nombre-de-tu-clase-superior-izquierda {
     display: none !important;
 }
-/* ====================== BOTONES MÁS PEQUEÑOS ====================== */
+/* ====================== MODAL COSECHA MEJORADO ====================== */
+#modal-ritual {
+    background: linear-gradient(145deg, #0a0000, #1f0a0a) !important;
+    border: 3px solid #6b0000 !important;
+    box-shadow: 0 0 45px rgba(139, 0, 0, 0.85),
+                0 0 20px rgba(0,0,0,0.95) !important;
+    width: 360px !important;
+    padding: 28px 22px !important;
+}
+
+#modal-ritual #titulo-ritual {
+    color: var(--color-ritmo, #f7931a) !important;
+    text-shadow: 0 0 20px currentColor !important;
+    font-size: 1.75rem !important;
+}
+
+#modal-ritual input,
+#modal-ritual select {
+    background: #0c0c0c !important;
+    border: 2px solid #4a0000 !important;
+    color: #ddd !important;
+}
+
 .botones-exchange {
-    gap: 12px !important;
-    margin-top: 22px !important;
+    gap: 10px !important;
+    margin-top: 18px !important;
 }
 
 .botones-exchange button {
-    padding: 10px 20px !important;     /* Más pequeño */
-    font-size: 0.9rem !important;      /* Texto más chico */
-    min-width: 120px !important;       /* Ancho más reducido */
-    height: auto !important;
+    padding: 8px 18px !important;
+    font-size: 0.78rem !important;
+    min-width: 105px !important;
+    height: 38px !important;
     font-family: 'Nosifer', cursive !important;
     letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    border-radius: 4px !important;
 }
 
 /* Botón principal */
 #btn-cosecha-enviar {
     background: #c44a00 !important;
     color: #fff !important;
-    border: 2px solid #ff7700 !important;
+    border: 2px solid #ff8800 !important;
 }
 
 /* Botón cancelar */
 #btn-cosecha-cancelar {
-    background: #1c1c1c !important;
-    color: #bbb !important;
+    background: #1f1f1f !important;
+    color: #ccc !important;
     border: 2px solid #4a0000 !important;
 }
 
-/* Hover */
 #btn-cosecha-enviar:hover {
-    background: #ff6600 !important;
+    background: #ff5500 !important;
     transform: scale(1.04) !important;
 }
 
