@@ -253,11 +253,11 @@ function generarCementerio() {
     const textoBalance = saldoGuardado > 0 ? saldoGuardado.toFixed(6) : "0"; 
 
     if (pos.especial) {
-        div.innerHTML = `
-            <div class="sigilo-soulgeist"></div>
-            <div class="nombre-cripto">Soulgeist</div>
-            <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
-        `;
+    div.innerHTML = `
+        <div class="sigilo-soulgeist"></div>
+        <div class="nombre-cripto">Soulgeist</div>
+        <div class="balance-actual" id="balance-soulgeist">Poder: ${balanceUsuarioSG} SG</div>
+    `;
     } else { 
         div.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
@@ -300,36 +300,36 @@ if (balanceUsuarioSG <= 0) {
     }
 
     // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
-   if (ritualActivo) {
-    ritualActivo = false; 
-    
-    // 1. Identificamos la fuente (Soulgeist)
-    const tumbaOrigen = document.querySelector('.alma-maestra');
-    const balanceElemento = tumbaOrigen.querySelector('.balance-actual');
-    
-    // Extraemos el número del texto (ejemplo: "Poder: 50.000 SG" -> extraemos 50)
-    let balanceActual = parseFloat(balanceElemento.innerText.replace(/[^0-9.]/g, '')) || 0;
-    
-    const tumbaDestino = e.currentTarget; 
-    const gananciaDecimal = balanceActual > 0 ? (balanceActual * pos.tasa) : 0;
-    
-    // 2. DESCONTAMOS DIRECTAMENTE DEL SOULGEIST
-    balanceElemento.innerText = `Poder: 0 SG`;
-    tumbaOrigen.querySelector('.balance-proyectado').innerText = `0 SG`;
-    tumbaOrigen.querySelector('.balance-proyectado').style.opacity = "0.5";
+    if (ritualActivo) {
+        ritualActivo = false;
+        
+        const tumbaOrigen = document.querySelector('.alma-maestra');
+        const tumbaDestino = e.currentTarget;
+        
+        // CALCULAMOS: El balance actual del Soulgeist
+        const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 0);
+        
+        // --- AQUÍ EL RESETEO VISUAL (Lo que faltaba) ---
+        balanceUsuarioSG = 0;
+        
+        // Actualizamos el display superior
+        document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
+        
+        // Actualizamos el display DENTRO de la tumba Soulgeist
+        const balanceCripta = document.getElementById('balance-soulgeist');
+if (balanceCripta) {
+    balanceCripta.innerText = `Poder: 0 SG`;
+}
 
-    // 3. LANZAMOS EL ALMA
-    if (typeof lanzarAlma === 'function') {
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos.sim, () => {
+        // 3. LANZAMOS EL ALMA
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+            // Guardamos en el objeto global
+            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
             
-            // Guardamos el saldo en la tumba destino
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
-            
-            const saldoTotal = window.tumbasConSaldo[pos.nombre];
+            // ACTUALIZACIÓN VISUAL EN DESTINO
             const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            
             if (contenedorBalance) {
-                contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
                 contenedorBalance.style.opacity = "1";
             }
             mostrarModalFusionExitosa(pos, gananciaDecimal);
