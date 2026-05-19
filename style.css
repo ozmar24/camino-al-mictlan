@@ -1068,38 +1068,39 @@ button,
 .nombre-de-tu-clase-superior-izquierda {
     display: none !important;
 }
-/* ====================== DOS BOTONES PEQUEÑOS - ESTILO OSCURO ====================== */
-#modal-ritual .botones-exchange {
+/* ====================== BOTONES MÁS PEQUEÑOS ====================== */
+.botones-exchange {
     gap: 12px !important;
-    margin-top: 20px !important;
+    margin-top: 22px !important;
 }
 
-#modal-ritual .botones-exchange button {
-    padding: 9px 20px !important;
-    font-size: 0.82rem !important;
-    min-width: 118px !important;
+.botones-exchange button {
+    padding: 10px 20px !important;     /* Más pequeño */
+    font-size: 0.9rem !important;      /* Texto más chico */
+    min-width: 120px !important;       /* Ancho más reducido */
+    height: auto !important;
     font-family: 'Nosifer', cursive !important;
     letter-spacing: 1px !important;
-    text-transform: uppercase !important;
 }
 
-/* Botón Extraer Alma */
+/* Botón principal */
 #btn-cosecha-enviar {
-    background: #b53d00 !important;
+    background: #c44a00 !important;
     color: #fff !important;
     border: 2px solid #ff7700 !important;
 }
 
-/* Botón Volver */
+/* Botón cancelar */
 #btn-cosecha-cancelar {
-    background: #1a1a1a !important;
-    color: #ccc !important;
+    background: #1c1c1c !important;
+    color: #bbb !important;
     border: 2px solid #4a0000 !important;
 }
 
+/* Hover */
 #btn-cosecha-enviar:hover {
-    background: #ff5500 !important;
-    transform: scale(1.05) !important;
+    background: #ff6600 !important;
+    transform: scale(1.04) !important;
 }
 
 #btn-cosecha-cancelar:hover {
