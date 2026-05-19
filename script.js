@@ -279,6 +279,10 @@ function generarCementerio() {
         // ==================================================================
         div.onclick = (e) => {
     e.stopPropagation();
+if (balanceUsuarioSG <= 0) {
+        lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
+        return; // Detiene todo, no deja seguir
+    }
     
     // 1. SI YA TIENE SALDO -> SEGUNDO CLIC -> ABRIR MODAL RETIRO
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
@@ -754,12 +758,23 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
         destino.style.transform = 'scale(1.1)';
         destino.style.filter = `drop-shadow(0 0 20px ${color})`;
         
+        window.tumbasConSaldo[pos.nombre] = true; 
+        
+        const contenedorBalance = destino.querySelector('.balance-proyectado');
+        if (contenedorBalance) {
+            contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
+            contenedorBalance.style.opacity = "1";
+        }
+
+        // Ejecutamos el callback que prometimos al iniciar la animación
+        if (typeof callback === 'function') {
+            callback();
+        }
+        
+        // Quitamos el efecto visual después de un momento
         setTimeout(() => {
-            destino.style.transform = 'none';
+            destino.style.transform = 'scale(1)';
             destino.style.filter = 'none';
-            
-            // Relevo final: levanta el modal de éxito con los saldos
-            if (callback) callback();
-        }, 150);
+        }, 300);
     });
 }
