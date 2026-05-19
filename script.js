@@ -310,7 +310,7 @@ if (balanceUsuarioSG <= 0) {
         
         // DESCONTAMOS DEL SOULGEIST INMEDIATAMENTE
         balanceUsuarioSG = 0; 
-        document.querySelector('.balance-actual').innerText = `Poder: ${balanceUsuarioSG} SG`;
+        document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
 
         if (typeof lanzarAlma === 'function') {
             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
@@ -747,7 +747,7 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
 
     anima.addEventListener('transitionend', () => {
         anima.remove(); 
-        destino.style.transform = 'scale(1.1)';
+        destino.classList.add('efecto-impacto');
         
         const contenedorBalance = destino.querySelector('.balance-proyectado');
         if (contenedorBalance) {
@@ -757,7 +757,7 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
         }
         
         setTimeout(() => {
-            destino.style.transform = 'none';
+            destino.classList.remove('efecto-impacto');
             if (callback) callback(); 
         }, 150);
     });

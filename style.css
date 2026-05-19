@@ -1049,3 +1049,8 @@ button,
     text-decoration: underline !important;
     font-weight: bold !important;
 }
+.efecto-impacto {
+    /* Usamos filter en lugar de transform porque no altera el layout ni el tamaño */
+    filter: drop-shadow(0 0 15px white) brightness(1.5);
+    transition: filter 0.3s ease;
+}
