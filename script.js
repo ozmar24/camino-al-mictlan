@@ -391,8 +391,8 @@ function abrirModalCosechaFinal(pos) {
         contenedorBotones.style.display = 'flex';
         contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
-            <button id="btn-cosecha-enviar" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-family:'MedievalSharp';">ENVIAR ALMA</button>
-            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">CANCELAR</button>
+            
+            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR/button>
         `;
 
         document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
