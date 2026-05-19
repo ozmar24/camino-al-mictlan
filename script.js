@@ -247,15 +247,12 @@ function generarCementerio() {
         div.style.setProperty('--color-cripto', pos.color); 
         div.setAttribute('data-nombre', pos.nombre); 
 
+        const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
+        const textoVisual = saldoGuardado > 0 ? `+${saldoGuardado.toFixed(6)}` : `0`;
+
         if (pos.especial) {
-            div.innerHTML = `
-                <div class="sigilo-soulgeist"></div>
-                <div class="nombre-cripto">${pos.nombre}</div>
-                <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
-            `; 
-        } else {
-            const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0; 
-            const textoBalance = window.tumbasConSaldo[pos.nombre] && gananciaDecimal > 0 ? `+${gananciaDecimal.toLocaleString()}` : `0`; 
+            div.innerHTML = `<div class="sigilo-soulgeist"></div>...`;
+        } else { 
             
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
@@ -279,6 +276,7 @@ function generarCementerio() {
         // ==================================================================
         div.onclick = (e) => {
     e.stopPropagation();
+
 if (balanceUsuarioSG <= 0) {
         lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
         return; // Detiene todo, no deja seguir
@@ -301,23 +299,21 @@ if (balanceUsuarioSG <= 0) {
     if (ritualActivo) {
         ritualActivo = false; 
         
-        // --- DEFINICIÓN DE VARIABLES NECESARIAS ---
+        // Variables necesarias
         let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-        const tumbaDestino = e.currentTarget; // e.currentTarget es la cripta que tocaste
-        
-        // 1. Calculamos la ganancia
+        const tumbaDestino = e.currentTarget; 
         const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
         
-        // 2. DESCONTAMOS DEL SOULGEIST INMEDIATAMENTE
+        // DESCONTAMOS DEL SOULGEIST INMEDIATAMENTE
         balanceUsuarioSG = 0; 
         document.querySelector('.balance-actual').innerText = `Poder: ${balanceUsuarioSG} SG`;
 
         if (typeof lanzarAlma === 'function') {
             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
-                // AL IMPACTAR (Callback):
-                window.tumbasConSaldo[pos.nombre] = true;
+                // AQUÍ GUARDAMOS EL VALOR REAL DEL SALDO
+                window.tumbasConSaldo[pos.nombre] = gananciaDecimal; 
                 
-                // 3. ACTUALIZAMOS VISUALMENTE LA CRIPTA
+                // Actualizamos visualmente
                 const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
                 if (contenedorBalance) {
                     contenedorBalance.innerText = `+${gananciaDecimal.toFixed(6)} ${pos.sim}`;
@@ -756,30 +752,22 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
     });
 
     // 5. Gestión del impacto al terminar la transición CSS
-    anima.addEventListener('transitionend', () => {
-        anima.remove(); // Eliminamos el elemento para no saturar la memoria de la lap
-        
-        // Pequeño feedback visual de absorción en la tumba destino
-        destino.style.transform = 'scale(1.1)';
-        destino.style.filter = `drop-shadow(0 0 20px ${color})`;
-        
-        window.tumbasConSaldo[pos.nombre] = true; 
-        
-        const contenedorBalance = destino.querySelector('.balance-proyectado');
-        if (contenedorBalance) {
-            contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
-            contenedorBalance.style.opacity = "1";
-        }
-
-        // Ejecutamos el callback que prometimos al iniciar la animación
-        if (typeof callback === 'function') {
-            callback();
-        }
-        
-        // Quitamos el efecto visual después de un momento
-        setTimeout(() => {
-            destino.style.transform = 'scale(1)';
-            destino.style.filter = 'none';
-        }, 300);
-    });
-}
+   anima.addEventListener('transitionend', () => {
+    anima.remove(); 
+    
+    // Feedback visual
+    destino.style.transform = 'scale(1.1)';
+    
+    // --- ESTA ES LA CLAVE DE LA ACTUALIZACIÓN ---
+    const contenedorBalance = destino.querySelector('.balance-proyectado');
+    if (contenedorBalance) {
+        // Usamos la variable 'cantidad' que ya recibes en la función lanzarAlma
+        contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim || ''}`;
+        contenedorBalance.style.opacity = "1";
+    }
+    
+    setTimeout(() => {
+        destino.style.transform = 'none';
+        if (callback) callback(); // Esto dispara el Modal de éxito después
+    }, 150);
+});

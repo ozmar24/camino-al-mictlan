@@ -155,10 +155,10 @@ button,
     z-index: 150;
 }
 .info-tumba {
-    width: 120px !important; /* Fuerza un ancho fijo */
+    min-height: 60px;       /* Asegura que el contenedor no colapse */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
 }
 
 .zona-tumba::after {
@@ -250,6 +250,10 @@ button,
     font-weight: bold;
     height: 14px; /* Reserva el espacio para el texto */
     white-space: nowrap;
+    min-height: 60px;       /* Asegura que el contenedor no colapse */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* --- EFECTOS HOVER --- */
