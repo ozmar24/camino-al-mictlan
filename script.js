@@ -301,23 +301,28 @@ if (balanceUsuarioSG <= 0) {
     if (ritualActivo) {
         ritualActivo = false; 
         
+        // --- DEFINICIÓN DE VARIABLES NECESARIAS ---
         let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-        const tumbaDestino = e.currentTarget; 
+        const tumbaDestino = e.currentTarget; // e.currentTarget es la cripta que tocaste
+        
+        // 1. Calculamos la ganancia
         const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+        
+        // 2. DESCONTAMOS DEL SOULGEIST INMEDIATAMENTE
+        balanceUsuarioSG = 0; 
+        document.querySelector('.balance-actual').innerText = `Poder: ${balanceUsuarioSG} SG`;
 
         if (typeof lanzarAlma === 'function') {
             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
-                // AL IMPACTAR:
-                window.tumbasConSaldo[pos.nombre] = true; // MARCAMOS COMO LLENA
+                // AL IMPACTAR (Callback):
+                window.tumbasConSaldo[pos.nombre] = true;
                 
-                // PINTAR SALDO VISUAL
+                // 3. ACTUALIZAMOS VISUALMENTE LA CRIPTA
                 const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
                 if (contenedorBalance) {
-                    contenedorBalance.innerText = `+${gananciaDecimal.toFixed(4)} ${pos.simbolo}`;
+                    contenedorBalance.innerText = `+${gananciaDecimal.toFixed(6)} ${pos.sim}`;
                     contenedorBalance.style.opacity = "1";
                 }
-
-                // MOSTRAR MODAL ÉXITO
                 mostrarModalFusionExitosa(pos, gananciaDecimal);
             });
         }

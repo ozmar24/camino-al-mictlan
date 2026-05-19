@@ -154,6 +154,12 @@ button,
     align-items: center;
     z-index: 150;
 }
+.info-tumba {
+    width: 120px !important; /* Fuerza un ancho fijo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .zona-tumba::after {
     content: '';
@@ -242,6 +248,8 @@ button,
     text-shadow: 1px 1px 2px #000, 0 0 10px var(--color-cripto); 
     filter: drop-shadow(0 0 5px rgba(0,0,0,1));
     font-weight: bold;
+    height: 14px; /* Reserva el espacio para el texto */
+    white-space: nowrap;
 }
 
 /* --- EFECTOS HOVER --- */
