@@ -343,7 +343,7 @@ function generarCementerio() {
         }
         contenedor.appendChild(enlace); 
     });
-}
+
 
 // ==================================================================
 // PASO 4: MODAL DE COSECHA DE CRIPTO Y CONFIGURACIÓN DE WALLET
