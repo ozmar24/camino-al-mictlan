@@ -309,7 +309,7 @@ if (balanceUsuarioSG <= 0) {
         document.querySelector('.balance-actual').innerText = `Poder: ${balanceUsuarioSG} SG`;
 
         if (typeof lanzarAlma === 'function') {
-            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos.sim, () => {
+            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                 // AQUÍ GUARDAMOS EL VALOR REAL DEL SALDO
                 window.tumbasConSaldo[pos.nombre] = gananciaDecimal; 
                 
@@ -753,19 +753,22 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
 
     // 5. Gestión del impacto al terminar la transición CSS
    anima.addEventListener('transitionend', () => {
-        anima.remove(); 
-        destino.style.transform = 'scale(1.1)';
-        
-        const contenedorBalance = destino.querySelector('.balance-proyectado');
-        if (contenedorBalance) {
-            // CORRECCIÓN: Aquí usamos 'simbolo' que pasamos como parámetro
-            contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${simbolo}`;
-            contenedorBalance.style.opacity = "1";
-        }
-        
-        setTimeout(() => {
-            destino.style.transform = 'none';
-            if (callback) callback(); 
-        }, 150);
-    });
+    anima.remove(); 
+    
+    // Feedback visual
+    destino.style.transform = 'scale(1.1)';
+    
+    // --- ESTA ES LA CLAVE DE LA ACTUALIZACIÓN ---
+    const contenedorBalance = destino.querySelector('.balance-proyectado');
+    if (contenedorBalance) {
+        // Usamos la variable 'cantidad' que ya recibes en la función lanzarAlma
+        contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim || ''}`;
+        contenedorBalance.style.opacity = "1";
+    }
+    
+    setTimeout(() => {
+        destino.style.transform = 'none';
+        if (callback) callback(); // Esto dispara el Modal de éxito después
+    }, 150);
+});
 }
