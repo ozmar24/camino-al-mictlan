@@ -298,36 +298,45 @@ function generarCementerio() {
 
     // 2. Ejecución del Ritual (Sólo si ritualActivo es true)
     if (ritualActivo) {
-        ritualActivo = false; // Bloqueamos para evitar clics dobles
-
-        // Identificamos el origen (Soulgeist) y el destino
-        const tumbaOrigen = document.querySelector('.alma-maestra');
-        const tumbaDestino = e.currentTarget;
-
-        // Calculamos la ganancia
-        const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 0);
-
-        // --- ACCIÓN CRÍTICA: Descuento inmediato ---
-        balanceUsuarioSG = 0;
-        
-        // Actualizamos visualmente el Soulgeist
-        tumbaOrigen.querySelector('.balance-actual').innerText = "Poder: 0 SG";
-        tumbaOrigen.querySelector('.balance-proyectado').innerText = "0 SG";
-        tumbaOrigen.querySelector('.balance-proyectado').style.opacity = "0.5";
-
-        // --- ANIMACIÓN ---
-        // Pasamos tumbaOrigen como referencia para el inicio del alma
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
-            // Este callback corre cuando el alma LLEGA al destino
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
+            ritualActivo = false; 
             
-            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            if (contenedorBalance) {
-                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                contenedorBalance.style.opacity = "1";
+            // Definimos el origen como la tumba maestra
+            const tumbaOrigen = document.querySelector('.alma-maestra');
+            const tumbaDestino = e.currentTarget; 
+            
+            // --- CORRECCIÓN AQUÍ: Leemos el balance desde el Soulgeist específico ---
+            // Buscamos el balance dentro de la tumba Soulgeist, no el de la esquina superior
+            const elementoBalanceSoul = tumbaOrigen.querySelector('.balance-actual');
+            const balanceActual = balanceUsuarioSG; // Usamos tu variable global que ya tiene el dato
+            
+            const gananciaDecimal = balanceActual > 0 ? (balanceActual * pos.tasa) : 0;
+            
+            // Reseteamos el balance
+            balanceUsuarioSG = 0; 
+            
+            // Actualizamos SOLAMENTE el balance dentro del Soulgeist
+            if (elementoBalanceSoul) {
+                elementoBalanceSoul.innerText = `Poder: 0 SG`;
             }
-            mostrarModalFusionExitosa(pos, gananciaDecimal);
-        });
+            
+            const criptaSoulgeist = tumbaOrigen.querySelector('.balance-proyectado');
+            if (criptaSoulgeist) {
+                criptaSoulgeist.innerText = `0 SG`; 
+                criptaSoulgeist.style.opacity = "0.5"; 
+            }
+
+            // Lanzamos el alma
+            if (typeof lanzarAlma === 'function') {
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
+                    const saldoTotal = window.tumbasConSaldo[pos.nombre];
+                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                    if (contenedorBalance) {
+                        contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+                        contenedorBalance.style.opacity = "1";
+                    }
+                    mostrarModalFusionExitosa(pos, gananciaDecimal);
+                });
     } else {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
     }
