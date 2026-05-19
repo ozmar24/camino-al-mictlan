@@ -174,42 +174,47 @@ if (typeof window.tumbasConSaldo === 'undefined') {
 // PASO 1: CLICK EN SOULGEIST -> MODAL INFORMATIVO CON SOLO BOTÓN "CERRAR"
 // ==================================================================
 function dispararInicioRitualGlobal() {
-    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+    // 1. Aplicamos el desenfoque al Campo Santo
+    const campoSanto = document.getElementById('campo-santo');
+    if (campoSanto) {
+        campoSanto.style.filter = "blur(5px) brightness(0.4)";
+    }
+    
     const modal = document.getElementById('modal-ritual');
     if (modal) {
         modal.style.setProperty('--color-ritmo', "#00ffff");
         modal.style.display = 'block';
     }
 
-    // Ocultamos elementos del formulario de cobro para el aviso místico
-    const inputContenedor = document.getElementById('wallet-input')?.parentElement;
-    const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
-    if (inputContenedor) inputContenedor.style.display = 'none';
-    if (selectContenedor) selectContenedor.style.display = 'none';
+    // 2. Seteamos los textos exactos de tu video de Firefox
+    const tituloRitual = document.getElementById('titulo-ritual');
+    const infoRitual = document.getElementById('info-ritual');
+    
+    if (tituloRitual) tituloRitual.innerText = "RITUAL INICIADO";
+    if (infoRitual) {
+        infoRitual.innerHTML = `
+            <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
+                SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SG.
+            </p>
+        `;
+    }
 
-    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
-    document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
-            SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.
-        </p>
-    `;
-
-    // Capturamos tus botones reales del HTML
-    const btnEnviar = document.getElementById('btn-ritual-enviar') || document.getElementById('btn-ritual-enviar-unico');
-    const btnCancelar = document.getElementById('btn-ritual-cancelar') || document.getElementById('btn-ritual-cancelar-primer-paso');
-
-    if (btnEnviar) btnEnviar.style.display = 'none'; // Quitamos el botón extra temporalmente
-
-    if (btnCancelar) {
-        btnCancelar.style.display = 'block';
-        btnCancelar.innerText = "ACEPTAR"; // Modificamos el texto nativo sin destruir el botón
+    // 3. LA CLAVE: Buscamos el botón CANCELAR real de tu HTML
+    // (Ya sea por ID o el botón secundario dentro del contenedor)
+    const btnCancelarReal = document.getElementById('btn-ritual-cancelar') || document.querySelector('#botones-exchange button') || document.querySelector('#modal-ritual button');
+    
+    if (btnCancelarReal) {
+        // Cambiamos su comportamiento temporalmente para el modo Ritual
+        btnCancelarReal.innerText = "CERRAR Y ELEGIR CRIPTA"; // O déjalo como "CANCELAR" si prefieres el texto idéntico
         
-        btnCancelar.onclick = (event) => {
+        btnCancelarReal.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
             
-            ritualActivo = true; // Descongela el mapa para que espere el destino
-            cerrarRitual();      // Cierra el modal y quita el blur para que la animación sea visible
+            ritualActivo = true; // <--- ¡AQUÍ SE ACTIVA AL CERRAR!
+            
+            cerrarRitual(); // Oculta el modal de aviso
+            console.log("Mictlán Activo: Esperando clic en la tumba de destino...");
         };
     }
 }
