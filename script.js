@@ -301,24 +301,28 @@ if (balanceUsuarioSG <= 0) {
 
     // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
     if (ritualActivo) {
-    ritualActivo = false; 
-    
-    let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-    const tumbaDestino = e.currentTarget; 
-    const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
-    
-    balanceUsuarioSG = 0; 
-    document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
-    
-    const criptaSoulgeist = document.querySelector('.alma-maestra .balance-proyectado');
-    if (criptaSoulgeist) {
-        criptaSoulgeist.innerText = `0 SG`; 
-        criptaSoulgeist.style.opacity = "0.5"; 
-    }
+        ritualActivo = false; 
+        
+        let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
+        const tumbaDestino = e.currentTarget; 
+        const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+        
+        // --- AQUÍ HACEMOS EL RESETEO VISUAL DEL SOULGEIST ---
+        balanceUsuarioSG = 0; 
+        document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
+        
+        const criptaSoulgeist = document.querySelector('.alma-maestra .balance-proyectado');
+        if (criptaSoulgeist) {
+            criptaSoulgeist.innerText = `0 SG`; 
+            criptaSoulgeist.style.opacity = "0.5"; 
+        }
+        // ----------------------------------------------------
 
-    if (typeof lanzarAlma === 'function') {
+        if (typeof lanzarAlma === 'function') {
             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+                // ... lógica de éxito al llegar ...
                 window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
+                
                 const saldoTotal = window.tumbasConSaldo[pos.nombre];
                 const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
                 if (contenedorBalance) {
