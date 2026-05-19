@@ -670,25 +670,45 @@ async function enviarOfrendaOraculo() {
 }
 
 // ==================================================================
-// CARGA INICIAL Y PERSISTENCIA DE ALMAS
+// CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
 // ==================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    inicializarBotonGoogle();
+    // Inicialización segura del botón de inicio de sesión de Google
+    if (typeof inicializarBotonGoogle === 'function') {
+        inicializarBotonGoogle();
+    }
 
+    // Portal de Entrada a las Rejas
     const portalElement = document.getElementById('escena-portal');
-    if(portalElement) {
+    if (portalElement) {
         portalElement.onclick = entrarAlMictlan;
     }
 
-    // Vinculamos de forma segura el disparador global de la ventana interactiva
+    // Botón Principal Superior: "ABSORBER ENERGÍA" / Iniciar Ritual
     const btnRitualFlotante = document.getElementById('btn-iniciar-ritual-faucet') || document.querySelector('.btn-invocar-ritual');
     if (btnRitualFlotante) {
         btnRitualFlotante.onclick = dispararInicioRitualGlobal;
     }
 
+    // VINCULACIÓN SEGURA DE LOS BOTONES DEL MODAL GRIMORIO (Evita el error fatal de la consola)
+    // Buscamos tus IDs reales: 'btn-ritual-enviar-unico' y 'btn-ritual-cancelar-primer-paso'
+    const btnEnviarGlobal = document.getElementById('btn-ritual-enviar-unico') || document.getElementById('btn-ritual-enviar');
+    if (btnEnviarGlobal) {
+        btnEnviarGlobal.onclick = procesarRetiro;
+    }
+
+    const btnCancelarGlobal = document.getElementById('btn-ritual-cancelar-primer-paso') || document.getElementById('btn-ritual-cancelar');
+    if (btnCancelarGlobal) {
+        btnCancelarGlobal.onclick = cerrarRitual;
+    }
+
+    // Persistencia del usuario en el Inframundo
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        entrarAlCampoSanto({ balanceSG: 0 }); 
+        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
+        if (typeof entrarAlCampoSanto === 'function') {
+            entrarAlCampoSanto({ balanceSG: 0 }); 
+        }
     }
 });
