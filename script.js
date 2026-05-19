@@ -279,45 +279,45 @@ function generarCementerio() {
         div.onclick = (e) => {
             e.stopPropagation();
 
-            if (balanceUsuarioSG <= 0) {
-                lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
-                return;
-            }
-
-            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
+            // 1. SI LA TUMBA TIENE SALDO -> ABRIR MODAL DE RETIRO
+            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
                 abrirModalCosechaFinal(pos);
                 return;
             }
 
+            // 2. SI ES EL SOULGEIST (ESPECIAL) -> INICIAR RITUAL
             if (pos.especial) {
                 dispararInicioRitualGlobal();
                 return;
             }
 
+            // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE (TRANSFERENCIA)
             if (ritualActivo) {
+                if (balanceUsuarioSG <= 0) {
+                    lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
+                    return;
+                }
+
                 ritualActivo = false;
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
-                const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 1);
+                const ganancia = balanceUsuarioSG * (pos.tasa || 0);
 
+                // Descuento inmediato
                 balanceUsuarioSG = 0;
-
-                const elementoBalanceSoul = tumbaOrigen.querySelector('.balance-actual');
-                if (elementoBalanceSoul) {
-                    elementoBalanceSoul.innerText = `Poder: 0 SG`;
-                }
-
-                if (typeof lanzarAlma === 'function') {
-                    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
-                        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
-                        const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                        if (contenedorBalance) {
-                            contenedorBalance.innerText = `+${gananciaDecimal.toFixed(6)} ${pos.sim}`;
-                            contenedorBalance.style.opacity = "1";
-                        }
-                        mostrarModalFusionExitosa(pos, gananciaDecimal);
-                    });
-                }
+                actualizarBalanceSoulgeist(0);
+                
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+                    // Solo aquí se suma al saldo acumulado de esa tumba
+                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+                    
+                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                    if (contenedorBalance) {
+                        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+                        contenedorBalance.style.opacity = "1";
+                    }
+                    mostrarModalFusionExitosa(pos, ganancia);
+                });
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
             }
@@ -355,54 +355,67 @@ function generarCementerio() {
 // PASO 4: MODAL DE COSECHA DE CRIPTO Y CONFIGURACIÓN DE WALLET
 // ==================================================================
 function abrirModalCosechaFinal(pos) {
-    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)"; 
-
-    const modal = document.getElementById('modal-ritual'); 
-    if(modal) {
-        modal.style.setProperty('--color-ritmo', pos.color); 
-        modal.style.display = 'block'; 
+    const campoSanto = document.getElementById('campo-santo');
+    if (campoSanto) {
+        campoSanto.style.filter = "blur(5px) brightness(0.4)";
     }
-    
-    // Calculamos saldo real vs mínimo configurado en tu array
-    const saldoAcumulado = balanceUsuarioSG * pos.tasa;
-    const cumpleMinimo = saldoAcumulado >= pos.tasa; // O usa pos.usdMinimo si prefieres
 
-    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
-    window.currentCripto = pos; // Guardamos todo el objeto pos
+    const modal = document.getElementById('modal-ritual');
+    if (!modal) return;
 
-    // Renderizado del formulario
+    modal.style.setProperty('--color-ritmo', pos.color || "#f7931a");
+    modal.style.display = 'block';
+
+    // Calcular saldo
+    const saldoAcumulado = window.tumbasConSaldo[pos.nombre] || 0;
+
+    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
+
+    window.currentCripto = pos;
+
+    // Contenido del modal
     document.getElementById('info-ritual').innerHTML = `
-        <div style="text-align: center; margin-bottom: 15px;">
-            <p style="color: #fff; font-size: 18px;">Total: <b style="color:${pos.color}">${saldoAcumulado.toFixed(8)} ${pos.sim}</b></p>
-            ${!cumpleMinimo ? `<p style="color: #ff4444; font-size: 12px;">(Mínimo no alcanzado para retiro)</p>` : ''}
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="color: #fff; font-size: 19px; margin: 10px 0;">
+                Saldo disponible: 
+                <b style="color: ${pos.color};">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
+            </p>
         </div>
-        
-        <div style="margin-bottom: 15px;">
-            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px;">
+
+        <div style="margin-bottom: 18px;">
+            <label style="color:#bbb; font-size: 14px; display:block; margin-bottom:6px;">
+                Portal de retiro:
+            </label>
+            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
+                    style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
                 <option value="faucetpay">FaucetPay</option>
                 <option value="bitso">Bitso</option>
+                <option value="coinbase">Coinbase</option>
                 <option value="binance">Binance</option>
-		<option value="binance">Coinbase</option>
             </select>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <input type="text" id="wallet-input" placeholder="Dirección de destino..." style="width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center;">
+        <div>
+            <input type="text" id="wallet-input" placeholder="Ingresa tu dirección o correo..." 
+                   style="width: 100%; background:#000; color:#fff; border:2px solid #555; padding:14px; text-align:center; border-radius:6px; font-size:15px;">
         </div>
-    `; 
+    `;
 
-    const contenedorBotones = document.getElementById('botones-exchange');
-    if (contenedorBotones) {
-        contenedorBotones.style.display = 'flex';
-        contenedorBotones.innerHTML = `
-            ${cumpleMinimo ? `<button id="btn-cosecha-enviar" class="btn-ritual" style="background:${pos.color}; color:#000; margin-right:10px;">TRANSMUTAR</button>` : ''}
-            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff;">VOLVER</button>
+    // Botones
+    const botones = document.querySelector('.botones-exchange');
+    if (botones) {
+        botones.innerHTML = `
+            <button id="btn-cosecha-enviar" class="pentaculo-cursor" 
+                    style="background:${pos.color}; color:#000; padding:12px 30px; margin-right:10px; font-weight:bold;">
+                TRANSMUTAR ALMA
+            </button>
+            <button id="btn-cosecha-cancelar" class="pentaculo-cursor" 
+                    style="background:#222; color:#fff; padding:12px 30px;">
+                VOLVER A LAS SOMBRAS
+            </button>
         `;
 
-        // Solo vinculamos el evento si el botón existe
-        if(document.getElementById('btn-cosecha-enviar')) {
-            document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
-        }
+        document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
         document.getElementById('btn-cosecha-cancelar').onclick = cerrarRitual;
     }
 }

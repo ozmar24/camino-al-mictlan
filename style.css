@@ -1068,3 +1068,46 @@ button,
 .nombre-de-tu-clase-superior-izquierda {
     display: none !important;
 }
+/* =============================================
+   MEJORA DEL MODAL DE COSECHA (Bitcoin y otras con saldo)
+   ============================================= */
+
+#modal-ritual {
+    background: linear-gradient(145deg, #0a0000, #1a0a0a) !important;
+    border: 3px solid #4a0000 !important;
+    box-shadow: 0 0 40px rgba(139, 0, 0, 0.9),
+                inset 0 0 30px rgba(0, 0, 0, 0.95) !important;
+    width: 350px !important;
+    padding: 25px 20px !important;
+}
+
+#modal-ritual #titulo-ritual {
+    font-family: 'Nosifer', cursive !important;
+    text-shadow: 0 0 15px var(--color-ritmo, #ff0000) !important;
+    font-size: 1.7rem !important;
+}
+
+#modal-ritual input,
+#modal-ritual select {
+    background: #050505 !important;
+    border: 2px solid #4a0000 !important;
+    color: #eee !important;
+    padding: 13px !important;
+}
+
+.botones-exchange button {
+    padding: 13px 25px !important;
+    font-family: 'Nosifer', cursive !important;
+    font-size: 1.05rem !important;
+}
+
+#btn-cosecha-enviar {
+    background: var(--color-ritmo, #f7931a) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+}
+
+#btn-cosecha-cancelar {
+    background: #111 !important;
+    color: #ccc !important;
+}
