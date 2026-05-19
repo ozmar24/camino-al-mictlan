@@ -396,6 +396,7 @@ function abrirModalCosechaFinal(pos) {
 
     const botones = document.getElementById('botones-exchange');
     if (botones) {
+        botones.style.display = 'flex';
         botones.innerHTML = `
             <button id="btn-cosecha-enviar" class="btn-ritual">EXTRAER ALMA</button>
             <button id="btn-cosecha-cancelar" class="btn-ritual">VOLVER A LAS SOMBRAS</button>

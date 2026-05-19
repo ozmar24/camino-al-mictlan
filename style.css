@@ -1068,27 +1068,41 @@ button,
 .nombre-de-tu-clase-superior-izquierda {
     display: none !important;
 }
-/* =============================================
-   MEJORA DEL MODAL DE COSECHA (Bitcoin y otras con saldo)
-   ============================================= */
+/* ====================== DOS BOTONES PEQUEÑOS - ESTILO OSCURO ====================== */
+#modal-ritual .botones-exchange {
+    gap: 12px !important;
+    margin-top: 20px !important;
+}
 
-/* FORZAR BOTONES PEQUEÑOS EN MODAL */
 #modal-ritual .botones-exchange button {
     padding: 9px 20px !important;
     font-size: 0.82rem !important;
-    min-width: 115px !important;
-    height: 42px !important;
-    margin: 0 !important;
+    min-width: 118px !important;
+    font-family: 'Nosifer', cursive !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
 }
 
+/* Botón Extraer Alma */
 #btn-cosecha-enviar {
-    background: #c44a00 !important;
-    color: white !important;
-    border: 2px solid #ff8800 !important;
+    background: #b53d00 !important;
+    color: #fff !important;
+    border: 2px solid #ff7700 !important;
 }
 
+/* Botón Volver */
 #btn-cosecha-cancelar {
-    background: #1f1f1f !important;
+    background: #1a1a1a !important;
     color: #ccc !important;
     border: 2px solid #4a0000 !important;
+}
+
+#btn-cosecha-enviar:hover {
+    background: #ff5500 !important;
+    transform: scale(1.05) !important;
+}
+
+#btn-cosecha-cancelar:hover {
+    background: #330000 !important;
+    color: #fff !important;
 }
