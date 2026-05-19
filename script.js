@@ -181,35 +181,35 @@ function dispararInicioRitualGlobal() {
         modal.style.display = 'block';
     }
 
-    // Limpiamos selectores e inputs para que no se muestren en este paso
+    // Ocultamos elementos del formulario de cobro para el aviso místico
     const inputContenedor = document.getElementById('wallet-input')?.parentElement;
     const selectContenedor = document.getElementById('pasarela-select')?.parentElement;
     if (inputContenedor) inputContenedor.style.display = 'none';
     if (selectContenedor) selectContenedor.style.display = 'none';
 
-    // Título y mensaje descriptivo idéntico al video
-    document.getElementById('titulo-ritual').innerText = "CANALIZACIÓN MÍSTICA";
+    document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
     document.getElementById('info-ritual').innerHTML = `
         <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
-            EL PODER ESTÁ LATENTE. SELECCIONA UNA CRIPTA EN EL CAMPO SANTO PARA INYECTAR TUS ALMAS.
+            SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SOULGEIST.
         </p>
     `;
 
-    // UN SOLO BOTÓN: Cerrar
-    const contenedorBotones = document.getElementById('botones-exchange');
-    if (contenedorBotones) {
-        contenedorBotones.style.display = 'flex';
-        contenedorBotones.style.justifyContent = 'center';
-        contenedorBotones.innerHTML = `
-            <button id="btn-ritual-cerrar-solo" class="btn-ritual" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 45px; border: none; border-radius: 4px; cursor: pointer; font-family:'Nosifer';">ACEPTAR</button>
-        `;
+    // Capturamos tus botones reales del HTML
+    const btnEnviar = document.getElementById('btn-ritual-enviar') || document.getElementById('btn-ritual-enviar-unico');
+    const btnCancelar = document.getElementById('btn-ritual-cancelar') || document.getElementById('btn-ritual-cancelar-primer-paso');
 
-        document.getElementById('btn-ritual-cerrar-solo').onclick = (event) => {
+    if (btnEnviar) btnEnviar.style.display = 'none'; // Quitamos el botón extra temporalmente
+
+    if (btnCancelar) {
+        btnCancelar.style.display = 'block';
+        btnCancelar.innerText = "ACEPTAR"; // Modificamos el texto nativo sin destruir el botón
+        
+        btnCancelar.onclick = (event) => {
             event.preventDefault();
             event.stopPropagation();
             
-            ritualActivo = true; // Habilita el estado para recibir el clic en la tumba destino
-            cerrarRitual();      // Oculta el modal de aviso y quita el blur
+            ritualActivo = true; // Descongela el mapa para que espere el destino
+            cerrarRitual();      // Cierra el modal y quita el blur para que la animación sea visible
         };
     }
 }
@@ -268,7 +268,6 @@ function generarCementerio() {
             `; 
         }
 
-        // Dentro del configuracion.forEach(pos => { ... }) de tu generarCementerio:
 div.onclick = (e) => {
     e.stopPropagation();
     
@@ -277,19 +276,22 @@ div.onclick = (e) => {
         return;
     }
 
-    // SI EL RITUAL ESTÁ ACTIVO -> VIAJA EL ALMA PRIMERO
+    // SI EL RITUAL ESTÁ ACTIVO -> SE ACTIVA EL ENVÍO DE ALMAS EN VIVO
     if (ritualActivo) {
-        ritualActivo = false; // Consumimos el estado inmediatamente para evitar dobles clics
-        window.tumbasConSaldo[pos.nombre] = true;
+        ritualActivo = false; // Consumimos el estado místico para evitar spam de clicks
 
+        // Capturamos el Soulgeist de origen y la tumba de destino del click
         let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
         const tumbaDestino = e.currentTarget; 
         const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-        // La animación ocurre en vivo sobre el cementerio sin interferencias
+        // 1. DISPARO DIRECTO: Las almas viajan visibles con el cementerio despejado
         lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
             
-            // AL IMPACTAR EL ALMA: Abre automáticamente el modal "RITUAL INICIADO"
+            // 2. AL IMPACTAR EL ALMA: Ahora sí guardamos el saldo en la tumba
+            window.tumbasConSaldo[pos.nombre] = true;
+
+            // 3. SE ACTIVA EL MODAL DE RITUAL INICIADO
             document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
             const modal = document.getElementById('modal-ritual');
             if (modal) {
@@ -304,23 +306,26 @@ div.onclick = (e) => {
                 </p>
             `;
 
-            const contenedorBotones = document.getElementById('botones-exchange');
-            if (contenedorBotones) {
-                contenedorBotones.style.display = 'flex';
-                contenedorBotones.style.justifyContent = 'center';
-                contenedorBotones.innerHTML = `
-                    <button id="btn-ritual-aceptar-unico" class="btn-ritual" style="background: ${pos.color}; color: #000; font-weight: bold; padding: 12px 40px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
-                `;
-
-                document.getElementById('btn-ritual-aceptar-unico').onclick = () => {
+            // 4. CONTROL QUIRÚRGICO DE TUS BOTONES NATIVOS (Sin destruir el HTML)
+            // Usamos las variables exactas de tu script original
+            if (typeof btnRitualEnviar !== 'undefined' && btnRitualEnviar) {
+                btnRitualEnviar.style.display = 'none'; // Escondemos el que no se ocupa
+            }
+            
+            if (typeof btnRitualCancelar !== 'undefined' && btnRitualCancelar) {
+                btnRitualCancelar.style.display = 'block';
+                btnRitualCancelar.innerText = "ACEPTAR"; // Modificamos solo el texto
+                
+                // Le damos la función limpia de cerrar y redibujar
+                btnRitualCancelar.onclick = () => {
                     cerrarRitual();
-                    generarCementerio(); // Redibuja el mapa para pintar permanentemente el saldo (+X) en verde
+                    generarCementerio(); // Pinta el saldo (+X) en el mapa de forma permanente
                 };
             }
         });
 
     } else {
-        // SI SE CLIQUEA NORMAL UNA TUMBA QUE YA TIENE SALDO -> FORMULARIO DE COSECHA
+        // SI SE CLIQUEA NORMAL UNA TUMBA QUE YA TIENE SALDO -> PASO 4 (FORMULARIO BILLETERA)
         if (window.tumbasConSaldo[pos.nombre]) {
             abrirModalCosechaFinal(pos);
         } else {
