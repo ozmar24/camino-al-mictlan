@@ -317,22 +317,19 @@ if (balanceUsuarioSG <= 0) {
     }
 
     if (typeof lanzarAlma === 'function') {
-        // AÑADIMOS 'pos.sim' COMO EL 5TO PARÁMETRO
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos.sim, () => {
-            
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
-            
-            const saldoTotal = window.tumbasConSaldo[pos.nombre];
-            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            
-            if (contenedorBalance) {
-                contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
-                contenedorBalance.style.opacity = "1";
-            }
-            mostrarModalFusionExitosa(pos, gananciaDecimal);
-        });
-    }
-}
+            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+                window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
+                const saldoTotal = window.tumbasConSaldo[pos.nombre];
+                const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                if (contenedorBalance) {
+                    contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+                    contenedorBalance.style.opacity = "1";
+                }
+                mostrarModalFusionExitosa(pos, gananciaDecimal);
+            });
+        }
+    } // Cierra el if(ritualActivo)
+};
     } else {
         // 4. SINO ESTÁ ACTIVO EL RITUAL, AVISAR AL USUARIO
         console.log("Inicia la canalización interactiva tocando el Soulgeist central.");
@@ -711,6 +708,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 // Aceptamos 'pos' como parámetro
+// ÚNICA VERSIÓN DE lanzarAlma
 function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
     if (!origen || !destino) {
         if (callback) callback();
@@ -757,7 +755,6 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
         
         const contenedorBalance = destino.querySelector('.balance-proyectado');
         if (contenedorBalance) {
-            // AHORA SÍ: Usamos el objeto 'pos' que pasamos por parámetro
             contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
             contenedorBalance.style.opacity = "1";
         }
