@@ -323,10 +323,7 @@ button,
     margin-top: 8px;
     letter-spacing: 1px;
 }
-/* Busca el contenedor superior y ocúltalo */
-.nombre-de-tu-clase-superior-izquierda {
-    display: none !important;
-}
+
 
 .zona-tumba.alma-maestra:hover::after {
     content: '';
@@ -1066,4 +1063,8 @@ button,
 /* El balance del Soulgeist (el que generas en el script) se mantendrá visible */
 #balance-soulgeist {
     display: block !important;
+}
+/* Busca el contenedor superior y ocúltalo */
+.nombre-de-tu-clase-superior-izquierda {
+    display: none !important;
 }
