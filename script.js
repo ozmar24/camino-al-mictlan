@@ -774,3 +774,4 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
         if (callback) callback(); // Esto dispara el Modal de éxito después
     }, 150);
 });
+}
