@@ -282,60 +282,52 @@ function generarCementerio() {
         div.onclick = (e) => {
     e.stopPropagation();
 
-    // 1. Validaciones previas (Bloqueo de seguridad)
+    // 1. Validaciones
     if (balanceUsuarioSG <= 0) {
         lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
         return;
     }
-
-    // 2. Si ya tiene saldo, abrir menú de retiro
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
         abrirModalCosechaFinal(pos);
         return;
     }
-
-    // 3. Si es el pilar especial
     if (pos.especial) {
         dispararInicioRitualGlobal();
         return;
     }
 
-    // 4. Lógica del Ritual (LA FUENTE ES SOULGEIST)
+    // 2. Ejecución del Ritual (Sólo si ritualActivo es true)
     if (ritualActivo) {
-        ritualActivo = false;
+        ritualActivo = false; // Bloqueamos para evitar clics dobles
 
-        // Identificamos el origen (la tumba maestra) y el destino
+        // Identificamos el origen (Soulgeist) y el destino
         const tumbaOrigen = document.querySelector('.alma-maestra');
         const tumbaDestino = e.currentTarget;
-        const ganancia = balanceUsuarioSG * (pos.tasa || 0);
 
-        // --- ACCIÓN DE DESCUENTO INMEDIATO ---
-        balanceUsuarioSG = 0; // Vaciamos la variable global
+        // Calculamos la ganancia
+        const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 0);
+
+        // --- ACCIÓN CRÍTICA: Descuento inmediato ---
+        balanceUsuarioSG = 0;
         
         // Actualizamos visualmente el Soulgeist
-        const displaySoulgeist = tumbaOrigen.querySelector('.balance-actual');
-        if (displaySoulgeist) displaySoulgeist.innerText = "Poder: 0 SG";
-        
-        const visualSoulgeist = tumbaOrigen.querySelector('.balance-proyectado');
-        if (visualSoulgeist) {
-            visualSoulgeist.innerText = "0 SG";
-            visualSoulgeist.style.opacity = "0.5";
-        }
+        tumbaOrigen.querySelector('.balance-actual').innerText = "Poder: 0 SG";
+        tumbaOrigen.querySelector('.balance-proyectado').innerText = "0 SG";
+        tumbaOrigen.querySelector('.balance-proyectado').style.opacity = "0.5";
 
         // --- ANIMACIÓN ---
-        // Al pasar 'tumbaOrigen', la función lanza el alma desde ahí
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-            // --- ACCIÓN DE SUMA AL DESTINO ---
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+        // Pasamos tumbaOrigen como referencia para el inicio del alma
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+            // Este callback corre cuando el alma LLEGA al destino
+            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
             
             const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
             if (contenedorBalance) {
                 contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
                 contenedorBalance.style.opacity = "1";
             }
-            mostrarModalFusionExitosa(pos, ganancia);
+            mostrarModalFusionExitosa(pos, gananciaDecimal);
         });
-
     } else {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
     }
