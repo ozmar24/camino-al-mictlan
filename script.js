@@ -315,14 +315,15 @@ if (balanceUsuarioSG <= 0) {
         if (typeof lanzarAlma === 'function') {
             lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                 // AQUÍ GUARDAMOS EL VALOR REAL DEL SALDO
-                window.tumbasConSaldo[pos.nombre] = gananciaDecimal; 
+                window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
                 
                 // Actualizamos visualmente
-                const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                if (contenedorBalance) {
-                    contenedorBalance.innerText = `+${gananciaDecimal.toFixed(6)} ${pos.sim}`;
-                    contenedorBalance.style.opacity = "1";
-                }
+                const saldoTotal = window.tumbasConSaldo[pos.nombre];
+const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+if (contenedorBalance) {
+    contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+    contenedorBalance.style.opacity = "1";
+}
                 mostrarModalFusionExitosa(pos, gananciaDecimal);
             });
         }
@@ -703,83 +704,61 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
-function lanzarAlma(origen, destino, color, cantidad, callback) {
+// Aceptamos 'pos' como parámetro
+function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
     if (!origen || !destino) {
-        console.error("Faltan los templos de origen o destino para iniciar la trayectoria.");
         if (callback) callback();
         return;
     }
 
-    // 1. Creamos el ánima flotante usando tu clase exacta del CSS
     const anima = document.createElement('div');
-    anima.className = 'almaviajera'; // <--- Usamos tu clase nativa sin guion
+    anima.className = 'almaviajera';
     
-    // 2. Ajustamos quirúrgicamente los estilos dinámicos de trayectoria sobreescribiendo el fixed
     Object.assign(anima.style, {
-        position: 'absolute', // Cambiamos a absolute para que se mueva relativo al mapa del cementerio
-        left: '0px',
-        top: '0px',
-        width: '14px',        // Ajuste de refinamiento para el trayecto
-        height: '14px',
-        backgroundColor: color, // Forzamos el color de la cripta seleccionada (Solana, Bitcoin, etc.)
+        position: 'absolute',
+        left: '0px', top: '0px',
+        width: '14px', height: '14px',
+        backgroundColor: color,
         background: `radial-gradient(circle, #fff, ${color} 40%, transparent 70%)`,
         boxShadow: `0 0 15px ${color}, 0 0 30px ${color}`,
-        transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)', // Curva de aceleración limpia
+        transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
         transform: 'translate(-50%, -50%) scale(1)'
     });
 
-    // 3. Calculamos las posiciones del mapa
     const rectOrigen = origen.getBoundingClientRect();
     const rectDestino = destino.getBoundingClientRect();
     const rectContenedor = document.getElementById('contenedor-criptos').getBoundingClientRect();
 
-    // Punto de partida (Centro de Soulgeist)
     const xInicio = (rectOrigen.left + rectOrigen.width / 2) - rectContenedor.left;
     const yInicio = (rectOrigen.top + rectOrigen.height / 2) - rectContenedor.top;
-
-    // Punto de llegada (Centro de la cripta seleccionada)
     const xFin = (rectDestino.left + rectDestino.width / 2) - rectContenedor.left;
     const yFin = (rectDestino.top + rectDestino.height / 2) - rectContenedor.top;
 
-    // Seteamos la posición inicial
     anima.style.left = `${xInicio}px`;
     anima.style.top = `${yInicio}px`;
 
-    // Lo metemos al contenedor para que empiece a renderizar
     document.getElementById('contenedor-criptos').appendChild(anima);
 
-    // 4. Disparamos el viaje en el siguiente frame de renderizado
     requestAnimationFrame(() => {
         anima.style.left = `${xFin}px`;
         anima.style.top = `${yFin}px`;
-        anima.style.transform = 'translate(-50%, -50%) scale(1.6)'; // Se expande mágicamente en el trayecto
+        anima.style.transform = 'translate(-50%, -50%) scale(1.6)';
     });
 
-    // 5. Gestión del impacto al terminar la transición CSS
     anima.addEventListener('transitionend', () => {
-        anima.remove(); // Eliminamos el elemento para no saturar la memoria de la lap
-        
-        // Pequeño feedback visual de absorción en la tumba destino
+        anima.remove(); 
         destino.style.transform = 'scale(1.1)';
-        destino.style.filter = `drop-shadow(0 0 20px ${color})`;
-        
-        window.tumbasConSaldo[pos.nombre] = true; 
         
         const contenedorBalance = destino.querySelector('.balance-proyectado');
         if (contenedorBalance) {
+            // AHORA SÍ: Usamos el objeto 'pos' que pasamos por parámetro
             contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
             contenedorBalance.style.opacity = "1";
         }
-
-        // Ejecutamos el callback que prometimos al iniciar la animación
-        if (typeof callback === 'function') {
-            callback();
-        }
         
-        // Quitamos el efecto visual después de un momento
         setTimeout(() => {
-            destino.style.transform = 'scale(1)';
-            destino.style.filter = 'none';
-        }, 300);
+            destino.style.transform = 'none';
+            if (callback) callback(); 
+        }, 150);
     });
 }
