@@ -407,7 +407,7 @@ function abrirModalCosechaFinal(pos) {
         botones.innerHTML = `
             <button id="btn-cosecha-enviar" class="pentaculo-cursor" 
                     style="background:${pos.color}; color:#000; padding:12px 30px; margin-right:10px; font-weight:bold;">
-                TRANSMUTAR ALMA
+                SALVAR ALMA
             </button>
             <button id="btn-cosecha-cancelar" class="pentaculo-cursor" 
                     style="background:#222; color:#fff; padding:12px 30px;">
