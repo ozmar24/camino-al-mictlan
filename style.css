@@ -1103,27 +1103,22 @@ button,
 }
 
 .botones-exchange button {
-    padding: 9px 16px !important;
+    padding: 8px 16px !important;
     font-size: 0.75rem !important;
+    min-width: 110px !important;
     font-family: 'Nosifer', cursive !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 0.8px !important;
     border-radius: 4px !important;
     transition: all 0.3s ease !important;
     text-transform: uppercase !important;
 }
 
-/* Botón principal (Extraer Alma) */
+/* Botón principal */
 #btn-cosecha-enviar {
-    background: #b34d00 !important;
+    background: #c44a00 !important;
     color: #fff !important;
-    border: 2px solid #ff8800 !important;
-    font-weight: bold !important;
-}
-
-#btn-cosecha-enviar:hover {
-    background: #ff6600 !important;
-    transform: scale(1.05) !important;
-    box-shadow: 0 0 18px #ff8800 !important;
+    border: 2px solid #ff7700 !important;
+    padding: 9px 20px !important;
 }
 
 /* Botón cancelar */
@@ -1131,10 +1126,11 @@ button,
     background: #1f1f1f !important;
     color: #ccc !important;
     border: 2px solid #4a0000 !important;
+    padding: 9px 20px !important;
 }
 
+/* Hover */
+#btn-cosecha-enviar:hover,
 #btn-cosecha-cancelar:hover {
-    background: #330000 !important;
-    color: #fff !important;
-    border-color: #8b0000 !important;
+    transform: scale(1.03) !important;
 }
