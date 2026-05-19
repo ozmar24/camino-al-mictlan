@@ -301,40 +301,33 @@ if (balanceUsuarioSG <= 0) {
 
     // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
     if (ritualActivo) {
-        ritualActivo = false;
-        
-        const tumbaOrigen = document.querySelector('.alma-maestra');
-        const tumbaDestino = e.currentTarget;
-        
-        // CALCULAMOS: El balance actual del Soulgeist
-        const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 0);
-        
-        // --- AQUÍ EL RESETEO VISUAL (Lo que faltaba) ---
-        balanceUsuarioSG = 0;
-        
-        // Actualizamos el display superior
-        document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
-        
-        // Actualizamos el display DENTRO de la tumba Soulgeist
-        const balanceCripta = document.getElementById('balance-soulgeist');
-if (balanceCripta) {
-    balanceCripta.innerText = `Poder: 0 SG`;
-}
-
-        // 3. LANZAMOS EL ALMA
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
-            // Guardamos en el objeto global
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
-            
-            // ACTUALIZACIÓN VISUAL EN DESTINO
-            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            if (contenedorBalance) {
-                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                contenedorBalance.style.opacity = "1";
-            }
-            mostrarModalFusionExitosa(pos, gananciaDecimal);
-        });
+    ritualActivo = false; 
+    
+    let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
+    const tumbaDestino = e.currentTarget; 
+    const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+    
+    balanceUsuarioSG = 0; 
+    document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
+    
+    const criptaSoulgeist = document.querySelector('.alma-maestra .balance-proyectado');
+    if (criptaSoulgeist) {
+        criptaSoulgeist.innerText = `0 SG`; 
+        criptaSoulgeist.style.opacity = "0.5"; 
     }
+
+    if (typeof lanzarAlma === 'function') {
+            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+                window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
+                const saldoTotal = window.tumbasConSaldo[pos.nombre];
+                const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                if (contenedorBalance) {
+                    contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+                    contenedorBalance.style.opacity = "1";
+                }
+                mostrarModalFusionExitosa(pos, gananciaDecimal);
+            });
+        }
     
     } else {
         // 4. SINO ESTÁ ACTIVO EL RITUAL, AVISAR AL USUARIO
