@@ -776,3 +776,14 @@ function actualizarBalanceSoulgeist(nuevoValor) {
         el.innerText = `Poder: ${nuevoValor} SG`;
     }
 }
+function mostrarModalFusionExitosa(pos, cantidad) {
+    lanzarAlertaMictlan(
+        `¡Alma extraída con éxito! +${cantidad.toFixed(6)} ${pos.sim}`, 
+        "FUSIÓN COMPLETADA"
+    );
+    
+    // Opcional: Cerrar cualquier modal abierto
+    setTimeout(() => {
+        cerrarRitual();
+    }, 1800);
+}
