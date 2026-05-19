@@ -239,40 +239,42 @@ function generarCementerio() {
         { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.15 } 
     ];
 
-    configuracion.forEach(pos => {
-        const div = document.createElement('div'); 
-        div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba'; 
-        div.style.top = pos.top; 
-        div.style.left = pos.left; 
-        div.style.setProperty('--color-cripto', pos.color); 
-        div.setAttribute('data-nombre', pos.nombre); 
+   configuracion.forEach(pos => {
+    const div = document.createElement('div'); 
+    div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba'; 
+    div.style.top = pos.top; 
+    div.style.left = pos.left; 
+    div.style.setProperty('--color-cripto', pos.color); 
+    div.setAttribute('data-nombre', pos.nombre); 
 
-        if (pos.especial) {
-            div.innerHTML = `
-                <div class="sigilo-soulgeist"></div>
-                <div class="nombre-cripto">${pos.nombre}</div>
-                <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
-            `; 
-        } else {
-            const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
-        const textoVisual = saldoGuardado > 0 ? `+${saldoGuardado.toFixed(6)}` : `0`; 
-            
-            div.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
-                    <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
-                        <span class="simbolo-cripto">${pos.sim}</span>
+    // --- CORRECCIÓN AQUÍ: Calculamos el valor ANTES del innerHTML ---
+    const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
+    // Si saldoGuardado es un número mayor a 0, mostramos el saldo, si no, "0"
+    const textoBalance = saldoGuardado > 0 ? saldoGuardado.toFixed(6) : "0"; 
+
+    if (pos.especial) {
+        div.innerHTML = `
+            <div class="sigilo-soulgeist"></div>
+            <div class="nombre-cripto">Soulgeist</div>
+            <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
+        `;
+    } else { 
+        div.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
+                <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
+                    <span class="simbolo-cripto">${pos.sim}</span>
+                </div>
+                <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
+                    <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
+                        ${pos.nombre}
                     </div>
-                    <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
-                        <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
-                            ${pos.nombre}
-                        </div>
-                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
-                            ${textoBalance} ${pos.sim}
-                        </div>
+                    <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
+                        +${textoBalance} ${pos.sim}
                     </div>
                 </div>
-            `; 
-        }
+            </div>
+        `; 
+    }
 
 // ==================================================================
         // COMPORTAMIENTO INTERACTIVO DE LAS CRIPTAS (REPARADO)
