@@ -201,7 +201,7 @@ function dispararInicioRitualGlobal() {
         contenedorBotones.style.display = 'flex';
         contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
-            <button id="btn-ritual-cerrar-solo" class="btn-ritual" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 45px; border: none; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">CERRAR</button>
+            <button id="btn-ritual-cerrar-solo" class="btn-ritual" style="background: #00ffff; color: #000; font-weight: bold; padding: 12px 45px; border: none; border-radius: 4px; cursor: pointer; font-family:'Nosifer';">ACEPTAR</button>
         `;
 
         document.getElementById('btn-ritual-cerrar-solo').onclick = (event) => {
@@ -392,7 +392,7 @@ function abrirModalCosechaFinal(pos) {
         contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
             
-            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR/button>
+            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
         `;
 
         document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
