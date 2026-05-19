@@ -279,7 +279,6 @@ function generarCementerio() {
         // ==================================================================
         div.onclick = (e) => {
     e.stopPropagation();
-
 if (balanceUsuarioSG <= 0) {
         lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
         return; // Detiene todo, no deja seguir
@@ -755,23 +754,30 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
     });
 
     // 5. Gestión del impacto al terminar la transición CSS
-   anima.addEventListener('transitionend', () => {
-    anima.remove(); 
-    
-    // Feedback visual
-    destino.style.transform = 'scale(1.1)';
-    
-    // --- ESTA ES LA CLAVE DE LA ACTUALIZACIÓN ---
-    const contenedorBalance = destino.querySelector('.balance-proyectado');
-    if (contenedorBalance) {
-        // Usamos la variable 'cantidad' que ya recibes en la función lanzarAlma
-        contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim || ''}`;
-        contenedorBalance.style.opacity = "1";
-    }
-    
-    setTimeout(() => {
-        destino.style.transform = 'none';
-        if (callback) callback(); // Esto dispara el Modal de éxito después
-    }, 150);
-});
+    anima.addEventListener('transitionend', () => {
+        anima.remove(); // Eliminamos el elemento para no saturar la memoria de la lap
+        
+        // Pequeño feedback visual de absorción en la tumba destino
+        destino.style.transform = 'scale(1.1)';
+        destino.style.filter = `drop-shadow(0 0 20px ${color})`;
+        
+        window.tumbasConSaldo[pos.nombre] = true; 
+        
+        const contenedorBalance = destino.querySelector('.balance-proyectado');
+        if (contenedorBalance) {
+            contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
+            contenedorBalance.style.opacity = "1";
+        }
+
+        // Ejecutamos el callback que prometimos al iniciar la animación
+        if (typeof callback === 'function') {
+            callback();
+        }
+        
+        // Quitamos el efecto visual después de un momento
+        setTimeout(() => {
+            destino.style.transform = 'scale(1)';
+            destino.style.filter = 'none';
+        }, 300);
+    });
 }
