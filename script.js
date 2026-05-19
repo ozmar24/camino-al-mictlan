@@ -300,38 +300,41 @@ if (balanceUsuarioSG <= 0) {
     }
 
     // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
-    if (ritualActivo) {
-        ritualActivo = false; 
-        
-        let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-        const tumbaDestino = e.currentTarget; 
-        const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
-        
-        // --- AQUÍ HACEMOS EL RESETEO VISUAL DEL SOULGEIST ---
-        balanceUsuarioSG = 0; 
-        document.querySelector('.balance-actual').innerText = `Poder: 0 SG`;
-        
-        const criptaSoulgeist = document.querySelector('.alma-maestra .balance-proyectado');
-        if (criptaSoulgeist) {
-            criptaSoulgeist.innerText = `0 SG`; 
-            criptaSoulgeist.style.opacity = "0.5"; 
-        }
-        // ----------------------------------------------------
+   if (ritualActivo) {
+    ritualActivo = false; 
+    
+    // 1. Identificamos la fuente (Soulgeist)
+    const tumbaOrigen = document.querySelector('.alma-maestra');
+    const balanceElemento = tumbaOrigen.querySelector('.balance-actual');
+    
+    // Extraemos el número del texto (ejemplo: "Poder: 50.000 SG" -> extraemos 50)
+    let balanceActual = parseFloat(balanceElemento.innerText.replace(/[^0-9.]/g, '')) || 0;
+    
+    const tumbaDestino = e.currentTarget; 
+    const gananciaDecimal = balanceActual > 0 ? (balanceActual * pos.tasa) : 0;
+    
+    // 2. DESCONTAMOS DIRECTAMENTE DEL SOULGEIST
+    balanceElemento.innerText = `Poder: 0 SG`;
+    tumbaOrigen.querySelector('.balance-proyectado').innerText = `0 SG`;
+    tumbaOrigen.querySelector('.balance-proyectado').style.opacity = "0.5";
 
-        if (typeof lanzarAlma === 'function') {
-            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
-                // ... lógica de éxito al llegar ...
-                window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
-                
-                const saldoTotal = window.tumbasConSaldo[pos.nombre];
-                const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                if (contenedorBalance) {
-                    contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
-                    contenedorBalance.style.opacity = "1";
-                }
-                mostrarModalFusionExitosa(pos, gananciaDecimal);
-            });
-        }
+    // 3. LANZAMOS EL ALMA
+    if (typeof lanzarAlma === 'function') {
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos.sim, () => {
+            
+            // Guardamos el saldo en la tumba destino
+            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
+            
+            const saldoTotal = window.tumbasConSaldo[pos.nombre];
+            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+            
+            if (contenedorBalance) {
+                contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
+                contenedorBalance.style.opacity = "1";
+            }
+            mostrarModalFusionExitosa(pos, gananciaDecimal);
+        });
+    }
     
     } else {
         // 4. SINO ESTÁ ACTIVO EL RITUAL, AVISAR AL USUARIO
