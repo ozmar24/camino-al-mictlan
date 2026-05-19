@@ -323,6 +323,9 @@ function generarCementerio() {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
     }
 };
+contenedor.appendChild(div);
+
+});
 
     // Pilares fijos
     const pilares = [
@@ -343,7 +346,7 @@ function generarCementerio() {
         }
         contenedor.appendChild(enlace); 
     });
-
+}
 
 // ==================================================================
 // PASO 4: MODAL DE COSECHA DE CRIPTO Y CONFIGURACIÓN DE WALLET
