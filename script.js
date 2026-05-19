@@ -297,7 +297,8 @@ function generarCementerio() {
     }
 
     // 2. Ejecución del Ritual (Sólo si ritualActivo es true)
-    if (ritualActivo) {
+    // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
+        if (ritualActivo) {
             ritualActivo = false; 
             
             // Definimos el origen como la tumba maestra
@@ -337,6 +338,8 @@ function generarCementerio() {
                     }
                     mostrarModalFusionExitosa(pos, gananciaDecimal);
                 });
+            }
+        }
     } else {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
     }
