@@ -1072,65 +1072,23 @@ button,
    MEJORA DEL MODAL DE COSECHA (Bitcoin y otras con saldo)
    ============================================= */
 
-#modal-ritual {
-    background: linear-gradient(145deg, #0a0000, #1a0a0a) !important;
-    border: 3px solid #4a0000 !important;
-    box-shadow: 0 0 40px rgba(139, 0, 0, 0.9),
-                inset 0 0 30px rgba(0, 0, 0, 0.95) !important;
-    width: 350px !important;
-    padding: 25px 20px !important;
+/* FORZAR BOTONES PEQUEÑOS EN MODAL */
+#modal-ritual .botones-exchange button {
+    padding: 9px 20px !important;
+    font-size: 0.82rem !important;
+    min-width: 115px !important;
+    height: 42px !important;
+    margin: 0 !important;
 }
 
-#modal-ritual #titulo-ritual {
-    font-family: 'Nosifer', cursive !important;
-    text-shadow: 0 0 15px var(--color-ritmo, #ff0000) !important;
-    font-size: 1.7rem !important;
-}
-
-#modal-ritual input,
-#modal-ritual select {
-    background: #050505 !important;
-    border: 2px solid #4a0000 !important;
-    color: #eee !important;
-    padding: 13px !important;
-}
-
-/* ====================== BOTONES DEL MODAL COSECHA ====================== */
-/* ====================== BOTONES MODAL - VERSIÓN LIMPIA ====================== */
-.botones-exchange {
-    gap: 9px !important;
-    margin-top: 15px !important;
-}
-
-.botones-exchange button {
-    padding: 8px 16px !important;
-    font-size: 0.75rem !important;
-    min-width: 110px !important;
-    font-family: 'Nosifer', cursive !important;
-    letter-spacing: 0.8px !important;
-    border-radius: 4px !important;
-    transition: all 0.3s ease !important;
-    text-transform: uppercase !important;
-}
-
-/* Botón principal */
 #btn-cosecha-enviar {
     background: #c44a00 !important;
-    color: #fff !important;
-    border: 2px solid #ff7700 !important;
-    padding: 9px 20px !important;
+    color: white !important;
+    border: 2px solid #ff8800 !important;
 }
 
-/* Botón cancelar */
 #btn-cosecha-cancelar {
     background: #1f1f1f !important;
     color: #ccc !important;
     border: 2px solid #4a0000 !important;
-    padding: 9px 20px !important;
-}
-
-/* Hover */
-#btn-cosecha-enviar:hover,
-#btn-cosecha-cancelar:hover {
-    transform: scale(1.03) !important;
 }

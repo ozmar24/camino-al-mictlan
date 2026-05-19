@@ -402,15 +402,14 @@ function abrirModalCosechaFinal(pos) {
     `;
 
     // Botones
-    const botones = document.querySelector('.botones-exchange');
-    if (botones) {
-        botones.innerHTML = `
-            <button id="btn-cosecha-enviar" class="pentaculo-cursor" 
-                    style="background:${pos.color}; color:#000; padding:12px 30px; margin-right:10px; font-weight:bold;">
+    const contenedorBotones = document.getElementById('botones-exchange');
+    if (contenedorBotones) {
+        contenedorBotones.style.display = 'flex';
+        contenedorBotones.innerHTML = `
+            <button id="btn-cosecha-enviar" class="btn-ritual">
                 EXTRAER ALMA
             </button>
-            <button id="btn-cosecha-cancelar" class="pentaculo-cursor" 
-                    style="background:#222; color:#fff; padding:12px 30px;">
+            <button id="btn-cosecha-cancelar" class="btn-ritual">
                 VOLVER A LAS SOMBRAS
             </button>
         `;
