@@ -5,6 +5,9 @@ let balanceUsuarioSG = 0; // Controlará tu balance dinámico desde Redis
 let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
+if (typeof window.tumbasConSaldo === 'undefined') {
+    window.tumbasConSaldo = {}; // Guardará ejemplo: { "Solana": true, "Pepe": true }
+}
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
 const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com"; 
@@ -277,87 +280,51 @@ function generarCementerio() {
         // COMPORTAMIENTO INTERACTIVO DE LAS CRIPTAS (REPARADO)
         // ==================================================================
         div.onclick = (e) => {
-            e.stopPropagation();
-            
-            if (pos.especial) {
-                dispararInicioRitualGlobal();
-                return;
-            }
+    e.stopPropagation();
+    
+    // 1. SI YA TIENE SALDO -> SEGUNDO CLIC -> ABRIR MODAL RETIRO
+    if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
+        console.log("Cripta ya cargada. Abriendo menú de retiro...");
+        abrirModalCosechaFinal(pos); // Esta función debe contener tu lógica de retiro
+        return;
+    }
 
-            // SI EL RITUAL ESTÁ ACTIVO -> SE DISPARA EL VIAJE DEL ALMA
-            if (ritualActivo) {
-                ritualActivo = false; // Consumimos el estado de inmediato para evitar spam de clics
+    // 2. SI ES ESPECIAL (Pilar/Otro)
+    if (pos.especial) {
+        dispararInicioRitualGlobal();
+        return;
+    }
+
+    // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
+    if (ritualActivo) {
+        ritualActivo = false; 
+        
+        let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
+        const tumbaDestino = e.currentTarget; 
+        const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
+
+        if (typeof lanzarAlma === 'function') {
+            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
+                // AL IMPACTAR:
+                window.tumbasConSaldo[pos.nombre] = true; // MARCAMOS COMO LLENA
                 
-                let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-                const tumbaDestino = e.currentTarget; 
-                const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
-
-                console.log("Intentando invocar partículas hacia:", pos.nombre);
-
-                // CONTROL DE SEGURIDAD GLOBAL: Validamos si la función está lista en el script
-                if (typeof lanzarAlma === 'function') {
-                    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
-                        
-                        // AL IMPACTAR EL ALMA (CALLBACK): Guardamos el saldo con éxito
-                        window.tumbasConSaldo[pos.nombre] = true;
-
-                        // Levantamos el modal de éxito místico
-                        document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
-                        const modal = document.getElementById('modal-ritual');
-                        if (modal) {
-                            modal.style.setProperty('--color-ritmo', pos.color);
-                            modal.style.display = 'block';
-                        }
-
-                        if (document.getElementById('titulo-ritual')) {
-                            document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
-                        }
-                        if (document.getElementById('info-ritual')) {
-                            document.getElementById('info-ritual').innerHTML = `
-                                <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
-                                    ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
-                                </p>
-                            `;
-                        }
-
-                        // Ajustamos tus botones reales del HTML
-                        const btnEnviarHTML = document.getElementById('btn-ritual-enviar-unico') || document.getElementById('btn-ritual-enviar');
-                        const btnCancelarHTML = document.getElementById('btn-ritual-cancelar-primer-paso') || document.getElementById('btn-ritual-cancelar');
-
-                        if (btnEnviarHTML) btnEnviarHTML.style.display = 'none';
-
-                        if (btnCancelarHTML) {
-                            btnCancelarHTML.style.display = 'inline-block';
-                            btnCancelarHTML.innerText = "ACEPTAR";
-                            
-                            btnCancelarHTML.onclick = (event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                cerrarRitual();
-                                setTimeout(() => { generarCementerio(); }, 50);
-                            };
-                        }
-                    });
-                } else {
-                    console.error("⚠️ CRÍTICO: La función lanzarAlma() sigue atrapada o tiene un error de llaves.");
-                    // Respaldo de emergencia en caso de que falle el renderizador de partículas para que no se trabe el juego:
-                    window.tumbasConSaldo[pos.nombre] = true;
-                    generarCementerio();
+                // PINTAR SALDO VISUAL
+                const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                if (contenedorBalance) {
+                    contenedorBalance.innerText = `+${gananciaDecimal.toFixed(4)} ${pos.simbolo}`;
+                    contenedorBalance.style.opacity = "1";
                 }
 
-                return;
-            } else {
-                // RUTA NORMAL DE COSECHA (PASO 4)
-                if (window.tumbasConSaldo[pos.nombre]) {
-                    abrirModalCosechaFinal(pos);
-                } else {
-                    console.log("Inicia la canalización interactiva tocando el Soulgeist central.");
-                }
-            }
-        };
-
-        contenedor.appendChild(div); 
-    });
+                // MOSTRAR MODAL ÉXITO
+                mostrarModalFusionExitosa(pos, gananciaDecimal);
+            });
+        }
+    } else {
+        // 4. SINO ESTÁ ACTIVO EL RITUAL, AVISAR AL USUARIO
+        console.log("Inicia la canalización interactiva tocando el Soulgeist central.");
+        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
+    }
+};
 
     // Pilares fijos
     const pilares = [
@@ -392,37 +359,46 @@ function abrirModalCosechaFinal(pos) {
         modal.style.display = 'block'; 
     }
     
-    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
-    window.currentCripto = pos.nombre; 
+    // Calculamos saldo real vs mínimo configurado en tu array
+    const saldoAcumulado = balanceUsuarioSG * pos.tasa;
+    const cumpleMinimo = saldoAcumulado >= pos.tasa; // O usa pos.usdMinimo si prefieres
 
-    // Renderizado del formulario místico para la wallet
+    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`; 
+    window.currentCripto = pos; // Guardamos todo el objeto pos
+
+    // Renderizado del formulario
     document.getElementById('info-ritual').innerHTML = `
-        <p style="margin-bottom: 15px; color: #ccc; text-align:center; font-family:'MedievalSharp';">Elige tu billetera de destino para reclamar tus almas:</p>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <p style="color: #fff; font-size: 18px;">Total: <b style="color:${pos.color}">${saldoAcumulado.toFixed(8)} ${pos.sim}</b></p>
+            ${!cumpleMinimo ? `<p style="color: #ff4444; font-size: 12px;">(Mínimo no alcanzado para retiro)</p>` : ''}
+        </div>
         
         <div style="margin-bottom: 15px;">
-            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px; font-family:'MedievalSharp';">
-                <option value="faucetpay">FaucetPay (Micro-Wallet)</option>
-                <option value="bitso">Bitso Exchange</option>
-                <option value="coinbase">Coinbase Wallet</option>
+            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" style="width: 100%; background: #111; color: #fff; border: 1px solid ${pos.color}; padding: 10px; border-radius: 5px;">
+                <option value="faucetpay">FaucetPay</option>
+                <option value="bitso">Bitso</option>
                 <option value="binance">Binance</option>
+		<option value="binance">Coinbase</option>
             </select>
         </div>
 
         <div style="margin-bottom: 15px;">
-            <input type="text" id="wallet-input" placeholder="Correo de FaucetPay o dirección de destino" style="display: block; width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center; border-radius: 4px; box-sizing: border-box;">
+            <input type="text" id="wallet-input" placeholder="Dirección de destino..." style="width: 100%; background: #000; color: #fff; border: 1px solid #555; padding: 12px; text-align: center;">
         </div>
     `; 
 
     const contenedorBotones = document.getElementById('botones-exchange');
     if (contenedorBotones) {
         contenedorBotones.style.display = 'flex';
-        contenedorBotones.style.justifyContent = 'center';
         contenedorBotones.innerHTML = `
-            
-            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff; padding: 12px 25px; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-family:'MedievalSharp';">ACEPTAR</button>
+            ${cumpleMinimo ? `<button id="btn-cosecha-enviar" class="btn-ritual" style="background:${pos.color}; color:#000; margin-right:10px;">TRANSMUTAR</button>` : ''}
+            <button id="btn-cosecha-cancelar" class="btn-ritual" style="background: #222; color: #fff;">VOLVER</button>
         `;
 
-        document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
+        // Solo vinculamos el evento si el botón existe
+        if(document.getElementById('btn-cosecha-enviar')) {
+            document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
+        }
         document.getElementById('btn-cosecha-cancelar').onclick = cerrarRitual;
     }
 }
