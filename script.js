@@ -328,8 +328,7 @@ if (balanceUsuarioSG <= 0) {
                 mostrarModalFusionExitosa(pos, gananciaDecimal);
             });
         }
-    } // Cierra el if(ritualActivo)
-};
+    
     } else {
         // 4. SINO ESTÁ ACTIVO EL RITUAL, AVISAR AL USUARIO
         console.log("Inicia la canalización interactiva tocando el Soulgeist central.");
@@ -707,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
 // Aceptamos 'pos' como parámetro
 // ÚNICA VERSIÓN DE lanzarAlma
 function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
