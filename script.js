@@ -273,7 +273,10 @@ function generarCementerio() {
             `; 
         }
 
-div.onclick = (e) => {
+// ==================================================================
+        // COMPORTAMIENTO INTERACTIVO DE LAS CRIPTAS (REPARADO)
+        // ==================================================================
+        div.onclick = (e) => {
             e.stopPropagation();
             
             if (pos.especial) {
@@ -283,70 +286,72 @@ div.onclick = (e) => {
 
             // SI EL RITUAL ESTÁ ACTIVO -> SE DISPARA EL VIAJE DEL ALMA
             if (ritualActivo) {
-                ritualActivo = false; // Consumimos el estado de inmediato para evitar clicks fantasmas
+                ritualActivo = false; // Consumimos el estado de inmediato para evitar spam de clics
                 
-                // Respaldo de seguridad en caso de que la clase dinámica falle
                 let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
                 const tumbaDestino = e.currentTarget; 
                 const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-                console.log("Desbloqueando partículas míticas hacia:", pos.nombre);
+                console.log("Intentando invocar partículas hacia:", pos.nombre);
 
-                // 1. DISPARO DIRECTO: Ejecutamos tu animación nativa sobre el cementerio limpio
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
-                    
-                    // 2. CUANDO EL ALMA IMPACTA (CALLBACK): Asignamos permanentemente el saldo
-                    window.tumbasConSaldo[pos.nombre] = true;
-
-                    // 3. SE ACTIVA EL SEGUNDO MODAL (ÉXITO)
-                    document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
-                    const modal = document.getElementById('modal-ritual');
-                    if (modal) {
-                        modal.style.setProperty('--color-ritmo', pos.color);
-                        modal.style.display = 'block';
-                    }
-
-                    // Actualizamos los textos usando los elementos reales de tu Grimorio
-                    const tRitual = document.getElementById('titulo-ritual');
-                    const iRitual = document.getElementById('info-ritual');
-                    if (tRitual) tRitual.innerText = "RITUAL INICIADO";
-                    if (iRitual) {
-                        iRitual.innerHTML = `
-                            <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
-                                ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
-                            </p>
-                        `;
-                    }
-
-                    // 4. CONTROL QUIRÚRGICO DE TUS BOTONES REALES DEL HTML (Evita el TypeError null)
-                    const btnEnviarHTML = document.getElementById('btn-ritual-enviar-unico') || document.getElementById('btn-ritual-enviar');
-                    const btnCancelarHTML = document.getElementById('btn-ritual-cancelar-primer-paso') || document.getElementById('btn-ritual-cancelar');
-
-                    if (btnEnviarHTML) btnEnviarHTML.style.display = 'none'; // Escondemos enviar saldo
-
-                    if (btnCancelarHTML) {
-                        btnCancelarHTML.style.display = 'inline-block';
-                        btnCancelarHTML.innerText = "ACEPTAR"; // Mutamos temporalmente a botón de confirmación
+                // CONTROL DE SEGURIDAD GLOBAL: Validamos si la función está lista en el script
+                if (typeof lanzarAlma === 'function') {
+                    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                         
-                        btnCancelarHTML.onclick = (event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            cerrarRitual();
-                            
-                            setTimeout(() => {
-                                generarCementerio(); // Redibuja el cementerio pintando el +X con su color correspondiente
-                            }, 50);
-                        };
-                    }
-                });
+                        // AL IMPACTAR EL ALMA (CALLBACK): Guardamos el saldo con éxito
+                        window.tumbasConSaldo[pos.nombre] = true;
 
-                return; // Cortamos la ejecución para no saltar a la vista de retiro ordinario
+                        // Levantamos el modal de éxito místico
+                        document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+                        const modal = document.getElementById('modal-ritual');
+                        if (modal) {
+                            modal.style.setProperty('--color-ritmo', pos.color);
+                            modal.style.display = 'block';
+                        }
+
+                        if (document.getElementById('titulo-ritual')) {
+                            document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+                        }
+                        if (document.getElementById('info-ritual')) {
+                            document.getElementById('info-ritual').innerHTML = `
+                                <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
+                                    ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
+                                </p>
+                            `;
+                        }
+
+                        // Ajustamos tus botones reales del HTML
+                        const btnEnviarHTML = document.getElementById('btn-ritual-enviar-unico') || document.getElementById('btn-ritual-enviar');
+                        const btnCancelarHTML = document.getElementById('btn-ritual-cancelar-primer-paso') || document.getElementById('btn-ritual-cancelar');
+
+                        if (btnEnviarHTML) btnEnviarHTML.style.display = 'none';
+
+                        if (btnCancelarHTML) {
+                            btnCancelarHTML.style.display = 'inline-block';
+                            btnCancelarHTML.innerText = "ACEPTAR";
+                            
+                            btnCancelarHTML.onclick = (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                cerrarRitual();
+                                setTimeout(() => { generarCementerio(); }, 50);
+                            };
+                        }
+                    });
+                } else {
+                    console.error("⚠️ CRÍTICO: La función lanzarAlma() sigue atrapada o tiene un error de llaves.");
+                    // Respaldo de emergencia en caso de que falle el renderizador de partículas para que no se trabe el juego:
+                    window.tumbasConSaldo[pos.nombre] = true;
+                    generarCementerio();
+                }
+
+                return;
             } else {
-                // RUTA ORDINARIA (PASO 4): SI YA TIENE SALDO, ABRE EL FORMULARIO DE COSECHA
+                // RUTA NORMAL DE COSECHA (PASO 4)
                 if (window.tumbasConSaldo[pos.nombre]) {
                     abrirModalCosechaFinal(pos);
                 } else {
-                    console.log("Inicia la canalización interactiva tocando el Soulgeist del centro.");
+                    console.log("Inicia la canalización interactiva tocando el Soulgeist central.");
                 }
             }
         };
@@ -712,3 +717,72 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+function lanzarAlma(origen, destino, color, cantidad, callback) {
+    if (!origen || !destino) {
+        console.error("Faltan los templos de origen o destino para iniciar la trayectoria.");
+        if (callback) callback();
+        return;
+    }
+
+    // 1. Creamos el ánima flotante usando tu clase exacta del CSS
+    const anima = document.createElement('div');
+    anima.className = 'almaviajera'; // <--- Usamos tu clase nativa sin guion
+    
+    // 2. Ajustamos quirúrgicamente los estilos dinámicos de trayectoria sobreescribiendo el fixed
+    Object.assign(anima.style, {
+        position: 'absolute', // Cambiamos a absolute para que se mueva relativo al mapa del cementerio
+        left: '0px',
+        top: '0px',
+        width: '14px',        // Ajuste de refinamiento para el trayecto
+        height: '14px',
+        backgroundColor: color, // Forzamos el color de la cripta seleccionada (Solana, Bitcoin, etc.)
+        background: `radial-gradient(circle, #fff, ${color} 40%, transparent 70%)`,
+        boxShadow: `0 0 15px ${color}, 0 0 30px ${color}`,
+        transition: 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)', // Curva de aceleración limpia
+        transform: 'translate(-50%, -50%) scale(1)'
+    });
+
+    // 3. Calculamos las posiciones del mapa
+    const rectOrigen = origen.getBoundingClientRect();
+    const rectDestino = destino.getBoundingClientRect();
+    const rectContenedor = document.getElementById('contenedor-criptos').getBoundingClientRect();
+
+    // Punto de partida (Centro de Soulgeist)
+    const xInicio = (rectOrigen.left + rectOrigen.width / 2) - rectContenedor.left;
+    const yInicio = (rectOrigen.top + rectOrigen.height / 2) - rectContenedor.top;
+
+    // Punto de llegada (Centro de la cripta seleccionada)
+    const xFin = (rectDestino.left + rectDestino.width / 2) - rectContenedor.left;
+    const yFin = (rectDestino.top + rectDestino.height / 2) - rectContenedor.top;
+
+    // Seteamos la posición inicial
+    anima.style.left = `${xInicio}px`;
+    anima.style.top = `${yInicio}px`;
+
+    // Lo metemos al contenedor para que empiece a renderizar
+    document.getElementById('contenedor-criptos').appendChild(anima);
+
+    // 4. Disparamos el viaje en el siguiente frame de renderizado
+    requestAnimationFrame(() => {
+        anima.style.left = `${xFin}px`;
+        anima.style.top = `${yFin}px`;
+        anima.style.transform = 'translate(-50%, -50%) scale(1.6)'; // Se expande mágicamente en el trayecto
+    });
+
+    // 5. Gestión del impacto al terminar la transición CSS
+    anima.addEventListener('transitionend', () => {
+        anima.remove(); // Eliminamos el elemento para no saturar la memoria de la lap
+        
+        // Pequeño feedback visual de absorción en la tumba destino
+        destino.style.transform = 'scale(1.1)';
+        destino.style.filter = `drop-shadow(0 0 20px ${color})`;
+        
+        setTimeout(() => {
+            destino.style.transform = 'none';
+            destino.style.filter = 'none';
+            
+            // Relevo final: levanta el modal de éxito con los saldos
+            if (callback) callback();
+        }, 150);
+    });
+}
