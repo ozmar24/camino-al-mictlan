@@ -282,52 +282,69 @@ div.onclick = (e) => {
     }
 
     // SI EL RITUAL ESTÁ ACTIVO -> SE ACTIVA EL ENVÍO DE ALMAS EN VIVO
-    if (ritualActivo) {
-        ritualActivo = false; // Consumimos el estado místico para evitar spam de clicks
-
-        // Capturamos el Soulgeist de origen y la tumba de destino del click
-        let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
-        const tumbaDestino = e.currentTarget; 
-        const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
-
-        // 1. DISPARO DIRECTO: Las almas viajan visibles con el cementerio despejado
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
+  // SI EL RITUAL ESTÁ ACTIVO -> VIAJA EL ALMA PRIMERO
+        if (ritualActivo) {
+            ritualActivo = false; // Consumimos el estado inmediatamente para evitar dobles clics
             
-            // 2. AL IMPACTAR EL ALMA: Ahora sí guardamos el saldo en la tumba
-            window.tumbasConSaldo[pos.nombre] = true;
+            // Aseguramos capturar el origen de Soulgeist por su clase nativa o por su atributo de respaldo
+            let tumbaOrigen = document.querySelector('.alma-maestra') || document.querySelector('[data-nombre="Soulgeist"]');
+            const tumbaDestino = e.currentTarget; 
+            const gananciaDecimal = balanceUsuarioSG > 0 ? (balanceUsuarioSG * pos.tasa) : 0;
 
-            // 3. SE ACTIVA EL MODAL DE RITUAL INICIADO
-            document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
-            const modal = document.getElementById('modal-ritual');
-            if (modal) {
-                modal.style.setProperty('--color-ritmo', pos.color);
-                modal.style.display = 'block';
-            }
+            console.log("Desbloqueando partículas míticas hacia:", pos.nombre);
 
-            document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
-            document.getElementById('info-ritual').innerHTML = `
-                <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
-                    ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
-                </p>
-            `;
-
-            // 4. CONTROL QUIRÚRGICO DE TUS BOTONES NATIVOS (Sin destruir el HTML)
-            // Usamos las variables exactas de tu script original
-            if (typeof btnRitualEnviar !== 'undefined' && btnRitualEnviar) {
-                btnRitualEnviar.style.display = 'none'; // Escondemos el que no se ocupa
-            }
-            
-            if (typeof btnRitualCancelar !== 'undefined' && btnRitualCancelar) {
-                btnRitualCancelar.style.display = 'block';
-                btnRitualCancelar.innerText = "ACEPTAR"; // Modificamos solo el texto
+            // 1. DISPARO DIRECTO: Ejecutamos la animación nativa con el mapa libre
+            lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, () => {
                 
-                // Le damos la función limpia de cerrar y redibujar
-                btnRitualCancelar.onclick = () => {
-                    cerrarRitual();
-                    generarCementerio(); // Pinta el saldo (+X) en el mapa de forma permanente
-                };
-            }
-        });
+                // 2. CUANDO EL ALMA IMPACTA (CALLBACK): Guardamos de forma segura el saldo
+                window.tumbasConSaldo[pos.nombre] = true;
+
+                // 3. LEVANTAMOS EL MODAL CON EL BLUR
+                document.getElementById('campo-santo').style.filter = "blur(5px) brightness(0.4)";
+                const modal = document.getElementById('modal-ritual');
+                if (modal) {
+                    modal.style.setProperty('--color-ritmo', pos.color);
+                    modal.style.display = 'block';
+                }
+
+                // Seteamos los textos usando los ID nativos de tu HTML
+                document.getElementById('titulo-ritual').innerText = "RITUAL INICIADO";
+                document.getElementById('info-ritual').innerHTML = `
+                    <p style="margin-bottom: 15px; color: #fff; font-family:'MedievalSharp', cursive; text-align:center; font-size: 16px;">
+                        ¡EL ALMA SE HA FUSIONADO CON ÉXITO EN LA CRIPTA DE ${pos.nombre.toUpperCase()}!
+                    </p>
+                `;
+
+                // 4. CONTROL QUIRÚRGICO DE TU HTML REAL (No usamos innerHTML destructivo)
+                const btnEnviarHTML = document.getElementById('btn-ritual-enviar');
+                const btnCancelarHTML = document.getElementById('btn-ritual-cancelar');
+
+                // Ocultamos el botón de enviar porque aquí sólo ocupamos un "ACEPTAR"
+                if (btnEnviarHTML) {
+                    btnEnviarHTML.style.display = 'none';
+                }
+
+                // Usamos tu botón de cancelar físico como el botón de "ACEPTAR" transitorio
+                if (btnCancelarHTML) {
+                    btnCancelarHTML.style.display = 'inline-block';
+                    btnCancelarHTML.innerText = "ACEPTAR";
+                    
+                    btnCancelarHTML.onclick = (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        cerrarRitual(); // Quita el blur y oculta el modal
+                        
+                        // Pequeño delay místico de estabilidad antes de re-renderizar los saldos visuales
+                        setTimeout(() => {
+                            generarCementerio();
+                        }, 50);
+                    };
+                }
+            });
+
+            return; // Cortamos el flujo para que no intente saltar a la pantalla de cosecha ordinaria
+        }
 
     } else {
         // SI SE CLIQUEA NORMAL UNA TUMBA QUE YA TIENE SALDO -> PASO 4 (FORMULARIO BILLETERA)
