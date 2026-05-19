@@ -356,9 +356,7 @@ function generarCementerio() {
 // ==================================================================
 function abrirModalCosechaFinal(pos) {
     const campoSanto = document.getElementById('campo-santo');
-    if (campoSanto) {
-        campoSanto.style.filter = "blur(5px) brightness(0.4)";
-    }
+    if (campoSanto) campoSanto.style.filter = "blur(5px) brightness(0.4)";
 
     const modal = document.getElementById('modal-ritual');
     if (!modal) return;
@@ -366,28 +364,23 @@ function abrirModalCosechaFinal(pos) {
     modal.style.setProperty('--color-ritmo', pos.color || "#f7931a");
     modal.style.display = 'block';
 
-    // Calcular saldo
     const saldoAcumulado = window.tumbasConSaldo[pos.nombre] || 0;
 
     document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
 
     window.currentCripto = pos;
 
-    // Contenido del modal
     document.getElementById('info-ritual').innerHTML = `
         <div style="text-align: center; margin-bottom: 20px;">
-            <p style="color: #fff; font-size: 19px; margin: 10px 0;">
-                Saldo disponible: 
-                <b style="color: ${pos.color};">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
+            <p style="color: #fff; font-size: 19px;">
+                SALDO DISPONIBLE: <b style="color:${pos.color}">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
             </p>
         </div>
 
-        <div style="margin-bottom: 18px;">
-            <label style="color:#bbb; font-size: 14px; display:block; margin-bottom:6px;">
-                Portal de retiro:
-            </label>
+        <div style="margin-bottom: 15px;">
+            <label style="color:#aaa; font-size:14px;">Portal de retiro:</label>
             <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                    style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
+                    style="width:100%; background:#0a0a0a; color:#ddd; border:2px solid #4a0000; padding:12px; border-radius:6px;">
                 <option value="faucetpay">FaucetPay</option>
                 <option value="bitso">Bitso</option>
                 <option value="coinbase">Coinbase</option>
@@ -395,29 +388,24 @@ function abrirModalCosechaFinal(pos) {
             </select>
         </div>
 
-        <div>
+        <div style="margin-bottom: 20px;">
             <input type="text" id="wallet-input" placeholder="Ingresa tu dirección o correo..." 
-                   style="width: 100%; background:#000; color:#fff; border:2px solid #555; padding:14px; text-align:center; border-radius:6px; font-size:15px;">
+                   style="width:100%; background:#0a0a0a; color:#ddd; border:2px solid #4a0000; padding:13px; border-radius:6px; text-align:center;">
         </div>
     `;
 
-    // Botones
-    const contenedorBotones = document.getElementById('botones-exchange');
-    if (contenedorBotones) {
-        contenedorBotones.style.display = 'flex';
-        contenedorBotones.innerHTML = `
-            <button id="btn-cosecha-enviar" class="btn-ritual">
-                EXTRAER ALMA
-            </button>
-            <button id="btn-cosecha-cancelar" class="btn-ritual">
-                VOLVER A LAS SOMBRAS
-            </button>
+    const botones = document.getElementById('botones-exchange');
+    if (botones) {
+        botones.innerHTML = `
+            <button id="btn-cosecha-enviar" class="btn-ritual">EXTRAER ALMA</button>
+            <button id="btn-cosecha-cancelar" class="btn-ritual">VOLVER A LAS SOMBRAS</button>
         `;
 
         document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
         document.getElementById('btn-cosecha-cancelar').onclick = cerrarRitual;
     }
 }
+
 
 function adaptarPlaceholderPasarela(criptoId) {
     const pasarela = document.getElementById('pasarela-select').value; 
@@ -434,21 +422,22 @@ function adaptarPlaceholderPasarela(criptoId) {
 }
 
 function procesarRetiro() {
-    const inputWallet = document.getElementById('wallet-input'); 
-    const selectPasarela = document.getElementById('pasarela-select'); 
+    const inputWallet = document.getElementById('wallet-input');
+    const selectPasarela = document.getElementById('pasarela-select');
     
-    if(!inputWallet) return; 
-    
-    const wallet = inputWallet.value.trim(); 
-    const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay"; 
-    
-    if (wallet.length < 8) {
-        lanzarAlertaMictlan("La dirección o credencial del portal es demasiado corta.", "ERROR DE RITUAL"); 
-        return; 
+    if (!inputWallet) return;
+
+    const wallet = inputWallet.value.trim();
+
+    if (wallet.length < 5) {
+        lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
+        return;
     }
-    
-    cerrarRitual(); 
-    procesarCosecha(wallet, window.currentCripto, pasarelaElegida); 
+
+    const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
+
+    cerrarRitual();
+    procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
 }
 
 async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
