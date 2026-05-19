@@ -247,12 +247,15 @@ function generarCementerio() {
         div.style.setProperty('--color-cripto', pos.color); 
         div.setAttribute('data-nombre', pos.nombre); 
 
-        const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
-        const textoVisual = saldoGuardado > 0 ? `+${saldoGuardado.toFixed(6)}` : `0`;
-
         if (pos.especial) {
-            div.innerHTML = `<div class="sigilo-soulgeist"></div>...`;
-        } else { 
+            div.innerHTML = `
+                <div class="sigilo-soulgeist"></div>
+                <div class="nombre-cripto">${pos.nombre}</div>
+                <div class="balance-actual">Poder: ${balanceUsuarioSG} SG</div>
+            `; 
+        } else {
+            const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
+        const textoVisual = saldoGuardado > 0 ? `+${saldoGuardado.toFixed(6)}` : `0`; 
             
             div.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
@@ -771,4 +774,3 @@ function lanzarAlma(origen, destino, color, cantidad, callback) {
         if (callback) callback(); // Esto dispara el Modal de éxito después
     }, 150);
 });
-}
