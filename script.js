@@ -224,148 +224,130 @@ function dispararInicioRitualGlobal() {
 // PASO 2 Y 3: CLICK EN CRIPTA -> ANIMACIÓN EN VIVO -> MODAL RITUAL INICIADO
 // ==================================================================
 function generarCementerio() {
-    const contenedor = document.getElementById('contenedor-criptos'); 
-    if (!contenedor) return; 
-    contenedor.innerHTML = ''; 
+    const contenedor = document.getElementById('contenedor-criptos');
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = '';
 
     const configuracion = [
-        { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true }, 
-        { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.15 }, 
-        { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.15 }, 
-        { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.15 }, 
-        { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.15 }, 
-        { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.15 },  
-        { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.15 },  
-        { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.15 } 
+        { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
+        { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.15 },
+        { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.15 },
+        { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.15 },
+        { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.15 },
+        { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.15 },
+        { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.15 },
+        { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.15 }
     ];
 
-   configuracion.forEach(pos => {
-    const div = document.createElement('div'); 
-    div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba'; 
-    div.style.top = pos.top; 
-    div.style.left = pos.left; 
-    div.style.setProperty('--color-cripto', pos.color); 
-    div.setAttribute('data-nombre', pos.nombre); 
+    configuracion.forEach(pos => {
+        const div = document.createElement('div');
+        div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba';
+        div.style.top = pos.top;
+        div.style.left = pos.left;
+        div.style.setProperty('--color-cripto', pos.color);
+        div.setAttribute('data-nombre', pos.nombre);
 
-    // --- CORRECCIÓN AQUÍ: Calculamos el valor ANTES del innerHTML ---
-    const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
-    // Si saldoGuardado es un número mayor a 0, mostramos el saldo, si no, "0"
-    const textoBalance = saldoGuardado > 0 ? saldoGuardado.toFixed(6) : "0"; 
+        const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
+        const textoBalance = saldoGuardado > 0 ? saldoGuardado.toFixed(6) : "0";
 
-    if (pos.especial) {
-    div.innerHTML = `
-        <div class="sigilo-soulgeist"></div>
-        <div class="nombre-cripto">Soulgeist</div>
-        <div class="balance-actual" id="balance-soulgeist">Poder: ${balanceUsuarioSG} SG</div>
-    `;
-    } else { 
-        div.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
-                <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
-                    <span class="simbolo-cripto">${pos.sim}</span>
-                </div>
-                <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
-                    <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
-                        ${pos.nombre}
+        if (pos.especial) {
+            div.innerHTML = `
+                <div class="sigilo-soulgeist"></div>
+                <div class="nombre-cripto">Soulgeist</div>
+                <div class="balance-actual" id="balance-soulgeist">Poder: ${balanceUsuarioSG} SG</div>
+            `;
+        } else {
+            div.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative; width: 120px;">
+                    <div class="moneda-flotante" style="filter: drop-shadow(0 0 10px ${pos.color});">
+                        <span class="simbolo-cripto">${pos.sim}</span>
                     </div>
-                    <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
-                        +${textoBalance} ${pos.sim}
+                    <div class="info-tumba" style="margin-top: 12px; text-align: center; width: 100%;">
+                        <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
+                            ${pos.nombre}
+                        </div>
+                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
+                            +${textoBalance} ${pos.sim}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `; 
-    }
-
-// ==================================================================
-        // COMPORTAMIENTO INTERACTIVO DE LAS CRIPTAS (REPARADO)
-        // ==================================================================
-        div.onclick = (e) => {
-    e.stopPropagation();
-
-    // 1. Validaciones
-    if (balanceUsuarioSG <= 0) {
-        lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
-        return;
-    }
-    if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
-        abrirModalCosechaFinal(pos);
-        return;
-    }
-    if (pos.especial) {
-        dispararInicioRitualGlobal();
-        return;
-    }
-
-    // 2. Ejecución del Ritual (Sólo si ritualActivo es true)
-    // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE DEL ALMA
-        if (ritualActivo) {
-            ritualActivo = false; 
-            
-            // Definimos el origen como la tumba maestra
-            const tumbaOrigen = document.querySelector('.alma-maestra');
-            const tumbaDestino = e.currentTarget; 
-            
-            // --- CORRECCIÓN AQUÍ: Leemos el balance desde el Soulgeist específico ---
-            // Buscamos el balance dentro de la tumba Soulgeist, no el de la esquina superior
-            const elementoBalanceSoul = tumbaOrigen.querySelector('.balance-actual');
-            const balanceActual = balanceUsuarioSG; // Usamos tu variable global que ya tiene el dato
-            
-            const gananciaDecimal = balanceActual > 0 ? (balanceActual * pos.tasa) : 0;
-            
-            // Reseteamos el balance
-            balanceUsuarioSG = 0; 
-            
-            // Actualizamos SOLAMENTE el balance dentro del Soulgeist
-            if (elementoBalanceSoul) {
-                elementoBalanceSoul.innerText = `Poder: 0 SG`;
-            }
-            
-            const criptaSoulgeist = tumbaOrigen.querySelector('.balance-proyectado');
-            if (criptaSoulgeist) {
-                criptaSoulgeist.innerText = `0 SG`; 
-                criptaSoulgeist.style.opacity = "0.5"; 
-            }
-
-            // Lanzamos el alma
-            if (typeof lanzarAlma === 'function') {
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
-                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal; 
-                    const saldoTotal = window.tumbasConSaldo[pos.nombre];
-                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                    if (contenedorBalance) {
-                        contenedorBalance.innerText = `+${saldoTotal.toFixed(6)} ${pos.sim}`;
-                        contenedorBalance.style.opacity = "1";
-                    }
-                    mostrarModalFusionExitosa(pos, gananciaDecimal);
-                });
-            }
+            `;
         }
-    } else {
-        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
-    }
-};
-contenedor.appendChild(div);
 
-});
+        // ==================== COMPORTAMIENTO AL HACER CLICK ====================
+        div.onclick = (e) => {
+            e.stopPropagation();
+
+            if (balanceUsuarioSG <= 0) {
+                lanzarAlertaMictlan("Tu Soulgeist está vacío. Extrae almas primero.", "RITUAL DENEGADO");
+                return;
+            }
+
+            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) {
+                abrirModalCosechaFinal(pos);
+                return;
+            }
+
+            if (pos.especial) {
+                dispararInicioRitualGlobal();
+                return;
+            }
+
+            if (ritualActivo) {
+                ritualActivo = false;
+                const tumbaOrigen = document.querySelector('.alma-maestra');
+                const tumbaDestino = e.currentTarget;
+                const gananciaDecimal = balanceUsuarioSG * (pos.tasa || 1);
+
+                balanceUsuarioSG = 0;
+
+                const elementoBalanceSoul = tumbaOrigen.querySelector('.balance-actual');
+                if (elementoBalanceSoul) {
+                    elementoBalanceSoul.innerText = `Poder: 0 SG`;
+                }
+
+                if (typeof lanzarAlma === 'function') {
+                    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, gananciaDecimal, pos, () => {
+                        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + gananciaDecimal;
+                        const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                        if (contenedorBalance) {
+                            contenedorBalance.innerText = `+${gananciaDecimal.toFixed(6)} ${pos.sim}`;
+                            contenedorBalance.style.opacity = "1";
+                        }
+                        mostrarModalFusionExitosa(pos, gananciaDecimal);
+                    });
+                }
+            } else {
+                lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
+            }
+        };
+
+        contenedor.appendChild(div);
+    });
 
     // Pilares fijos
     const pilares = [
-        { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" }, 
-        { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" } 
+        { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
+        { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
     ];
 
     pilares.forEach(p => {
-        const pilarExistente = document.querySelector(`.${p.clase}`); 
-        if (pilarExistente) pilarExistente.remove(); 
+        const pilarExistente = document.querySelector(`.${p.clase}`);
+        if (pilarExistente) pilarExistente.remove();
 
-        const enlace = document.createElement('a'); 
-        enlace.href = p.link; 
-        enlace.className = `inscripcion-pilar ${p.clase}`; 
-        enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`; 
-        if(p.clase === "pilar-derecho") {
-            enlace.onclick = (e) => { e.preventDefault(); mostrarContratoMictlan(); }; 
+        const enlace = document.createElement('a');
+        enlace.href = p.link;
+        enlace.className = `inscripcion-pilar ${p.clase}`;
+        enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`;
+
+        if (p.clase === "pilar-derecho") {
+            enlace.onclick = (e) => { 
+                e.preventDefault(); 
+                mostrarContratoMictlan(); 
+            };
         }
-        contenedor.appendChild(enlace); 
+        contenedor.appendChild(enlace);
     });
 }
 
