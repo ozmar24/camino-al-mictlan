@@ -1058,3 +1058,12 @@ button,
     filter: drop-shadow(0 0 15px white) brightness(1.5);
     transition: filter 0.3s ease;
 }
+/* Oculta SOLO el balance de arriba a la izquierda */
+.alma-maestra .balance-actual { 
+    display: none !important; 
+}
+
+/* El balance del Soulgeist (el que generas en el script) se mantendrá visible */
+#balance-soulgeist {
+    display: block !important;
+}
