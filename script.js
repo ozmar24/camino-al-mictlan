@@ -16,23 +16,21 @@ const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.goog
 // FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO (CORREGIDO)
 // ==================================================================
 function entrarAlMictlan() {
-    const portal = document.getElementById('escena-portal'); 
-    const modalContrato = document.getElementById('modal-contrato'); 
+    console.log("Intentando entrar al Mictlán..."); // Para depurar en consola
     
-    if (!portal || !modalContrato) return; 
+    const portal = document.getElementById('escena-portal');
+    const modalContrato = document.getElementById('modal-contrato');
 
-    // Aseguramos que el cementerio NO se muestre todavía en el fondo
-    const campoSanto = document.getElementById('campo-santo'); 
-    if (campoSanto) campoSanto.style.display = 'none'; 
+    if (modalContrato) {
+        modalContrato.style.display = 'flex'; // Usamos flex para centrar
+        modalContrato.style.opacity = '1';
+        modalContrato.style.visibility = 'visible';
+    }
 
-    // Desvanecimiento suave del portal de las rejas
-    portal.style.transition = "opacity 0.8s ease"; 
-    portal.style.opacity = '0'; 
-    
-    setTimeout(() => {
-        portal.style.display = 'none'; 
-        modalContrato.style.display = 'flex'; // Abre el Grimorio/Registro limpiamente
-    }, 800); 
+    if (portal) {
+        portal.style.opacity = '0';
+        setTimeout(() => { portal.style.display = 'none'; }, 1000);
+    }
 }
 
 function inicializarBotonGoogle() {
