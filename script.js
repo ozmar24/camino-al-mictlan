@@ -344,7 +344,7 @@ div.onclick = (e) => {
             });
 
             return; // Cortamos el flujo para que no intente saltar a la pantalla de cosecha ordinaria
-        }
+        
 
     } else {
         // SI SE CLIQUEA NORMAL UNA TUMBA QUE YA TIENE SALDO -> PASO 4 (FORMULARIO BILLETERA)
