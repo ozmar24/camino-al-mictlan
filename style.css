@@ -1096,16 +1096,26 @@ button,
 }
 
 /* ====================== BOTONES DEL MODAL COSECHA ====================== */
-botones-exchange {
+.botones-exchange {
     gap: 15px !important;
     margin-top: 25px !important;
+    justify-content: center !important;
 }
 
 .botones-exchange button {
-    padding: 12px 26px !important;
-    font-size: 0.98rem !important;
-    min-width: 135px !important;
-    border-radius: 4px !important;
+    position: relative !important;
+    padding: 12px 28px !important;
+    font-size: 1rem !important;
+    font-family: 'Nosifer', cursive !important;
+    letter-spacing: 1.5px !important;
+    border: 2px solid #4a0000 !important;
+    background: linear-gradient(145deg, #1a0f0a, #2c1a12) !important;
+    color: #e8c9a0 !important;
+    text-shadow: 0 0 8px #000 !important;
+    overflow: hidden !important;
+    transition: all 0.4s ease !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8),
+                inset 0 2px 4px rgba(255,255,255,0.05) !important;
 }
 
 #btn-cosecha-enviar {
@@ -1115,9 +1125,11 @@ botones-exchange {
 }
 
 #btn-cosecha-enviar:hover {
-    background: #fff !important;
-    transform: scale(1.05) !important;
-    box-shadow: 0 0 15px var(--color-ritmo) !important;
+    background: linear-gradient(145deg, #3a1a00, #5c2a0a) !important;
+    color: #ffddaa !important;
+    border-color: #ff6600 !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 0 20px #ff6600 !important;
 }
 
 #btn-cosecha-cancelar {
@@ -1126,7 +1138,13 @@ botones-exchange {
 }
 
 #btn-cosecha-cancelar:hover {
-    background: #330000 !important;
-    color: #fff !important;
-    border-color: #ff0000 !important;
+    background: linear-gradient(145deg, #1f0a0a, #330f0f) !important;
+    color: #ddd !important;
+    border-color: #660000 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Texto más quemado */
+.botones-exchange button {
+    text-transform: uppercase !important;
 }
