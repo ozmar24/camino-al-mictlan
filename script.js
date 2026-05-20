@@ -314,7 +314,7 @@ function generarCementerio() {
 
         lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
             // Solo se suma UNA vez aquí
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
 
             const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
             if (contenedorBalance) {
@@ -778,12 +778,7 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
         anima.remove(); 
         destino.classList.add('efecto-impacto');
         
-        const contenedorBalance = destino.querySelector('.balance-proyectado');
-        if (contenedorBalance) {
-            contenedorBalance.innerText = `+${cantidad.toFixed(6)} ${pos.sim}`;
-            contenedorBalance.style.opacity = "1";
-        }
-        
+                
         setTimeout(() => {
             destino.classList.remove('efecto-impacto');
             if (callback) callback(); 
