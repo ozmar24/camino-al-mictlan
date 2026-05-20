@@ -775,9 +775,7 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
         anima.style.transform = 'translate(-50%, -50%) scale(1.6)';
     });
 
-    anima.addEventListener('transitionend', (e) => {
-
-    if (e.propertyName !== 'transform') return;
+    anima.addEventListener('transitionend', () => {
 
     anima.remove();
 
