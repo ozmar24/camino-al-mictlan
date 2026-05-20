@@ -1,6 +1,7 @@
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
+let retiroEnProceso = false;
 let balanceUsuarioSG = 0; // Controlará tu balance dinámico desde Redis
 let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
@@ -774,16 +775,23 @@ function lanzarAlma(origen, destino, color, cantidad, pos, callback) {
         anima.style.transform = 'translate(-50%, -50%) scale(1.6)';
     });
 
-    anima.addEventListener('transitionend', () => {
-        anima.remove(); 
-        destino.classList.add('efecto-impacto');
-        
-                
-        setTimeout(() => {
-            destino.classList.remove('efecto-impacto');
-            if (callback) callback(); 
-        }, 150);
-    });
+    anima.addEventListener('transitionend', (e) => {
+
+    if (e.propertyName !== 'transform') return;
+
+    anima.remove();
+
+    destino.classList.add('efecto-impacto');
+
+    setTimeout(() => {
+
+        destino.classList.remove('efecto-impacto');
+
+        if (callback) callback();
+
+    }, 150);
+
+}, { once: true });
 }
 function actualizarBalanceSoulgeist(nuevoValor) {
     // Busca el elemento del Soulgeist por su ID único
