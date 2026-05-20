@@ -281,9 +281,6 @@ function generarCementerio() {
         // ==================== COMPORTAMIENTO AL HACER CLICK ====================
        div.onclick = (e) => {
     e.stopPropagation();
-// BLOQUEO INMEDIATO: Si ya está procesando, no hacer nada
-    if (div.style.pointerEvents === 'none') return;
-    div.style.pointerEvents = 'none'; // Desactiva clics extra
 
     // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
