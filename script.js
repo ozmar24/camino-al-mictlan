@@ -283,20 +283,51 @@ function generarCementerio() {
        div.onclick = (e) => {
     e.stopPropagation();
 
-    // Si tiene saldo, abrir cosecha final (retiro a wallet)
+    // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
         abrirModalCosechaFinal(pos);
         return;
     }
 
-    // Si es Soulgeist, no hace nada (o muestra info)
-    if (pos.especial) return;
+    // 2. SI ES SOULGEIST → INICIAR RITUAL
+    if (pos.especial) {
+        dispararInicioRitualGlobal();
+        return;
+    }
 
-    // SI NO TIENE SALDO Y NO ES ESPECIAL, ABRIMOS EL MODAL DE CANTIDAD
+    // 3. TRANSFERENCIA (RITUAL ACTIVO)
     if (ritualActivo) {
-        abrirModalSeleccionCantidad(pos);
+        if (balanceUsuarioSG <= 0) {
+            lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
+            return;
+        }
+
+        ritualActivo = false;
+        const tumbaOrigen = document.querySelector('.alma-maestra');
+        const tumbaDestino = e.currentTarget;
+
+        // === CÁLCULO CORRECTO ===
+        const ganancia = balanceUsuarioSG * (pos.tasa || 0);
+
+        // Descontamos inmediatamente
+        balanceUsuarioSG = 0;
+        actualizarBalanceSoulgeist(0);
+
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+            // Solo se suma UNA vez aquí
+        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
+
+            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+            if (contenedorBalance) {
+                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+                contenedorBalance.style.opacity = "1";
+            }
+
+            mostrarModalFusionExitosa(pos, ganancia);
+        });
+
     } else {
-        lanzarAlertaMictlan("Toca el Soulgeist para activar el ritual primero.", "RITUAL INACTIVO");
+        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
     }
 };
 
