@@ -326,9 +326,7 @@ function generarCementerio() {
             }
 
             mostrarModalFusionExitosa(pos, ganancia);
-        div.style.pointerEvents = 'auto'; 
-    });
-};
+        });
 
     } else {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
