@@ -151,24 +151,27 @@ async function manejarLoginGoogle(response) {
 }
 
 function entrarAlCampoSanto(perfil) {
-    const modalContrato = document.getElementById('modal-contrato'); 
-    const cementerio = document.getElementById('campo-santo'); 
-    const candelabro = document.querySelector('.candelabro-central'); 
-    
-    if (modalContrato) modalContrato.style.display = 'none'; 
-    if (cementerio) cementerio.style.display = 'block'; 
-    
+    const modalContrato = document.getElementById('modal-contrato');
+    const cementerio = document.getElementById('campo-santo');
+    const candelabro = document.querySelector('.candelabro-central');
+   
+    if (modalContrato) modalContrato.style.display = 'none';
+    if (cementerio) cementerio.style.display = 'block';
+   
     if (candelabro) {
-        candelabro.style.display = 'block'; 
-        setTimeout(() => { candelabro.style.opacity = '1'; }, 50); 
+        candelabro.style.display = 'block';
+        setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    balanceUsuarioSG = perfil.balanceSG || 0; 
-    generarCementerio(); 
-}
+    // === CARGA CORRECTA DEL BALANCE ===
+    balanceUsuarioSG = perfil.balanceSG || 
+                      parseFloat(localStorage.getItem('soulgeist_balance')) || 
+                      0;
 
-if (typeof window.tumbasConSaldo === 'undefined') {
-    window.tumbasConSaldo = {}; 
+    // Guardamos en localStorage para que persista al recargar
+    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
+    generarCementerio();
 }
 
 // ==================================================================
@@ -276,52 +279,56 @@ function generarCementerio() {
         }
 
         // ==================== COMPORTAMIENTO AL HACER CLICK ====================
-        div.onclick = (e) => {
-            e.stopPropagation();
+       div.onclick = (e) => {
+    e.stopPropagation();
 
-            // 1. SI LA TUMBA TIENE SALDO -> ABRIR MODAL DE RETIRO
-            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
-                abrirModalCosechaFinal(pos);
-                return;
+    // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
+    if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
+        abrirModalCosechaFinal(pos);
+        return;
+    }
+
+    // 2. SI ES SOULGEIST → INICIAR RITUAL
+    if (pos.especial) {
+        dispararInicioRitualGlobal();
+        return;
+    }
+
+    // 3. TRANSFERENCIA (RITUAL ACTIVO)
+    if (ritualActivo) {
+        if (balanceUsuarioSG <= 0) {
+            lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
+            return;
+        }
+
+        ritualActivo = false;
+        const tumbaOrigen = document.querySelector('.alma-maestra');
+        const tumbaDestino = e.currentTarget;
+
+        // === CÁLCULO CORRECTO ===
+        const ganancia = balanceUsuarioSG * (pos.tasa || 0);
+
+        // Descontamos inmediatamente
+        balanceUsuarioSG = 0;
+        actualizarBalanceSoulgeist(0);
+
+        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+            // Solo se suma UNA vez aquí
+            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+
+            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+            if (contenedorBalance) {
+                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+                contenedorBalance.style.opacity = "1";
             }
 
-            // 2. SI ES EL SOULGEIST (ESPECIAL) -> INICIAR RITUAL
-            if (pos.especial) {
-                dispararInicioRitualGlobal();
-                return;
-            }
+            mostrarModalFusionExitosa(pos, ganancia);
+        });
 
-            // 3. SI EL RITUAL ESTÁ ACTIVO -> INICIAR VIAJE (TRANSFERENCIA)
-            if (ritualActivo) {
-                if (balanceUsuarioSG <= 0) {
-                    lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
-                    return;
-                }
-
-                ritualActivo = false;
-                const tumbaOrigen = document.querySelector('.alma-maestra');
-                const tumbaDestino = e.currentTarget;
-                const ganancia = balanceUsuarioSG * (pos.tasa || 0);
-
-                // Descuento inmediato
-                balanceUsuarioSG = 0;
-                actualizarBalanceSoulgeist(0);
-                
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-                    // Solo aquí se suma al saldo acumulado de esa tumba
-                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-                    
-                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                    if (contenedorBalance) {
-                        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                        contenedorBalance.style.opacity = "1";
-                    }
-                    mostrarModalFusionExitosa(pos, ganancia);
-                });
-            } else {
-                lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
-            }
-        };
+    } else {
+        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
+    }
+};
 
         contenedor.appendChild(div);
     });
@@ -457,41 +464,48 @@ function procesarRetiro() {
 async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
     try {
         const respuesta = await fetch('/api/reclamar', {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ 
-                wallet: walletUsuario, 
-                cripto: criptoSeleccionada, 
-                pasarela: pasarela 
-            }) 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                wallet: walletUsuario,
+                cripto: criptoSeleccionada,
+                pasarela: pasarela
+            })
         });
 
-        const resultado = await respuesta.json(); 
+        const resultado = await respuesta.json();
 
         if (respuesta.status === 403 || respuesta.status === 429) {
-            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO / SEGURIDAD"); 
-            return; 
+            lanzarAlertaMictlan(resultado.error || "Demasiados intentos", "CANDADO DEL TIEMPO");
+            return;
         }
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL"); 
-            return; 
+            lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL");
+            return;
         }
 
+        // Actualizamos balance si viene del backend
         if (resultado.balanceAlmas !== undefined) {
-            balanceUsuarioSG = resultado.balanceAlmas; 
-            const selectorBalance = document.querySelector('.alma-maestra .balance-actual'); 
+            balanceUsuarioSG = resultado.balanceAlmas;
+
+            // Persistencia
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
+            // Actualizar en pantalla
+            const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
             if (selectorBalance) {
-                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`; 
+                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
             }
-            generarCementerio(); 
+
+            generarCementerio();
         }
 
-        lanzarAlertaMictlan(resultado.mensaje, "RITUAL COMPLETADO"); 
+        lanzarAlertaMictlan(resultado.mensaje || "Ritual completado con éxito", "RITUAL COMPLETADO");
 
     } catch (error) {
-        console.error("Error en el portal:", error); 
-        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN"); 
+        console.error("Error en el portal:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
     }
 }
 
@@ -507,37 +521,42 @@ function cerrarRitual() {
 // ==================================================================
 async function videoCompletado() {
     if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO"); 
-        return; 
+        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO");
+        return;
     }
 
     try {
         const respuesta = await fetch('/api/acumular-sg', {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ wallet: window.userWallet }) 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
         });
 
-        const resultado = await respuesta.json(); 
+        const resultado = await respuesta.json();
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO"); 
-            return; 
+            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+            return;
         }
 
-        balanceUsuarioSG = resultado.nuevoBalance; 
-        
-        const selectorBalance = document.querySelector('.alma-maestra .balance-actual'); 
+        // Actualizamos el balance
+        balanceUsuarioSG = resultado.nuevoBalance || balanceUsuarioSG;
+
+        // === GUARDAR PERSISTENCIA ===
+        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
+        // Actualizar en pantalla
+        const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
         if (selectorBalance) {
-            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`; 
+            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
         }
-        
-        generarCementerio(); 
-        lanzarAlertaMictlan(resultado.mensaje, "ENERGÍA ABSORBIDA"); 
+
+        generarCementerio();
+        lanzarAlertaMictlan(resultado.mensaje || "Energía absorbida correctamente", "ENERGÍA ABSORBIDA");
 
     } catch (error) {
-        console.error("Error en la transmisión de almas:", error); 
-        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED"); 
+        console.error("Error en la transmisión de almas:", error);
+        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
     }
 }
 
