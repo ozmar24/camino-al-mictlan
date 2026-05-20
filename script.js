@@ -281,6 +281,9 @@ function generarCementerio() {
         // ==================== COMPORTAMIENTO AL HACER CLICK ====================
        div.onclick = (e) => {
     e.stopPropagation();
+// BLOQUEO INMEDIATO: Si ya está procesando, no hacer nada
+    if (div.style.pointerEvents === 'none') return;
+    div.style.pointerEvents = 'none'; // Desactiva clics extra
 
     // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
@@ -323,7 +326,9 @@ function generarCementerio() {
             }
 
             mostrarModalFusionExitosa(pos, ganancia);
-        });
+        div.style.pointerEvents = 'auto'; 
+    });
+};
 
     } else {
         lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
