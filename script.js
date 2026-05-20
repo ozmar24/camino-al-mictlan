@@ -283,51 +283,20 @@ function generarCementerio() {
        div.onclick = (e) => {
     e.stopPropagation();
 
-    // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
+    // Si tiene saldo, abrir cosecha final (retiro a wallet)
     if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
         abrirModalCosechaFinal(pos);
         return;
     }
 
-    // 2. SI ES SOULGEIST → INICIAR RITUAL
-    if (pos.especial) {
-        dispararInicioRitualGlobal();
-        return;
-    }
+    // Si es Soulgeist, no hace nada (o muestra info)
+    if (pos.especial) return;
 
-    // 3. TRANSFERENCIA (RITUAL ACTIVO)
+    // SI NO TIENE SALDO Y NO ES ESPECIAL, ABRIMOS EL MODAL DE CANTIDAD
     if (ritualActivo) {
-        if (balanceUsuarioSG <= 0) {
-            lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
-            return;
-        }
-
-        ritualActivo = false;
-        const tumbaOrigen = document.querySelector('.alma-maestra');
-        const tumbaDestino = e.currentTarget;
-
-        // === CÁLCULO CORRECTO ===
-        const ganancia = balanceUsuarioSG * (pos.tasa || 0);
-
-        // Descontamos inmediatamente
-        balanceUsuarioSG = 0;
-        actualizarBalanceSoulgeist(0);
-
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-            // Solo se suma UNA vez aquí
-        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
-
-            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            if (contenedorBalance) {
-                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                contenedorBalance.style.opacity = "1";
-            }
-
-            mostrarModalFusionExitosa(pos, ganancia);
-        });
-
+        abrirModalSeleccionCantidad(pos);
     } else {
-        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
+        lanzarAlertaMictlan("Toca el Soulgeist para activar el ritual primero.", "RITUAL INACTIVO");
     }
 };
 
@@ -808,4 +777,61 @@ function mostrarModalFusionExitosa(pos, cantidad) {
     setTimeout(() => {
         cerrarRitual();
     }, 1800);
+}
+// --- MODAL DE SELECCIÓN DE CANTIDAD ---
+function abrirModalSeleccionCantidad(pos) {
+    const modal = document.getElementById('modal-ritual'); // Reutilizamos el contenedor
+    if (!modal) return;
+
+    document.getElementById('titulo-ritual').innerText = `SACRIFICIO A ${pos.nombre.toUpperCase()}`;
+    
+    document.getElementById('info-ritual').innerHTML = `
+        <div style="text-align: center; color: #fff;">
+            <p>Soulgeist disponible: <b>${balanceUsuarioSG.toFixed(2)} SG</b></p>
+            <input type="number" id="cantidad-a-enviar" placeholder="Cantidad SG" 
+                   style="width:80%; padding:10px; background:#000; color:#fff; border:1px solid ${pos.color}; margin:10px 0;">
+        </div>
+    `;
+
+    // Reconfiguramos los botones del modal
+    const botones = document.querySelector('.botones-exchange');
+    botones.innerHTML = `
+        <button id="btn-confirmar-envio" style="background:${pos.color};">INICIAR RITUAL</button>
+        <button onclick="cerrarRitual()">CANCELAR</button>
+    `;
+
+    document.getElementById('btn-confirmar-envio').onclick = () => {
+        const cantidad = parseFloat(document.getElementById('cantidad-a-enviar').value);
+        if (isNaN(cantidad) || cantidad <= 0 || cantidad > balanceUsuarioSG) {
+            lanzarAlertaMictlan("Cantidad no válida o insuficiente.", "SACRIFICIO INVÁLIDO");
+            return;
+        }
+        
+        // Ejecutamos la transferencia con la cantidad elegida
+        iniciarTransferenciaElegida(pos, cantidad);
+    };
+    
+    modal.style.display = 'block';
+}
+function iniciarTransferenciaElegida(pos, cantidad) {
+    const tumbaOrigen = document.querySelector('.alma-maestra');
+    const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
+    
+    // Descontamos del balance REAL
+    balanceUsuarioSG -= cantidad;
+    actualizarBalanceSoulgeist(balanceUsuarioSG);
+    
+    // Calculamos ganancia según tasa
+    const ganancia = cantidad * (pos.tasa || 0);
+
+    cerrarRitual(); // Cerramos el modal de cantidad
+
+    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+        
+        // Actualizamos visualmente la tumba
+        const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+        contenedorBalance.style.opacity = "1";
+    });
 }
