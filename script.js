@@ -453,9 +453,13 @@ function procesarRetiro() {
     // 1. La wallet de destino (donde envías el dinero)
     const walletDestino = inputWallet.value.trim();
 
-    // 2. RECUPERAR LA IDENTIDAD REAL (El email con el que el usuario inició sesión)
-    // Asegúrate de que esta clave coincida con la que guardaste en tu login
-    const identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
+    // 2. RECUPERAR LA IDENTIDAD REAL (El email)
+    let identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
+
+    // === EL FILTRO MÁGICO: Forzamos minúsculas y quitamos espacios ===
+    if (identidadUsuario) {
+        identidadUsuario = identidadUsuario.toLowerCase().trim();
+    }
 
     if (walletDestino.length < 5) {
         lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
@@ -478,7 +482,7 @@ function procesarRetiro() {
     
     cerrarRitual();
     
-    // === IMPORTANTE: Ahora enviamos la identidad para Redis y la wallet para el pago ===
+    // === IMPORTANTE: Ahora enviamos la identidad en minúsculas para Redis y la wallet para el pago ===
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
 }
 

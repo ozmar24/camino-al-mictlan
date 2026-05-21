@@ -69,7 +69,7 @@ if (!identidad) {
 
     const walletKey = `user:wallet:${wallet}:${cripto}`;
     const ipKey = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`; 
-    const balanceKey = `user:balance:${identidad}`;
+    const balanceKey = `user:balance:${identidad.toLowerCase().trim()}`;
 
     try {
         // 5. PRIMER PASO: Consultar AMBAS llaves en Upstash en paralelo
