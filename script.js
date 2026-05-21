@@ -78,27 +78,18 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
-    // === CAPTURA RADICAL POR ORDEN FÍSICO ===
-    // Buscamos todos los inputs que están dentro del contenedor de autenticación
-    // (Ajusta '.auth-container' o '.login-box' si tu caja tiene una clase específica, 
-    // pero por ahora buscamos globalmente en el orden visual del formulario)
-    const todosLosInputs = Array.from(document.querySelectorAll('input'));
-    
-    let email = "";
-    let password = "";
+    // 1. Capturamos los elementos usando selectores nativos directos
+    const emailInput = document.getElementById('email') || document.querySelector('input[type="email"]');
+    const passwordInput = document.getElementById('password') || document.querySelector('input[type="password"]');
     const btnAuth = document.getElementById('btn-auth');
 
-    // Filtramos los inputs visibles o los que comúnmente usas en tu formulario
-    // El primer input de texto/email suele ser el correo, y el de tipo password la contraseña
-    const inputTexto = todosLosInputs.find(i => i.type === 'email' || i.type === 'text');
-    const inputPass = todosLosInputs.find(i => i.type === 'password');
+    if (!emailInput || !passwordInput) {
+        lanzarAlertaMictlan("No se encontraron los campos del portal.", "ERROR CRÍTICO");
+        return;
+    }
 
-    if (inputTexto) email = inputTexto.value.trim();
-    if (inputPass) password = inputPass.value.trim();
-
-    // RESPALDO: Si lo anterior fallara, intentamos por los IDs clásicos que tenías
-    if (!email) email = (document.getElementById('email') || {}).value?.trim() || "";
-    if (!password) password = (document.getElementById('password') || {}).value?.trim() || "";
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
    
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos del pacto.", "CAMPOS INCOMPLETOS");
@@ -106,32 +97,30 @@ async function manejarAuth() {
     }
 
     const accionMistica = esModoRegistro ? 'registro' : 'login';
-
     const textoOriginal = btnAuth.innerText;
+    
     btnAuth.innerText = "PROCESANDO PACTO...";
     btnAuth.disabled = true;
 
     try {
-        console.log(`→ Intentando ${accionMistica} con: ${email}`);
+        console.log(`→ Intentando ${accionMistica} al estilo Onyx con: ${email}`);
 
+        // Enviamos la petición estructurada de manera idéntica a Void Onyx
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                accion: accionMistica,
                 email: email,
                 password: password,
-                wallet: accionMistica === 'registro' ? "wallet-temp-" + Date.now() : undefined
+                accion: accionMistica
             })
         });
-
-        console.log("Status del pacto:", respuesta.status);
 
         const resultado = await respuesta.json();
         console.log("Respuesta backend:", resultado);
 
-        if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Error desconocido del inframundo.", "RITUAL RECHAZADO");
+        if (!respuesta.ok || resultado.success === false) {
+            lanzarAlertaMictlan(resultado.error || resultado.message || "Error desconocido.", "RITUAL RECHAZADO");
             return;
         }
 
@@ -139,9 +128,8 @@ async function manejarAuth() {
             lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
             cambiarModoAuth(); 
         } else {
+            // Guardamos las llaves de sesión exactamente como lo hacías en Soulgeist originalmente
             window.userWallet = resultado.usuario.email;
-            
-            // Forzamos la persistencia mística de la identidad para que no falle el retiro
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
             localStorage.setItem('email', resultado.usuario.email);
@@ -152,7 +140,7 @@ async function manejarAuth() {
 
     } catch (error) {
         console.error("Error en manejarAuth:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     } finally {
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;

@@ -10,81 +10,72 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, error: 'Método no permitido.' });
+        return res.status(405).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
     }
 
-    // 1. Extraemos los datos de forma segura (añadimos 'correo' por si el frontend lo manda en español)
-    const { accion, email, correo, password, wallet } = req.body || {};
-    const emailRecibido = email || correo;
+    // Extraemos las credenciales tal y como viajan desde el cuerpo limpio
+    const { email, password, accion } = req.body || {};
 
-    // 2. CORRECCIÓN CLAVE: Validamos primero si existen antes de aplicar funciones de texto
-    if (!emailRecibido || !password || !accion) {
-        return res.status(400).json({ success: false, error: 'Faltan datos esenciales (Email, Contraseña o Acción).' });
+    if (!email || !password || !accion) {
+        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES ESENCIALES.' });
     }
 
-    // 3. Ahora que estamos 100% seguros de que hay texto, normalizamos sin riesgo de romper el servidor
-    const emailNormalizado = emailRecibido.toLowerCase().trim();
+    // Usamos el limpiador de textos idéntico al de Void Onyx para evitar fallas de símbolos o minúsculas
+    const emailNormalizado = email.toLowerCase().trim();
 
     try {
-        console.log(`[pacto] Acción: ${accion} | Email: ${emailNormalizado}`);
-
+        // --- LÓGICA DE REGISTRO MANUAL ---
         if (accion === 'registro') {
-            if (!wallet) {
-                return res.status(400).json({ success: false, error: 'Se requiere wallet para registro.' });
-            }
-
+            // Buscamos si ya existe el rastro usando la estructura de datos original
             const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
+            
             if (existe) {
-                return res.status(400).json({ success: false, error: 'Este email ya está registrado.' });
+                return res.status(200).json({ success: false, error: 'ESTA IDENTIDAD YA EXISTE.' });
             }
 
+            // Sellar el nuevo registro
             await redis.hset(`usuario:${emailNormalizado}`, {
                 email: emailNormalizado,
                 password: password,
-                wallet: wallet.trim(),
+                wallet: "wallet-temp-" + Date.now(),
                 balance_soulgeist: "0",
                 creado_en: new Date().toISOString()
             });
 
-            console.log(`[pacto] Registro exitoso: ${emailNormalizado}`);
-
-            return res.status(201).json({
+            return res.status(200).json({
                 success: true,
-                message: 'Pacto sellado con éxito.',
-                usuario: { email: emailNormalizado, wallet: wallet.trim(), balance: 0 }
+                message: 'Pacto sellado con éxito.'
             });
         } 
 
-        // LOGIN
+        // --- LÓGICA DE LOGIN ---
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
 
             if (!usuario || Object.keys(usuario).length === 0) {
-                return res.status(404).json({ success: false, error: 'Usuario no encontrado.' });
+                return res.status(200).json({ success: false, error: 'IDENTIDAD NO ENCONTRADA.' });
             }
 
             if (usuario.password !== password) {
-                return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
+                return res.status(200).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
             }
 
             return res.status(200).json({
                 success: true,
-                message: 'Acceso concedido.',
                 usuario: {
                     email: usuario.email,
-                    wallet: usuario.wallet,
                     balance: parseFloat(usuario.balance_soulgeist || 0)
                 }
             });
         }
 
-        return res.status(400).json({ success: false, error: 'Acción inválida.' });
+        return res.status(200).json({ success: false, error: 'ACCCIÓN NO VÁLIDA.' });
 
     } catch (error) {
         console.error('ERROR CRÍTICO en pacto.js:', error);
         return res.status(500).json({ 
             success: false, 
-            error: 'Error interno del servidor.' 
+            error: 'Error interno en el abismo del servidor.' 
         });
     }
 }
