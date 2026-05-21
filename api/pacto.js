@@ -16,15 +16,17 @@ export default async function handler(req, res) {
     const { accion, email, password, wallet } = req.body || {};
 
     if (!email || !password || !accion) {
-        return res.status(400).json({ success: false, error: 'Faltan datos esenciales (email, password o acción).' });
+        return res.status(400).json({ success: false, error: 'Faltan datos esenciales.' });
     }
 
     const emailNormalizado = email.toLowerCase().trim();
 
     try {
+        console.log(`[pacto] Acción: ${accion} | Email: ${emailNormalizado}`);
+
         if (accion === 'registro') {
             if (!wallet) {
-                return res.status(400).json({ success: false, error: 'Se requiere una wallet para el registro.' });
+                return res.status(400).json({ success: false, error: 'Se requiere wallet para registro.' });
             }
 
             const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
@@ -32,23 +34,24 @@ export default async function handler(req, res) {
                 return res.status(400).json({ success: false, error: 'Este email ya está registrado.' });
             }
 
-            const nuevoUsuario = {
+            await redis.hset(`usuario:${emailNormalizado}`, {
                 email: emailNormalizado,
                 password: password,
                 wallet: wallet.trim(),
                 balance_soulgeist: "0",
                 creado_en: new Date().toISOString()
-            };
+            });
 
-            await redis.hmset(`usuario:${emailNormalizado}`, nuevoUsuario);
+            console.log(`[pacto] Registro exitoso: ${emailNormalizado}`);
 
             return res.status(201).json({
                 success: true,
                 message: 'Pacto sellado con éxito.',
-                usuario: { email: emailNormalizado, wallet: nuevoUsuario.wallet, balance: 0 }
+                usuario: { email: emailNormalizado, wallet: wallet.trim(), balance: 0 }
             });
         } 
 
+        // LOGIN
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
 
@@ -74,10 +77,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Acción inválida.' });
 
     } catch (error) {
-        console.error('Error en pacto.js:', error);
+        console.error('ERROR CRÍTICO en pacto.js:', error);
         return res.status(500).json({ 
             success: false, 
-            error: 'Error interno del servidor. Revisa los logs de Vercel.' 
+            error: 'Error interno del servidor.' 
         });
     }
 }

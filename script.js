@@ -96,21 +96,18 @@ async function manejarAuth() {
     try {
         console.log(`→ Intentando ${accionMistica} con: ${email}`);
 
-        const respuesta = await fetch('/api/pacto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                accion: accionMistica,
-                email: email,
-                password: password,
-                // Solo enviamos wallet si es registro
-                wallet: accionMistica === 'registro' ? "wallet-temp-" + Date.now() : undefined
-            })
-        });
+                const respuesta = await fetch('/api/pacto', { ... });
 
         console.log("Status del pacto:", respuesta.status);
 
-        const resultado = await respuesta.json();
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (e) {
+            console.error("Respuesta no es JSON:", await respuesta.text());
+            throw new Error("El servidor no respondió correctamente");
+        }
+
         console.log("Respuesta backend:", resultado);
 
         if (!respuesta.ok) {
