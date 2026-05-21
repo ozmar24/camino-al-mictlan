@@ -450,12 +450,11 @@ function procesarRetiro() {
     
     if (!inputWallet) return;
 
-    // 1. La dirección o correo destino de FaucetPay
+    // 1. La billetera o correo destino de FaucetPay/Bitso
     const walletDestino = inputWallet.value.trim();
 
-    // 2. Recuperar el correo de login
+    // 2. Recuperar el correo de login en minúsculas
     let identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
-
     if (identidadUsuario) {
         identidadUsuario = identidadUsuario.toLowerCase().trim();
     }
@@ -470,52 +469,41 @@ function procesarRetiro() {
         return;
     }
 
-    // === DETECTAR LA MONEDA ACTIVA DESDE EL MODAL ABIERTO ===
-    // Buscamos el título del modal o la tumba que esté activa visualmente para saber el nombre real
-    let nombreCripto = "";
-    
-    // Si tu modal de retiro tiene una estructura visible, o usamos la tumba que el usuario clickeó:
-    if (window.currentCripto && window.currentCripto.nombre) {
-        nombreCripto = window.currentCripto.nombre; 
-    } else {
-        // Respaldo de emergencia por texto si el objeto global falló
-        const tituloModal = document.querySelector('#modal-retiro h2, .modal h3');
-        if (tituloModal) {
-            if (tituloModal.innerText.toLowerCase().includes('bitcoin')) nombreCripto = "Bitcoin";
-            if (tituloModal.innerText.toLowerCase().includes('litecoin')) nombreCripto = "Litecoin";
-        }
-    }
+    // 3. Obtener el nombre de la cripto y mapearlo a su abreviación real (Mayúsculas)
+    let nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";    
+    let llaveSaldo = nombreCripto; // Por defecto
 
-    // Si de plano sigue vacío, le asignamos Bitcoin por defecto si estás seguro de que es la que usas
-    if (!nombreCripto) {
-        nombreCripto = "Bitcoin"; 
+    // TRADUCTOR DE MONEDAS: Convierte nombres largos a las llaves de tus criptas
+    const nombreLimpio = nombreCripto.toLowerCase().trim();
+    if (nombreLimpio.includes('bitcoin') || nombreLimpio === 'btc') {
+        llaveSaldo = "BTC";
+        nombreCripto = "Bitcoin";
+    } else if (nombreLimpio.includes('litecoin') || nombreLimpio === 'ltc') {
+        llaveSaldo = "LTC";
+        nombreCripto = "Litecoin";
+    } else if (nombreLimpio.includes('doge')) {
+        llaveSaldo = "DOGE";
+        nombreCripto = "Dogecoin";
     }
 
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
     
-    // === EXTRAER EL SALDO DIRECTAMENTE DESDE LA PANTALLA ===
-    let saldoAcumulado = 0;
-    // Buscamos la tumba que coincide con la cripto seleccionada
-    const tumbaActiva = document.querySelector(`[data-nombre="${nombreCripto}"]`) || document.querySelector(`[data-nombre="Bitcoin"]`);
+    // 4. Buscar el saldo real acumulado usando la abreviación correcta (BTC o LTC)
+    const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[llaveSaldo] ? parseFloat(window.tumbasConSaldo[llaveSaldo]) : 0;
     
-    if (tumbaActiva) {
-        const elementoBalance = tumbaActiva.querySelector('.balance-proyectado');
-        if (elementoBalance) {
-            saldoAcumulado = parseFloat(elementoBalance.innerText) || 0;
-        }
+    // 5. Calcular la equivalencia en Poder SG
+    const tasaCripto = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
+    const saldoEnSG = tasaCripto > 0 ? (saldoAcumulado / tasaCripto) : 0;
+    
+    // === VALIDACIÓN DE EMERGENCIA EN FRONTEND ===
+    if (saldoAcumulado <= 0) {
+        lanzarAlertaMictlan(`No tienes balance acumulado en la cripta de ${nombreCripto} (Buscado como: ${llaveSaldo}).`, "CRIPTAS VACÍAS");
+        return;
     }
 
-    // Si el HTML falló, revisamos tus variables guardadas
-    if (saldoAcumulado === 0) {
-        saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
-    }
-    
-    // Forzamos que 'saldoEnSG' tome el valor numérico para saltar el validador del backend
-    const saldoEnSG = saldoAcumulado > 0 ? saldoAcumulado : 0;
-    
     cerrarRitual();
     
-    // Enviamos los datos correctos forzando la moneda correspondiente
+    // Enviamos los datos correctos sincronizados
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
 }
 
