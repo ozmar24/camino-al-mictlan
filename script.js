@@ -457,7 +457,9 @@ function procesarRetiro() {
         return;
     }
 
-    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
+    // Obtener identidad del usuario (la clave correcta)
+    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
+                          window.userWallet;
 
     if (!identidadUsuario) {
         lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
@@ -470,50 +472,71 @@ function procesarRetiro() {
 
     cerrarRitual();
 
-    // Llamada correcta con todos los datos
+    // Llamada al backend con todos los datos necesarios
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
-async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
+async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
     try {
+        const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
+        const tasa = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
+        const saldoEnSG = saldoCripto * tasa;   // ← Esto es lo más importante
+
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                identidad: identidad,
+                identidad: localStorage.getItem('soulgeist_user_email') || window.userWallet,
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela
+                pasarela: pasarela,
+                cantidadRetiro: saldoCripto,     // cantidad en la cripto (BTC, USDT, etc)
+                cantidadSG: saldoEnSG,           // cantidad equivalente en Soulgeist
+                saldoEnSG: saldoEnSG
             })
         });
 
+        console.log("Status reclamar:", respuesta.status); // Para debug
+
         const resultado = await respuesta.json();
 
+        if (respuesta.status === 400) {
+            lanzarAlertaMictlan(resultado.error || "Saldo insuficiente", "ADVERTENCIA MORTAL");
+            return;
+        }
+
         if (respuesta.status === 403 || respuesta.status === 429) {
-            lanzarAlertaMictlan(resultado.error || "Demasiados intentos", "CANDADO DEL TIEMPO");
+            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO");
             return;
         }
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "El ritual falló.", "ADVERTENCIA MORTAL");
+            lanzarAlertaMictlan(resultado.error || "El ritual falló.", "ERROR");
             return;
         }
 
+        // Éxito
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-            const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
-            if (selectorBalance) selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
-            
+            const selector = document.querySelector('.alma-maestra .balance-actual');
+            if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
+
+            // Limpiar la tumba
+            if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
+                window.tumbasConSaldo[criptoSeleccionada] = 0;
+                localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+            }
+
             generarCementerio();
         }
 
-        lanzarAlertaMictlan(resultado.mensaje || "Ritual completado", "ÉXITO");
+        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "RITUAL COMPLETADO");
 
     } catch (error) {
-        console.error("Error en el portal:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
+        console.error("Error en procesarCosecha:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
 
