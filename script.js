@@ -94,44 +94,44 @@ async function manejarAuth() {
         btnAuth.innerText = "PROCESANDO PACTO...";
         btnAuth.disabled = true;
 
+        console.log(`Intentando ${accionMistica} con email: ${email}`);
+
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 accion: accionMistica,
                 email: email,
-                password: password
+                password: password,
+                wallet: accionMistica === 'registro' ? "wallet-prueba-" + Date.now() : undefined  // Temporal para pruebas
             })
         });
 
+        console.log("Status del pacto:", respuesta.status);
+
         const resultado = await respuesta.json();
-        
+        console.log("Respuesta del backend:", resultado);
+
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Las deidades rechazaron tu ofrenda.", "RITUAL RECHAZADO");
+            lanzarAlertaMictlan(resultado.error || "Error desconocido", "RITUAL RECHAZADO");
             return;
         }
 
         if (accionMistica === 'registro') {
-            lanzarAlertaMictlan(resultado.message || "Alma registrada con éxito.", "ALMA REGISTRADA");
-            cambiarModoAuth(); // Cambia a modo login
-        } 
-        else if (accionMistica === 'login') {
-            // Guardamos correctamente la identidad
+            lanzarAlertaMictlan("Pacto sellado con éxito.", "ALMA REGISTRADA");
+            cambiarModoAuth();
+        } else {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             
-            lanzarAlertaMictlan("Bienvenido de vuelta al Mictlán.", "ACCESO CONCEDIDO");
-            
-            entrarAlCampoSanto({ 
-                balanceSG: resultado.usuario.balance || 0 
-            });
+            entrarAlCampoSanto({ balanceSG: resultado.usuario.balance || 0 });
         }
 
     } catch (error) {
-        console.error("Fallo en manejarAuth:", error);
+        console.error("Error completo en manejarAuth:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
