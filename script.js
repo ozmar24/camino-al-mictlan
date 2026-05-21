@@ -468,14 +468,20 @@ function procesarRetiro() {
         return;
     }
 
+    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";    
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
-    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";
-
+    
+    // Guardamos el saldo acumulado en una variable
+    const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
+    
     cerrarRitual();
-    procesarCosecha(wallet, nombreCripto, pasarelaElegida);
+    
+    // === SE LO PASAMOS COMO CUARTO PARÁMETRO ===
+    procesarCosecha(wallet, nombreCripto, pasarelaElegida, saldoAcumulado);
 }
 
-async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
+// === AGREGAMOS 'saldoCripto' AQUÍ ABAJO EN LOS PARÁMETROS ===
+async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, saldoCripto) {
     try {
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
@@ -483,7 +489,8 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
             body: JSON.stringify({
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela
+                pasarela: pasarela,
+                cantidadRetiro: saldoCripto // <--- Ahora sí sabe qué valor tiene esta variable
             })
         });
 
