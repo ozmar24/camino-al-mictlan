@@ -7,7 +7,8 @@ let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
 if (typeof window.tumbasConSaldo === 'undefined') {
-    window.tumbasConSaldo = {}; // Guardará ejemplo: { "Solana": true, "Pepe": true }
+    const criptasGuardadas = localStorage.getItem('soulgeist_criptas');
+window.tumbasConSaldo = criptasGuardadas ? JSON.parse(criptasGuardadas) : {}; // Guardará ejemplo: { "Solana": true, "Pepe": true }
 }
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
@@ -258,8 +259,10 @@ function generarCementerio() {
         div.style.setProperty('--color-cripto', pos.color);
         div.setAttribute('data-nombre', pos.nombre);
 
-        const saldoGuardado = window.tumbasConSaldo[pos.nombre] || 0;
-        const textoBalance = saldoGuardado > 0 ? saldoGuardado.toFixed(6) : "0";
+        // LEEMOS EL SALDO REAL DEL MAPA GLOBAL
+        const saldoGuardado = window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] ? window.tumbasConSaldo[pos.nombre] : 0;
+        const visibilidadOpacidad = saldoGuardado > 0 ? "1" : "0";
+        const textoBalance = saldoGuardado.toFixed(6);
 
         if (pos.especial) {
             div.innerHTML = `
@@ -277,7 +280,7 @@ function generarCementerio() {
                         <div class="nombre-cripto" style="color: ${pos.color}; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #000;">
                             ${pos.nombre}
                         </div>
-                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: 0.8;">
+                        <div class="balance-proyectado" style="color: #fff; font-size: 12px; opacity: ${visibilidadOpacidad}; transition: opacity 0.5s ease;">
                             +${textoBalance} ${pos.sim}
                         </div>
                     </div>
@@ -285,87 +288,73 @@ function generarCementerio() {
             `;
         }
 
-        // ==================== COMPORTAMIENTO AL HACER CLICK ====================
-       div.onclick = (e) => {
-    e.stopPropagation();
+        div.onclick = (e) => {
+            e.stopPropagation();
 
-    // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
-    if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
-        abrirModalCosechaFinal(pos);
-        return;
-    }
-
-    // 2. SI ES SOULGEIST → INICIAR RITUAL
-    if (pos.especial) {
-        dispararInicioRitualGlobal();
-        return;
-    }
-
-    // 3. TRANSFERENCIA (RITUAL ACTIVO)
-    if (ritualActivo) {
-        if (balanceUsuarioSG <= 0) {
-            lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
-            return;
-        }
-
-        ritualActivo = false;
-        const tumbaOrigen = document.querySelector('.alma-maestra');
-        const tumbaDestino = e.currentTarget;
-
-        // Recuperamos la cantidad que el usuario eligió en el modal
-        const cantidadEnviada = window.cantidadParaRitual || 0;
-
-        // === CÁLCULO CORRECTO ===
-        const ganancia = cantidadEnviada * (pos.tasa || 0);
-
-        // === DESCUENTO CORRECTO (SOLO RESTAMOS LO QUE ENVIÓ) ===
-        balanceUsuarioSG = balanceUsuarioSG - cantidadEnviada;
-        actualizarBalanceSoulgeist(balanceUsuarioSG);
-
-        // Opcional: si usas localStorage para guardar el saldo, actulízalo aquí
-        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
-        lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-            // Solo se suma UNA vez aquí
-            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
-
-            const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-            if (contenedorBalance) {
-                contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                contenedorBalance.style.opacity = "1";
+            // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
+            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
+                abrirModalCosechaFinal(pos);
+                return;
             }
 
-            mostrarModalFusionExitosa(pos, ganancia);
-        });
+            // 2. SI ES SOULGEIST → INICIAR RITUAL
+            if (pos.especial) {
+                dispararInicioRitualGlobal();
+                return;
+            }
 
-    } else {
-        lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
-    }
-};
+            // 3. TRANSFERENCIA (RITUAL ACTIVO)
+            if (ritualActivo) {
+                if (balanceUsuarioSG <= 0) {
+                    lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
+                    return;
+                }
+
+                ritualActivo = false;
+                const tumbaOrigen = document.querySelector('.alma-maestra');
+                const tumbaDestino = e.currentTarget;
+                const cantidadEnviada = window.cantidadParaRitual || 0;
+                const ganancia = cantidadEnviada * (pos.tasa || 0);
+
+                balanceUsuarioSG = balanceUsuarioSG - cantidadEnviada;
+                actualizarBalanceSoulgeist(balanceUsuarioSG);
+                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+                    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));   
+
+                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+                    if (contenedorBalance) {
+                        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+                        contenedorBalance.style.opacity = "1";
+                    }
+
+                    mostrarModalFusionExitosa(pos, ganancia);
+                });
+
+            } else {
+                lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
+            }
+        };
 
         contenedor.appendChild(div);
     });
 
-    // Pilares fijos
+    // Pilares fijos (Tu código original de pilares se mantiene aquí abajo)
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
     ];
-
     pilares.forEach(p => {
         const pilarExistente = document.querySelector(`.${p.clase}`);
         if (pilarExistente) pilarExistente.remove();
-
         const enlace = document.createElement('a');
         enlace.href = p.link;
         enlace.className = `inscripcion-pilar ${p.clase}`;
         enlace.innerHTML = `<span>${p.texto}</span><small>${p.sub}</small>`;
-
         if (p.clase === "pilar-derecho") {
-            enlace.onclick = (e) => { 
-                e.preventDefault(); 
-                mostrarContratoMictlan(); 
-            };
+            enlace.onclick = (e) => { e.preventDefault(); mostrarContratoMictlan(); };
         }
         contenedor.appendChild(enlace);
     });
@@ -523,6 +512,14 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
         }
 
         lanzarAlertaMictlan(resultado.mensaje || "Ritual completado con éxito", "RITUAL COMPLETADO");
+// === LIMPIEZA POST-RETIRO ===
+        if (window.tumbasConSaldo && window.tumbasConSaldo[criptoSeleccionada]) {
+            window.tumbasConSaldo[criptoSeleccionada] = 0;
+            // Actualizamos el almacenamiento local
+            localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+            // Refrescamos visualmente el mapa
+            generarCementerio();
+        }
 
     } catch (error) {
         console.error("Error en el portal:", error);
@@ -868,21 +865,22 @@ function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
     
-    // Descontamos del balance REAL
     balanceUsuarioSG -= cantidad;
     actualizarBalanceSoulgeist(balanceUsuarioSG);
+    localStorage.setItem('soulgeist_balance', balanceUsuarioSG); // PERSISTENCIA
     
-    // Calculamos ganancia según tasa
     const ganancia = cantidad * (pos.tasa || 0);
 
-    cerrarRitual(); // Cerramos el modal de cantidad
+    cerrarRitual(); 
 
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo)); // PERSISTENCIA CRÍTICA
         
-        // Actualizamos visualmente la tumba
         const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-        contenedorBalance.style.opacity = "1";
+        if (contenedorBalance) {
+            contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+            contenedorBalance.style.opacity = "1";
+        }
     });
 }
