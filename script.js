@@ -457,49 +457,49 @@ function procesarRetiro() {
         return;
     }
 
-    // === DEBUG: Ver qué identidad estamos enviando ===
-    const identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
-                            window.userWallet || 
-                            "SIN_IDENTIDAD";
+    const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
 
-    console.log("🔍 Identidad enviada al backend:", identidadUsuario);
-
-    if (!identidadUsuario || identidadUsuario === "SIN_IDENTIDAD") {
-        lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
+    if (!identidadUsuario) {
+        lanzarAlertaMictlan("Tu alma no está autenticada.", "ERROR DE IDENTIDAD");
         cerrarRitual();
         return;
     }
 
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
-    let nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
+    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
 
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
+
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
 async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
-        console.log("Enviando reclamo con identidad:", identidad);
+        console.log("🔄 Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
+
+        const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
 
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                identidad: identidad,           // ← Esto es lo más importante
+                identidad: identidad,
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela
+                pasarela: pasarela,
+                cantidadRetiro: saldoCripto,
+                cantidadSG: saldoCripto   // Por si el backend lo usa
             })
         });
 
-        console.log("Status del backend:", respuesta.status);
+        console.log("Status:", respuesta.status);
 
         const resultado = await respuesta.json();
         console.log("Respuesta backend:", resultado);
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Error desconocido", "ADVERTENCIA MORTAL");
+            lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
             return;
         }
 
