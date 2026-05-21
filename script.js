@@ -457,9 +457,7 @@ function procesarRetiro() {
         return;
     }
 
-    // === CORRECCIÓN PRINCIPAL ===
-    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
-                          window.userWallet;
+    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
 
     if (!identidadUsuario) {
         lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
@@ -468,37 +466,24 @@ function procesarRetiro() {
     }
 
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
-
-    // Obtener nombre de cripto
     let nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
 
-    // Llamamos con los datos correctos
-    procesarCosecha(walletDestino, nombreCripto, pasarelaElegida);
+    // Llamada correcta con todos los datos
+    procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
-async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, saldoCripto, saldoEnSG) {
+async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-		identidad: identidadUsuario, // Esto ahora enviará tu correo "mi-correo@gmail.com"
+                identidad: identidad,
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela,
-                
-                // [BLINDAJE 1] Enviamos el valor de la Cripto en todas las variables posibles:
-                cantidadRetiro: saldoCripto, 
-                cantidad: saldoCripto,
-                monto: saldoCripto,
-                amount: saldoCripto,
-                
-                // [BLINDAJE 2] Enviamos el Poder SG original por si el backend calcula en base a SG:
-                cantidadSG: saldoEnSG,
-                poderSG: saldoEnSG,
-                sgAmount: saldoEnSG
+                pasarela: pasarela
             })
         });
 
@@ -510,31 +495,21 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
         }
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "El ritual falló misteriosamente.", "ADVERTENCIA MORTAL");
+            lanzarAlertaMictlan(resultado.error || "El ritual falló.", "ADVERTENCIA MORTAL");
             return;
         }
 
-        // Actualizamos balance si viene del backend
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
             const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
-            if (selectorBalance) {
-                selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
-            }
-
+            if (selectorBalance) selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+            
             generarCementerio();
         }
 
-        lanzarAlertaMictlan(resultado.mensaje || "Ritual completado con éxito", "RITUAL COMPLETADO");
-
-        // === LIMPIEZA POST-RETIRO ===
-        if (window.tumbasConSaldo && window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
-            window.tumbasConSaldo[criptoSeleccionada] = 0;
-            localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-            generarCementerio();
-        }
+        lanzarAlertaMictlan(resultado.mensaje || "Ritual completado", "ÉXITO");
 
     } catch (error) {
         console.error("Error en el portal:", error);
