@@ -478,42 +478,28 @@ function procesarRetiro() {
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
-async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
+async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
-        const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
-        const tasa = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
-        const saldoEnSG = saldoCripto * tasa;   // ← Esto es lo más importante
+        console.log("Enviando reclamo con identidad:", identidad);
 
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                identidad: localStorage.getItem('soulgeist_user_email') || window.userWallet,
+                identidad: identidad,           // ← Esto es lo más importante
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela,
-                cantidadRetiro: saldoCripto,     // cantidad en la cripto (BTC, USDT, etc)
-                cantidadSG: saldoEnSG,           // cantidad equivalente en Soulgeist
-                saldoEnSG: saldoEnSG
+                pasarela: pasarela
             })
         });
 
-        console.log("Status reclamar:", respuesta.status); // Para debug
+        console.log("Status del backend:", respuesta.status);
 
         const resultado = await respuesta.json();
-
-        if (respuesta.status === 400) {
-            lanzarAlertaMictlan(resultado.error || "Saldo insuficiente", "ADVERTENCIA MORTAL");
-            return;
-        }
-
-        if (respuesta.status === 403 || respuesta.status === 429) {
-            lanzarAlertaMictlan(resultado.error, "CANDADO DEL TIEMPO");
-            return;
-        }
+        console.log("Respuesta backend:", resultado);
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "El ritual falló.", "ERROR");
+            lanzarAlertaMictlan(resultado.error || "Error desconocido", "ADVERTENCIA MORTAL");
             return;
         }
 
@@ -525,19 +511,13 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
             const selector = document.querySelector('.alma-maestra .balance-actual');
             if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
 
-            // Limpiar la tumba
-            if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
-                window.tumbasConSaldo[criptoSeleccionada] = 0;
-                localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-            }
-
             generarCementerio();
         }
 
-        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "RITUAL COMPLETADO");
+        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
 
     } catch (error) {
-        console.error("Error en procesarCosecha:", error);
+        console.error("Error completo:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
