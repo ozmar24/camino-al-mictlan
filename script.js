@@ -179,47 +179,53 @@ function entrarAlCampoSanto(perfil) {
 // PASO 1: CLICK EN SOULGEIST -> MODAL INFORMATIVO CON SOLO BOTÓN "CERRAR"
 // ==================================================================
 function dispararInicioRitualGlobal() {
-    // 1. Aplicamos el desenfoque al Campo Santo
-    const campoSanto = document.getElementById('campo-santo');
-    if (campoSanto) {
-        campoSanto.style.filter = "blur(5px) brightness(0.4)";
-    }
-    
     const modal = document.getElementById('modal-ritual');
-    if (modal) {
-        modal.style.setProperty('--color-ritmo', "#00ffff");
-        modal.style.display = 'block';
-    }
+    const info = document.getElementById('info-ritual');
+    const titulo = document.getElementById('titulo-ritual');
 
-    // 2. Seteamos los textos exactos de tu video de Firefox
-    const tituloRitual = document.getElementById('titulo-ritual');
-    const infoRitual = document.getElementById('info-ritual');
+    if (!modal) return;
+
+    // 1. Mostrar el modal
+    modal.style.display = 'block';
+    if (titulo) titulo.innerText = "CANALIZACIÓN DE SOULGEIST";
     
-    if (tituloRitual) tituloRitual.innerText = "RITUAL INICIADO";
-    if (infoRitual) {
-        infoRitual.innerHTML = `
-            <p style="margin-bottom: 15px; color: #ccc; font-family:'MedievalSharp', cursive; text-align:center;">
-                SELECCIONA UNA TUMBA DE DESTINO PARA CANALIZAR TU PODER SG.
-            </p>
+    // 2. Inyectar el selector de cantidad
+    if (info) {
+        info.innerHTML = `
+            <div style="text-align: center; margin: 20px 0;">
+                <p style="color: #aaa;">Poder disponible en Soulgeist:</p>
+                <h2 style="color: #00ffff;">${balanceUsuarioSG.toFixed(2)} SG</h2>
+                <input type="number" id="input-cantidad-ritual" 
+                       placeholder="Cantidad a enviar" 
+                       style="width: 80%; padding: 10px; background: #111; border: 1px solid #00ffff; color: #fff; text-align: center;">
+            </div>
         `;
     }
 
-    // 3. LA CLAVE: Buscamos el botón CANCELAR real de tu HTML
-    // (Ya sea por ID o el botón secundario dentro del contenedor)
-    const btnCancelarReal = document.getElementById('btn-ritual-cancelar') || document.querySelector('#botones-exchange button') || document.querySelector('#modal-ritual button');
-    
-    if (btnCancelarReal) {
-        // Cambiamos su comportamiento temporalmente para el modo Ritual
-        btnCancelarReal.innerText = "ACEPTAR"; // O déjalo como "CANCELAR" si prefieres el texto idéntico
-        
-        btnCancelarReal.onclick = (event) => {
-            event.preventDefault();
-            event.stopPropagation();
+    // 3. Botones (asegurando que no se dupliquen eventos)
+    const botones = document.querySelector('.botones-exchange');
+    if (botones) {
+        botones.innerHTML = `
+            <button id="btn-ritual-aceptar" style="background: #00ffff; color: #000; padding: 10px 20px;">CONFIRMAR</button>
+            <button onclick="cerrarRitual()" style="padding: 10px 20px;">CANCELAR</button>
+        `;
+
+        document.getElementById('btn-ritual-aceptar').onclick = () => {
+            const cantidad = parseFloat(document.getElementById('input-cantidad-ritual').value);
             
-            ritualActivo = true; // <--- ¡AQUÍ SE ACTIVA AL CERRAR!
+            if (isNaN(cantidad) || cantidad <= 0 || cantidad > balanceUsuarioSG) {
+                lanzarAlertaMictlan("Cantidad no válida o insuficiente.", "ERROR");
+                return;
+            }
+
+            // GUARDAMOS LA CANTIDAD EN UNA VARIABLE GLOBAL
+            window.cantidadParaRitual = cantidad;
             
-            cerrarRitual(); // Oculta el modal de aviso
-            console.log("Mictlán Activo: Esperando clic en la tumba de destino...");
+            // Activamos el estado de ritual para que las tumbas respondan
+            ritualActivo = true;
+            
+            lanzarAlertaMictlan("Ahora selecciona una tumba para canalizar.", "RITUAL LISTO");
+            cerrarRitual(); 
         };
     }
 }
@@ -307,7 +313,7 @@ function generarCementerio() {
         const tumbaDestino = e.currentTarget;
 
         // === CÁLCULO CORRECTO ===
-        const ganancia = balanceUsuarioSG * (pos.tasa || 0);
+        const ganancia = (window.cantidadParaRitual || 0) * (pos.tasa || 0);
 
         // Descontamos inmediatamente
         balanceUsuarioSG = 0;
