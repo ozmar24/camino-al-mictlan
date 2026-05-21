@@ -447,66 +447,36 @@ function adaptarPlaceholderPasarela(criptoId) {
 function procesarRetiro() {
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
-    
+   
     if (!inputWallet) return;
 
-    // 1. La billetera o correo destino de FaucetPay/Bitso
     const walletDestino = inputWallet.value.trim();
-
-    // 2. Recuperar el correo de login en minúsculas
-    let identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
-    if (identidadUsuario) {
-        identidadUsuario = identidadUsuario.toLowerCase().trim();
-    }
 
     if (walletDestino.length < 5) {
         lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
         return;
     }
-    
+
+    // === CORRECCIÓN PRINCIPAL ===
+    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
+                          window.userWallet;
+
     if (!identidadUsuario) {
         lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
+        cerrarRitual();
         return;
-    }
-
-    // 3. Obtener el nombre de la cripto y mapearlo a su abreviación real (Mayúsculas)
-    let nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";    
-    let llaveSaldo = nombreCripto; // Por defecto
-
-    // TRADUCTOR DE MONEDAS: Convierte nombres largos a las llaves de tus criptas
-    const nombreLimpio = nombreCripto.toLowerCase().trim();
-    if (nombreLimpio.includes('bitcoin') || nombreLimpio === 'btc') {
-        llaveSaldo = "BTC";
-        nombreCripto = "Bitcoin";
-    } else if (nombreLimpio.includes('litecoin') || nombreLimpio === 'ltc') {
-        llaveSaldo = "LTC";
-        nombreCripto = "Litecoin";
-    } else if (nombreLimpio.includes('doge')) {
-        llaveSaldo = "DOGE";
-        nombreCripto = "Dogecoin";
     }
 
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
-    
-    // 4. Buscar el saldo real acumulado usando la abreviación correcta (BTC o LTC)
-    const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[llaveSaldo] ? parseFloat(window.tumbasConSaldo[llaveSaldo]) : 0;
-    
-    // 5. Calcular la equivalencia en Poder SG
-    const tasaCripto = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
-    const saldoEnSG = tasaCripto > 0 ? (saldoAcumulado / tasaCripto) : 0;
-    
-    // === VALIDACIÓN DE EMERGENCIA EN FRONTEND ===
-    if (saldoAcumulado <= 0) {
-        lanzarAlertaMictlan(`No tienes balance acumulado en la cripta de ${nombreCripto} (Buscado como: ${llaveSaldo}).`, "CRIPTAS VACÍAS");
-        return;
-    }
+
+    // Obtener nombre de cripto
+    let nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
-    
-    // Enviamos los datos correctos sincronizados
-    procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
-}
 
+    // Llamamos con los datos correctos
+    procesarCosecha(walletDestino, nombreCripto, pasarelaElegida);
+}
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
 async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, saldoCripto, saldoEnSG) {
     try {
