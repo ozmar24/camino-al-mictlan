@@ -80,6 +80,7 @@ function cambiarModoAuth() {
 async function manejarAuth() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
+    const btnAuth = document.getElementById('btn-auth');
    
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
@@ -88,13 +89,12 @@ async function manejarAuth() {
 
     const accionMistica = esModoRegistro ? 'registro' : 'login';
 
-    try {
-        const btnAuth = document.getElementById('btn-auth');
-        const textoOriginal = btnAuth.innerText;
-        btnAuth.innerText = "PROCESANDO PACTO...";
-        btnAuth.disabled = true;
+    const textoOriginal = btnAuth.innerText;
+    btnAuth.innerText = "PROCESANDO PACTO...";
+    btnAuth.disabled = true;
 
-        console.log(`Intentando ${accionMistica} con email: ${email}`);
+    try {
+        console.log(`→ Intentando ${accionMistica} con: ${email}`);
 
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
@@ -103,36 +103,39 @@ async function manejarAuth() {
                 accion: accionMistica,
                 email: email,
                 password: password,
-                wallet: accionMistica === 'registro' ? "wallet-prueba-" + Date.now() : undefined  // Temporal para pruebas
+                // Solo enviamos wallet si es registro
+                wallet: accionMistica === 'registro' ? "wallet-temp-" + Date.now() : undefined
             })
         });
 
         console.log("Status del pacto:", respuesta.status);
 
         const resultado = await respuesta.json();
-        console.log("Respuesta del backend:", resultado);
-
-        btnAuth.innerText = textoOriginal;
-        btnAuth.disabled = false;
+        console.log("Respuesta backend:", resultado);
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Error desconocido", "RITUAL RECHAZADO");
+            lanzarAlertaMictlan(resultado.error || "Error desconocido del inframundo.", "RITUAL RECHAZADO");
             return;
         }
 
         if (accionMistica === 'registro') {
-            lanzarAlertaMictlan("Pacto sellado con éxito.", "ALMA REGISTRADA");
-            cambiarModoAuth();
+            lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
+            cambiarModoAuth(); // Cambia automáticamente a login
         } else {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             
+            lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             entrarAlCampoSanto({ balanceSG: resultado.usuario.balance || 0 });
         }
 
     } catch (error) {
-        console.error("Error completo en manejarAuth:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
+        console.error("Error en manejarAuth:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
+    } finally {
+        // Siempre devolvemos el botón a su estado normal
+        btnAuth.innerText = textoOriginal;
+        btnAuth.disabled = false;
     }
 }
 
