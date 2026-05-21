@@ -78,21 +78,27 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
-    // === BUSCADOR INTELIGENTE DEL INPUT DE CORREO ===
-    let emailInput = document.getElementById('email') || 
-                     document.querySelector('input[type="email"]') || 
-                     document.querySelector('input[name="email"]') ||
-                     document.getElementById('correo-input');
-
-    // === BUSCADOR INTELIGENTE DEL INPUT DE CONTRASEÑA ===
-    let passwordInput = document.getElementById('password') || 
-                        document.querySelector('input[type="password"]') ||
-                        document.getElementById('password-input');
-   
-    // Extraemos los valores si se encontraron los elementos
-    const email = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value.trim() : "";
+    // === CAPTURA RADICAL POR ORDEN FÍSICO ===
+    // Buscamos todos los inputs que están dentro del contenedor de autenticación
+    // (Ajusta '.auth-container' o '.login-box' si tu caja tiene una clase específica, 
+    // pero por ahora buscamos globalmente en el orden visual del formulario)
+    const todosLosInputs = Array.from(document.querySelectorAll('input'));
+    
+    let email = "";
+    let password = "";
     const btnAuth = document.getElementById('btn-auth');
+
+    // Filtramos los inputs visibles o los que comúnmente usas en tu formulario
+    // El primer input de texto/email suele ser el correo, y el de tipo password la contraseña
+    const inputTexto = todosLosInputs.find(i => i.type === 'email' || i.type === 'text');
+    const inputPass = todosLosInputs.find(i => i.type === 'password');
+
+    if (inputTexto) email = inputTexto.value.trim();
+    if (inputPass) password = inputPass.value.trim();
+
+    // RESPALDO: Si lo anterior fallara, intentamos por los IDs clásicos que tenías
+    if (!email) email = (document.getElementById('email') || {}).value?.trim() || "";
+    if (!password) password = (document.getElementById('password') || {}).value?.trim() || "";
    
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos del pacto.", "CAMPOS INCOMPLETOS");
@@ -115,7 +121,6 @@ async function manejarAuth() {
                 accion: accionMistica,
                 email: email,
                 password: password,
-                // Solo enviamos wallet si es registro
                 wallet: accionMistica === 'registro' ? "wallet-temp-" + Date.now() : undefined
             })
         });
@@ -132,11 +137,11 @@ async function manejarAuth() {
 
         if (accionMistica === 'registro') {
             lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
-            cambiarModoAuth(); // Cambia automáticamente a login
+            cambiarModoAuth(); 
         } else {
             window.userWallet = resultado.usuario.email;
             
-            // Sincronizamos las llaves del localStorage para los retiros futuros
+            // Forzamos la persistencia mística de la identidad para que no falle el retiro
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
             localStorage.setItem('email', resultado.usuario.email);
@@ -149,7 +154,6 @@ async function manejarAuth() {
         console.error("Error en manejarAuth:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN");
     } finally {
-        // Siempre devolvemos el botón a su estado normal
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;
     }
