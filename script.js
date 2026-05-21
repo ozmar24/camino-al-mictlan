@@ -64,7 +64,7 @@ function cambiarModoAuth() {
     const toggleText = document.getElementById('toggle-auth-text'); 
 
     if (esModoRegistro) {
-        tagline.innerText = "REGISTRO DE ESPÍRITUS"; 
+        tagline.innerText = "REGISTRO DE ALMAS"; 
         btnAuth.innerText = "SELLAR NUEVA IDENTIDAD"; 
         toggleText.innerText = "¿Ya tienes un rastro registrado? Accede aquí"; 
     } else {
@@ -78,12 +78,24 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+    // === BUSCADOR INTELIGENTE DEL INPUT DE CORREO ===
+    let emailInput = document.getElementById('email') || 
+                     document.querySelector('input[type="email"]') || 
+                     document.querySelector('input[name="email"]') ||
+                     document.getElementById('correo-input');
+
+    // === BUSCADOR INTELIGENTE DEL INPUT DE CONTRASEÑA ===
+    let passwordInput = document.getElementById('password') || 
+                        document.querySelector('input[type="password"]') ||
+                        document.getElementById('password-input');
+   
+    // Extraemos los valores si se encontraron los elementos
+    const email = emailInput ? emailInput.value.trim() : "";
+    const password = passwordInput ? passwordInput.value.trim() : "";
     const btnAuth = document.getElementById('btn-auth');
    
     if (!email || !password) {
-        lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
+        lanzarAlertaMictlan("Debes completar ambos campos del pacto.", "CAMPOS INCOMPLETOS");
         return;
     }
 
@@ -123,7 +135,11 @@ async function manejarAuth() {
             cambiarModoAuth(); // Cambia automáticamente a login
         } else {
             window.userWallet = resultado.usuario.email;
+            
+            // Sincronizamos las llaves del localStorage para los retiros futuros
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
+            localStorage.setItem('usuario_email', resultado.usuario.email);
+            localStorage.setItem('email', resultado.usuario.email);
             
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             entrarAlCampoSanto({ balanceSG: resultado.usuario.balance || 0 });
