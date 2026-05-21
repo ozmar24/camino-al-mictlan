@@ -455,7 +455,7 @@ function procesarRetiro() {
 
     // 2. RECUPERAR LA IDENTIDAD REAL (El email con el que el usuario inició sesión)
     // Asegúrate de que esta clave coincida con la que guardaste en tu login
-    const identidadUsuario = localStorage.getItem('usuario_email'); 
+    const identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
 
     if (walletDestino.length < 5) {
         lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
@@ -489,7 +489,7 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-		identidad: identidad,
+		identidad: identidadUsuario, // Esto ahora enviará tu correo "mi-correo@gmail.com"
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
                 pasarela: pasarela,
