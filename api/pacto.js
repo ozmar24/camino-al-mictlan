@@ -1,78 +1,73 @@
 import { Redis } from '@upstash/redis';
 
-// Inicializamos la conexión con el inframundo (Redis)
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 export default async function handler(req, res) {
-    // Forzar cabeceras de seguridad y evitar respuestas en caché
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, error: 'Método no permitido por las deidades.' });
+        return res.status(405).json({ success: false, error: 'Método no permitido.' });
     }
 
     const { accion, email, password, wallet } = req.body;
 
-    // Validaciones básicas de entrada
     if (!email || !password || !accion) {
-        return res.status(400).json({ success: false, error: 'Faltan datos esenciales para sellar el pacto.' });
+        return res.status(400).json({ success: false, error: 'Faltan datos esenciales.' });
     }
 
-    // Normalizar el email para evitar duplicados por formato
     const emailNormalizado = email.toLowerCase().trim();
 
     try {
-        // --- CASO 1: REGISTRO DE NUEVA ALMA ---
+        // ==================== REGISTRO ====================
         if (accion === 'registro') {
             if (!wallet || wallet.trim() === '') {
-                return res.status(400).json({ success: false, error: 'Se requiere una dirección de Wallet para el tributo.' });
+                return res.status(400).json({ success: false, error: 'Se requiere una dirección de Wallet para registrar.' });
             }
 
-            // Verificar si el email ya sacrificó su alma antes
-            const usuarioExistente = await redis.hget(`usuario:${emailNormalizado}`, 'email');
-            if (usuarioExistente) {
-                return res.status(400).json({ success: false, error: 'Esta alma ya está vinculada a un pacto activo.' });
+            const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
+            if (existe) {
+                return res.status(400).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
             }
 
-            // Estructura inicial del usuario en Redis
             const nuevoUsuario = {
                 email: emailNormalizado,
-                password: password, // NOTA: Para producción real, considera usar bcrypt para encriptarla
+                password: password,           // TODO: Encriptar con bcrypt en producción
                 wallet: wallet.trim(),
-                balance_soulgeist: 0, // Inicia en ceros en el flujo central
+                balance_soulgeist: 0,
                 creado_en: new Date().toISOString()
             };
 
-            // Guardar el hash del usuario en Redis
             await redis.hmset(`usuario:${emailNormalizado}`, nuevoUsuario);
 
             return res.status(201).json({
                 success: true,
-                message: 'Pacto sellado con éxito. Tu alma ha sido registrada.',
-                usuario: { email: emailNormalizado, wallet: nuevoUsuario.wallet }
+                message: 'Pacto sellado. Tu alma ha sido registrada.',
+                usuario: { 
+                    email: emailNormalizado, 
+                    wallet: nuevoUsuario.wallet 
+                }
             });
         }
 
-        // --- CASO 2: INICIO DE SESIÓN (LOGIN) ---
+        // ==================== LOGIN ====================
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
 
             if (!usuario || Object.keys(usuario).length === 0) {
-                return res.status(404).json({ success: false, error: 'El alma no se encuentra en el registro del Mictlán.' });
+                return res.status(404).json({ success: false, error: 'El alma no se encuentra registrada.' });
             }
 
-            // Validar contraseña rudimentaria
             if (usuario.password !== password) {
-                return res.status(401).json({ success: false, error: 'Contraseña incorrecta. Las deidades rechazan tu acceso.' });
+                return res.status(401).json({ success: false, error: 'Contraseña incorrecta.' });
             }
 
             return res.status(200).json({
                 success: true,
-                message: 'Acceso concedido al inframundo.',
+                message: 'Acceso concedido al Mictlán.',
                 usuario: {
                     email: usuario.email,
                     wallet: usuario.wallet,
@@ -81,10 +76,10 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(400).json({ success: false, error: 'Acción mística desconocida.' });
+        return res.status(400).json({ success: false, error: 'Acción desconocida.' });
 
     } catch (error) {
-        console.error('Error en el Mictlán Backend:', error);
-        return res.status(500).json({ success: false, error: 'El servidor del inframundo ha colapsado temporalmente.' });
+        console.error('Error en pacto.js:', error);
+        return res.status(500).json({ success: false, error: 'Error interno del inframundo.' });
     }
 }

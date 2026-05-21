@@ -78,55 +78,61 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
-    const email = document.getElementById('email').value.trim(); 
-    const password = document.getElementById('password').value.trim(); 
-    
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+   
     if (!email || !password) {
-        lanzarAlertaMictlan("Debes completar ambos campos para alterar el libro de los muertos.", "CAMPOS INCOMPLETOS"); 
-        return; 
+        lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
+        return;
     }
 
-    const accionMistica = esModoRegistro ? 'registro' : 'login'; 
+    const accionMistica = esModoRegistro ? 'registro' : 'login';
 
     try {
-        const btnAuth = document.getElementById('btn-auth'); 
-        const textoOriginal = btnAuth.innerText; 
-        btnAuth.innerText = "PROCESANDO PACTO..."; 
-        btnAuth.disabled = true; 
+        const btnAuth = document.getElementById('btn-auth');
+        const textoOriginal = btnAuth.innerText;
+        btnAuth.innerText = "PROCESANDO PACTO...";
+        btnAuth.disabled = true;
 
         const respuesta = await fetch('/api/pacto', {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ 
-                accion: accionMistica, 
-                email: email, 
-                password: password 
-            }) 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                accion: accionMistica,
+                email: email,
+                password: password
+            })
         });
 
-        const resultado = await respuesta.json(); 
+        const resultado = await respuesta.json();
         
-        btnAuth.innerText = textoOriginal; 
-        btnAuth.disabled = false; 
+        btnAuth.innerText = textoOriginal;
+        btnAuth.disabled = false;
 
         if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Las deidades del inframundo han rechazado tu ofrenda.", "RITUAL RECHAZADO"); 
-            return; 
+            lanzarAlertaMictlan(resultado.error || "Las deidades rechazaron tu ofrenda.", "RITUAL RECHAZADO");
+            return;
         }
 
         if (accionMistica === 'registro') {
-            lanzarAlertaMictlan(resultado.message, "ALMA REGISTRADA"); 
-            cambiarModoAuth(); 
+            lanzarAlertaMictlan(resultado.message || "Alma registrada con éxito.", "ALMA REGISTRADA");
+            cambiarModoAuth(); // Cambia a modo login
         } 
         else if (accionMistica === 'login') {
-            window.userWallet = resultado.usuario.email; 
-            localStorage.setItem('soulgeist_user_email', resultado.usuario.email); 
-            entrarAlCampoSanto({ balanceSG: resultado.usuario.balance }); 
+            // Guardamos correctamente la identidad
+            window.userWallet = resultado.usuario.email;
+            localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
+            
+            lanzarAlertaMictlan("Bienvenido de vuelta al Mictlán.", "ACCESO CONCEDIDO");
+            
+            entrarAlCampoSanto({ 
+                balanceSG: resultado.usuario.balance || 0 
+            });
         }
 
     } catch (error) {
-        console.error("Fallo de conexión con el Mictlán:", error); 
-        lanzarAlertaMictlan("No se pudo establecer conexión con el inframundo. Revisa tu red.", "FALLO DE CONEXIÓN"); 
+        console.error("Fallo en manejarAuth:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
 
@@ -397,7 +403,7 @@ function abrirModalCosechaFinal(pos) {
             </label>
             <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
                     style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
-                <option value="faucetpay">FaucetPay</option>
+                
                 <option value="bitso">Bitso</option>
                 <option value="coinbase">Coinbase</option>
                 <option value="binance">Binance</option>
@@ -431,16 +437,14 @@ function abrirModalCosechaFinal(pos) {
 
 
 function adaptarPlaceholderPasarela(criptoId) {
-    const pasarela = document.getElementById('pasarela-select').value; 
-    const input = document.getElementById('wallet-input'); 
-    if (!input) return; 
-    
-    if (pasarela === 'faucetpay') {
-        input.placeholder = "Correo vinculado a FaucetPay o Dirección"; 
-    } else if (pasarela === 'bitso_lightning') {
-        input.placeholder = "Ingresa tu Invoice de Lightning (lnbc...)"; 
+    const pasarela = document.getElementById('pasarela-select').value;
+    const input = document.getElementById('wallet-input');
+    if (!input) return;
+
+    if (pasarela === 'bitso') {
+        input.placeholder = "Dirección Bitso (BTC, USDT, etc.)";
     } else {
-        input.placeholder = `Dirección de depósito de ${criptoId} (on-chain)`; 
+        input.placeholder = `Dirección de ${criptoId} en ${pasarela.toUpperCase()}`;
     }
 }
 

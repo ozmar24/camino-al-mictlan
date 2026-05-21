@@ -127,43 +127,27 @@ if (!identidad) {
         let pagoExitoso = false;
         let mensajeRetorno = "";
 
+        // === FaucetPay DESACTIVADO temporalmente por seguridad ===
         if (pasarela === "faucetpay") {
-            // INTERFAZ DIRECTA CON LA API DE FAUCETPAY
-            const paramsFP = new URLSearchParams({
-                api_key: process.env.FAUCETPAY_API_KEY,
-                to: wallet,
-                amount: cantidadAEnviar,
-                currency: infoCripta.simFP,
-                referral: "false",
-                ip_address: ipLimpia
+            return res.status(400).json({ 
+                error: "Retiros por FaucetPay están temporalmente desactivados por seguridad." 
             });
-
-            const respuestaFP = await fetch('https://faucetpay.io/api/v1/send', { method: 'POST', body: paramsFP });
-            const resultadoFP = await respuestaFP.json();
-            
-            if (resultadoFP.status === 200) {
-                pagoExitoso = true;
-                mensajeRetorno = `Poder transferido. Cosecha de +${cantidadAEnviar} ${infoCripta.simFP} enviada a tu FaucetPay.`;
-            } else {
-                return res.status(502).json({ error: `El canal de FaucetPay rechazó el pacto: ${resultadoFP.message || 'Fondos del grifo insuficientes'}` });
-            }
-
-        } else if (pasarela === "bitso_lightning" && cripto === "Bitcoin") {
+        } 
+        else if (pasarela === "bitso_lightning" && cripto === "Bitcoin") {
             // INTERFAZ DE RITUAL PARA BITSO LIGHTNING NETWORK ⚡
-            // 'wallet' contiene el invoice lnbc... introducido por el usuario
             const respuestaLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-            
+           
             if (respuestaLN.success) {
                 pagoExitoso = true;
                 mensajeRetorno = `¡Energía canalizada instantáneamente a tu Bitso mediante la Red Lightning! (Enviados ${cantidadAEnviar} BTC).`;
             } else {
                 return res.status(502).json({ error: `El nodo de Bitso Lightning rechazó el pago: ${respuestaLN.error}` });
             }
-
-        } else if (["bitso", "binance", "coinbase"].includes(pasarela)) {
+        } 
+        else if (["bitso", "binance", "coinbase"].includes(pasarela)) {
             // INTERFAZ PARA RETIROS ON-CHAIN A GRANDES EXCHANGES
             const respuestaOnChain = await procesarRetiroOnChain(pasarela, wallet, cantidadAEnviar, cripto);
-            
+           
             if (respuestaOnChain.success) {
                 pagoExitoso = true;
                 mensajeRetorno = `Cosecha autorizada. Transmisión enviada a la blockchain destino hacia ${pasarela.toUpperCase()}.`;
