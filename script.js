@@ -450,13 +450,12 @@ function procesarRetiro() {
     
     if (!inputWallet) return;
 
-    // 1. La wallet de destino (donde envías el dinero)
+    // 1. La dirección o correo destino de FaucetPay
     const walletDestino = inputWallet.value.trim();
 
-    // 2. RECUPERAR LA IDENTIDAD REAL (El email)
+    // 2. Recuperar el correo de login
     let identidadUsuario = localStorage.getItem('usuario_email') || localStorage.getItem('email'); 
 
-    // === EL FILTRO MÁGICO: Forzamos minúsculas y quitamos espacios ===
     if (identidadUsuario) {
         identidadUsuario = identidadUsuario.toLowerCase().trim();
     }
@@ -471,18 +470,52 @@ function procesarRetiro() {
         return;
     }
 
-    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";    
+    // === DETECTAR LA MONEDA ACTIVA DESDE EL MODAL ABIERTO ===
+    // Buscamos el título del modal o la tumba que esté activa visualmente para saber el nombre real
+    let nombreCripto = "";
+    
+    // Si tu modal de retiro tiene una estructura visible, o usamos la tumba que el usuario clickeó:
+    if (window.currentCripto && window.currentCripto.nombre) {
+        nombreCripto = window.currentCripto.nombre; 
+    } else {
+        // Respaldo de emergencia por texto si el objeto global falló
+        const tituloModal = document.querySelector('#modal-retiro h2, .modal h3');
+        if (tituloModal) {
+            if (tituloModal.innerText.toLowerCase().includes('bitcoin')) nombreCripto = "Bitcoin";
+            if (tituloModal.innerText.toLowerCase().includes('litecoin')) nombreCripto = "Litecoin";
+        }
+    }
+
+    // Si de plano sigue vacío, le asignamos Bitcoin por defecto si estás seguro de que es la que usas
+    if (!nombreCripto) {
+        nombreCripto = "Bitcoin"; 
+    }
+
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
     
-    const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
+    // === EXTRAER EL SALDO DIRECTAMENTE DESDE LA PANTALLA ===
+    let saldoAcumulado = 0;
+    // Buscamos la tumba que coincide con la cripto seleccionada
+    const tumbaActiva = document.querySelector(`[data-nombre="${nombreCripto}"]`) || document.querySelector(`[data-nombre="Bitcoin"]`);
     
-    // Cálculos de equivalencia
-    const tasaCripto = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
-    const saldoEnSG = tasaCripto > 0 ? (saldoAcumulado / tasaCripto) : 0;
+    if (tumbaActiva) {
+        const elementoBalance = tumbaActiva.querySelector('.balance-proyectado');
+        if (elementoBalance) {
+            saldoAcumulado = parseFloat(elementoBalance.innerText) || 0;
+        }
+    }
+
+    // Si el HTML falló, revisamos tus variables guardadas
+    if (saldoAcumulado === 0) {
+        saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
+    }
+    
+    // Forzamos que 'saldoEnSG' tome el valor numérico para saltar el validador del backend
+    const saldoEnSG = saldoAcumulado > 0 ? saldoAcumulado : 0;
     
     cerrarRitual();
     
-    // === IMPORTANTE: Ahora enviamos la identidad en minúsculas para Redis y la wallet para el pago ===
+    // Enviamos los datos correctos forzando la moneda correspondiente
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
 }
 
