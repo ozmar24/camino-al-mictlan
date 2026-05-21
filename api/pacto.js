@@ -13,31 +13,30 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, error: 'Método no permitido.' });
     }
 
-    const { accion, email, password, wallet } = req.body;
+    const { accion, email, password, wallet } = req.body || {};
 
     if (!email || !password || !accion) {
-        return res.status(400).json({ success: false, error: 'Faltan datos esenciales.' });
+        return res.status(400).json({ success: false, error: 'Faltan datos esenciales (email, password o acción).' });
     }
 
     const emailNormalizado = email.toLowerCase().trim();
 
     try {
-        // ==================== REGISTRO ====================
         if (accion === 'registro') {
-            if (!wallet || wallet.trim() === '') {
-                return res.status(400).json({ success: false, error: 'Se requiere una dirección de Wallet para registrar.' });
+            if (!wallet) {
+                return res.status(400).json({ success: false, error: 'Se requiere una wallet para el registro.' });
             }
 
             const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
             if (existe) {
-                return res.status(400).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
+                return res.status(400).json({ success: false, error: 'Este email ya está registrado.' });
             }
 
             const nuevoUsuario = {
                 email: emailNormalizado,
-                password: password,           // TODO: Encriptar con bcrypt en producción
+                password: password,
                 wallet: wallet.trim(),
-                balance_soulgeist: 0,
+                balance_soulgeist: "0",
                 creado_en: new Date().toISOString()
             };
 
@@ -45,20 +44,16 @@ export default async function handler(req, res) {
 
             return res.status(201).json({
                 success: true,
-                message: 'Pacto sellado. Tu alma ha sido registrada.',
-                usuario: { 
-                    email: emailNormalizado, 
-                    wallet: nuevoUsuario.wallet 
-                }
+                message: 'Pacto sellado con éxito.',
+                usuario: { email: emailNormalizado, wallet: nuevoUsuario.wallet, balance: 0 }
             });
-        }
+        } 
 
-        // ==================== LOGIN ====================
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
 
             if (!usuario || Object.keys(usuario).length === 0) {
-                return res.status(404).json({ success: false, error: 'El alma no se encuentra registrada.' });
+                return res.status(404).json({ success: false, error: 'Usuario no encontrado.' });
             }
 
             if (usuario.password !== password) {
@@ -67,7 +62,7 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: 'Acceso concedido al Mictlán.',
+                message: 'Acceso concedido.',
                 usuario: {
                     email: usuario.email,
                     wallet: usuario.wallet,
@@ -76,10 +71,13 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(400).json({ success: false, error: 'Acción desconocida.' });
+        return res.status(400).json({ success: false, error: 'Acción inválida.' });
 
     } catch (error) {
         console.error('Error en pacto.js:', error);
-        return res.status(500).json({ success: false, error: 'Error interno del inframundo.' });
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Error interno del servidor. Revisa los logs de Vercel.' 
+        });
     }
 }
