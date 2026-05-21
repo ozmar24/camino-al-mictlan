@@ -457,11 +457,14 @@ function procesarRetiro() {
         return;
     }
 
-    // Obtener identidad del usuario (la clave correcta)
-    let identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
-                          window.userWallet;
+    // === DEBUG: Ver qué identidad estamos enviando ===
+    const identidadUsuario = localStorage.getItem('soulgeist_user_email') || 
+                            window.userWallet || 
+                            "SIN_IDENTIDAD";
 
-    if (!identidadUsuario) {
+    console.log("🔍 Identidad enviada al backend:", identidadUsuario);
+
+    if (!identidadUsuario || identidadUsuario === "SIN_IDENTIDAD") {
         lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
         cerrarRitual();
         return;
@@ -472,7 +475,6 @@ function procesarRetiro() {
 
     cerrarRitual();
 
-    // Llamada al backend con todos los datos necesarios
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
