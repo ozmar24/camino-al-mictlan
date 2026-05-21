@@ -312,16 +312,22 @@ function generarCementerio() {
         const tumbaOrigen = document.querySelector('.alma-maestra');
         const tumbaDestino = e.currentTarget;
 
-        // === CÁLCULO CORRECTO ===
-        const ganancia = (window.cantidadParaRitual || 0) * (pos.tasa || 0);
+        // Recuperamos la cantidad que el usuario eligió en el modal
+        const cantidadEnviada = window.cantidadParaRitual || 0;
 
-        // Descontamos inmediatamente
-        balanceUsuarioSG = 0;
-        actualizarBalanceSoulgeist(0);
+        // === CÁLCULO CORRECTO ===
+        const ganancia = cantidadEnviada * (pos.tasa || 0);
+
+        // === DESCUENTO CORRECTO (SOLO RESTAMOS LO QUE ENVIÓ) ===
+        balanceUsuarioSG = balanceUsuarioSG - cantidadEnviada;
+        actualizarBalanceSoulgeist(balanceUsuarioSG);
+
+        // Opcional: si usas localStorage para guardar el saldo, actulízalo aquí
+        // localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
         lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
             // Solo se suma UNA vez aquí
-        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
+            window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;   
 
             const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
             if (contenedorBalance) {
