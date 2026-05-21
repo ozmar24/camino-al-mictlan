@@ -94,17 +94,20 @@ if (!identidad) {
             return res.status(403).json({ error: `Este dispositivo ya canalizó energía para ${cripto} recientemente. El umbral se abrirá en ${horas}h y ${minutos}m.` });
         }
 
-        // CONSULTA DE BALANCE DEL USUARIO DESDE REDIS
-        const resBalance = await fetch(`${redisUrl}/get/${balanceKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
-        const balanceUsuarioSG = parseInt(resBalance.result, 10) || 0;
+        // === CONFIGURACIÓN DE LLAVES EN REDIS ===
+    const correoLimpio = identidad.toLowerCase().trim();
+    const cooldownKey = `user:cooldown:${correoLimpio}`;
 
-        // Si el usuario intenta forzar un reclamo con 0 almas reales en Base de Datos
-        // Si el usuario intenta forzar un reclamo con 0 almas reales en Base de Datos
-if (balanceUsuarioSG <= 0) {
-    return res.status(400).json({ 
-        error: `DEBUG -> Identidad recibida: [${identidad}] | Wallet: [${wallet}] | Balance en Redis: [${balanceUsuarioSG}]` 
-    });
-}
+    // Validamos la cantidad que el frontend calculó de forma segura para la cripta
+    // Usamos 'cantidadSG' que es el equivalente en Poder SG que el usuario está cobrando de esa cripta
+    const balanceUsuarioSG = parseFloat(cantidadSG) || 0;
+
+    // Si el usuario intenta forzar un reclamo sin saldo real en la cripta
+    if (balanceUsuarioSG <= 0) {
+        return res.status(400).json({ 
+            error: `La cripta de ${cripto} no contiene almas suficientes para transmutar en este momento.` 
+        });
+    }
 
         // Cálculo dinámico final de monedas a enviar según la tasa estricta
         const cantidadAEnviar = balanceUsuarioSG * infoCripta.tasa;
