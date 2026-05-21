@@ -13,13 +13,17 @@ export default async function handler(req, res) {
         return res.status(405).json({ success: false, error: 'Método no permitido.' });
     }
 
-    const { accion, email, password, wallet } = req.body || {};
+    // 1. Extraemos los datos de forma segura (añadimos 'correo' por si el frontend lo manda en español)
+    const { accion, email, correo, password, wallet } = req.body || {};
+    const emailRecibido = email || correo;
 
-    if (!email || !password || !accion) {
-        return res.status(400).json({ success: false, error: 'Faltan datos esenciales.' });
+    // 2. CORRECCIÓN CLAVE: Validamos primero si existen antes de aplicar funciones de texto
+    if (!emailRecibido || !password || !accion) {
+        return res.status(400).json({ success: false, error: 'Faltan datos esenciales (Email, Contraseña o Acción).' });
     }
 
-    const emailNormalizado = email.toLowerCase().trim();
+    // 3. Ahora que estamos 100% seguros de que hay texto, normalizamos sin riesgo de romper el servidor
+    const emailNormalizado = emailRecibido.toLowerCase().trim();
 
     try {
         console.log(`[pacto] Acción: ${accion} | Email: ${emailNormalizado}`);
