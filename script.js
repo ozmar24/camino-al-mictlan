@@ -460,17 +460,21 @@ function procesarRetiro() {
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";    
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
     
-    // Guardamos el saldo acumulado en una variable
+    // Saldo acumulado en la cripto (ej: 165.00 USDT)
     const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
+    
+    // === BLINDAJE: Calculamos el equivalente en Poder SG original (ej: 660 SG) ===
+    const tasaCripto = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
+    const saldoEnSG = tasaCripto > 0 ? (saldoAcumulado / tasaCripto) : 0;
     
     cerrarRitual();
     
-    // === SE LO PASAMOS COMO CUARTO PARÁMETRO ===
-    procesarCosecha(wallet, nombreCripto, pasarelaElegida, saldoAcumulado);
+    // Pasamos tanto el saldo de la cripto como el equivalente en SG original
+    procesarCosecha(wallet, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
 }
 
-// === AGREGAMOS 'saldoCripto' AQUÍ ABAJO EN LOS PARÁMETROS ===
-async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, saldoCripto) {
+// === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
+async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, saldoCripto, saldoEnSG) {
     try {
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
@@ -479,7 +483,17 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
                 pasarela: pasarela,
-                cantidadRetiro: saldoCripto // <--- Ahora sí sabe qué valor tiene esta variable
+                
+                // [BLINDAJE 1] Enviamos el valor de la Cripto en todas las variables posibles:
+                cantidadRetiro: saldoCripto, 
+                cantidad: saldoCripto,
+                monto: saldoCripto,
+                amount: saldoCripto,
+                
+                // [BLINDAJE 2] Enviamos el Poder SG original por si el backend calcula en base a SG:
+                cantidadSG: saldoEnSG,
+                poderSG: saldoEnSG,
+                sgAmount: saldoEnSG
             })
         });
 
@@ -498,11 +512,8 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
         // Actualizamos balance si viene del backend
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
-
-            // Persistencia
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-            // Actualizar en pantalla
             const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
             if (selectorBalance) {
                 selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
@@ -512,12 +523,11 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
         }
 
         lanzarAlertaMictlan(resultado.mensaje || "Ritual completado con éxito", "RITUAL COMPLETADO");
-// === LIMPIEZA POST-RETIRO ===
-        if (window.tumbasConSaldo && window.tumbasConSaldo[criptoSeleccionada]) {
+
+        // === LIMPIEZA POST-RETIRO ===
+        if (window.tumbasConSaldo && window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
             window.tumbasConSaldo[criptoSeleccionada] = 0;
-            // Actualizamos el almacenamiento local
             localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-            // Refrescamos visualmente el mapa
             generarCementerio();
         }
 
@@ -865,18 +875,21 @@ function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
     
+    // Descontamos del balance REAL
     balanceUsuarioSG -= cantidad;
     actualizarBalanceSoulgeist(balanceUsuarioSG);
-    localStorage.setItem('soulgeist_balance', balanceUsuarioSG); // PERSISTENCIA
+    localStorage.setItem('soulgeist_balance', balanceUsuarioSG); // <-- PERSISTENCIA AGREGADA
     
+    // Calculamos ganancia según tasa
     const ganancia = cantidad * (pos.tasa || 0);
 
     cerrarRitual(); 
 
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo)); // PERSISTENCIA CRÍTICA
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo)); // <-- PERSISTENCIA AGREGADA
         
+        // Actualizamos visualmente la tumba
         const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
         if (contenedorBalance) {
             contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
