@@ -99,9 +99,12 @@ if (!identidad) {
         const balanceUsuarioSG = parseInt(resBalance.result, 10) || 0;
 
         // Si el usuario intenta forzar un reclamo con 0 almas reales en Base de Datos
-        if (balanceUsuarioSG <= 0) {
-            return res.status(400).json({ error: 'No posees Poder SG acumulado en tus criptas para transmutar.' });
-        }
+        // Si el usuario intenta forzar un reclamo con 0 almas reales en Base de Datos
+if (balanceUsuarioSG <= 0) {
+    return res.status(400).json({ 
+        error: `DEBUG -> Identidad recibida: [${identidad}] | Wallet: [${wallet}] | Balance en Redis: [${balanceUsuarioSG}]` 
+    });
+}
 
         // Cálculo dinámico final de monedas a enviar según la tasa estricta
         const cantidadAEnviar = balanceUsuarioSG * infoCripta.tasa;
