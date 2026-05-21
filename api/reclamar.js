@@ -15,7 +15,10 @@ export default async function handler(req, res) {
     }
 
     // 3. Extraemos los datos e incluimos la "pasarela" elegida por el usuario
-    const { wallet, cripto, pasarela } = req.body;
+    const { identidad, wallet, cripto, pasarela, cantidadRetiro, cantidadSG } = req.body;
+if (!identidad) {
+    return res.status(400).json({ error: 'La identidad del alma no fue enviada al ritual.' });
+}
     
     const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
@@ -66,7 +69,7 @@ export default async function handler(req, res) {
 
     const walletKey = `user:wallet:${wallet}:${cripto}`;
     const ipKey = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`; 
-    const balanceKey = `user:balance:${wallet}`; // Llave para limpiar o consultar el balance real si aplica
+    const balanceKey = `user:balance:${identidad}`;
 
     try {
         // 5. PRIMER PASO: Consultar AMBAS llaves en Upstash en paralelo

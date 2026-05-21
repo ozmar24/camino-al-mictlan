@@ -450,27 +450,36 @@ function procesarRetiro() {
     
     if (!inputWallet) return;
 
-    const wallet = inputWallet.value.trim();
+    // 1. La wallet de destino (donde envías el dinero)
+    const walletDestino = inputWallet.value.trim();
 
-    if (wallet.length < 5) {
+    // 2. RECUPERAR LA IDENTIDAD REAL (El email con el que el usuario inició sesión)
+    // Asegúrate de que esta clave coincida con la que guardaste en tu login
+    const identidadUsuario = localStorage.getItem('usuario_email'); 
+
+    if (walletDestino.length < 5) {
         lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
+        return;
+    }
+    
+    if (!identidadUsuario) {
+        lanzarAlertaMictlan("Tu alma no está autenticada. Inicia sesión de nuevo.", "ERROR DE IDENTIDAD");
         return;
     }
 
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";    
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
     
-    // Saldo acumulado en la cripto (ej: 165.00 USDT)
     const saldoAcumulado = window.tumbasConSaldo && window.tumbasConSaldo[nombreCripto] ? window.tumbasConSaldo[nombreCripto] : 0;
     
-    // === BLINDAJE: Calculamos el equivalente en Poder SG original (ej: 660 SG) ===
+    // Cálculos de equivalencia
     const tasaCripto = window.currentCripto ? (window.currentCripto.tasa || 1) : 1;
     const saldoEnSG = tasaCripto > 0 ? (saldoAcumulado / tasaCripto) : 0;
     
     cerrarRitual();
     
-    // Pasamos tanto el saldo de la cripto como el equivalente en SG original
-    procesarCosecha(wallet, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
+    // === IMPORTANTE: Ahora enviamos la identidad para Redis y la wallet para el pago ===
+    procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida, saldoAcumulado, saldoEnSG);
 }
 
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
@@ -480,6 +489,7 @@ async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela, sald
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+		identidad: identidad,
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
                 pasarela: pasarela,
