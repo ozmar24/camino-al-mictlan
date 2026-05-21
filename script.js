@@ -2,7 +2,7 @@
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
 let retiroEnProceso = false;
-let balanceUsuarioSG = 0; // Controlará tu balance dinámico desde Redis
+let balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0; // Controlará tu balance dinámico desde Redis
 let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
@@ -323,7 +323,7 @@ function generarCementerio() {
         actualizarBalanceSoulgeist(balanceUsuarioSG);
 
         // Opcional: si usas localStorage para guardar el saldo, actulízalo aquí
-        // localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
         lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
             // Solo se suma UNA vez aquí
@@ -469,9 +469,10 @@ function procesarRetiro() {
     }
 
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
+    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "";
 
     cerrarRitual();
-    procesarCosecha(wallet, window.currentCripto, pasarelaElegida);
+    procesarCosecha(wallet, nombreCripto, pasarelaElegida);
 }
 
 async function procesarCosecha(walletUsuario, criptoSeleccionada, pasarela) {
