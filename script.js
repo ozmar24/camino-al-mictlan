@@ -953,7 +953,7 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    wallet: window.userWallet, 
+                    identidad: window.userWallet, 
                     nuevoBalance: balanceUsuarioSG,
                     accion: 'descontar_ritual'
                 })
