@@ -287,6 +287,17 @@ function generarCementerio() {
     
     contenedor.innerHTML = '';
 
+    // === DETECCIÓN Y PARCHE DE NUEVO ESPÍRITU ===
+    // Si el balance general del usuario es 0, nos aseguramos de que el mapa global de criptas empiece limpio
+    if (typeof balanceUsuarioSG === 'undefined' || balanceUsuarioSG === 0) {
+        window.tumbasConSaldo = {
+            "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
+            "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
+        };
+        // Sobreescribimos el caché del navegador para desvincular saldos de cuentas viejas
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+    }
+
     const configuracion = [
         { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
         { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.15 },
@@ -306,7 +317,7 @@ function generarCementerio() {
         div.style.setProperty('--color-cripto', pos.color);
         div.setAttribute('data-nombre', pos.nombre);
 
-        // LEEMOS EL SALDO REAL DEL MAPA GLOBAL
+        // LEEMOS EL SALDO REAL YA FILTRADO
         const saldoGuardado = window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] ? window.tumbasConSaldo[pos.nombre] : 0;
         const visibilidadOpacidad = saldoGuardado > 0 ? "1" : "0";
         const textoBalance = saldoGuardado.toFixed(6);
@@ -338,19 +349,16 @@ function generarCementerio() {
         div.onclick = (e) => {
             e.stopPropagation();
 
-            // 1. SI YA TIENE SALDO → ABRIR MODAL DE RETIRO
             if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
                 abrirModalCosechaFinal(pos);
                 return;
             }
 
-            // 2. SI ES SOULGEIST → INICIAR RITUAL
             if (pos.especial) {
                 dispararInicioRitualGlobal();
                 return;
             }
 
-            // 3. TRANSFERENCIA (RITUAL ACTIVO)
             if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
@@ -388,7 +396,7 @@ function generarCementerio() {
         contenedor.appendChild(div);
     });
 
-    // Pilares fijos (Tu código original de pilares se mantiene aquí abajo)
+    // Pilares fijos
     const pilares = [
         { texto: "ASCENSO", sub: "REGRESAR", link: "https://faucet-btc.xyz", clase: "pilar-izquierdo" },
         { texto: "MICTLÁN", sub: "DESCENDER", link: "#", clase: "pilar-derecho" }
