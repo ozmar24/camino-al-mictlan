@@ -370,10 +370,10 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                // === DEDUCCIÓN CORRECTA Y SEGURA ===
+                // === DEDUCCIÓN FUERTE ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
-                
-                // Actualizamos visual + persistencia
+
+                // Actualizamos visual y guardamos inmediatamente
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
@@ -383,7 +383,6 @@ function generarCementerio() {
                 const tumbaDestino = e.currentTarget;
 
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-                    // Solo sumamos a la cripta destino
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
 
