@@ -287,15 +287,19 @@ function generarCementerio() {
     
     contenedor.innerHTML = '';
 
-    // === DETECCIÓN Y PARCHE DE NUEVO ESPÍRITU ===
-    // Si el balance general del usuario es 0, nos aseguramos de que el mapa global de criptas empiece limpio
-    if (typeof balanceUsuarioSG === 'undefined' || balanceUsuarioSG === 0) {
+    // === CORRECCIÓN VISUAL DE NUEVO ESPÍRITU (BUG 1 SOLUCIONADO) ===
+    const criptasExistentes = localStorage.getItem('soulgeist_criptas');
+    
+    if (!criptasExistentes) {
+        // Solo si nunca ha guardado criptas (usuario nuevo), inicializamos en cero limpio
         window.tumbasConSaldo = {
             "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
             "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
         };
-        // Sobreescribimos el caché del navegador para desvincular saldos de cuentas viejas
         localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+    } else if (!window.tumbasConSaldo || Object.keys(window.tumbasConSaldo).length === 0) {
+        // Si el usuario refrescó la página, restauramos sus criptas reales guardadas
+        window.tumbasConSaldo = JSON.parse(criptasExistentes);
     }
 
     const configuracion = [
@@ -605,19 +609,25 @@ async function videoCompletado() {
             return;
         }
 
-        // Actualizamos el balance
-        balanceUsuarioSG = resultado.nuevoBalance || balanceUsuarioSG;
+        // === CORRECCIÓN DE SUMA EXACTA (BUG 2 SOLUCIONADO) ===
+        // Tomamos el valor exacto enviado por el servidor de Redis
+        balanceUsuarioSG = parseFloat(resultado.nuevoBalance);
 
-        // === GUARDAR PERSISTENCIA ===
+        // Guardamos la persistencia en el navegador de manera limpia
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-        // Actualizar en pantalla
-        const selectorBalance = document.querySelector('.alma-maestra .balance-actual');
-        if (selectorBalance) {
-            selectorBalance.innerText = `Poder: ${balanceUsuarioSG} SG`;
+        // Actualizamos de manera segura el contenedor superior izquierdo (si existe en tu HTML)
+        const balanceIzquierdo = document.getElementById('balance-izquierdo');
+        if (balanceIzquierdo) {
+            balanceIzquierdo.innerText = balanceUsuarioSG.toFixed(4);
         }
 
+        // Actualizar el texto del Alma Maestra central en vivo
+        actualizarBalanceSoulgeist(balanceUsuarioSG);
+
+        // Volvemos a pintar el cementerio para asegurar que las criptas mantengan su saldo sin alterarse
         generarCementerio();
+        
         lanzarAlertaMictlan(resultado.mensaje || "Energía absorbida correctamente", "ENERGÍA ABSORBIDA");
 
     } catch (error) {
