@@ -5,7 +5,6 @@ export default async function handler(req, res) {
 
     const { wallet, nuevoBalance, accion } = req.body;
     
-    // Captura de IP para el escudo
     const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
 
@@ -15,22 +14,29 @@ export default async function handler(req, res) {
 
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const cleanUrl = redisUrl?.replace(/\/$/, "");
 
     const balanceKey = `user:balance:${wallet}`;
 
     // ==========================================
-    // NUEVA OPERACIÓN: DESCONTAR SALDO DEL RITUAL
+    // OPERACIÓN: DESCONTAR SALDO DEL RITUAL (CORREGIDO)
     // ==========================================
     if (accion === 'descontar_ritual') {
         if (typeof nuevoBalance === 'undefined') {
             return res.status(400).json({ error: 'Falta el nuevo balance para actualizar.' });
         }
         try {
-            // Guardamos el balance exacto calculado por el frontend usando SET
-            await fetch(`${redisUrl}/set/${balanceKey}/${nuevoBalance}`, { 
+            // Enviamos el comando como un arreglo POST para evitar problemas de URL en Upstash
+            const respuestaUpstash = await fetch(`${cleanUrl}`, { 
                 method: 'POST',
-                headers: { Authorization: `Bearer ${redisToken}` } 
-            });
+                headers: { 
+                    Authorization: `Bearer ${redisToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(["SET", balanceKey, String(nuevoBalance)])
+            }).then(r => r.json());
+
+            console.log("[REDIS SET RESULT]:", respuestaUpstash);
 
             return res.status(200).json({
                 success: true,
@@ -51,12 +57,12 @@ export default async function handler(req, res) {
     const RECOMPENSA_SG = 10;      
 
     try {
-        const checkCooldown = await fetch(`${redisUrl}/get/${cooldownKey}`, {
+        const checkCooldown = await fetch(`${cleanUrl}/get/${cooldownKey}`, {
             headers: { Authorization: `Bearer ${redisToken}` }
         }).then(r => r.json());
 
         if (checkCooldown && checkCooldown.result) {
-            const ttlRes = await fetch(`${redisUrl}/ttl/${cooldownKey}`, {
+            const ttlRes = await fetch(`${cleanUrl}/ttl/${cooldownKey}`, {
                 headers: { Authorization: `Bearer ${redisToken}` } 
             }).then(r => r.json());
             
@@ -65,15 +71,15 @@ export default async function handler(req, res) {
             });
         }
 
-        await fetch(`${redisUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
+        await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         });
 
-        await fetch(`${redisUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
+        await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         });
 
-        const resNuevoBalance = await fetch(`${redisUrl}/get/${balanceKey}`, { 
+        const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         }).then(r => r.json());
 

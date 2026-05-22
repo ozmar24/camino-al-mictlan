@@ -14,12 +14,12 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método no permitido en el inframundo' });
     }
 
-    // 3. Extraemos los datos e incluimos la "pasarela" elegida por el usuario
+    // 3. Extraemos los datos
     const { identidad, wallet, cripto, pasarela, cantidadRetiro, cantidadSG } = req.body;
-if (!identidad) {
-    return res.status(400).json({ error: 'La identidad del alma no fue enviada al ritual.' });
-}
-    
+    if (!identidad) {
+        return res.status(400).json({ error: 'La identidad del alma no fue enviada al ritual.' });
+    }
+        
     const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
     const country = req.headers['x-vercel-ip-country'] || 'XX';
@@ -33,16 +33,16 @@ if (!identidad) {
     }
 
     // ==================================================================
-    // TABLA DE CRYPTO-CONFIGURACIONES (Tasas del inframundo coincidentes con Frontend)
+    // TABLA DE CRYPTO-CONFIGURACIONES CALIBRADA CON MÍNIMOS EQUIVALENTES
     // ==================================================================
     const CONFIG_CRIPTAS = {
-        "Ethereum": { tasa: 0.00000045, simFP: "ETH" },
-        "Litecoin": { tasa: 0.0012,       simFP: "LTC" },
-        "Pepe":     { tasa: 15000,        simFP: "PEPE" },
-        "Solana":   { tasa: 0.0008,       simFP: "SOL" },
-        "Dogecoin": { tasa: 1.5,          simFP: "DOGE" },
-        "USDT":     { tasa: 0.25,         simFP: "USDT" },
-        "Bitcoin":  { tasa: 0.000002,     simFP: "BTC" }
+        "Ethereum": { tasa: 0.00000045, simFP: "ETH", minimoNativo: 0.00000005 }, 
+        "Litecoin": { tasa: 0.0012,       simFP: "LTC", minimoNativo: 0.000144 },     
+        "Pepe":     { tasa: 15000,        simFP: "PEPE", minimoNativo: 180 }, 
+        "Solana":   { tasa: 0.0008,       simFP: "SOL", minimoNativo: 0.000096 },     
+        "Dogecoin": { tasa: 1.5,          simFP: "DOGE", minimoNativo: 0.18 },     
+        "USDT":     { tasa: 0.25,         simFP: "USDT", minimoNativo: 0.03 },      
+        "Bitcoin":  { tasa: 0.00000166,   simFP: "BTC", minimoNativo: 0.0000002 } // 0.0000002 BTC Exacto (6 ceros)
     };
 
     const infoCripta = CONFIG_CRIPTAS[cripto];
@@ -62,6 +62,7 @@ if (!identidad) {
     // 4. Variables de control de Redis
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const cleanUrl = redisUrl?.replace(/\/$/, "");
 
     if (!redisUrl || !redisToken) {
         return res.status(500).json({ error: 'Las llaves del cofre de Redis no están configuradas.' });
@@ -69,48 +70,53 @@ if (!identidad) {
 
     const walletKey = `user:wallet:${wallet}:${cripto}`;
     const ipKey = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`; 
-    const balanceKey = `user:balance:${identidad.toLowerCase().trim()}`;
+    const balanceKey = `user:balance:${identidad}`;
 
     try {
-        // 5. PRIMER PASO: Consultar AMBAS llaves en Upstash en paralelo
+        // 5. Consultar candados de Wallet e IP en paralelo en Upstash
         const [resWallet, resIp] = await Promise.all([
-            fetch(`${redisUrl}/get/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json()),
-            fetch(`${redisUrl}/get/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json())
+            fetch(`${cleanUrl}/get/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json()),
+            fetch(`${cleanUrl}/get/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json())
         ]);
 
-        // REGLA A: Bloqueo de Wallet
+        // REGLA A: Bloqueo de Wallet (24 Horas)
         if (resWallet.result !== null) {
-            const ttlRes = await fetch(`${redisUrl}/ttl/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
+            const ttlRes = await fetch(`${cleanUrl}/ttl/${walletKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
             const horas = Math.floor(ttlRes.result / 3600);
             const minutos = Math.floor((ttlRes.result % 3600) / 60);
             return res.status(403).json({ error: `Tu billetera aún no está lista para otra cosecha de ${cripto}. Regresa en ${horas}h y ${minutos}m.` });
         }
 
-        // REGLA B: Bloqueo de IP
+        // REGLA B: Bloqueo de IP (24 Horas)
         if (resIp.result !== null) {
-            const ttlRes = await fetch(`${redisUrl}/ttl/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
+            const ttlRes = await fetch(`${cleanUrl}/ttl/${ipKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
             const horas = Math.floor(ttlRes.result / 3600);
             const minutos = Math.floor((ttlRes.result % 3600) / 60);
             return res.status(403).json({ error: `Este dispositivo ya canalizó energía para ${cripto} recientemente. El umbral se abrirá en ${horas}h y ${minutos}m.` });
         }
 
-        // === CONFIGURACIÓN DE LLAVES EN REDIS ===
-    const correoLimpio = identidad.toLowerCase().trim();
-    const cooldownKey = `user:cooldown:${correoLimpio}`;
+        // 6. Validamos la cantidad enviada de la tumba
+        const balanceUsuarioSG = parseFloat(cantidadSG) || 0;
 
-    // Validamos la cantidad que el frontend calculó de forma segura para la cripta
-    // Usamos 'cantidadSG' que es el equivalente en Poder SG que el usuario está cobrando de esa cripta
-    const balanceUsuarioSG = parseFloat(cantidadSG) || 0;
+        if (balanceUsuarioSG <= 0) {
+            return res.status(400).json({ 
+                error: `La cripta de ${cripto} está completamente vacía en el abismo.` 
+            });
+        }
 
-    // Si el usuario intenta forzar un reclamo sin saldo real en la cripta
-    if (balanceUsuarioSG <= 0) {
-        return res.status(400).json({ 
-            error: `La cripta de ${cripto} no contiene almas suficientes para transmutar en este momento.` 
-        });
-    }
-
-        // Cálculo dinámico final de monedas a enviar según la tasa estricta
+        // 7. Calculamos la transmutación final a enviar a la pasarela
         const cantidadAEnviar = balanceUsuarioSG * infoCripta.tasa;
+
+        // ==================================================================
+        // ESCUDO DE MONTO MÍNIMO NATIVO EQUIVALENTE (CORREGIDO)
+        // ==================================================================
+        if (cantidadAEnviar < infoCripta.minimoNativo) {
+            const sgNecesariosParaMinimo = infoCripta.minimoNativo / infoCripta.tasa;
+
+            return res.status(400).json({
+                error: `Monto insuficiente en la cripta. El mínimo para retirar ${cripto} es de ${infoCripta.minimoNativo.toFixed(7)} ${infoCripta.simFP} (Tienes equivalencia a ${cantidadAEnviar.toFixed(7)} ${infoCripta.simFP}). Necesitas acumular al menos ${sgNecesariosParaMinimo.toFixed(0)} SG en esta tumba.`
+            });
+        }
 
         // ==================================================================
         // ESCUDO B: VERIFICACIÓN ANTI-VPN CON PROXYCHECK
@@ -127,27 +133,22 @@ if (!identidad) {
         let pagoExitoso = false;
         let mensajeRetorno = "";
 
-        // === FaucetPay DESACTIVADO temporalmente por seguridad ===
         if (pasarela === "faucetpay") {
             return res.status(400).json({ 
                 error: "Retiros por FaucetPay están temporalmente desactivados por seguridad." 
             });
         } 
         else if (pasarela === "bitso_lightning" && cripto === "Bitcoin") {
-            // INTERFAZ DE RITUAL PARA BITSO LIGHTNING NETWORK ⚡
             const respuestaLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-           
             if (respuestaLN.success) {
                 pagoExitoso = true;
-                mensajeRetorno = `¡Energía canalizada instantáneamente a tu Bitso mediante la Red Lightning! (Enviados ${cantidadAEnviar} BTC).`;
+                mensajeRetorno = `¡Energía canalizada instantáneamente a tu Bitso mediante la Red Lightning! (Enviados ${cantidadAEnviar.toFixed(7)} BTC).`;
             } else {
                 return res.status(502).json({ error: `El nodo de Bitso Lightning rechazó el pago: ${respuestaLN.error}` });
             }
         } 
         else if (["bitso", "binance", "coinbase"].includes(pasarela)) {
-            // INTERFAZ PARA RETIROS ON-CHAIN A GRANDES EXCHANGES
             const respuestaOnChain = await procesarRetiroOnChain(pasarela, wallet, cantidadAEnviar, cripto);
-           
             if (respuestaOnChain.success) {
                 pagoExitoso = true;
                 mensajeRetorno = `Cosecha autorizada. Transmisión enviada a la blockchain destino hacia ${pasarela.toUpperCase()}.`;
@@ -159,46 +160,50 @@ if (!identidad) {
         }
 
         // ==================================================================
-        // CIERRE DE CANDADOS Y LIMPIEZA (Sólo ocurre si el pago fue 100% Exitoso)
+        // CIERRE DE CANDADOS Y LIMPIEZA SEGURA EN REDIS (SIN BARRAS EN URL)
         // ==================================================================
         if (pagoExitoso) {
-            const tiempoDeVida = 86400; // 24 horas en segundos
+            const tiempoDeVida = 86400; // 24 horas exactas en segundos
             
             await Promise.all([
-                fetch(`${redisUrl}/set/${walletKey}/activo/EX/${tiempoDeVida}`, { headers: { Authorization: `Bearer ${redisToken}` } }),
-                fetch(`${redisUrl}/set/${ipKey}/activo/EX/${tiempoDeVida}`, { headers: { Authorization: `Bearer ${redisToken}` } }),
-                fetch(`${redisUrl}/set/${balanceKey}/0`, { headers: { Authorization: `Bearer ${redisToken}` } }) // Reseteamos sus almas a 0
+                fetch(`${cleanUrl}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(["SET", walletKey, "activo", "EX", String(tiempoDeVida)])
+                }),
+                fetch(`${cleanUrl}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(["SET", ipKey, "activo", "EX", String(tiempoDeVida)])
+                }),
+                fetch(`${cleanUrl}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(["SET", balanceKey, "0"]) // Seteo del balance a cero impecable
+                })
             ]);
 
-            // Alerta de éxito consolidada en Telegram para auditoría
-            await enviarAlertaTelegram(`💀 *MICTLÁN* - 💰 *Retiro Multi-Pasarela*\n*Wallet/ID:* \`${wallet}\`\n*Pasarela:* \`${pasarela.toUpperCase()}\`\n*Cripto:* \`${cripto}\`\n*Cantidad:* \`${cantidadAEnviar}\` ${infoCripta.simFP}\n*IP:* \`${ipLimpia}\`\n*País:* ${country}`);
+            await enviarAlertaTelegram(`💀 *MICTLÁN* - 💰 *Retiro Multi-Pasarela*\n*Wallet/ID:* \`${wallet}\`\n*Pasarela:* \`${pasarela.toUpperCase()}\`\n*Cripto:* \`${cripto}\`\n*Cantidad:* \`${cantidadAEnviar.toFixed(7)}\` ${infoCripta.simFP}\n*IP:* \`${ipLimpia}\`\n*País:* ${country}`);
 
             return res.status(200).json({ 
                 success: true, 
                 mensaje: mensajeRetorno,
-                balanceAlmas: 0 // Devolvemos el balance reseteado al frontend
+                balanceAlmas: 0 
             });
         }
 
     } catch (err) {
-        console.error(err);
+        console.error("Error crítico en reclamar:", err);
         return res.status(500).json({ error: 'Error de conexión con el inframundo de Redis o Pasarelas.' });
     }
 }
 
-// ==================================================================
-// FUNCIONES CONTROLADORAS MOCK (Listas para rellenar con tus SDKs/API Keys)
-// ==================================================================
-
+// FUNCIONES CONTROLADORAS MOCK MANTENIDAS
 async function ejecutarRetiroBitsoLightning(invoice, montoCripto) {
-    // TODO: Conectar con tu endpoint corporativo de Bitso, Zebedee, OpenNode o LNBits.
-    // Usando las llaves del proceso: process.env.BITSO_API_SECRET
-    return { success: true }; // Cambiar a falso si la pasarela falla
+    return { success: true };
 }
 
 async function procesarRetiroOnChain(plataforma, address, monto, token) {
-    // TODO: Implementar la API de retiros masivos de Binance, Bitso o Coinbase
-    // Ej: Binance API Endpoint -> /api/v3/capital/withdraw/apply
     return { success: true };
 }
 
@@ -229,18 +234,12 @@ async function verificarFraudeIP(ip) {
 async function enviarAlertaTelegram(mensaje) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    
     if (!token || !chatId) return;
-
     try {
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: mensaje,
-                parse_mode: 'Markdown'
-            })
+            body: JSON.stringify({ chat_id: chatId, text: mensaje, parse_mode: 'Markdown' })
         });
     } catch (err) {
         console.error("Fallo al enviar notificación a Telegram:", err);
