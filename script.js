@@ -207,12 +207,10 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === CARGA SEGURA DEL BALANCE ===
-    if (perfil && typeof perfil.balanceSG !== 'undefined') {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
-    } else {
-        balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
-    }
+    // Carga segura desde backend o localStorage
+    balanceUsuarioSG = (perfil && typeof perfil.balanceSG !== 'undefined') 
+        ? parseFloat(perfil.balanceSG) 
+        : parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
 
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
@@ -361,7 +359,7 @@ function generarCementerio() {
                 return;
             }
 
-            if (ritualActivo) {
+                        if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -370,10 +368,9 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                // === DEDUCCIÓN FUERTE ===
+                // === DEDUCCIÓN REAL ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
 
-                // Actualizamos todo
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
@@ -593,7 +590,7 @@ function cerrarRitual() {
 // ==================================================================
 async function videoCompletado() {
     if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet al Mictlán antes de absorber energía de los videos.", "SANTUARIO SIN DUEÑO");
+        lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
@@ -611,30 +608,18 @@ async function videoCompletado() {
             return;
         }
 
-        // === CORRECCIÓN DE SUMA EXACTA (BUG 2 SOLUCIONADO) ===
-        // Tomamos el valor exacto enviado por el servidor de Redis
-        balanceUsuarioSG = parseFloat(resultado.nuevoBalance);
-
-        // Guardamos la persistencia en el navegador de manera limpia
+        // Actualización limpia desde Redis
+        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-        // Actualizamos de manera segura el contenedor superior izquierdo (si existe en tu HTML)
-        const balanceIzquierdo = document.getElementById('balance-izquierdo');
-        if (balanceIzquierdo) {
-            balanceIzquierdo.innerText = balanceUsuarioSG.toFixed(4);
-        }
-
-        // Actualizar el texto del Alma Maestra central en vivo
         actualizarBalanceSoulgeist(balanceUsuarioSG);
-
-        // Volvemos a pintar el cementerio para asegurar que las criptas mantengan su saldo sin alterarse
         generarCementerio();
-        
-        lanzarAlertaMictlan(resultado.mensaje || "Energía absorbida correctamente", "ENERGÍA ABSORBIDA");
+
+        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
 
     } catch (error) {
-        console.error("Error en la transmisión de almas:", error);
-        lanzarAlertaMictlan("El portal no pudo registrar tu visualización. Revisa tu conexión con el inframundo.", "FALLO DE RED");
+        console.error("Error en video:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
     }
 }
 
