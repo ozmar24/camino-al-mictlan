@@ -14,59 +14,64 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
     }
 
-    // === TOLERANCIA DE VARIABLES (Estilo Onyx + Soulgeist) ===
     const { email, password, accion, action } = req.body || {};
-    const accionReal = accion || action; // Acepta tanto 'accion' como 'action'
+    const accionReal = accion || action;
 
     if (!email || !password || !accionReal) {
         return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
     }
 
     const emailNormalizado = email.toLowerCase().trim();
+    // Creamos la llave limpia idéntica al formato de Void Onyx
     const userKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
     try {
-        // === CONSULTAR ALMA VÍA FETCH ===
-        const urlGet = `${cleanUrl}/hgetall/${userKey}`;
+        // === 1. LEER USUARIO (Método String plano estilo Onyx) ===
+        const urlGet = `${cleanUrl}/get/${userKey}`;
         const checkUser = await fetch(urlGet, {
             headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
         }).then(r => r.json());
 
-        const arrayResultado = checkUser.result || [];
-        const usuario = {};
-        if (Array.isArray(arrayResultado)) {
-            for (let i = 0; i < arrayResultado.length; i += 2) {
-                usuario[arrayResultado[i]] = arrayResultado[i + 1];
+        let usuario = null;
+        
+        // Si hay un resultado, lo parseamos de JSON a objeto JS
+        if (checkUser && checkUser.result) {
+            try {
+                usuario = typeof checkUser.result === 'string' ? JSON.parse(checkUser.result) : checkUser.result;
+            } catch (e) {
+                console.error("Error al parsear usuario existente:", e);
             }
         }
 
-        const existeUsuario = Object.keys(usuario).length > 0;
+        const existeUsuario = usuario !== null;
 
-        // === LÓGICA DE REGISTRO ===
+        // === 2. LÓGICA DE REGISTRO ===
         if (accionReal === 'registro') {
             if (existeUsuario) {
                 return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
             }
 
-            const nuevosDatos = [
-                "email", emailNormalizado,
-                "password", password,
-                "wallet", "wallet-temp-" + Date.now(),
-                "balance_soulgeist", "0",
-                "creado_en", new Date().toISOString()
-            ];
+            // Creamos el objeto del espíritu completo
+            const nuevoUsuarioObjeto = {
+                email: emailNormalizado,
+                password: password,
+                wallet: "wallet-temp-" + Date.now(),
+                balance_soulgeist: "0",
+                creado_en: new Date().toISOString()
+            };
 
-            const urlSet = `${cleanUrl}/hset/${userKey}`;
+            // Lo guardamos directo como un String JSON usando /set/ igual que en Onyx
+            const urlSet = `${cleanUrl}/set/${userKey}`;
             const writeResponse = await fetch(urlSet, {
                 method: 'POST',
                 headers: { 
                     Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(nuevosDatos)
+                body: JSON.stringify(nuevoUsuarioObjeto) // Guardado directo sin arreglos raros
             });
 
-            if (!writeResponse.ok) throw new Error("Fallo al escribir en las criptas de Redis");
+            if (!writeResponse.ok) throw new Error("Fallo en la respuesta REST de Upstash");
 
             return res.status(200).json({
                 success: true,
@@ -74,7 +79,7 @@ export default async function handler(req, res) {
             });
         } 
 
-        // === LÓGICA DE LOGIN ===
+        // === 3. LÓGICA DE LOGIN ===
         if (accionReal === 'login') {
             if (!existeUsuario) {
                 return res.status(200).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
@@ -99,7 +104,7 @@ export default async function handler(req, res) {
         console.error('ERROR CRÍTICO EN EL BACKEND:', error);
         return res.status(200).json({ 
             success: false, 
-            error: 'Fallo interno en el abismo del servidor.' 
+            error: 'Error interno de comunicación con las criptas de Upstash.' 
         });
     }
 }
