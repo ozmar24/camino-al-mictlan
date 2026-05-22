@@ -220,6 +220,18 @@ function entrarAlCampoSanto(perfil) {
     // Guardamos en localStorage para que persista el saldo REAL de este usuario actual al recargar
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
+    // ==================================================================
+    // NUEVO ESCUDO: LIMPIEZA DE CRIPTAS INDIVIDUALES SI EL BALANCE ES 0
+    // ==================================================================
+    if (balanceUsuarioSG === 0) {
+        // Si el usuario es nuevo o tiene cero, vaciamos por completo las tumbas en el caché
+        window.tumbasConSaldo = {
+            "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
+            "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
+        };
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+    }
+
     generarCementerio();
 }
 
