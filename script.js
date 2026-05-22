@@ -78,24 +78,25 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
-    // 1. Capturamos los elementos usando selectores nativos directos
-    const emailInput = document.getElementById('email') || document.querySelector('input[type="email"]');
-    const passwordInput = document.getElementById('password') || document.querySelector('input[type="password"]');
+    // 1. Recolección limpia utilizando las IDs exactas de tu HTML
+    const emailEl = document.getElementById('email');
+    const passwordEl = document.getElementById('password');
     const btnAuth = document.getElementById('btn-auth');
 
-    if (!emailInput || !passwordInput) {
-        lanzarAlertaMictlan("No se encontraron los campos del portal.", "ERROR CRÍTICO");
+    if (!emailEl || !passwordEl) {
+        lanzarAlertaMictlan("Los portales de texto no se manifestaron.", "ERROR CRÍTICO");
         return;
     }
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email = emailEl.value.trim();
+    const password = passwordEl.value.trim();
    
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos del pacto.", "CAMPOS INCOMPLETOS");
         return;
     }
 
+    // Usamos 'esModoRegistro' igual que en tu lógica original
     const accionMistica = esModoRegistro ? 'registro' : 'login';
     const textoOriginal = btnAuth.innerText;
     
@@ -103,9 +104,9 @@ async function manejarAuth() {
     btnAuth.disabled = true;
 
     try {
-        console.log(`→ Intentando ${accionMistica} al estilo Onyx con: ${email}`);
+        console.log(`→ Solicitando ${accionMistica} estilo Onyx para: ${email}`);
 
-        // Enviamos la petición estructurada de manera idéntica a Void Onyx
+        // Mandamos la estructura limpia de tres variables
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -117,18 +118,19 @@ async function manejarAuth() {
         });
 
         const resultado = await respuesta.json();
-        console.log("Respuesta backend:", resultado);
+        console.log("Respuesta del abismo:", resultado);
 
-        if (!respuesta.ok || resultado.success === false) {
-            lanzarAlertaMictlan(resultado.error || resultado.message || "Error desconocido.", "RITUAL RECHAZADO");
+        // Validamos la respuesta idéntico a Onyx (usando resultado.success)
+        if (resultado.success === false) {
+            lanzarAlertaMictlan(resultado.error || "Pacto rechazado.", "RITUAL RECHAZADO");
             return;
         }
 
         if (accionMistica === 'registro') {
             lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
-            cambiarModoAuth(); 
+            cambiarModoAuth(); // Te pasa automáticamente a la pantalla de Login
         } else {
-            // Guardamos las llaves de sesión exactamente como lo hacías en Soulgeist originalmente
+            // Sincronización radical del LocalStorage para evitar balances en 0 en los retiros
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);

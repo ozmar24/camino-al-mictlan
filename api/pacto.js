@@ -10,30 +10,28 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
+        return res.status(200).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
     }
 
-    // Extraemos las credenciales tal y como viajan desde el cuerpo limpio
     const { email, password, accion } = req.body || {};
 
+    // Seguridad estilo Onyx: si falta algo, salimos sin tronar el backend
     if (!email || !password || !accion) {
-        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES ESENCIALES.' });
+        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
     }
 
-    // Usamos el limpiador de textos idéntico al de Void Onyx para evitar fallas de símbolos o minúsculas
     const emailNormalizado = email.toLowerCase().trim();
 
     try {
-        // --- LÓGICA DE REGISTRO MANUAL ---
+        // === LÓGICA DE REGISTRO MANUAL ===
         if (accion === 'registro') {
-            // Buscamos si ya existe el rastro usando la estructura de datos original
             const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
             
             if (existe) {
-                return res.status(200).json({ success: false, error: 'ESTA IDENTIDAD YA EXISTE.' });
+                return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
             }
 
-            // Sellar el nuevo registro
+            // Guardamos en tu estructura original Hash de Soulgeist
             await redis.hset(`usuario:${emailNormalizado}`, {
                 email: emailNormalizado,
                 password: password,
@@ -48,12 +46,12 @@ export default async function handler(req, res) {
             });
         } 
 
-        // --- LÓGICA DE LOGIN ---
+        // === LÓGICA DE LOGIN ===
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
 
             if (!usuario || Object.keys(usuario).length === 0) {
-                return res.status(200).json({ success: false, error: 'IDENTIDAD NO ENCONTRADA.' });
+                return res.status(200).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
             }
 
             if (usuario.password !== password) {
@@ -73,9 +71,9 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('ERROR CRÍTICO en pacto.js:', error);
-        return res.status(500).json({ 
+        return res.status(200).json({ 
             success: false, 
-            error: 'Error interno en el abismo del servidor.' 
+            error: 'Fallo interno en el abismo del servidor.' 
         });
     }
 }
