@@ -382,17 +382,30 @@ function generarCementerio() {
                 const tumbaDestino = e.currentTarget;
 
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-                    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
 
-                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                    if (contenedorBalance) {
-                        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                        contenedorBalance.style.opacity = "1";
-                    }
+    // === ACTUALIZAR REDIS ===
+    if (window.userWallet) {
+        fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                wallet: window.userWallet,
+                nuevoBalance: balanceUsuarioSG,
+                accion: 'descontar_ritual'
+            })
+        }).then(r => r.json()).then(console.log).catch(console.error);
+    }
 
-                    mostrarModalFusionExitosa(pos, ganancia);
-                });
+    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+    if (contenedorBalance) {
+        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+        contenedorBalance.style.opacity = "1";
+    }
+
+    mostrarModalFusionExitosa(pos, ganancia);
+});
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
             }
