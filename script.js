@@ -112,13 +112,13 @@ async function manejarAuth() {
 
         let resultado;
         try {
-            resultado = await respuesta.json();
-        } catch {
-            const texto = await respuesta.text();
-            console.error("Respuesta cruda:", texto);
-            lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
-            return;
-        }
+             resultado = await respuesta.json();
+} catch (error) {
+    // Si falla, significa que no era JSON válido
+    console.error("Respuesta no es JSON:", error);
+    lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
+    return;
+}
 
         console.log("Respuesta del abismo:", resultado);
 

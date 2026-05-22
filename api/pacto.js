@@ -10,52 +10,43 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
 
     if (req.method !== 'POST') {
-        return res.status(200).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
+        return res.status(405).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
     }
 
     const { email, password, accion } = req.body || {};
 
-    // Seguridad estilo Onyx: si falta algo, salimos sin tronar el backend
     if (!email || !password || !accion) {
-        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
+        return res.status(400).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
     }
 
     const emailNormalizado = email.toLowerCase().trim();
 
     try {
-        // === LÓGICA DE REGISTRO MANUAL ===
         if (accion === 'registro') {
             const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
-            
             if (existe) {
                 return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
             }
 
-            // Guardamos en tu estructura original Hash de Soulgeist
             await redis.hset(`usuario:${emailNormalizado}`, {
                 email: emailNormalizado,
-                password: password,
+                password,
                 wallet: "wallet-temp-" + Date.now(),
                 balance_soulgeist: "0",
                 creado_en: new Date().toISOString()
             });
 
-            return res.status(200).json({
-                success: true,
-                message: 'Pacto sellado con éxito.'
-            });
-        } 
+            return res.status(200).json({ success: true, message: 'Pacto sellado con éxito.' });
+        }
 
-        // === LÓGICA DE LOGIN ===
         if (accion === 'login') {
             const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
-
             if (!usuario || Object.keys(usuario).length === 0) {
-                return res.status(200).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
+                return res.status(404).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
             }
 
             if (usuario.password !== password) {
-                return res.status(200).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
+                return res.status(401).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
             }
 
             return res.status(200).json({
@@ -67,13 +58,14 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(200).json({ success: false, error: 'ACCCIÓN NO VÁLIDA.' });
+        return res.status(400).json({ success: false, error: 'ACCIÓN NO VÁLIDA.' });
 
     } catch (error) {
         console.error('ERROR CRÍTICO en pacto.js:', error);
-        return res.status(200).json({ 
+        return res.status(500).json({ 
             success: false, 
-            error: 'Fallo interno en el abismo del servidor.' 
+            error: 'Fallo interno en el abismo del servidor.',
+            detalle: error.message || 'Error desconocido'
         });
     }
 }
