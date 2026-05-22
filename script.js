@@ -104,21 +104,19 @@ async function manejarAuth() {
     try {
         console.log(`→ Solicitando ${accionMistica} estilo Onyx para: ${email}`);
 
-        const respuesta = await fetch('/api/pacto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, accion: accionMistica })
-        });
+        const respuesta = await fetch('/api/pacto', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email, password, accion: accionMistica }) });
 
-        let resultado;
-        try {
-             resultado = await respuesta.json();
+let resultado;
+try {
+  resultado = await respuesta.json();
 } catch (error) {
-    // Si falla, significa que no era JSON válido
-    console.error("Respuesta no es JSON:", error);
-    lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
-    return;
+  console.error('Respuesta no es JSON. Status:', respuesta.status, 'Error:', err);
+  const texto = await respuesta.text().catch(() => '[no body]');
+  console.error('Respuesta cruda:', texto);
+  lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
+  return;
 }
+
 
         console.log("Respuesta del abismo:", resultado);
 
