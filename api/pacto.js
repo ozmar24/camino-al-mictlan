@@ -1,80 +1,105 @@
-import { Redis } from '@upstash/redis';
-
-let redisClient = null;
-function getRedis() {
-  if (redisClient) return redisClient;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) {
-    throw new Error('Variables de entorno de Redis faltantes');
-  }
-  redisClient = new Redis({ url, token });
-  return redisClient;
-}
-
 export default async function handler(req, res) {
-  console.log("Entró a /api/pacto - ENV present:",
-    !!process.env.UPSTASH_REDIS_REST_URL, !!process.env.UPSTASH_REDIS_REST_TOKEN);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Content-Type', 'application/json');
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
-  }
-
-  const { email, password, accion } = req.body || {};
-
-  if (!email || !password || !accion) {
-    return res.status(400).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
-  }
-
-  const emailNormalizado = String(email).toLowerCase().trim();
-
-  try {
-    const redis = getRedis();
-
-    if (accion === 'registro') {
-      const existe = await redis.hget(`usuario:${emailNormalizado}`, 'email');
-      if (existe) {
-        return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
-      }
-
-      await redis.hset(`usuario:${emailNormalizado}`, {
-        email: emailNormalizado,
-        password,
-        wallet: "wallet-temp-" + Date.now(),
-        balance_soulgeist: "0",
-        creado_en: new Date().toISOString()
-      });
-
-      return res.status(200).json({ success: true, message: 'Pacto sellado con éxito.' });
+    const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
+    
+    if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
+        return res.status(200).json({ success: false, error: "ERROR: Conexión al Abismo no configurada." });
     }
 
-    if (accion === 'login') {
-      const usuario = await redis.hgetall(`usuario:${emailNormalizado}`);
-      if (!usuario || Object.keys(usuario).length === 0) {
-        return res.status(404).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
-      }
+    const cleanUrl = UPSTASH_REDIS_REST_URL.replace(/\/$/, "");
 
-      if (usuario.password !== password) {
-        return res.status(401).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
-      }
+    if (req.method !== 'POST') {
+        return res.status(200).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
+    }
 
-      return res.status(200).json({
-        success: true,
-        usuario: {
-          email: usuario.email,
-          balance: parseFloat(usuario.balance_soulgeist || 0)
+    // === TOLERANCIA DE VARIABLES (Estilo Onyx + Soulgeist) ===
+    const { email, password, accion, action } = req.body || {};
+    const accionReal = accion || action; // Acepta tanto 'accion' como 'action'
+
+    if (!email || !password || !accionReal) {
+        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
+    }
+
+    const emailNormalizado = email.toLowerCase().trim();
+    const userKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    try {
+        // === CONSULTAR ALMA VÍA FETCH ===
+        const urlGet = `${cleanUrl}/hgetall/${userKey}`;
+        const checkUser = await fetch(urlGet, {
+            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+        }).then(r => r.json());
+
+        const arrayResultado = checkUser.result || [];
+        const usuario = {};
+        if (Array.isArray(arrayResultado)) {
+            for (let i = 0; i < arrayResultado.length; i += 2) {
+                usuario[arrayResultado[i]] = arrayResultado[i + 1];
+            }
         }
-      });
+
+        const existeUsuario = Object.keys(usuario).length > 0;
+
+        // === LÓGICA DE REGISTRO ===
+        if (accionReal === 'registro') {
+            if (existeUsuario) {
+                return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
+            }
+
+            const nuevosDatos = [
+                "email", emailNormalizado,
+                "password", password,
+                "wallet", "wallet-temp-" + Date.now(),
+                "balance_soulgeist", "0",
+                "creado_en", new Date().toISOString()
+            ];
+
+            const urlSet = `${cleanUrl}/hset/${userKey}`;
+            const writeResponse = await fetch(urlSet, {
+                method: 'POST',
+                headers: { 
+                    Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(nuevosDatos)
+            });
+
+            if (!writeResponse.ok) throw new Error("Fallo al escribir en las criptas de Redis");
+
+            return res.status(200).json({
+                success: true,
+                message: 'Pacto sellado con éxito.'
+            });
+        } 
+
+        // === LÓGICA DE LOGIN ===
+        if (accionReal === 'login') {
+            if (!existeUsuario) {
+                return res.status(200).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
+            }
+
+            if (usuario.password !== password) {
+                return res.status(200).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
+            }
+
+            return res.status(200).json({
+                success: true,
+                usuario: {
+                    email: usuario.email,
+                    balance: parseFloat(usuario.balance_soulgeist || 0)
+                }
+            });
+        }
+
+        return res.status(200).json({ success: false, error: 'ACCCIÓN NO VÁLIDA.' });
+
+    } catch (error) {
+        console.error('ERROR CRÍTICO EN EL BACKEND:', error);
+        return res.status(200).json({ 
+            success: false, 
+            error: 'Fallo interno en el abismo del servidor.' 
+        });
     }
-
-    return res.status(400).json({ success: false, error: 'ACCIÓN NO VÁLIDA.' });
-
-  } catch (error) {
-    console.error('ERROR CRÍTICO en pacto.js:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Fallo interno en el abismo del servidor.',
-      detalle: error.message || 'Error desconocido'
-    });
-  }
 }
