@@ -216,7 +216,7 @@ function entrarAlCampoSanto(perfil) {
 
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-    console.log("Balance cargado:", balanceUsuarioSG);
+    console.log("Balance cargado al entrar:", balanceUsuarioSG);
 
     generarCementerio();
 }
@@ -361,7 +361,7 @@ function generarCementerio() {
                 return;
             }
 
-                                   if (ritualActivo) {
+            if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -373,7 +373,7 @@ function generarCementerio() {
                 // === DEDUCCIÓN FUERTE ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
 
-                // Actualizamos visual y guardamos inmediatamente
+                // Actualizamos todo
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
