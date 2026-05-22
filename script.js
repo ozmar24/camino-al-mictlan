@@ -207,16 +207,34 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === CARGA PRIORIDAD BACKEND > LOCALSTORAGE ===
-    if (perfil && typeof perfil.balanceSG !== 'undefined') {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
+    // === CARGA REAL DESDE BACKEND ===
+    if (perfil && typeof perfil.balanceSG !== 'undefined' && perfil.balanceSG > 0) {
+        balanceUsuarioSG = parseFloat(perfil.balanceSG);
+    } else if (window.userWallet) {
+        // Si no viene del perfil, intentamos cargar desde Redis vía acumular
+        fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.nuevoBalance !== undefined) {
+                balanceUsuarioSG = parseFloat(data.nuevoBalance);
+                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+                actualizarBalanceSoulgeist(balanceUsuarioSG);
+                generarCementerio();
+            }
+        })
+        .catch(() => {
+            balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+        });
     } else {
         balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
 
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
-    console.log("=== BALANCE CARGADO ===", balanceUsuarioSG);
+    console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
 
     generarCementerio();
 }
