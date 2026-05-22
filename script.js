@@ -198,39 +198,25 @@ function entrarAlCampoSanto(perfil) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
-   
+
     if (modalContrato) modalContrato.style.display = 'none';
     if (cementerio) cementerio.style.display = 'block';
-   
+
     if (candelabro) {
         candelabro.style.display = 'block';
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === SOLUCIÓN TOTAL CONTRA SALDOS RESIDUALES ===
-    // Validamos estrictamente si 'balanceSG' existe y es un número. 
-    // Si viene del backend (sea 0 o 100), lo usamos directamente ignorando el localStorage viejo.
+    // === CARGA SEGURA DEL BALANCE ===
     if (perfil && typeof perfil.balanceSG !== 'undefined') {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG);
+        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
     } else {
-        // Solo si por alguna razón no viene nada del backend, usamos el respaldo
         balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
 
-    // Guardamos en localStorage para que persista el saldo REAL de este usuario actual al recargar
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-    // ==================================================================
-    // NUEVO ESCUDO: LIMPIEZA DE CRIPTAS INDIVIDUALES SI EL BALANCE ES 0
-    // ==================================================================
-    if (balanceUsuarioSG === 0) {
-        // Si el usuario es nuevo o tiene cero, vaciamos por completo las tumbas en el caché
-        window.tumbasConSaldo = {
-            "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
-            "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
-        };
-        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-    }
+    console.log("Balance cargado:", balanceUsuarioSG);
 
     generarCementerio();
 }
@@ -375,35 +361,36 @@ function generarCementerio() {
                 return;
             }
 
-            if (ritualActivo) {
+                        if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
                 }
 
-                ritualActivo = false;
-                const tumbaOrigen = document.querySelector('.alma-maestra');
-                const tumbaDestino = e.currentTarget;
-                const cantidadEnviada = window.cantidadParaRitual || 0;
+                const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                balanceUsuarioSG = balanceUsuarioSG - cantidadEnviada;
+                // DEDUCCIÓN INMEDIATA Y SEGURA
+                balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
+                ritualActivo = false;
+
+                const tumbaOrigen = document.querySelector('.alma-maestra');
+                const tumbaDestino = e.currentTarget;
+
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-                    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));   
+                    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
 
                     const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
                     if (contenedorBalance) {
                         contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
                         contenedorBalance.style.opacity = "1";
                     }
-
                     mostrarModalFusionExitosa(pos, ganancia);
                 });
-
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
             }
@@ -945,16 +932,25 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     cerrarRitual(); 
 
     // === ENVIAR EL DESCUENTO REAL A UPSTASH REDIS ===
+    // === ENVIAR ACTUALIZACIÓN DE BALANCE A UPSTASH REDIS ===
     if (window.userWallet) {
         try {
-            console.log(`[RITUAL] Notificando descuento a Redis. Quedan: ${balanceUsuarioSG}`);
+            // CORRECCIÓN MATEMÁTICA CRÍTICA:
+            // Restamos la cantidad transmutada del balance general ANTES de enviarlo a Redis
+            balanceUsuarioSG = balanceUsuarioSG - cantidad;
+            if (balanceUsuarioSG < 0) balanceUsuarioSG = 0; // Evita que baje de cero por seguridad
+
+            // Actualizamos inmediatamente el localStorage para que el saldo persista al refrescar
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            
+            console.log(`[RITUAL] Notificando descuento a Redis. Quedan reales: ${balanceUsuarioSG}`);
             
             const res = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    identidad: window.userWallet, 
-                    nuevoBalance: balanceUsuarioSG,
+                    wallet: window.userWallet, 
+                    nuevoBalance: balanceUsuarioSG, // Ahora sí va el valor restado (ej: 0)
                     accion: 'descontar_ritual'
                 })
             });
