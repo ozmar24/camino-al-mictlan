@@ -78,6 +78,7 @@ function cambiarModoAuth() {
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
 async function manejarAuth() {
+    // 1. Recolección limpia utilizando las IDs exactas de tu HTML
     const emailEl = document.getElementById('email');
     const passwordEl = document.getElementById('password');
     const btnAuth = document.getElementById('btn-auth');
@@ -95,31 +96,52 @@ async function manejarAuth() {
         return;
     }
 
+    // === DETECCIÓN DE ACCIÓN ===
     const accionMistica = esModoRegistro ? 'registro' : 'login';
-    const textoOriginal = btnAuth.innerText;
 
+    // === NUEVO FILTRO DE SEGURIDAD PARA LA CONTRASEÑA (SOLO EN REGISTRO) ===
+    if (accionMistica === 'registro') {
+        // Expresión regular: Mínimo 8 caracteres, 1 mayúscula, 1 minúscula y 1 símbolo/carácter especial
+        const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+        
+        if (!regexPassword.test(password)) {
+            lanzarAlertaMictlan(
+                "La llave secreta es débil. Debe contener al menos 8 caracteres, una deidad mayúscula, una minúscula y un símbolo arcano (ej: @, $, !, #, _).", 
+                "LLAVE INSEGURA"
+            );
+            return; // Bloquea el envío si no pasa la prueba de fuego
+        }
+    }
+
+    // === INICIO DEL PROCESAMIENTO VISUAL ===
+    const textoOriginal = btnAuth.innerText;
     btnAuth.innerText = "PROCESANDO PACTO...";
     btnAuth.disabled = true;
 
     try {
         console.log(`→ Solicitando ${accionMistica} estilo Onyx para: ${email}`);
 
-        const respuesta = await fetch('/api/pacto', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email, password, accion: accionMistica }) });
+        const respuesta = await fetch('/api/pacto', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email, password, accion: accionMistica }) 
+        });
 
-let resultado;
-try {
-  resultado = await respuesta.json();
-} catch (error) {
-  console.error('Respuesta no es JSON. Status:', respuesta.status, 'Error:', err);
-  const texto = await respuesta.text().catch(() => '[no body]');
-  console.error('Respuesta cruda:', texto);
-  lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
-  return;
-}
-
+        // === CONTROL DE ERRORES AL LEER EL JSON ===
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (err) {
+            console.error('Respuesta no es JSON. Status:', respuesta.status, 'Error:', err);
+            const texto = await respuesta.text().catch(() => '[no body]');
+            console.error('Respuesta cruda:', texto);
+            lanzarAlertaMictlan("Respuesta inválida del servidor.", "FALLO DE CONEXIÓN");
+            return;
+        }
 
         console.log("Respuesta del abismo:", resultado);
 
+        // Validamos la respuesta idéntica a Onyx (usando resultado.success)
         if (resultado.success === false) {
             lanzarAlertaMictlan(resultado.error || "Pacto rechazado.", "RITUAL RECHAZADO");
             return;
@@ -127,21 +149,23 @@ try {
 
         if (accionMistica === 'registro') {
             lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
-            cambiarModoAuth();
+            cambiarModoAuth(); // Te pasa automáticamente a la pantalla de Login
         } else {
+            // Sincronización radical del LocalStorage
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
             localStorage.setItem('email', resultado.usuario.email);
-
+            
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             entrarAlCampoSanto({ balanceSG: resultado.usuario.balance || 0 });
         }
 
     } catch (error) {
-        console.error("Error en manejarAuth:", error);
+        console.error("Error crítico en manejarAuth:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     } finally {
+        // Devolvemos siempre el botón a su estado original pase lo que pase
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;
     }
