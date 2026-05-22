@@ -207,12 +207,17 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === CARGA CORRECTA DEL BALANCE ===
-    balanceUsuarioSG = perfil.balanceSG || 
-                      parseFloat(localStorage.getItem('soulgeist_balance')) || 
-                      0;
+    // === SOLUCIÓN TOTAL CONTRA SALDOS RESIDUALES ===
+    // Validamos estrictamente si 'balanceSG' existe y es un número. 
+    // Si viene del backend (sea 0 o 100), lo usamos directamente ignorando el localStorage viejo.
+    if (perfil && typeof perfil.balanceSG !== 'undefined') {
+        balanceUsuarioSG = parseFloat(perfil.balanceSG);
+    } else {
+        // Solo si por alguna razón no viene nada del backend, usamos el respaldo
+        balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    }
 
-    // Guardamos en localStorage para que persista al recargar
+    // Guardamos en localStorage para que persista el saldo REAL de este usuario actual al recargar
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
     generarCementerio();
