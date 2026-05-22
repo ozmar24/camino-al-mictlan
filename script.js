@@ -361,7 +361,7 @@ function generarCementerio() {
                 return;
             }
 
-                        if (ritualActivo) {
+                                   if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -370,8 +370,10 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                // DEDUCCIÓN INMEDIATA Y SEGURA
+                // === DEDUCCIÓN CORRECTA Y SEGURA ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
+                
+                // Actualizamos visual + persistencia
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
@@ -381,6 +383,7 @@ function generarCementerio() {
                 const tumbaDestino = e.currentTarget;
 
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+                    // Solo sumamos a la cripta destino
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
 
@@ -389,6 +392,7 @@ function generarCementerio() {
                         contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
                         contenedorBalance.style.opacity = "1";
                     }
+
                     mostrarModalFusionExitosa(pos, ganancia);
                 });
             } else {
