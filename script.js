@@ -919,29 +919,50 @@ function abrirModalSeleccionCantidad(pos) {
     
     modal.style.display = 'block';
 }
-function iniciarTransferenciaElegida(pos, cantidad) {
+async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
     
-    // Descontamos del balance REAL
+    // 1. Descontamos en caliente localmente para dar respuesta visual rápida
     balanceUsuarioSG -= cantidad;
     actualizarBalanceSoulgeist(balanceUsuarioSG);
-    localStorage.setItem('soulgeist_balance', balanceUsuarioSG); // <-- PERSISTENCIA AGREGADA
-    
-    // Calculamos ganancia según tasa
+    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
     const ganancia = cantidad * (pos.tasa || 0);
 
     cerrarRitual(); 
 
+    // === ENVIAR EL DESCUENTO REAL A UPSTASH REDIS ===
+    if (window.userWallet) {
+        try {
+            console.log(`[RITUAL] Notificando descuento a Redis. Quedan: ${balanceUsuarioSG}`);
+            
+            // Reutilizamos tu endpoint pasándole la orden de descontar
+            await fetch('/api/acumular-sg', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    wallet: window.userWallet, 
+                    nuevoBalance: balanceUsuarioSG,
+                    accion: 'descontar_ritual' // Gatillo para activar la resta
+                })
+            });
+        } catch (error) {
+            console.error("Fallo de conexión al restar saldo en Redis:", error);
+        }
+    }
+
+    // 2. Ejecutar animación del alma volando hacia su lápida
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo)); // <-- PERSISTENCIA AGREGADA
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
         
-        // Actualizamos visualmente la tumba
         const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
         if (contenedorBalance) {
             contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
             contenedorBalance.style.opacity = "1";
         }
+
+        mostrarModalFusionExitosa(pos, ganancia);
     });
 }
