@@ -207,34 +207,16 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === CARGA REAL DESDE BACKEND ===
-    if (perfil && typeof perfil.balanceSG !== 'undefined' && perfil.balanceSG > 0) {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG);
-    } else if (window.userWallet) {
-        // Si no viene del perfil, intentamos cargar desde Redis vía acumular
-        fetch('/api/acumular-sg', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wallet: window.userWallet })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.nuevoBalance !== undefined) {
-                balanceUsuarioSG = parseFloat(data.nuevoBalance);
-                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
-                generarCementerio();
-            }
-        })
-        .catch(() => {
-            balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
-        });
+    // === CARGA DE BALANCE RESPETANDO TU ESTRUCTURA ===
+    if (perfil && typeof perfil.balanceSG !== 'undefined') {
+        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
     } else {
         balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
 
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-    console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
+
+    console.log("=== BALANCE CARGADO AL ENTRAR ===", balanceUsuarioSG);
 
     generarCementerio();
 }
@@ -379,7 +361,7 @@ function generarCementerio() {
                 return;
             }
 
-                            if (ritualActivo) {
+                          if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -388,7 +370,7 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                // === DEDUCCIÓN INMEDIATA ===
+                // === DEDUCCIÓN CORRECTA ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
 
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
@@ -401,6 +383,8 @@ function generarCementerio() {
 
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+                    
+                    // MANTENEMOS TU VERIFICACIÓN DE LOCALSTORAGE
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
 
                     const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
