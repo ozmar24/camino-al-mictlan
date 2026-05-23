@@ -171,7 +171,7 @@ async function manejarLoginGoogle(response) {
     }
 }
 
-async function entrarAlCampoSanto(perfil) {
+function entrarAlCampoSanto(perfil = {}) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
@@ -181,31 +181,18 @@ async function entrarAlCampoSanto(perfil) {
 
     if (candelabro) {
         candelabro.style.display = 'block';
-        setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
+        setTimeout(() => candelabro.style.opacity = '1', 50);
     }
 
-    // === LIMPIEZA TOTAL: Eliminamos el saldo anterior ===
-    localStorage.removeItem('soulgeist_balance');
-
-    try {
-        const res = await fetch(`/api/acumular-sg?wallet=${window.userWallet}`, { method: 'GET' });
-        const data = await res.json();
-        
-        // Si el servidor responde, usamos el valor real
-        if (data.balance !== undefined) {
-            balanceUsuarioSG = parseFloat(data.balance);
-        } else {
-            balanceUsuarioSG = 0; // Usuario nuevo
-        }
-    } catch (error) {
-        console.error("No se pudo conectar con la Cripta. Asumiendo saldo 0.");
-        balanceUsuarioSG = 0; // Si falla el servidor, mostramos 0, NO el saldo viejo
+    // Carga fuerte
+    if (perfil && perfil.balanceSG !== undefined) {
+        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
     }
 
-    // === ACTUALIZACIÓN DE ESTADO ===
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-    console.log("=== SALDO REAL CARGADO:", balanceUsuarioSG, "===");
+    console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
 
+    actualizarBalanceSoulgeist(balanceUsuarioSG);
     generarCementerio();
 }
 
@@ -349,37 +336,35 @@ function generarCementerio() {
                 return;
             }
 
-                            if (ritualActivo) {
+                 if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
                 }
 
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
-                const ganancia = cantidadEnviada * (pos.tasa || 0);
+                
+                if (cantidadEnviada > balanceUsuarioSG) {
+                    lanzarAlertaMictlan("No tienes suficiente Soulgeist.", "RITUAL DENEGADO");
+                    return;
+                }
 
-                // DEDUCCIÓN REAL
+                // DESCUESTA REAL
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
-
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+                actualizarBalanceSoulgeist(balanceUsuarioSG);
 
                 ritualActivo = false;
 
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadEnviada * (pos.tasa || 0), pos, () => {
+                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + (cantidadEnviada * (pos.tasa || 0));
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-
-                    const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-                    if (contenedorBalance) {
-                        contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-                        contenedorBalance.style.opacity = "1";
-                    }
-
-                    mostrarModalFusionExitosa(pos, ganancia);
+                    
+                    generarCementerio(); // Refresca todo
+                    mostrarModalFusionExitosa(pos, cantidadEnviada * (pos.tasa || 0));
                 });
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
@@ -954,22 +939,31 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
         mostrarModalFusionExitosa(pos, ganancia);
     });
 }
+// ======================== SINCRONIZACIÓN DE BALANCE ========================
 async function sincronizarBalanceConRedis() {
-    if (!window.userWallet) return;
+    if (!window.userWallet) {
+        console.log("⚠️ No hay wallet, usando localStorage");
+        return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    }
+
     try {
-        // Debes tener una ruta en tu API para obtener el saldo actual
-        const res = await fetch(`/api/obtener-balance?wallet=${window.userWallet}`);
+        const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(window.userWallet)}`);
+        if (!res.ok) throw new Error("Error al obtener balance");
+
         const data = await res.json();
+        
         if (data.balance !== undefined) {
-            balanceUsuarioSG = data.balance;
-            localStorage.setItem('soulgeist_balance', data.balance);
-            // Actualiza también el elemento visual si existe
-            const display = document.getElementById('display-balance');
-            if (display) display.innerText = data.balance;
+            balanceUsuarioSG = parseFloat(data.balance) || 0;
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            console.log("✅ Balance cargado desde Redis:", balanceUsuarioSG);
+            return balanceUsuarioSG;
         }
     } catch (e) {
-        console.error("Error al sincronizar saldo:", e);
+        console.warn("No se pudo conectar con Redis, usando localStorage", e);
     }
+
+    balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    return balanceUsuarioSG;
 }
 // Agrega esta función a tu script.js
 function resetearMemoriaUsuario() {
