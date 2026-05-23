@@ -17,12 +17,10 @@ export default async function handler(req, res) {
     const cleanUrl = redisUrl?.replace(/\/$/, "");
     const balanceKey = `user:balance:${wallet}`;
 
-    // ==========================================
-    // DESCONTAR SALDO DEL RITUAL (Soulgeist -> Cripta)
-    // ==========================================
+    // ====================== DESCONTAR RITUAL ======================
     if (accion === 'descontar_ritual') {
         if (typeof nuevoBalance === 'undefined') {
-            return res.status(400).json({ error: 'Falta el nuevo balance para actualizar.' });
+            return res.status(400).json({ error: 'Falta el nuevo balance.' });
         }
         try {
             await fetch(`${cleanUrl}`, {
@@ -36,18 +34,16 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                mensaje: "Balance actualizado en Redis.",
+                mensaje: "Balance descontado correctamente en Redis.",
                 nuevoBalance: parseFloat(nuevoBalance)
             });
         } catch (error) {
-            console.error("Error al descontar:", error);
-            return res.status(500).json({ error: "Fallo interno al actualizar Redis." });
+            console.error("Error descontando:", error);
+            return res.status(500).json({ error: "Fallo al actualizar Redis." });
         }
     }
 
-    // ==========================================
-    // ACUMULAR POR VIDEO (Lógica original mejorada)
-    // ==========================================
+    // ====================== ACUMULAR VIDEO ======================
     const cooldownKey = `user:cooldown:video:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const TIEMPO_ESPERA_VIDEO = 60;
     const RECOMPENSA_SG = 10;
@@ -67,17 +63,14 @@ export default async function handler(req, res) {
             });
         }
 
-        // Acumular
         await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         });
 
-        // Cooldown
         await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         });
 
-        // Obtener nuevo balance
         const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { 
             headers: { Authorization: `Bearer ${redisToken}` } 
         }).then(r => r.json());
