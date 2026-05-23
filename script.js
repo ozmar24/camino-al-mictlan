@@ -171,7 +171,7 @@ async function manejarLoginGoogle(response) {
     }
 }
 
-function entrarAlCampoSanto(perfil) {
+async function entrarAlCampoSanto(perfil) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
@@ -184,17 +184,26 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // === CARGA PRIORITARIA DESDE REDIS / LOCALSTORAGE ===
-    if (perfil && typeof perfil.balanceSG !== 'undefined') {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
-    } else {
+    try {
+        const res = await fetch(`/api/acumular-sg?wallet=${window.userWallet}`, { method: 'GET' });
+        const data = await res.json();
+        
+        // Si el servidor responde, usamos ese valor sí o sí
+        if (data.balance !== undefined) {
+            balanceUsuarioSG = parseFloat(data.balance);
+            console.log("Saldo verificado en Cripta:", balanceUsuarioSG);
+        }
+    } catch (error) {
+        console.error("No se pudo conectar con la Cripta, usando respaldo local:", error);
+        // Respaldo solo si el servidor falla por completo
         balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
 
+    // === PASO 2: ACTUALIZACIÓN DE ESTADO ===
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+    console.log("=== BALANCE FINAL CARGADO ===", balanceUsuarioSG);
 
-    console.log("=== BALANCE CARGADO AL ENTRAR ===", balanceUsuarioSG);
-
+    // === PASO 3: DIBUJAR ===
     generarCementerio();
 }
 
