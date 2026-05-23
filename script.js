@@ -184,26 +184,28 @@ async function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
+    // === LIMPIEZA TOTAL: Eliminamos el saldo anterior ===
+    localStorage.removeItem('soulgeist_balance');
+
     try {
         const res = await fetch(`/api/acumular-sg?wallet=${window.userWallet}`, { method: 'GET' });
         const data = await res.json();
         
-        // Si el servidor responde, usamos ese valor sí o sí
+        // Si el servidor responde, usamos el valor real
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance);
-            console.log("Saldo verificado en Cripta:", balanceUsuarioSG);
+        } else {
+            balanceUsuarioSG = 0; // Usuario nuevo
         }
     } catch (error) {
-        console.error("No se pudo conectar con la Cripta, usando respaldo local:", error);
-        // Respaldo solo si el servidor falla por completo
-        balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+        console.error("No se pudo conectar con la Cripta. Asumiendo saldo 0.");
+        balanceUsuarioSG = 0; // Si falla el servidor, mostramos 0, NO el saldo viejo
     }
 
-    // === PASO 2: ACTUALIZACIÓN DE ESTADO ===
+    // === ACTUALIZACIÓN DE ESTADO ===
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-    console.log("=== BALANCE FINAL CARGADO ===", balanceUsuarioSG);
+    console.log("=== SALDO REAL CARGADO:", balanceUsuarioSG, "===");
 
-    // === PASO 3: DIBUJAR ===
     generarCementerio();
 }
 
@@ -968,4 +970,22 @@ async function sincronizarBalanceConRedis() {
     } catch (e) {
         console.error("Error al sincronizar saldo:", e);
     }
+}
+// Agrega esta función a tu script.js
+function resetearMemoriaUsuario() {
+    localStorage.removeItem('soulgeist_balance');
+    localStorage.removeItem('soulgeist_criptas'); // O cualquier otra llave que uses
+    balanceUsuarioSG = 0;
+    console.log("Memoria local limpiada para un nuevo usuario.");
+}
+function limpiarSesionPrevia() {
+    localStorage.removeItem('soulgeist_balance');
+    // Si usas otras llaves, remuévelas también aquí
+    console.log("Memoria limpiada: Preparando para un nuevo pacto.");
+}
+// Ejemplo al obtener éxito del login
+async function loginExitoso(datosUsuario) {
+    limpiarSesionPrevia(); // Limpia la basura anterior
+    window.userWallet = datosUsuario.email; // Define la identidad
+    await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
