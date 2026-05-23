@@ -194,7 +194,7 @@ async function manejarLoginGoogle(response) {
     }
 }
 
-async function entrarAlCampoSanto(perfil) {
+function entrarAlCampoSanto(perfil) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
@@ -207,31 +207,16 @@ async function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // --- AQUÍ EMPIEZA LA SINCRONIZACIÓN ---
-    console.log("Sincronizando con Redis antes de mostrar...");
-    
-    try {
-        // Consultamos a Redis para saber el saldo real
-        const res = await fetch(`/api/obtener-balance?wallet=${window.userWallet}`);
-        const data = await res.json();
-        
-        if (data.balance !== undefined) {
-            balanceUsuarioSG = parseFloat(data.balance);
-            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            console.log("Balance sincronizado desde Redis:", balanceUsuarioSG);
-        }
-    } catch (error) {
-        console.error("No se pudo conectar con Redis, usando valor local:", error);
-        // Si falla, usamos lo que ya tenías en el perfil o localStorage
-        balanceUsuarioSG = (perfil && typeof perfil.balanceSG !== 'undefined') 
-            ? parseFloat(perfil.balanceSG) 
-            : parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    // === CARGA SEGURA DEL BALANCE ===
+    if (perfil && typeof perfil.balanceSG !== 'undefined') {
+        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
+    } else {
+        balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
-    // --- AQUÍ TERMINA LA SINCRONIZACIÓN ---
 
-    // Finalmente generamos el cementerio con el saldo ya verificado
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-    console.log("=== BALANCE FINAL CARGADO ===", balanceUsuarioSG);
+
+    console.log("=== BALANCE CARGADO AL ENTRAR ===", balanceUsuarioSG);
 
     generarCementerio();
 }
@@ -376,7 +361,7 @@ function generarCementerio() {
                 return;
             }
 
-               if (ritualActivo) {
+                         if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -385,46 +370,17 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
-                // 1. Descuento local en la pantalla
+                // === DEDUCCIÓN REAL ===
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
+
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
                 ritualActivo = false;
 
-                // =========================================================
-                // 2. EL ESLABÓN PERDIDO: AVISAR AL BACKEND DEL DESCUENTO
-                // =========================================================
-                const walletActiva = window.userWallet || localStorage.getItem('wallet') || localStorage.getItem('soulgeist_wallet');
-
-                if (!walletActiva) {
-                    alert("⚠️ ALERTA DE DEBUG: No se encontró la wallet. El descuento no se pudo enviar a Redis.");
-                } else {
-                    fetch('/api/acumular-sg', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            wallet: walletActiva,
-                            nuevoBalance: balanceUsuarioSG, // Mandamos el saldo descontado (ej: 0)
-                            accion: 'descontar_ritual'
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert("⚠️ ERROR DEL SERVIDOR: " + data.error);
-                        }
-                    })
-                    .catch(err => {
-                        alert("⚠️ ERROR DE RED: Falló la conexión con tu API en Vercel.");
-                    });
-                }
-                // =========================================================
-
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
-                // 3. Ejecutar animación y guardar saldo en la cripta
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
