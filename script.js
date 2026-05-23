@@ -509,7 +509,7 @@ function procesarRetiro() {
 }
 
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
-aasync function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
+async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
         console.log("🔄 Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
 
