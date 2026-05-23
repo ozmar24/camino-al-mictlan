@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     if (accion === 'descontar_ritual') {
         if (typeof nuevoBalance === 'undefined') {
             return res.status(400).json({ error: 'Falta el nuevo balance.' });
+	return;
         }
         try {
             // CONSTRUIMOS EL COMANDO EN LA URL: /set/llave/valor
@@ -65,11 +66,12 @@ export default async function handler(req, res) {
     }
 
     // ====================== ACUMULAR VIDEO ======================
-    const cooldownKey = `user:cooldown:video:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  const cooldownKey = `user:cooldown:video:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}`;
     const TIEMPO_ESPERA_VIDEO = 60;
     const RECOMPENSA_SG = 10;
 
     try {
+        // 1. Verificar Cooldown
         const checkCooldown = await fetch(`${cleanUrl}/get/${cooldownKey}`, {
             headers: { Authorization: `Bearer ${redisToken}` }
         }).then(r => r.json());
@@ -78,23 +80,15 @@ export default async function handler(req, res) {
             const ttlRes = await fetch(`${cleanUrl}/ttl/${cooldownKey}`, {
                 headers: { Authorization: `Bearer ${redisToken}` }
             }).then(r => r.json());
-           
-            return res.status(429).json({ 
-                error: `Los ancestros exigen paciencia. Podrás absorber más en ${ttlRes.result} segundos.` 
-            });
+            return res.status(429).json({ error: `Espera ${ttlRes.result}s.` });
         }
 
-        await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
+        // 2. Acumular y Bloquear
+        await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { headers: { Authorization: `Bearer ${redisToken}` } });
+        await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { headers: { Authorization: `Bearer ${redisToken}` } });
 
-        await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
-
-        const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        }).then(r => r.json());
+        // 3. Obtener nuevo balance
+        const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { headers: { Authorization: `Bearer ${redisToken}` } }).then(r => r.json());
 
         return res.status(200).json({
             success: true,
@@ -103,7 +97,7 @@ export default async function handler(req, res) {
         });
 
     } catch (e) {
-        console.error("Error acumulando SG:", e);
-        return res.status(500).json({ error: "Error en las criptas de Upstash." });
+        console.error("Error acumulando:", e);
+        return res.status(500).json({ error: "Fallo en las criptas." });
     }
 }
