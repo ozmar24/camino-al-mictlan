@@ -359,13 +359,16 @@ function generarCementerio() {
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadEnviada * (pos.tasa || 0), pos, () => {
-                    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + (cantidadEnviada * (pos.tasa || 0));
-                    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-                    
-                    generarCementerio(); // Refresca todo
-                    mostrarModalFusionExitosa(pos, cantidadEnviada * (pos.tasa || 0));
-                });
+                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadEnviada * (pos.tasa || 0), pos, async () => {
+    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + (cantidadEnviada * (pos.tasa || 0));
+    localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+
+    // === ACTUALIZACIÓN CRÍTICA EN REDIS ===
+    await descontarBalanceEnRedis(balanceUsuarioSG);
+
+    generarCementerio();
+    mostrarModalFusionExitosa(pos, cantidadEnviada * (pos.tasa || 0));
+});
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");
             }
@@ -982,4 +985,28 @@ async function loginExitoso(datosUsuario) {
     limpiarSesionPrevia(); // Limpia la basura anterior
     window.userWallet = datosUsuario.email; // Define la identidad
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
+}
+async function descontarBalanceEnRedis(nuevoBalance) {
+    if (!window.userWallet) return;
+
+    try {
+        const respuesta = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                wallet: window.userWallet,
+                nuevoBalance: nuevoBalance,
+                accion: 'descontar_ritual'
+            })
+        });
+
+        const resultado = await respuesta.json();
+        console.log("✅ Descuento enviado a Redis:", resultado);
+
+        if (respuesta.ok) {
+            console.log("Balance actualizado en Redis correctamente");
+        }
+    } catch (error) {
+        console.error("❌ Error al actualizar Redis:", error);
+    }
 }
