@@ -17,33 +17,36 @@ export default async function handler(req, res) {
     const cleanUrl = redisUrl?.replace(/\/$/, "");
     const balanceKey = `user:balance:${wallet}`;
 
-    // ====================== DESCONTAR RITUAL (FORMA SEGURA) ======================
+    // ====================== DESCONTAR RITUAL (FORMA DIRECTA A URL) ======================
     if (accion === 'descontar_ritual') {
         if (typeof nuevoBalance === 'undefined') {
             return res.status(400).json({ error: 'Falta el nuevo balance.' });
         }
         try {
-            // Usamos el formato /set/llave/valor que sabemos que funciona en tu proyecto
-            const urlFinal = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
+            // CONSTRUIMOS EL COMANDO EN LA URL: /set/llave/valor
+            // Esto evita enviar cualquier JSON que esté causando el 400
+            const urlRedis = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
             
-            const response = await fetch(urlFinal, {
-                method: 'POST', // Upstash requiere POST incluso en la URL
+            const response = await fetch(urlRedis, {
+                method: 'POST',
                 headers: { 
-                    Authorization: `Bearer ${redisToken}`
+                    'Authorization': `Bearer ${redisToken}`
                 }
             });
 
             const data = await response.json();
 
+            // Si Upstash devuelve un error, lo veremos en el log
             if (data.error) {
-                return res.status(500).json({ error: "Error de Redis: " + data.error });
+                console.error("Upstash rechazó el comando:", data.error);
+                return res.status(500).json({ error: "Redis rechazó el cambio: " + data.error });
             }
 
             return res.status(200).json({ success: true, nuevoBalance: nuevoBalance });
             
         } catch (error) {
-            console.error("Fallo crítico al conectar con Redis:", error);
-            return res.status(500).json({ error: "Fallo de comunicación con la base de datos." });
+            console.error("Error crítico en la comunicación con Redis:", error);
+            return res.status(500).json({ error: "No se pudo contactar con el Inframundo." });
         }
     }
 
