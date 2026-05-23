@@ -194,7 +194,7 @@ async function manejarLoginGoogle(response) {
     }
 }
 
-function entrarAlCampoSanto(perfil) {
+async function entrarAlCampoSanto(perfil) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
@@ -207,16 +207,31 @@ function entrarAlCampoSanto(perfil) {
         setTimeout(() => { candelabro.style.opacity = '1'; }, 50);
     }
 
-    // CARGA REAL
-    if (perfil && typeof perfil.balanceSG !== 'undefined') {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
-    } else {
-        balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    // --- AQUÍ EMPIEZA LA SINCRONIZACIÓN ---
+    console.log("Sincronizando con Redis antes de mostrar...");
+    
+    try {
+        // Consultamos a Redis para saber el saldo real
+        const res = await fetch(`/api/acumular-sg?wallet=${window.userWallet}`, { method: 'GET' });
+const data = await res.json();
+        
+        if (data.balance !== undefined) {
+            balanceUsuarioSG = parseFloat(data.balance);
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            console.log("Balance sincronizado desde Redis:", balanceUsuarioSG);
+        }
+    } catch (error) {
+        console.error("No se pudo conectar con Redis, usando valor local:", error);
+        // Si falla, usamos lo que ya tenías en el perfil o localStorage
+        balanceUsuarioSG = (perfil && typeof perfil.balanceSG !== 'undefined') 
+            ? parseFloat(perfil.balanceSG) 
+            : parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
+    // --- AQUÍ TERMINA LA SINCRONIZACIÓN ---
 
+    // Finalmente generamos el cementerio con el saldo ya verificado
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
-    console.log("=== BALANCE CARGADO AL ENTRAR ===", balanceUsuarioSG);
+    console.log("=== BALANCE FINAL CARGADO ===", balanceUsuarioSG);
 
     generarCementerio();
 }
@@ -994,4 +1009,21 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
 
         mostrarModalFusionExitosa(pos, ganancia);
     });
+}
+async function sincronizarBalanceConRedis() {
+    if (!window.userWallet) return;
+    try {
+        // Debes tener una ruta en tu API para obtener el saldo actual
+        const res = await fetch(`/api/obtener-balance?wallet=${window.userWallet}`);
+        const data = await res.json();
+        if (data.balance !== undefined) {
+            balanceUsuarioSG = data.balance;
+            localStorage.setItem('soulgeist_balance', data.balance);
+            // Actualiza también el elemento visual si existe
+            const display = document.getElementById('display-balance');
+            if (display) display.innerText = data.balance;
+        }
+    } catch (e) {
+        console.error("Error al sincronizar saldo:", e);
+    }
 }

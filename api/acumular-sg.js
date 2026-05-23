@@ -1,21 +1,35 @@
 export default async function handler(req, res) {
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const cleanUrl = redisUrl?.replace(/\/$/, "");
+
+    // 1. MANEJO DE CONSULTA DE SALDO (GET)
+    if (req.method === 'GET') {
+        const { wallet } = req.query;
+        if (!wallet) return res.status(400).json({ error: 'Falta la wallet para consultar.' });
+        
+        try {
+            const respuesta = await fetch(`${cleanUrl}/get/user:balance:${wallet}`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            });
+            const data = await respuesta.json();
+            return res.status(200).json({ balance: parseFloat(data.result || 0) });
+        } catch (e) {
+            return res.status(500).json({ error: "Error al consultar Redis" });
+        }
+    }
+
+    // 2. MANEJO DE ACCIONES (POST)
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido' });
     }
 
     const { wallet, nuevoBalance, accion } = req.body;
-   
-    const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
-    const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
+    const balanceKey = `user:balance:${wallet}`;
 
     if (!wallet) {
         return res.status(400).json({ error: 'Falta la credencial del alma (wallet).' });
     }
-
-    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-    const cleanUrl = redisUrl?.replace(/\/$/, "");
-    const balanceKey = `user:balance:${wallet}`;
 
     // ====================== DESCONTAR RITUAL (FORMA DIRECTA A URL) ======================
     if (accion === 'descontar_ritual') {
