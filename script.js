@@ -361,7 +361,7 @@ function generarCementerio() {
                 return;
             }
 
-                             if (ritualActivo) {
+               if (ritualActivo) {
                 if (balanceUsuarioSG <= 0) {
                     lanzarAlertaMictlan("Tu Soulgeist está vacío.", "RITUAL DENEGADO");
                     return;
@@ -370,16 +370,36 @@ function generarCementerio() {
                 const cantidadEnviada = window.cantidadParaRitual || balanceUsuarioSG;
                 const ganancia = cantidadEnviada * (pos.tasa || 0);
 
+                // 1. Descuento local en la pantalla
                 balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
-
                 actualizarBalanceSoulgeist(balanceUsuarioSG);
                 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
                 ritualActivo = false;
 
+                // =========================================================
+                // 2. EL ESLABÓN PERDIDO: AVISAR AL BACKEND DEL DESCUENTO
+                // =========================================================
+                if (window.userWallet) {
+                    fetch('/api/acumular-sg', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            wallet: window.userWallet,
+                            nuevoBalance: balanceUsuarioSG, // Se envía el saldo en 0
+                            accion: 'descontar_ritual'
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log("Redis actualizado tras ritual:", data))
+                    .catch(err => console.error("Error al descontar en Redis:", err));
+                }
+                // =========================================================
+
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
+                // 3. Ejecutar animación y guardar saldo en la cripta
                 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
                     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
                     localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
