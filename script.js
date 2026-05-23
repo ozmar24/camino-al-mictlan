@@ -212,8 +212,8 @@ async function entrarAlCampoSanto(perfil) {
     
     try {
         // Consultamos a Redis para saber el saldo real
-        const res = await fetch(`/api/acumular-sg?wallet=${window.userWallet}`, { method: 'GET' });
-const data = await res.json();
+        const res = await fetch(`/api/obtener-balance?wallet=${window.userWallet}`);
+        const data = await res.json();
         
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance);
