@@ -1015,13 +1015,14 @@ async function descontarBalanceEnRedis(nuevoBalance) {
         console.error("❌ Error al actualizar Redis:", error);
     }
 }
-// Cargar saldos específicos del usuario
-async function cargarSaldosCriptas() {
+// Cargar saldos por usuario
+function cargarSaldosCriptas() {
     if (!window.userWallet) {
         window.tumbasConSaldo = {
             "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
             "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
         };
+        console.log("Nuevo usuario: criptas en cero");
         return;
     }
 
@@ -1031,7 +1032,7 @@ async function cargarSaldosCriptas() {
         
         if (guardados) {
             window.tumbasConSaldo = JSON.parse(guardados);
-            console.log(`✅ Saldos cargados para ${window.userWallet}`);
+            console.log(`✅ Criptas cargadas para ${window.userWallet}`);
         } else {
             window.tumbasConSaldo = {
                 "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
@@ -1045,9 +1046,11 @@ async function cargarSaldosCriptas() {
     }
 }
 
-// Guardar saldos específicos del usuario
+// Guardar saldos por usuario
 function guardarSaldosCriptas() {
     if (!window.userWallet) return;
+    
     const key = `soulgeist_criptas_${window.userWallet}`;
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
+    console.log(`💾 Criptas guardadas para ${window.userWallet}`);
 }
