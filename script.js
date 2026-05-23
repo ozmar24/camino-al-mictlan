@@ -6,9 +6,9 @@ let balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 
 let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
 let ritualActivo = false; // Bloquea o desbloquea la selección de destino
 let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
+// Reemplaza la parte vieja de window.tumbasConSaldo
 if (typeof window.tumbasConSaldo === 'undefined') {
-    const criptasGuardadas = localStorage.getItem('soulgeist_criptas');
-window.tumbasConSaldo = criptasGuardadas ? JSON.parse(criptasGuardadas) : {}; // Guardará ejemplo: { "Solana": true, "Pepe": true }
+    window.tumbasConSaldo = {};
 }
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
@@ -193,6 +193,7 @@ function entrarAlCampoSanto(perfil = {}) {
     console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
 
     actualizarBalanceSoulgeist(balanceUsuarioSG);
+await cargarSaldosCriptas();
     generarCementerio();
 }
 
@@ -508,7 +509,7 @@ function procesarRetiro() {
 }
 
 // === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
-async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
+aasync function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
         console.log("🔄 Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
 
@@ -523,12 +524,11 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
                 cripto: criptoSeleccionada,
                 pasarela: pasarela,
                 cantidadRetiro: saldoCripto,
-                cantidadSG: saldoCripto   // Por si el backend lo usa
+                cantidadSG: saldoCripto
             })
         });
 
         console.log("Status:", respuesta.status);
-
         const resultado = await respuesta.json();
         console.log("Respuesta backend:", resultado);
 
@@ -537,17 +537,22 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
             return;
         }
 
-        // Éxito
+        // === ÉXITO EN EL RETIRO ===
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
+            
             const selector = document.querySelector('.alma-maestra .balance-actual');
             if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
-
-            generarCementerio();
         }
 
+        // ←←← LIMPIAMOS EL SALDO DE LA CRIPTA Y LO GUARDAMOS POR USUARIO
+        if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
+            window.tumbasConSaldo[criptoSeleccionada] = 0;
+            guardarSaldosCriptas();   // ←←← ESTA ES LA LÍNEA IMPORTANTE
+        }
+
+        generarCementerio();
         lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
 
     } catch (error) {
@@ -1009,4 +1014,40 @@ async function descontarBalanceEnRedis(nuevoBalance) {
     } catch (error) {
         console.error("❌ Error al actualizar Redis:", error);
     }
+}
+// Cargar saldos específicos del usuario
+async function cargarSaldosCriptas() {
+    if (!window.userWallet) {
+        window.tumbasConSaldo = {
+            "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
+            "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
+        };
+        return;
+    }
+
+    try {
+        const key = `soulgeist_criptas_${window.userWallet}`;
+        const guardados = localStorage.getItem(key);
+        
+        if (guardados) {
+            window.tumbasConSaldo = JSON.parse(guardados);
+            console.log(`✅ Saldos cargados para ${window.userWallet}`);
+        } else {
+            window.tumbasConSaldo = {
+                "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
+                "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
+            };
+            console.log(`Nuevo usuario: criptas en cero`);
+        }
+    } catch (e) {
+        console.error("Error cargando criptas:", e);
+        window.tumbasConSaldo = {};
+    }
+}
+
+// Guardar saldos específicos del usuario
+function guardarSaldosCriptas() {
+    if (!window.userWallet) return;
+    const key = `soulgeist_criptas_${window.userWallet}`;
+    localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
 }
