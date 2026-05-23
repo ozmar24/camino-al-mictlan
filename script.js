@@ -193,7 +193,7 @@ function entrarAlCampoSanto(perfil = {}) {
     console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
 
     actualizarBalanceSoulgeist(balanceUsuarioSG);
-await cargarSaldosCriptas();
+cargarSaldosCriptas();
     generarCementerio();
 }
 
