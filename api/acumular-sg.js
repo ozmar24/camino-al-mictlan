@@ -23,23 +23,25 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Falta el nuevo balance.' });
         }
         try {
-            await fetch(`${cleanUrl}`, {
-                method: 'POST',
-                headers: { 
-                    Authorization: `Bearer ${redisToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(["SET", balanceKey, String(nuevoBalance)])
+            // SOLUCIÓN: Usar el mismo formato de URL que usas para el INCRBY (100% seguro)
+            const urlDescuento = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
+            
+            const upstashReq = await fetch(urlDescuento, {
+                headers: { Authorization: `Bearer ${redisToken}` }
             });
+            const upstashRes = await upstashReq.json();
 
-            return res.status(200).json({
-                success: true,
-                mensaje: "Balance descontado correctamente en Redis.",
-                nuevoBalance: parseFloat(nuevoBalance)
-            });
+            // Verificar si Upstash rechazó la orden
+            if (upstashRes.error) {
+                console.error("Upstash rechazó el ritual:", upstashRes.error);
+                return res.status(500).json({ error: "El Mictlán rechazó el descuento." });
+            }
+
+            return res.status(200).json({ success: true, nuevoBalance: nuevoBalance });
+            
         } catch (error) {
-            console.error("Error descontando:", error);
-            return res.status(500).json({ error: "Fallo al actualizar Redis." });
+            console.error("Fallo de red hacia Upstash:", error);
+            return res.status(500).json({ error: "Conexión perdida con las criptas." });
         }
     }
 
