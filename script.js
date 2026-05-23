@@ -380,19 +380,29 @@ function generarCementerio() {
                 // =========================================================
                 // 2. EL ESLABÓN PERDIDO: AVISAR AL BACKEND DEL DESCUENTO
                 // =========================================================
-                if (window.userWallet) {
+                const walletActiva = window.userWallet || localStorage.getItem('wallet') || localStorage.getItem('soulgeist_wallet');
+
+                if (!walletActiva) {
+                    alert("⚠️ ALERTA DE DEBUG: No se encontró la wallet. El descuento no se pudo enviar a Redis.");
+                } else {
                     fetch('/api/acumular-sg', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            wallet: window.userWallet,
-                            nuevoBalance: balanceUsuarioSG, // Se envía el saldo en 0
+                            wallet: walletActiva,
+                            nuevoBalance: balanceUsuarioSG, // Mandamos el saldo descontado (ej: 0)
                             accion: 'descontar_ritual'
                         })
                     })
                     .then(res => res.json())
-                    .then(data => console.log("Redis actualizado tras ritual:", data))
-                    .catch(err => console.error("Error al descontar en Redis:", err));
+                    .then(data => {
+                        if (data.error) {
+                            alert("⚠️ ERROR DEL SERVIDOR: " + data.error);
+                        }
+                    })
+                    .catch(err => {
+                        alert("⚠️ ERROR DE RED: Falló la conexión con tu API en Vercel.");
+                    });
                 }
                 // =========================================================
 
