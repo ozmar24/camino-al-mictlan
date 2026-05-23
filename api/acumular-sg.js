@@ -17,29 +17,33 @@ export default async function handler(req, res) {
     const cleanUrl = redisUrl?.replace(/\/$/, "");
     const balanceKey = `user:balance:${wallet}`;
 
-    // ====================== DESCONTAR RITUAL ======================
+    // ====================== DESCONTAR RITUAL (FORMA SEGURA) ======================
     if (accion === 'descontar_ritual') {
         if (typeof nuevoBalance === 'undefined') {
             return res.status(400).json({ error: 'Falta el nuevo balance.' });
         }
         try {
-            // OBLIGAMOS A USAR LA URL DIRECTA PARA EVITAR RECHAZOS DE UPSTASH
-            const urlDescuento = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
+            // Usamos el formato /set/llave/valor que sabemos que funciona en tu proyecto
+            const urlFinal = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
             
-            const upstashReq = await fetch(urlDescuento, {
-                headers: { Authorization: `Bearer ${redisToken}` }
+            const response = await fetch(urlFinal, {
+                method: 'POST', // Upstash requiere POST incluso en la URL
+                headers: { 
+                    Authorization: `Bearer ${redisToken}`
+                }
             });
-            const upstashRes = await upstashReq.json();
 
-            // Si Upstash tira error, se lo mandamos a tu pantalla
-            if (upstashRes.error) {
-                return res.status(500).json({ error: "Upstash rechazó la orden: " + upstashRes.error });
+            const data = await response.json();
+
+            if (data.error) {
+                return res.status(500).json({ error: "Error de Redis: " + data.error });
             }
 
             return res.status(200).json({ success: true, nuevoBalance: nuevoBalance });
             
         } catch (error) {
-            return res.status(500).json({ error: "Fallo de conexión en el backend hacia el Mictlán." });
+            console.error("Fallo crítico al conectar con Redis:", error);
+            return res.status(500).json({ error: "Fallo de comunicación con la base de datos." });
         }
     }
 
