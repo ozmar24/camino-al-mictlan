@@ -1040,3 +1040,25 @@ function guardarSaldosCriptas() {
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
     console.log(`💾 Guardado criptas para ${window.userWallet}`);
 }
+function salirDelMictlan() {
+    // 1. Limpiamos la identidad del alma (sesión)
+    localStorage.removeItem('soulgeist_user_email');
+    localStorage.removeItem('usuario_email');
+    // Opcional: Si quieres limpiar el balance al salir
+    // localStorage.removeItem('soulgeist_balance'); 
+
+    lanzarAlertaMictlan("Tu rastro se desvanece... Regresando al umbral.", "ALMA EN REPOSO");
+
+    // 2. Recargamos la página después de un momento para volver al portal inicial
+    setTimeout(() => {
+        window.location.reload();
+    }, 2000);
+}
+
+// Vincular el botón al cargar el documento
+document.addEventListener("DOMContentLoaded", () => {
+    const btnSalir = document.getElementById('btn-salir-mictlan');
+    if (btnSalir) {
+        btnSalir.onclick = salirDelMictlan;
+    }
+});
