@@ -50,46 +50,71 @@ export default async function handler(req, res) {
         }
     }
 
-    // ====================== ACUMULAR VIDEO ======================
-    const cooldownKey = `user:cooldown:video:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    const TIEMPO_ESPERA_VIDEO = 60;
-    const RECOMPENSA_SG = 10;
+  export default async function handler(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-    try {
-        const checkCooldown = await fetch(`${cleanUrl}/get/${cooldownKey}`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
-        }).then(r => r.json());
+    const { wallet, nuevoBalance, accion } = req.body;
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const cleanUrl = redisUrl?.replace(/\/$/, "");
+    const balanceKey = `user:balance:${wallet}`;
 
-        if (checkCooldown && checkCooldown.result) {
-            const ttlRes = await fetch(`${cleanUrl}/ttl/${cooldownKey}`, {
-                headers: { Authorization: `Bearer ${redisToken}` }
+    // 1. LÓGICA DE DESCONTAR RITUAL (Para retiros)
+    if (accion === 'descontar_ritual') {
+        try {
+            // Obtenemos el objeto actual
+            const resActual = await fetch(`${cleanUrl}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(["GET", balanceKey])
             }).then(r => r.json());
-           
-            return res.status(429).json({ 
-                error: `Los ancestros exigen paciencia. Podrás absorber más en ${ttlRes.result} segundos.` 
+
+            let usuario = resActual.result ? JSON.parse(resActual.result) : { balance_soulgeist: 0 };
+            
+            // Actualizamos balance
+            usuario.balance_soulgeist = nuevoBalance;
+
+            // Guardamos el objeto completo
+            await fetch(`${cleanUrl}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(["SET", balanceKey, JSON.stringify(usuario)])
             });
+
+            return res.status(200).json({ success: true });
+        } catch (e) {
+            return res.status(500).json({ error: "Error en el Inframundo." });
         }
+    }
 
-        await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
-
-        await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
-
-        const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
+    // 2. LÓGICA DE ACUMULAR (La que activa el video)
+    const RECOMPENSA_SG = 10;
+    try {
+        // Obtenemos el objeto del usuario
+        const resActual = await fetch(`${cleanUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(["GET", balanceKey])
         }).then(r => r.json());
 
-        return res.status(200).json({
-            success: true,
-            mensaje: `Has absorbido +${RECOMPENSA_SG} SG.`,
-            nuevoBalance: parseInt(resNuevoBalance.result || 0, 10)
+        // Parseamos o inicializamos si es usuario nuevo
+        let usuario = resActual.result ? JSON.parse(resActual.result) : { 
+            balance_soulgeist: 0, 
+            saldos_criptas: { "Bitcoin": 0, "Ethereum": 0, "Solana": 0 } 
+        };
+
+        // Sumamos la recompensa
+        usuario.balance_soulgeist = parseInt(usuario.balance_soulgeist || 0) + RECOMPENSA_SG;
+
+        // Guardamos el objeto completo de vuelta en Redis
+        await fetch(`${cleanUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(["SET", balanceKey, JSON.stringify(usuario)])
         });
 
+        return res.status(200).json({ success: true, nuevoBalance: usuario.balance_soulgeist });
     } catch (e) {
-        console.error("Error acumulando SG:", e);
-        return res.status(500).json({ error: "Error en las criptas de Upstash." });
+        return res.status(500).json({ error: "Error en las criptas." });
     }
 }
