@@ -70,7 +70,8 @@ export default async function handler(req, res) {
 
     const walletKey = `user:wallet:${wallet}:${cripto}`;
     const ipKey = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`; 
-    const balanceKey = `user:balance:${identidad}`;
+    const emailNormalizado = identidad.toLowerCase().trim();
+const balanceKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
     try {
         // 5. Consultar candados de Wallet e IP en paralelo en Upstash
@@ -95,14 +96,19 @@ export default async function handler(req, res) {
             return res.status(403).json({ error: `Este dispositivo ya canalizó energía para ${cripto} recientemente. El umbral se abrirá en ${horas}h y ${minutos}m.` });
         }
 
-        // 6. Validamos la cantidad enviada de la tumba
-        const balanceUsuarioSG = parseFloat(cantidadSG) || 0;
+        // 6. LEER EL OBJETO REAL DEL USUARIO DESDE LA LLAVE UNIFICADA
+const resUsuario = await fetch(`${cleanUrl}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(["GET", balanceKey])
+}).then(r => r.json());
 
-        if (balanceUsuarioSG <= 0) {
-            return res.status(400).json({ 
-                error: `La cripta de ${cripto} está completamente vacía en el abismo.` 
-            });
-        }
+let usuario = resUsuario.result ? JSON.parse(resUsuario.result) : null;
+const balanceUsuarioSG = usuario ? parseFloat(usuario.balance_soulgeist || 0) : 0;
+
+if (balanceUsuarioSG <= 0) {
+    return res.status(400).json({ error: `La cripta está vacía.` });
+}
 
         // 7. Calculamos la transmutación final a enviar a la pasarela
         const cantidadAEnviar = balanceUsuarioSG * infoCripta.tasa;
@@ -163,25 +169,28 @@ export default async function handler(req, res) {
         // CIERRE DE CANDADOS Y LIMPIEZA SEGURA EN REDIS (SIN BARRAS EN URL)
         // ==================================================================
         if (pagoExitoso) {
-            const tiempoDeVida = 86400; // 24 horas exactas en segundos
-            
-            await Promise.all([
-                fetch(`${cleanUrl}`, {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(["SET", walletKey, "activo", "EX", String(tiempoDeVida)])
-                }),
-                fetch(`${cleanUrl}`, {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(["SET", ipKey, "activo", "EX", String(tiempoDeVida)])
-                }),
-                fetch(`${cleanUrl}`, {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(["SET", balanceKey, "0"]) // Seteo del balance a cero impecable
-                })
-            ]);
+    const tiempoDeVida = 86400;
+
+    // Actualizamos el objeto del usuario poniendo el balance en 0
+    usuario.balance_soulgeist = "0";
+
+    await Promise.all([
+        fetch(`${cleanUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(["SET", walletKey, "activo", "EX", String(tiempoDeVida)])
+        }),
+        fetch(`${cleanUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(["SET", ipKey, "activo", "EX", String(tiempoDeVida)])
+        }),
+        fetch(`${cleanUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(["SET", balanceKey, JSON.stringify(usuario)]) // Guardamos el objeto limpio
+        })
+    ]);
 
             await enviarAlertaTelegram(`💀 *MICTLÁN* - 💰 *Retiro Multi-Pasarela*\n*Wallet/ID:* \`${wallet}\`\n*Pasarela:* \`${pasarela.toUpperCase()}\`\n*Cripto:* \`${cripto}\`\n*Cantidad:* \`${cantidadAEnviar.toFixed(7)}\` ${infoCripta.simFP}\n*IP:* \`${ipLimpia}\`\n*País:* ${country}`);
 
