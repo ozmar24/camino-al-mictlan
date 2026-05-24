@@ -104,14 +104,14 @@ const resUsuario = await fetch(`${cleanUrl}`, {
 }).then(r => r.json());
 
 let usuario = resUsuario.result ? JSON.parse(resUsuario.result) : null;
-const balanceUsuarioSG = usuario ? parseFloat(usuario.balance_soulgeist || 0) : 0;
+const balanceReal = parseFloat(usuario.saldos_criptas?.[cripto] || 0);
 
-if (balanceUsuarioSG <= 0) {
+if (balanceReal <= 0) {
     return res.status(400).json({ error: `La cripta está vacía.` });
 }
 
         // 7. Calculamos la transmutación final a enviar a la pasarela
-        const cantidadAEnviar = balanceUsuarioSG * infoCripta.tasa;
+        const cantidadAEnviar = balanceReal * infoCripta.tasa;
 
         // ==================================================================
         // ESCUDO DE MONTO MÍNIMO NATIVO EQUIVALENTE (CORREGIDO)
