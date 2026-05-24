@@ -908,20 +908,24 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     const ganancia = cantidad * (pos.tasa || 0);
     cerrarRitual(); 
 
-    if (window.userWallet) {
+   if (window.userWallet) {
         try {
-            // Enviamos el balance ya restado a Redis
+            // AQUÍ ES DONDE ESTABA EL ERROR: 
+            // Ya no restamos de nuevo, simplemente enviamos el balanceUsuarioSG que ya restamos arriba.
+            
+            console.log(`[RITUAL] Notificando descuento a Redis. Quedan: ${balanceUsuarioSG}`);
+            
             await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     wallet: window.userWallet, 
-                    nuevoBalance: balanceUsuarioSG,
+                    nuevoBalance: balanceUsuarioSG, 
                     accion: 'descontar_ritual'
                 })
             });
         } catch (error) {
-            console.error("Error al actualizar Redis:", error);
+            console.error("Fallo de conexión al restar saldo en Redis:", error);
         }
     }
 
