@@ -405,9 +405,7 @@ guardarSaldosCriptas();
 // ==================================================================
 function abrirModalCosechaFinal(pos) {
     const campoSanto = document.getElementById('campo-santo');
-    if (campoSanto) {
-        campoSanto.style.filter = "blur(5px) brightness(0.4)";
-    }
+    if (campoSanto) campoSanto.style.filter = "blur(5px) brightness(0.4)";
 
     const modal = document.getElementById('modal-ritual');
     if (!modal) return;
@@ -415,20 +413,21 @@ function abrirModalCosechaFinal(pos) {
     modal.style.setProperty('--color-ritmo', pos.color || "#f7931a");
     modal.style.display = 'block';
 
-    // Calcular saldo
     const saldoAcumulado = window.tumbasConSaldo[pos.nombre] || 0;
+
+    console.log(`Abriendo retiro de ${pos.nombre} - Saldo real: ${saldoAcumulado}`);
 
     document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
 
     window.currentCripto = pos;
 
-    // Contenido del modal
     document.getElementById('info-ritual').innerHTML = `
         <div style="text-align: center; margin-bottom: 20px;">
             <p style="color: #fff; font-size: 19px; margin: 10px 0;">
                 Saldo disponible: 
                 <b style="color: ${pos.color};">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
             </p>
+            <small style="color:#aaa;">Mínimo aproximado: ${pos.usdMinimo || 0.15} USD</small>
         </div>
 
         <div style="margin-bottom: 18px;">
@@ -437,7 +436,6 @@ function abrirModalCosechaFinal(pos) {
             </label>
             <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
                     style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
-                
                 <option value="bitso">Bitso</option>
                 <option value="coinbase">Coinbase</option>
                 <option value="binance">Binance</option>
@@ -450,7 +448,6 @@ function abrirModalCosechaFinal(pos) {
         </div>
     `;
 
-    // Botones
     const botones = document.querySelector('.botones-exchange');
     if (botones) {
         botones.innerHTML = `
@@ -503,11 +500,17 @@ function procesarRetiro() {
         return;
     }
 
-    const pasarelaElegida = selectPasarela ? selectPasarela.value : "faucetpay";
+    const pasarelaElegida = selectPasarela ? selectPasarela.value : "bitso";
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
-    cerrarRitual();
+    const saldoActual = window.tumbasConSaldo[nombreCripto] || 0;
 
+    if (saldoActual <= 0) {
+        lanzarAlertaMictlan("No tienes saldo en esta cripta.", "CRIPTAS VACÍAS");
+        return;
+    }
+
+    cerrarRitual();
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 
@@ -695,7 +698,7 @@ function mostrarPergamino(tipo) {
         cuerpo.innerHTML = "EL CONTRATO ES DE POR VIDA.<br>LOS RECLAMOS REQUIEREN SACRIFICIO.<br>EL MICTLÁN NO OLVIDA."; 
     } else if (tipo === 'alianzas') {
         titulo.innerText = "ALIANZAS OSCURAS"; 
-        cuerpo.innerHTML = "<br><br>• FAUCETPAY<br>• BITSO<br>• COINBASE<br>• BINANCE"; 
+        cuerpo.innerHTML = "<br><br>• BITSO<br>• COINBASE<br>• BINANCE"; 
     }
 
     if (pantalla) {
