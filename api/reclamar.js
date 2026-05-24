@@ -97,13 +97,22 @@ const balanceKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
         }
 
         // 6. LEER EL OBJETO REAL DEL USUARIO DESDE LA LLAVE UNIFICADA
-const resUsuario = await fetch(`${cleanUrl}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(["GET", balanceKey])
+// --- CORRECCIÓN EN RECLAMAR.JS ---
+const resRedis = await fetch(`${cleanUrl}/get/${balanceKey}`, {
+    headers: { Authorization: `Bearer ${redisToken}` }
 }).then(r => r.json());
 
-let usuario = resUsuario.result ? JSON.parse(resUsuario.result) : null;
+let usuario;
+try {
+    // Si resRedis.result es null, creamos un objeto vacío por defecto
+    usuario = resRedis.result ? JSON.parse(resRedis.result) : { balance_soulgeist: "0", saldos_criptas: {} };
+} catch (e) {
+    // Si resRedis.result existe pero no es un JSON válido (por ejemplo, es un simple "0"),
+    // también inicializamos un objeto seguro
+    usuario = { balance_soulgeist: "0", saldos_criptas: {} };
+}
+
+// Ahora sí, obtenemos el saldo de forma segura
 const balanceReal = parseFloat(usuario.saldos_criptas?.[cripto] || 0);
 
 if (balanceReal <= 0) {
