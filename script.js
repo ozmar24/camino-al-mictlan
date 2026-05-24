@@ -521,6 +521,8 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
 
         const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
 
+        console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
+
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -529,21 +531,20 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
                 pasarela: pasarela,
-                cantidadRetiro: saldoCripto,
+                cantidadRetiro: saldoCripto,     // ← Esto es lo importante
                 cantidadSG: saldoCripto
             })
         });
 
-        console.log("Status:", respuesta.status);
         const resultado = await respuesta.json();
-        console.log("Respuesta backend:", resultado);
+        console.log("Respuesta del backend:", resultado);
 
         if (!respuesta.ok) {
             lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
             return;
         }
 
-        // === ÉXITO EN EL RETIRO ===
+        // Éxito
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
@@ -552,17 +553,16 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
             if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
         }
 
-        // ←←← LIMPIAMOS EL SALDO DE LA CRIPTA Y LO GUARDAMOS POR USUARIO
         if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
             window.tumbasConSaldo[criptoSeleccionada] = 0;
-            guardarSaldosCriptas();   // ←←← ESTA ES LA LÍNEA IMPORTANTE
+            guardarSaldosCriptas();
         }
 
         generarCementerio();
         lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
 
     } catch (error) {
-        console.error("Error completo:", error);
+        console.error("Error en procesarCosecha:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
