@@ -404,67 +404,76 @@ guardarSaldosCriptas();
 // PASO 4: MODAL DE COSECHA DE CRIPTO Y CONFIGURACIÓN DE WALLET
 // ==================================================================
 function abrirModalCosechaFinal(pos) {
-    const campoSanto = document.getElementById('campo-santo');
-    if (campoSanto) campoSanto.style.filter = "blur(5px) brightness(0.4)";
-
     const modal = document.getElementById('modal-ritual');
+    const titulo = document.getElementById('titulo-ritual');
+    const info = document.getElementById('info-ritual');
+    const botones = document.querySelector('.botones-exchange');
+
     if (!modal) return;
 
-    modal.style.setProperty('--color-ritmo', pos.color || "#f7931a");
-    modal.style.display = 'block';
-
-    const saldoAcumulado = window.tumbasConSaldo[pos.nombre] || 0;
-
-    console.log(`Abriendo retiro de ${pos.nombre} - Saldo real: ${saldoAcumulado}`);
-
-    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
-
     window.currentCripto = pos;
+    titulo.innerText = `BÓVEDA DE ${pos.nombre.toUpperCase()}`;
+    
+    const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
 
-    document.getElementById('info-ritual').innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-            <p style="color: #fff; font-size: 19px; margin: 10px 0;">
-                Saldo disponible: 
-                <b style="color: ${pos.color};">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
+    info.innerHTML = `
+        <div style="text-align: center; margin: 20px 0;">
+            <p style="color: #aaa;">Saldo acumulado en esta tumba:</p>
+            <h2 style="color: ${pos.color}; font-size: 28px; text-shadow: 0 0 10px ${pos.color};">
+                ${saldoActual.toFixed(8)} ${pos.sim}
+            </h2>
+            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                ¿Qué deseas hacer con esta energía acumulada?
             </p>
-            <small style="color:#aaa;">Mínimo aproximado: ${pos.usdMinimo || 0.15} USD</small>
-        </div>
-
-        <div style="margin-bottom: 18px;">
-            <label style="color:#bbb; font-size: 14px; display:block; margin-bottom:6px;">
-                Portal de retiro:
-            </label>
-            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                    style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
-                <option value="bitso">Bitso</option>
-                <option value="coinbase">Coinbase</option>
-                <option value="binance">Binance</option>
-            </select>
-        </div>
-
-        <div>
-            <input type="text" id="wallet-input" placeholder="Ingresa tu dirección o correo..." 
-                   style="width: 100%; background:#000; color:#fff; border:2px solid #555; padding:14px; text-align:center; border-radius:6px; font-size:15px;">
+            
+            <!-- Campo para la wallet, solo se usa si decide retirar -->
+            <div id="seccion-retiro" style="display:none; margin-top: 20px;">
+                <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
+                        style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
+                    <option value="bitso">BITSO (Recomendado)</option>
+                    <option value="binance">BINANCE</option>
+                    <option value="coinbase">COINBASE</option>
+                    ${pos.nombre === 'Bitcoin' ? '<option value="bitso_lightning">BITSO LIGHTNING (Instantáneo)</option>' : ''}
+                </select>
+                <input type="text" id="wallet-input" placeholder="Dirección de destino" 
+                       style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
+            </div>
         </div>
     `;
 
-    const botones = document.querySelector('.botones-exchange');
-    if (botones) {
-        botones.innerHTML = `
-            <button id="btn-cosecha-enviar" class="pentaculo-cursor" 
-                    style="background:${pos.color}; color:#000; padding:12px 30px; margin-right:10px; font-weight:bold;">
-                TRANSMUTAR ALMA
+    botones.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
+            <!-- Opción 1: Seguir acumulando -->
+            <button onclick="abrirModalSeleccionCantidad(window.currentCripto)" 
+                    style="background: #222; color: ${pos.color}; border: 1px solid ${pos.color}; padding: 12px; font-weight: bold;">
+                ➕ AÑADIR MÁS PODER
             </button>
-            <button id="btn-cosecha-cancelar" class="pentaculo-cursor" 
-                    style="background:#222; color:#fff; padding:12px 30px;">
-                VOLVER A LAS SOMBRAS
+            
+            <!-- Opción 2: Retirar (Muestra los campos de wallet) -->
+            <button id="btn-mostrar-retiro" 
+                    style="background: ${pos.color}; color: #000; padding: 12px; font-weight: bold;">
+                💰 RETIRAR A BILLETERA
             </button>
-        `;
+            
+            <button onclick="cerrarRitual()" style="background: transparent; color: #666; padding: 5px;">
+                CANCELAR
+            </button>
+        </div>
+    `;
 
-        document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
-        document.getElementById('btn-cosecha-cancelar').onclick = cerrarRitual;
-    }
+    // Lógica para mostrar los campos de retiro solo si pulsa el botón
+    document.getElementById('btn-mostrar-retiro').onclick = function() {
+        const seccion = document.getElementById('seccion-retiro');
+        if (seccion.style.display === 'none') {
+            seccion.style.display = 'block';
+            this.innerText = "CONFIRMAR RETIRO";
+            this.onclick = procesarRetiro; // Al segundo click, procesa el retiro
+        }
+    };
+
+    modal.style.display = 'block';
 }
+
 
 
 function adaptarPlaceholderPasarela(criptoId) {
