@@ -778,7 +778,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.userWallet = usuarioGuardado;
         // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: 0 }); 
+            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
         }
     }
 });
@@ -898,61 +898,42 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
     
-    // 1. Descontamos localmente de inmediato
-    balanceUsuarioSG -= cantidad;
+    // 1. Descontamos localmente UNA SOLA VEZ
+    balanceUsuarioSG = balanceUsuarioSG - cantidad; 
+    if (balanceUsuarioSG < 0) balanceUsuarioSG = 0;
+
     actualizarBalanceSoulgeist(balanceUsuarioSG);
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
     const ganancia = cantidad * (pos.tasa || 0);
-
     cerrarRitual(); 
 
-    // === ENVIAR EL DESCUENTO REAL A UPSTASH REDIS ===
-    // === ENVIAR ACTUALIZACIÓN DE BALANCE A UPSTASH REDIS ===
     if (window.userWallet) {
         try {
-            // CORRECCIÓN MATEMÁTICA CRÍTICA:
-            // Restamos la cantidad transmutada del balance general ANTES de enviarlo a Redis
-            balanceUsuarioSG = balanceUsuarioSG - cantidad;
-            if (balanceUsuarioSG < 0) balanceUsuarioSG = 0; // Evita que baje de cero por seguridad
-
-            // Actualizamos inmediatamente el localStorage para que el saldo persista al refrescar
-            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            
-            console.log(`[RITUAL] Notificando descuento a Redis. Quedan reales: ${balanceUsuarioSG}`);
-            
-            const res = await fetch('/api/acumular-sg', {
+            // Enviamos el balance ya restado a Redis
+            await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     wallet: window.userWallet, 
-                    nuevoBalance: balanceUsuarioSG, // Ahora sí va el valor restado (ej: 0)
+                    nuevoBalance: balanceUsuarioSG,
                     accion: 'descontar_ritual'
                 })
             });
-            
-            const datosServidor = await res.json();
-            console.log("Servidor responde:", datosServidor);
-
         } catch (error) {
-            console.error("Fallo de conexión al restar saldo en Redis:", error);
+            console.error("Error al actualizar Redis:", error);
         }
     }
 
-    // 2. Ejecutar animación del alma volando
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+        const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
-        
-        const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
-        if (contenedorBalance) {
-            contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
-            contenedorBalance.style.opacity = "1";
-        }
-
+        localStorage.setItem(keyCriptas, JSON.stringify(window.tumbasConSaldo));
+        generarCementerio();
         mostrarModalFusionExitosa(pos, ganancia);
     });
 }
+
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
 async function sincronizarBalanceConRedis() {
     if (!window.userWallet) {

@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, "");
         const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-        const respuesta = await fetch(`${redisUrl}/get/user:balance:${wallet}`, {
+        const respuesta = await fetch(\${redisUrl}/get/user:balance:${wallet.toLowerCase().trim()}`, ...`
             headers: { Authorization: `Bearer ${redisToken}` }
         });
 
