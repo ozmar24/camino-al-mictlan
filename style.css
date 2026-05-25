@@ -772,7 +772,7 @@ button,
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
-        width: 2100px !important; 
+        width: 3100px !important; 
         height: 1550px !important; /* Más altura interna para los botones */
         
         /* Escala equilibrada para que se vea GRANDE pero quepa en la pantalla */
