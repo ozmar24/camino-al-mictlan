@@ -853,14 +853,14 @@ button,
 
     #aviso-rotar h2 {
         font-family: 'Nosifer', sans-serif !important;
-        font-size: 16px !important;
+        font-size: 10px !important;
         text-shadow: 0 0 10px #ff0000 !important;
         margin-bottom: 20px !important;
     }
 
     #aviso-rotar p {
         font-family: 'Creepster', sans-serif !important;
-        font-size: 18px !important;
+        font-size: 12px !important;
         color: #fff !important;
         line-height: 1.5 !important;
     }
