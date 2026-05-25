@@ -929,8 +929,8 @@ button,
     position: absolute !important;
     top: 15% !important;        /* Subimos un poco para ganar espacio abajo */
     left: 15% !important;       /* Ajustamos el margen lateral */
-    width: 45% !important;      /* Damos más ancho para que los botones quepan */
-    height: 85% !important;     
+    width: 25% !important;      /* Damos más ancho para que los botones quepan */
+    height: 65% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -944,8 +944,8 @@ button,
     position: absolute !important;
     top: 15% !important;        
     right: 15% !important;      
-    width: 45% !important;      
-    height: 85% !important;     
+    width: 25% !important;      
+    height: 65% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
