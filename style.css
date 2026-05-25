@@ -1270,3 +1270,24 @@ button,
     width: 100% !important;
     max-width: 100% !important;
 }
+/* ====================== MENÚ SUPERIOR (LEYES - ORÁCULO - ALIANZAS) ====================== */
+
+/* Ocultar en la pantalla del grimorio (login) */
+#modal-contrato .menu-textos,
+.grimorio-container .menu-textos {
+    display: none !important;
+}
+
+/* Mostrar solo cuando ya estés dentro del cementerio */
+#campo-santo .menu-textos {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
+/* Ajuste de tamaño en móvil */
+@media (max-width: 1024px) {
+    .menu-textos .opcion {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+}
