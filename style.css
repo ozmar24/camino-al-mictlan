@@ -762,45 +762,50 @@ button,
    9. OPTIMIZACIÓN MÓVIL UNIFICADA (MICTLÁN STABLE)
    ========================================================================== */
 
-/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - ESTABILIDAD TOTAL --- */
+/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - AJUSTE DE MARCO --- */
 @media screen and (max-height: 600px) and (orientation: landscape) {
     
     #aviso-rotar { display: none !important; }
 
-    /* 1. EL LIBRO: Lo hacemos un poco más alto para que el contenido no "desborde" */
+    /* 1. EL GRIMORIO: Le damos un tamaño interno "Gigante" y lo escalamos */
     .grimorio-container {
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
-        height: 700px !important; /* Aumentamos la altura interna del libro */
-        transform: translate(-50%, -50%) scale(0.55) !important; /* Escalamos un poco más para que quepa */
+        
+        /* Quitamos los límites de 'max-height' que lo aplastaban */
+        max-width: none !important;
+        max-height: none !important;
+        
+        /* Aumentamos el tamaño base para que el fondo sea más grande */
+        width: 1200px !important; 
+        height: 850px !important; 
+        
+        /* Escalamos el conjunto completo para que quepa en la pantalla del móvil */
+        transform: translate(-50%, -50%) scale(0.45) !important; 
+        
+        background-size: 100% 100% !important;
+        display: block !important;
     }
 
-    /* 2. LAS PÁGINAS: Las centramos verticalmente de forma automática */
+    /* 2. AJUSTE DE PÁGINAS: Las movemos ligeramente para que centren en el nuevo tamaño */
     .grimorio-container .pagina-izquierda,
     .grimorio-container .pagina-derecha {
-        top: 50% !important;
-        transform: translateY(-50%) !important; /* Centrado vertical perfecto */
-        height: 80% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important; /* Todo el contenido al centro */
-        gap: 8px !important; /* Espacio mínimo entre elementos */
+        top: 22% !important; /* Ajuste milimétrico para que el texto no toque el borde superior */
+        height: 70% !important;
     }
 
-    /* 3. LOS BOTONES Y LINKS: Forzamos que se queden dentro del flujo */
-    .grimorio-container .btn-ritual-grimorio,
+    /* 3. MEJORA DE BOTONES: Aseguramos que el botón de acceso no se encime */
+    .grimorio-container .btn-ritual-grimorio {
+        margin-top: 20px !important;
+        padding: 15px !important;
+        font-size: 1rem !important; /* Texto más grande para que sea fácil de tocar */
+    }
+
+    /* 4. TEXTOS DE APOYO: Los bajamos un poco para que no se salgan por abajo */
     .grimorio-container .cambio-modo-contenedor,
     .grimorio-container #new-user-helper {
-        position: relative !important;
-        margin-top: 5px !important;
-        width: 100% !important;
-    }
-
-    /* Reducimos un poco el tamaño de los títulos para ganar espacio */
-    #auth-tagline, #right-title {
-        font-size: 1.2rem !important;
-        margin-bottom: 5px !important;
+        margin-top: 25px !important;
     }
 }
 
