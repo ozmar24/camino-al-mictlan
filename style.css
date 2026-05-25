@@ -762,45 +762,48 @@ button,
    9. OPTIMIZACIÓN MÓVIL UNIFICADA (MICTLÁN STABLE)
    ========================================================================== */
 
-/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - MEJORA DE LEGIBILIDAD --- */
+/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - ESTABILIDAD TOTAL --- */
 @media screen and (max-height: 600px) and (orientation: landscape) {
     
     #aviso-rotar { display: none !important; }
 
-    /* Ajuste de fuentes: Mínimo 12px para que sea legible */
-    .opcion {
-        font-size: 12px !important; 
-        letter-spacing: 1px;
-        text-shadow: 2px 2px 4px #000 !important;
-    }
-
-    .pilar-izquierdo, .pilar-derecho {
-        font-size: 11px !important;
-        line-height: 1.3 !important;
-        top: 35% !important; 
-    }
-
-    /* SOLUCIÓN MAESTRA: Escalamos el contenedor completo del grimorio */
+    /* 1. EL LIBRO: Lo hacemos un poco más alto para que el contenido no "desborde" */
     .grimorio-container {
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
-        /* Escala base para móviles pequeños */
-        transform: translate(-50%, -50%) scale(0.6) !important; 
+        height: 700px !important; /* Aumentamos la altura interna del libro */
+        transform: translate(-50%, -50%) scale(0.55) !important; /* Escalamos un poco más para que quepa */
     }
 
-    /* En pantallas un poco más grandes (como tablets o móviles Plus), subimos la escala */
-    @media (min-width: 900px) {
-        .grimorio-container { 
-            transform: translate(-50%, -50%) scale(0.75) !important; 
-        }
+    /* 2. LAS PÁGINAS: Las centramos verticalmente de forma automática */
+    .grimorio-container .pagina-izquierda,
+    .grimorio-container .pagina-derecha {
+        top: 50% !important;
+        transform: translateY(-50%) !important; /* Centrado vertical perfecto */
+        height: 80% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important; /* Todo el contenido al centro */
+        gap: 8px !important; /* Espacio mínimo entre elementos */
     }
 
-    /* Ocultar elementos que estorben en pantallas con muy poca altura */
-    .candelabro-central img {
-        max-height: 60px !important;
+    /* 3. LOS BOTONES Y LINKS: Forzamos que se queden dentro del flujo */
+    .grimorio-container .btn-ritual-grimorio,
+    .grimorio-container .cambio-modo-contenedor,
+    .grimorio-container #new-user-helper {
+        position: relative !important;
+        margin-top: 5px !important;
+        width: 100% !important;
+    }
+
+    /* Reducimos un poco el tamaño de los títulos para ganar espacio */
+    #auth-tagline, #right-title {
+        font-size: 1.2rem !important;
+        margin-bottom: 5px !important;
     }
 }
+
 
 /* --- 9.2 VISTA VERTICAL (PORTRAIT) - BLOQUEO TOTAL COHERENTE --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
