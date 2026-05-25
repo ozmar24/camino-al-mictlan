@@ -1191,7 +1191,7 @@ button,
 
     /* Ajuste fino de textos y botones */
     .grimorio-container h2 {
-        font-size: 1.25rem !important;
+        font-size: 1.05rem !important;
         margin-bottom: 12px !important;
     }
 
@@ -1255,7 +1255,7 @@ button,
 @media (max-width: 1024px) {
     #google-btn-container {
         max-width: 220px !important;
-        margin: 20px auto !important;
+        margin: 18px auto !important;
     }
 }
 
