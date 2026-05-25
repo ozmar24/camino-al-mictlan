@@ -763,7 +763,7 @@ button,
    ========================================================================== */
 
 /* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
-@media screen and (max-height: 500px) and (orientation: landscape) {
+@media screen and (max-height: 600px) and (orientation: landscape) {
     
     #aviso-rotar {
         display: none !important;
@@ -828,7 +828,7 @@ button,
 }
 
 /* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT - CORTINA BLOQUEO) --- */
-@media screen and (max-width: 550px) and (orientation: portrait) {
+@media screen and (max-width: 600px) and (orientation: portrait) {
     
     #contenedor-criptos, 
     #campo-santo, 
