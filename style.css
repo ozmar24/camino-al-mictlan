@@ -779,7 +779,7 @@ button,
         
         /* Aumentamos el tamaño base para que el fondo sea más grande */
         width: 1200px !important; 
-        height: 850px !important; 
+        height: 1000px !important; 
         
         /* Escalamos el conjunto completo para que quepa en la pantalla del móvil */
         transform: translate(-50%, -50%) scale(0.45) !important; 
