@@ -758,104 +758,71 @@ button,
 @keyframes resplandor-rojo { 0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #8b0000); } 50% { opacity: 0.9; filter: drop-shadow(0 0 12px #ff0000); } }
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
-/* ============================================================
-   ESTÉTICA MÓVIL FINAL: EL PERGAMINO SAGRADO (Sustituye 9.1 y 9.2)
-   ============================================================ */
+/* ==========================================================================
+   9. OPTIMIZACIÓN MÓVIL: EL PERGAMINO SAGRADO (Sustituye 9.1 y 9.2)
+   ========================================================================== */
 @media screen and (max-width: 900px) {
-    
     #aviso-rotar { display: none !important; }
 
-    /* 1. EL CONTENEDOR: Forzamos el uso de contrato.png */
-    .grimorio-container {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-        width: 90% !important;
-        max-width: 420px !important;
-        min-height: 700px !important; 
-        margin: 30px auto !important;
-        
-        background-image: url('img/contrato.png') !important;
-        background-size: 100% 100% !important;
-        background-repeat: no-repeat !important;
-        background-color: transparent !important;
-        
-        padding: 80px 45px !important; /* Margen para que el texto caiga en el papel */
+    /* Forzamos el uso de contrato.png como fondo vertical */
+    body .grimorio-container {
         display: flex !important;
         flex-direction: column !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.9) !important;
-        z-index: 1000 !important;
+        background: url('img/contrato.png') no-repeat center center !important;
+        background-size: 100% 100% !important;
+        width: 92% !important;
+        max-width: 420px !important;
+        min-height: 800px !important; 
+        margin: 20px auto !important;
+        padding: 85px 45px !important; 
+        position: relative !important;
+        top: 0 !important; left: 0 !important; transform: none !important;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8) !important;
+        height: auto !important;
     }
 
-    /* 2. RESET DE POSICIONES FIJAS: Esto es lo más importante */
+    /* RESET TOTAL: Forzamos que todo fluya verticalmente en el móvil */
     .grimorio-container .pagina-izquierda,
     .grimorio-container .pagina-derecha,
     #email, #password, #btn-auth, #auth-tagline, #left-desc, 
-    #right-title, #right-desc, #toggle-auth-text, #google-btn-container {
-        position: relative !important; /* Quitamos el 'absolute' que los movía */
-        top: auto !important;
-        left: auto !important;
-        right: auto !important;
-        transform: none !important;
+    #right-title, #right-desc, #toggle-auth-text, #google-btn-container,
+    .cambio-modo-contenedor, .formulario-goth, .divisor-arcano, #new-user-helper {
+        position: relative !important;
+        top: auto !important; left: auto !important; right: auto !important;
         width: 100% !important;
-        margin: 10px 0 !important;
-        display: block !important;
+        margin: 12px 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        transform: none !important;
         text-align: center !important;
+        height: auto !important;
     }
 
-    /* 3. TEXTOS: Rojo Sangre para el pergamino */
-    .grimorio-container h2, 
-    .grimorio-container p, 
-    .grimorio-container span,
-    #auth-tagline, #right-title {
+    /* Colores oscuros para el pergamino claro en móvil */
+    .grimorio-container h2, .grimorio-container p, .grimorio-container span, #toggle-auth-text {
         color: #4a0000 !important;
         font-family: 'MedievalSharp', cursive !important;
-        font-size: 1.3rem !important;
         text-shadow: none !important;
+        font-size: 1rem !important;
     }
 
-    #left-desc, #right-desc, #toggle-auth-text {
-        color: #600000 !important;
-        font-size: 0.85rem !important;
-        line-height: 1.2 !important;
-    }
+    .grimorio-container h2 { font-size: 1.4rem !important; }
 
-    /* 4. INPUTS: Estilo elegante sobre el papel */
     .input-pergamino-goth {
-        background: rgba(0, 0, 0, 0.05) !important;
+        background: rgba(0,0,0,0.05) !important;
         border: none !important;
         border-bottom: 2px solid #8b0000 !important;
         color: #000 !important;
         padding: 12px !important;
-        font-size: 1rem !important;
-        border-radius: 0 !important;
+        font-size: 1.1rem !important;
     }
 
-    /* 5. BOTÓN DE ACCESO: Resaltado */
     #btn-auth {
         background: #8b0000 !important;
         color: #fff !important;
-        border: 1px solid #4a0000 !important;
         padding: 15px !important;
         font-size: 1rem !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
-    }
-
-    /* 6. GOOGLE: Centrado */
-    #google-btn-container {
-        display: flex !important;
-        justify-content: center !important;
-        padding: 10px 0 !important;
-    }
-}
-
-/* BLOQUEO DE ROTACIÓN: Solo para cuando el juego está activo */
-@media screen and (max-width: 900px) and (orientation: portrait) {
-    #campo-santo:not([style*="display: none"]) ~ #aviso-rotar {
-        display: flex !important;
     }
 }
 
