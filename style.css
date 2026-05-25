@@ -124,6 +124,16 @@ button,
     z-index: 100;
     display: none; 
 }
+/* --- 3.1 CONTROL DE CAPAS DEL GRIMORIO --- */
+#modal-contrato {
+    z-index: 1000000 !important; /* Fuerza al grimorio a estar por encima de todo */
+}
+
+/* Asegura que el menú de textos no se encime */
+.menu-textos {
+    z-index: 1000 !important; 
+}
+
 
 #contenedor-criptos {
     position: relative;
@@ -499,6 +509,7 @@ button,
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
+
 }
 
 .opcion {
@@ -1128,5 +1139,29 @@ button,
 
 #btn-cosecha-cancelar:hover {
     background: #330000 !important;
+    color: #fff !important;
+}
+/* AJUSTES FINALES: TEXTO ROJO Y ENCUADRE */
+.grimorio-container h2, 
+.grimorio-container p, 
+.grimorio-container span,
+.grimorio-container label {
+    color: #8b0000 !important;
+    font-size: 0.85rem !important; /* Un poco más pequeño para asegurar encaje */
+    margin-bottom: 4px !important;
+    text-shadow: none !important;
+}
+
+.input-pergamino-goth {
+    color: #8b0000 !important;
+    font-size: 0.8rem !important;
+    border-bottom: 1px solid #8b0000 !important;
+}
+
+.btn-ritual-grimorio {
+    font-size: 0.75rem !important;
+    padding: 8px !important;
+    margin-top: 10px !important;
+    background: #4a0000 !important;
     color: #fff !important;
 }
