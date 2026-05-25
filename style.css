@@ -776,8 +776,8 @@ button,
         max-height: none !important;
         
         /* Aumentamos el tamaño base del libro */
-        width: 1768px !important; 
-        height: 1250px !important; 
+        width: 2768px !important; 
+        height: 1750px !important; 
         
         /* Ajustamos la escala para que quepa en el móvil */
         transform: translate(-50%, -50%) scale(0.5) !important; 
