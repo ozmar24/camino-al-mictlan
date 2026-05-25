@@ -904,8 +904,8 @@ button,
 .grimorio-container {
     background: url('img/grimorio.png') no-repeat center center !important;
     background-size: 100% 100% !important;
-    width: 1050px !important;
-    height: 620px !important;
+    width: 1250px !important;
+    height: 920px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
     position: relative !important; /* Base sagrada de coordenadas */
