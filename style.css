@@ -765,95 +765,90 @@ button,
     
     #aviso-rotar { display: none !important; }
 
-    /* 1. EL CONTENEDOR: Ahora usa tu imagen contrato.png */
+    /* 1. EL CONTENEDOR: Forzamos el uso de contrato.png */
     .grimorio-container {
         position: relative !important;
         top: 0 !important;
         left: 0 !important;
         transform: none !important;
         width: 90% !important;
-        max-width: 450px !important;
-        min-height: 650px !important; /* Altura para que luzca el pergamino */
-        margin: 40px auto !important;
+        max-width: 420px !important;
+        min-height: 700px !important; 
+        margin: 30px auto !important;
         
-        /* USAMOS TU IMAGEN DE FONDO */
         background-image: url('img/contrato.png') !important;
         background-size: 100% 100% !important;
         background-repeat: no-repeat !important;
         background-color: transparent !important;
         
-        padding: 60px 40px !important; /* Espacio para no tocar los bordes del dibujo */
+        padding: 80px 45px !important; /* Margen para que el texto caiga en el papel */
         display: flex !important;
         flex-direction: column !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-        border: none !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.9) !important;
+        z-index: 1000 !important;
     }
 
-    /* 2. LAS PÁGINAS: Se apilan verticalmente dentro del pergamino */
+    /* 2. RESET DE POSICIONES FIJAS: Esto es lo más importante */
     .grimorio-container .pagina-izquierda,
-    .grimorio-container .pagina-derecha {
-        position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        height: auto !important;
+    .grimorio-container .pagina-derecha,
+    #email, #password, #btn-auth, #auth-tagline, #left-desc, 
+    #right-title, #right-desc, #toggle-auth-text, #google-btn-container {
+        position: relative !important; /* Quitamos el 'absolute' que los movía */
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
         transform: none !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
+        width: 100% !important;
+        margin: 10px 0 !important;
+        display: block !important;
+        text-align: center !important;
     }
 
-    /* Separador místico entre secciones */
-    .grimorio-container .pagina-izquierda::after {
-        content: '☠ • ☠ • ☠' !important;
-        color: #8b0000;
-        margin: 20px 0;
-        font-family: 'MedievalSharp';
-    }
-
-    /* 3. TEXTOS: Rojo Sangre sobre el pergamino */
+    /* 3. TEXTOS: Rojo Sangre para el pergamino */
     .grimorio-container h2, 
     .grimorio-container p, 
     .grimorio-container span,
-    #auth-tagline, #left-desc, #right-title, #right-desc, #new-user-helper p {
-        color: #4a0000 !important; /* Un rojo más oscuro para que se lea bien sobre el papel */
-        text-align: center !important;
+    #auth-tagline, #right-title {
+        color: #4a0000 !important;
         font-family: 'MedievalSharp', cursive !important;
+        font-size: 1.3rem !important;
+        text-shadow: none !important;
     }
 
-    .grimorio-container h2 { font-size: 1.4rem !important; margin-bottom: 10px !important; }
-    .grimorio-container p { font-size: 0.9rem !important; line-height: 1.2 !important; }
+    #left-desc, #right-desc, #toggle-auth-text {
+        color: #600000 !important;
+        font-size: 0.85rem !important;
+        line-height: 1.2 !important;
+    }
 
-    /* 4. INPUTS: Estilo Gótico que encaja con el papel */
-    .grimorio-container .input-pergamino-goth {
-        width: 100% !important;
-        background: rgba(255, 255, 255, 0.1) !important;
+    /* 4. INPUTS: Estilo elegante sobre el papel */
+    .input-pergamino-goth {
+        background: rgba(0, 0, 0, 0.05) !important;
         border: none !important;
         border-bottom: 2px solid #8b0000 !important;
-        color: #000 !important; /* Texto negro para que se lea en el pergamino claro */
-        margin-bottom: 15px !important;
+        color: #000 !important;
+        padding: 12px !important;
         font-size: 1rem !important;
-        padding: 10px !important;
+        border-radius: 0 !important;
     }
 
-    /* 5. BOTÓN DE ACCESO: Imponente */
-    .grimorio-container .btn-ritual-grimorio {
-        width: 100% !important;
+    /* 5. BOTÓN DE ACCESO: Resaltado */
+    #btn-auth {
         background: #8b0000 !important;
         color: #fff !important;
         border: 1px solid #4a0000 !important;
         padding: 15px !important;
         font-size: 1rem !important;
-        cursor: pointer;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    /* 6. GOOGLE: Centrado al final */
+    /* 6. GOOGLE: Centrado */
     #google-btn-container {
-        width: 100% !important;
         display: flex !important;
         justify-content: center !important;
-        transform: scale(0.9);
+        padding: 10px 0 !important;
     }
 }
 
