@@ -1198,3 +1198,68 @@ button,
         font-size: 0.6rem !important;
     }
 }
+/* ====================== AJUSTES ESPECÍFICOS PARA MÓVIL ====================== */
+@media (max-width: 1050px) {
+    .grimorio-container {
+        width: 95vw !important;
+        height: auto !important;
+        min-height: 85vh !important;
+        padding: 15px !important;
+        background-size: 100% 100% !important;
+        margin: 10px auto !important;
+    }
+
+    /* Páginas del grimorio en móvil */
+    .grimorio-container .pagina-izquierda,
+    .grimorio-container .pagina-derecha {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 15px auto !important;
+        padding: 15px !important;
+    }
+
+    /* Izquierda - Registro manual */
+    .grimorio-container .pagina-izquierda {
+        border-right: 2px solid rgba(139, 0, 0, 0.3) !important;
+    }
+
+    /* Derecha - Google Auth */
+    .grimorio-container .pagina-derecha {
+        border-left: 2px solid rgba(139, 0, 0, 0.3) !important;
+    }
+
+    /* Ajuste de inputs y botones */
+    .grimorio-container .input-pergamino-goth,
+    .grimorio-container .btn-ritual-grimorio {
+        width: 100% !important;
+        font-size: 0.85rem !important;
+        padding: 12px !important;
+    }
+
+    #google-btn-container {
+        width: 100% !important;
+        margin: 15px 0 !important;
+    }
+
+    /* Centrar mejor el contenido del grimorio */
+    .grimorio-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+}
+
+/* Ajuste fino para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .grimorio-container .pagina-izquierda,
+    .grimorio-container .pagina-derecha {
+        max-width: 340px !important;
+        padding: 12px !important;
+    }
+
+    .grimorio-container h2 {
+        font-size: 1.1rem !important;
+    }
+}
