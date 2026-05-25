@@ -769,96 +769,81 @@ button,
 @keyframes resplandor-rojo { 0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px #8b0000); } 50% { opacity: 0.9; filter: drop-shadow(0 0 12px #ff0000); } }
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
-/* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) - VERSIÓN FINAL --- */
+/* ==========================================================================
+   9. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL MÓVIL
+   ========================================================================== */
+
+/* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
 @media screen and (max-height: 600px) and (orientation: landscape) {
     
-    #aviso-rotar { display: none !important; }
+    #aviso-rotar {
+        display: none !important;
+    }
 
-    /* 🛡️ ESCUDO DE CAPAS: El Grimorio siempre arriba */
-    #modal-contrato { z-index: 1000000 !important; }
-    .menu-textos { z-index: 1000 !important; }
-
-    /* --- Tu lógica original de pilares y menú --- */
-    .candelabro-central img, img.img-candelabro {
-        display: none !important; opacity: 0 !important; visibility: hidden !important;
+    .candelabro-central img,
+    img.img-candelabro {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
     }
 
     .candelabro-central {
-        position: fixed !important; top: 0 !important; left: 50% !important;
-        transform: translateX(-50%) !important; width: 100% !important;
-        max-width: 340px !important; height: auto !important;
-        display: flex !important; justify-content: center !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 340px !important;
+        height: auto !important;
+        background: none !important;
+        display: flex !important;
+        justify-content: center !important;
         z-index: 999999 !important;
     }
 
     .menu-textos {
-        display: flex !important; flex-direction: row !important;
-        justify-content: space-between !important; width: 100% !important;
-        position: static !important; transform: none !important; margin-top: 15px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        position: static !important;
+        transform: none !important;
+        margin-top: 15px !important;
     }
 
     .opcion {
-        display: inline-block !important; font-family: 'Nosifer', sans-serif !important;
-        font-size: 10px !important; color: #ff0000 !important;
+        display: inline-block !important;
+        font-family: 'Nosifer', sans-serif !important;
+        font-size: 10px !important;
+        color: #ff0000 !important;
         text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
     }
 
-    .pilar-izquierdo, .pilar-derecho {
-        position: absolute !important; top: 38% !important;
-        display: flex !important; flex-direction: column !important;
-        align-items: center !important; font-size: 8px !important;
-        line-height: 1.1 !important; z-index: 995 !important;
+    .pilar-izquierdo, 
+    .pilar-derecho {
+        position: absolute !important;
+        top: 38% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        font-size: 8px !important;
+        line-height: 1.1 !important;
+        z-index: 995 !important;
     }
     
     .pilar-izquierdo { left: 45.6% !important; }
     .pilar-derecho   { left: 56.6% !important; }
-
-    /* 💀 AJUSTES DE PRECISIÓN DEL GRIMORIO (Añadido) 💀 */
-    .grimorio-container .pagina-izquierda,
-    .grimorio-container .pagina-derecha {
-        top: 8% !important;        /* Subimos el contenido */
-        height: 82% !important;     /* Ganamos espacio abajo */
-        gap: 4px !important;        /* Compactamos todo */
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: flex-start !important;
-        padding-top: 15px !important;
-    }
-
-    /* Labels y Textos en Rojo Sangre */
-    .grimorio-container h2 { font-size: 1.1rem !important; color: #8b0000 !important; margin-bottom: 2px !important; }
-    .grimorio-container label, .grimorio-container p, .grimorio-container span {
-        color: #8b0000 !important;
-        font-size: 0.75rem !important;
-        margin: 0 !important;
-        line-height: 1.1 !important;
-        text-shadow: none !important;
-    }
-
-    /* Inputs y Botones compactos */
-    .input-pergamino-goth {
-        height: 28px !important; font-size: 0.85rem !important;
-        color: #8b0000 !important; border-bottom: 1px solid #8b0000 !important;
-    }
-
-    #btn-auth {
-        margin-top: 8px !important; padding: 8px !important;
-        font-size: 0.8rem !important; width: 85% !important;
-        background: #4a0000 !important; color: #fff !important;
-    }
-
-    #google-btn-container { transform: scale(0.75) !important; margin-top: -5px !important; }
-    #toggle-auth-text { color: #ff0000 !important; font-size: 0.7rem !important; }
 }
-
 
 /* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT - CORTINA BLOQUEO) --- */
 @media screen and (max-width: 600px) and (orientation: portrait) {
     
     #contenedor-criptos, 
     #campo-santo, 
-    .candelabro-central,
-    #modal-contrato { /* 🛡️ MEJORA: Ocultamos también el login para forzar la rotación */
+    .candelabro-central {
         display: none !important;
     }
 
@@ -923,11 +908,10 @@ button,
     40%, 60% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
 }
-
 /* ==================================================================
    COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
    ================================================================== */
-@media screen and (min-width: 901px) {
+
 /* Forzamos el contenedor del grimorio a ser un bloque rígido y estable */
 .grimorio-container {
     background: url('img/grimorio.png') no-repeat center center !important;
