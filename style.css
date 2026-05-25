@@ -928,7 +928,7 @@ button,
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
     top: 15% !important;        /* Subimos un poco para ganar espacio abajo */
-    left: 10% !important;       /* Ajustamos el margen lateral */
+    left: 15% !important;       /* Ajustamos el margen lateral */
     width: 35% !important;      /* Damos más ancho para que los botones quepan */
     height: 65% !important;     
     display: flex !important;
@@ -943,7 +943,7 @@ button,
 .grimorio-container .pagina-derecha {
     position: absolute !important;
     top: 15% !important;        
-    right: 10% !important;      
+    right: 15% !important;      
     width: 35% !important;      
     height: 65% !important;     
     display: flex !important;
