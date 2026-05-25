@@ -1245,7 +1245,7 @@ button,
 
 #google-btn-container {
     width: 100% !important;
-    max-width: 200px !important;     /* ← Este es el que controla el tamaño */
+    max-width: 180px !important;     /* ← Este es el que controla el tamaño */
     margin: 18px auto !important;
     display: flex !important;
     justify-content: center !important;
@@ -1254,7 +1254,7 @@ button,
 /* Versión móvil más ajustada */
 @media (max-width: 1024px) {
     #google-btn-container {
-        max-width: 220px !important;
+        max-width: 170px !important;
         margin: 18px auto !important;
     }
 }
