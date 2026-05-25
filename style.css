@@ -940,7 +940,7 @@ button,
 
 /* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
-    position: relative !important;
+    position: absolute !important;
     top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
     left: 23% !important;       /* Margen exacto desde el borde izquierdo del libro */
     width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
