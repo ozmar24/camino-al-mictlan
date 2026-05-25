@@ -914,17 +914,18 @@ button,
 
 .grimorio-container {
     background: url('img/grimorio.png') no-repeat center center !important;
-    background-size: contain !important; /* Mejor que 100% 100% para no deformar la imagen */
-    width: 95vw !important;              /* Usa el 95% del ancho de pantalla */
-    height: 55vw !important;             /* Mantiene la proporción del libro automáticamente */
-    max-width: 1050px !important;        /* No pasará de 1050 en escritorio */
-    max-height: 620px !important;        /* No pasará de 620 en escritorio */
-    margin: 0 auto !important;           /* Centrado */
+    background-size: 100% 100% !important; /* El fondo se adapta al tamaño del contenedor */
+    width: 95vw !important;               /* Ocupa el 95% del ancho de pantalla */
+    height: 140vw !important;             /* Mantiene una proporción vertical para que quepa el contenido */
+    max-width: 1050px !important;         /* No crece más allá de tu diseño original */
+    max-height: 1400px !important;        /* Altura máxima para evitar que sea infinito */
+    margin: 0 auto !important;
     position: relative !important;
-    display: block !important;
-    padding: 0 !important;
+    padding: 20px !important;             /* Damos aire para que el texto no toque los bordes */
+    display: flex !important;             /* Activamos Flexbox */
+    flex-direction: column !important;    /* Ordena los elementos en columna */
+    align-items: center !important;       /* Centra todo horizontalmente */
     box-sizing: border-box !important;
-    filter: drop-shadow(0 0 20px #000) !important;
 }
 /* Base para el cursor del pentáculo en todos los botones e interactivos del grimorio */
 .grimorio-container button, 
@@ -939,7 +940,7 @@ button,
 
 /* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
-    position: absolute !important;
+    position: relative !important;
     top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
     left: 23% !important;       /* Margen exacto desde el borde izquierdo del libro */
     width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
@@ -1167,18 +1168,33 @@ button,
 }
 @media (max-width: 1050px) {
     .grimorio-container {
-        /* Aumentamos de 0.6 a 0.8 para que se vea más grande */
-        transform: scale(0.8); 
-        transform-origin: top center;
-        /* Reducimos el margen negativo para que el libro no suba tanto */
-        margin-top: -50px; 
+        transform: none !important; /* Eliminamos el escalado que encima los textos */
+        width: 95vw !important;
+        height: auto !important; /* Dejamos que el libro crezca según el contenido */
+        min-height: 80vh !important;
+        margin-top: 20px !important;
+        background-size: 100% 100% !important;
+    }
+
+    /* FORZAMOS QUE LAS PÁGINAS SE APILEN EN MÓVIL */
+    .grimorio-container .pagina-izquierda,
+    .grimorio-container .pagina-derecha {
+        position: relative !important; /* Quitamos el absolute */
+        top: 0 !important;
+        left: 0 !important;
+        width: 90% !important;
+        margin: 10px auto !important;
     }
 }
-
 @media (max-width: 600px) {
-    .grimorio-container {
-        /* Aumentamos de 0.4 a 0.65 para que ocupe más pantalla en móviles */
-        transform: scale(0.65); 
-        margin-top: -100px;
+    .grimorio-container h2, 
+    .grimorio-container p, 
+    .grimorio-container label {
+        font-size: 0.7rem !important; /* Ajustamos el tamaño aquí */
+    }
+    
+    .grimorio-container .btn-ritual-grimorio {
+        padding: 5px !important;
+        font-size: 0.6rem !important;
     }
 }
