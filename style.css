@@ -780,7 +780,7 @@ button,
         height: 1750px !important; 
         
         /* Ajustamos la escala para que quepa en el móvil */
-        transform: translate(-50%, -50%) scale(1.5) !important; 
+        transform: translate(-50%, -50%) scale(.7) !important; 
         
         background-size: 100% 100% !important;
         display: block !important;
