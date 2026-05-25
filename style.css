@@ -774,7 +774,7 @@ button,
         left: 50% !important;
         width: 1350px !important; 
         height: 950px !important; 
-        transform: translate(-50%, -50%) scale(0.8) !important; 
+        transform: translate(-60%, -60%) scale(0.8) !important; 
         background-size: 100% 100% !important;
         display: block !important;
     }
