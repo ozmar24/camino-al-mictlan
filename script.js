@@ -948,31 +948,31 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
 }
 
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
+// Reemplaza tu función actual por esta versión para depurar:
 async function sincronizarBalanceConRedis() {
-    if (!window.userWallet) {
-        console.log("⚠️ No hay wallet, usando localStorage");
-        return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
-    }
+    if (!window.userWallet) return 0;
 
     try {
-        const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(window.userWallet)}`);
-        if (!res.ok) throw new Error("Error al obtener balance");
+        const emailLimpio = window.userWallet.toLowerCase().trim();
+const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
+        if (!res.ok) {
+            const errorData = await res.json();
+            console.error("Detalle del error en el servidor:", errorData);
+            throw new Error(`Servidor respondió con status ${res.status}`);
+        }
 
         const data = await res.json();
-        
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance) || 0;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            console.log("✅ Balance cargado desde Redis:", balanceUsuarioSG);
             return balanceUsuarioSG;
         }
     } catch (e) {
-        console.warn("No se pudo conectar con Redis, usando localStorage", e);
+        console.warn("Fallo total de conexión:", e);
     }
-
-    balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
-    return balanceUsuarioSG;
+    return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
 }
+
 // Agrega esta función a tu script.js
 function resetearMemoriaUsuario() {
     localStorage.removeItem('soulgeist_balance');
