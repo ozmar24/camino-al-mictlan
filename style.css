@@ -770,8 +770,8 @@ button,
     /* 1. EL GRIMORIO: Le damos un tamaño interno "Gigante" y lo escalamos */
     .grimorio-container {
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
+        top: 70% !important;
+        left: 70% !important;
         
         /* Quitamos los límites de 'max-height' que lo aplastaban */
         max-width: none !important;
