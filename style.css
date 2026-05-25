@@ -905,40 +905,33 @@ button,
     cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
-    top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
-    left: 23% !important;       /* Margen exacto desde el borde izquierdo del libro */
-    width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
-    height: 70% !important;     /* Altura máxima para no pisar el fondo */
+    top: 15% !important;        /* Subimos un poco para ganar espacio abajo */
+    left: 15% !important;       /* Ajustamos el margen lateral */
+    width: 35% !important;      /* Damos más ancho para que los botones quepan */
+    height: 75% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important; /* Alineación limpia desde arriba */
-    gap: 15px !important;       /* Separación balanceada y constante entre elementos */
-    box-sizing: border-box !important;
-    padding: 10px 20px !important;
-    z-index: 30 !important;
-    color: #7a1c1c !important;
+    justify-content: center !important; /* Centramos todo verticalmente */
+    gap: 10px !important;       /* Menos espacio entre piezas para que no se salgan */
+    padding: 0 !important;
 }
 
 /* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
-    top: 20% !important;        
-    right: 25% !important;      /* Margen exacto desde el borde derecho del libro */
-    width: 25% !important;      
-    height: 70% !important;     
+    top: 15% !important;        
+    right: 15% !important;      
+    width: 35% !important;      
+    height: 75% !important;     
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important; 
-    gap: 15px !important;       
-    box-sizing: border-box !important;
-    padding: 10px 20px !important;
-    z-index: 30 !important;
-    color: #7a1c1c !important;
+    justify-content: center !important; 
+    gap: 10px !important;
+    padding: 0 !important;
 }
 
 /* 📌 CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
@@ -960,10 +953,11 @@ button,
 }
 
 .grimorio-container .btn-ritual-grimorio {
-    font-size: 0.75rem !important;
-    padding: 10px !important;
-    width: 100% !important;
+    font-size: 0.7rem !important;
+    padding: 8px !important;
+    width: 90% !important;      /* Un poco más angosto para que no toque los bordes */
     margin-top: 5px !important;
+    position: relative !important; /* Asegura que se mueva con la página */
 }
 
 /* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO CON CURSOR FORZADO */
@@ -997,17 +991,10 @@ button,
     margin: 5px 0 !important;
 }
 
-/* 📌 PIES DE PÁGINA ACOMODADOS */
-.grimorio-container .cambio-modo-contenedor,
-.grimorio-container #new-user-helper {
-    position: relative !important;
-    font-family: 'nosifer', cursive !important;
-    font-size: 0.7rem !important;
-    color: #7a1c1c !important;
-    text-align: center !important;
-    width: 100% !important;
-    margin-top: 15px !important; /* Empuja el texto al fondo de la hoja de manera segura */
-    padding-bottom: 0 !important;
+.grimorio-container .cambio-modo-contenedor {
+    margin-top: 10px !important;
+    width: 90% !important;
+    font-size: 0.6rem !important; /* Texto un poco más pequeño para que quepa en una línea */
 }
 
 .grimorio-container #new-user-helper p {
