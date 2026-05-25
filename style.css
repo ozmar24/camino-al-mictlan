@@ -810,7 +810,7 @@ button,
     .grimorio-container .pagina-izquierda,
     .grimorio-container .pagina-derecha {
         top: 25% !important; 
-        height: 65% !important;
+        height: 45% !important;
     }
 
     /* 5. INPUTS: Aseguramos que el texto que escribe el usuario también sea rojo */
