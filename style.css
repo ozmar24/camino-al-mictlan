@@ -759,73 +759,156 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   9. OPTIMIZACIÓN MÓVIL: EL PERGAMINO SAGRADO (Sustituye 9.1 y 9.2)
+   9. OPTIMIZACIÓN MÓVIL UNIFICADA (MICTLÁN STABLE)
    ========================================================================== */
-@media screen and (max-width: 900px) {
+
+/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - DISEÑO FINAL ROJO --- */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    
     #aviso-rotar { display: none !important; }
 
-    /* Forzamos el uso de contrato.png como fondo vertical */
-    body .grimorio-container {
-        display: flex !important;
-        flex-direction: column !important;
-        background: url('img/contrato.png') no-repeat center center !important;
+    /* 1. EL GRIMORIO: Lo hacemos más alto (850px) para que el papel cubra todo */
+    .grimorio-container {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        width: 2100px !important; 
+        height: 1550px !important; /* Más altura interna para los botones */
+        
+        /* Escala equilibrada para que se vea GRANDE pero quepa en la pantalla */
+        transform: translate(-50%, -50%) scale(0.7) !important; 
+        
         background-size: 100% 100% !important;
-        width: 92% !important;
-        max-width: 420px !important;
-        min-height: 800px !important; 
-        margin: 20px auto !important;
-        padding: 85px 45px !important; 
-        position: relative !important;
-        top: 0 !important; left: 0 !important; transform: none !important;
-        box-shadow: 0 0 30px rgba(0,0,0,0.8) !important;
-        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
     }
 
-    /* RESET TOTAL: Forzamos que todo fluya verticalmente en el móvil */
+    /* 2. CONTENIDO ROJO: Forzamos el color en todos los textos */
+    .grimorio-container h2, 
+    .grimorio-container p, 
+    .grimorio-container span,
+    .grimorio-container label,
+    .grimorio-container .input-pergamino-goth,
+    #auth-tagline, #left-desc, #right-title, #right-desc, #new-user-helper p {
+        color: #8b0000 !important; /* Rojo Sangre */
+        text-shadow: none !important;
+    }
+
+    /* 3. POSICIONAMIENTO: Subimos el contenido para que no toque el borde inferior */
     .grimorio-container .pagina-izquierda,
-    .grimorio-container .pagina-derecha,
-    #email, #password, #btn-auth, #auth-tagline, #left-desc, 
-    #right-title, #right-desc, #toggle-auth-text, #google-btn-container,
-    .cambio-modo-contenedor, .formulario-goth, .divisor-arcano, #new-user-helper {
-        position: relative !important;
-        top: auto !important; left: auto !important; right: auto !important;
-        width: 100% !important;
-        margin: 12px 0 !important;
+    .grimorio-container .pagina-derecha {
+        top: 12% !important; /* Subimos el inicio del texto */
+        height: 80% !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important;
-        transform: none !important;
-        text-align: center !important;
-        height: auto !important;
+        justify-content: flex-start !important;
+        gap: 5px !important; /* Espacio mínimo para que quepa todo */
     }
 
-    /* Colores oscuros para el pergamino claro en móvil */
-    .grimorio-container h2, .grimorio-container p, .grimorio-container span, #toggle-auth-text {
-        color: #4a0000 !important;
-        font-family: 'MedievalSharp', cursive !important;
-        text-shadow: none !important;
-        font-size: 1rem !important;
+    /* 4. FORMULARIO Y BOTONES: Compactos y funcionales */
+    .grimorio-container .formulario-goth {
+        gap: 5px !important;
+        margin-top: 5px !important;
     }
 
-    .grimorio-container h2 { font-size: 1.4rem !important; }
-
-    .input-pergamino-goth {
-        background: rgba(0,0,0,0.05) !important;
-        border: none !important;
-        border-bottom: 2px solid #8b0000 !important;
-        color: #000 !important;
+    .grimorio-container .btn-ritual-grimorio {
+        background: #4a0000 !important;
+        color: #fff !important; /* El texto del botón lo dejamos blanco para que resalte */
         padding: 12px !important;
-        font-size: 1.1rem !important;
+        font-size: 0.9rem !important;
+        margin-top: 10px !important;
     }
 
-    #btn-auth {
-        background: #8b0000 !important;
-        color: #fff !important;
-        padding: 15px !important;
-        font-size: 1rem !important;
+    /* 5. GOOGLE: Lo ajustamos para que no desborde */
+    #google-btn-container {
+        transform: scale(0.8) !important;
+        margin-top: 0 !important;
+    }
+
+    /* 6. ENLACE DE REGISTRO: Rojo brillante */
+    #toggle-auth-text {
+        color: #ff0000 !important;
+        font-weight: bold !important;
+        font-size: 0.75rem !important;
     }
 }
 
+
+
+
+/* --- 9.2 VISTA VERTICAL (PORTRAIT) - BLOQUEO TOTAL COHERENTE --- */
+@media screen and (max-width: 550px) and (orientation: portrait) {
+    
+    /* BLOQUEO: Añadimos el Grimorio (#modal-contrato) a la lista de ocultos */
+    #contenedor-criptos, 
+    #campo-santo, 
+    .candelabro-central,
+    #modal-contrato, 
+    .overlay-contrato {
+        display: none !important;
+    }
+
+    #aviso-rotar {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #050505 !important;
+        z-index: 9999999 !important;
+        color: #8b0000 !important;
+        text-align: center !important;
+        padding: 40px !important;
+    }
+
+    #aviso-rotar h2 {
+        font-family: 'Nosifer', sans-serif !important;
+        font-size: 10px !important;
+        text-shadow: 0 0 10px #ff0000 !important;
+        margin-bottom: 20px !important;
+    }
+
+    #aviso-rotar p {
+        font-family: 'Creepster', sans-serif !important;
+        font-size: 12px !important;
+        color: #fff !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Animación del icono de rotación */
+    .icono-giro {
+        display: block !important;
+        width: 40px;
+        height: 65px;
+        margin-top: 30px;
+        border: 2px solid #8b0000;
+        border-radius: 6px;
+        position: relative;
+        animation: rotarMictlanFinal 2.5s infinite ease-in-out;
+    }
+    
+    .icono-giro::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: 5px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 6px !important;
+        height: 6px !important;
+        border: 1px solid #8b0000 !important;
+        border-radius: 50% !important;
+    }
+}
+
+@keyframes rotarMictlanFinal {
+    0% { transform: rotate(0deg); }
+    40%, 60% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+}
 
 /* ==================================================================
    COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
