@@ -1202,7 +1202,7 @@ button,
 
     .input-pergamino-goth {
         padding: 13px !important;
-        font-size: 0.95rem !important;
+        font-size: 0.75rem !important;
     }
 
     .btn-ritual-grimorio {
@@ -1240,4 +1240,33 @@ button,
 /* Mostrarlos solo cuando ya estés dentro del cementerio */
 #campo-santo .menu-textos {
     display: flex !important;
+}
+/* ====================== BOTÓN GOOGLE AJUSTADO ====================== */
+
+#google-btn-container {
+    width: 100% !important;
+    max-width: 260px !important;     /* ← Este es el que controla el tamaño */
+    margin: 18px auto !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* Versión móvil más ajustada */
+@media (max-width: 1024px) {
+    #google-btn-container {
+        max-width: 240px !important;
+        margin: 20px auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #google-btn-container {
+        max-width: 220px !important;   /* Aún más pequeño en celulares */
+    }
+}
+
+/* Forzar que el botón interno de Google respete el tamaño */
+#google-btn-container iframe {
+    width: 100% !important;
+    max-width: 100% !important;
 }
