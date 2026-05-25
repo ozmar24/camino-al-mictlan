@@ -1130,3 +1130,114 @@ button,
     background: #330000 !important;
     color: #fff !important;
 }
+/* ====================== GRIMORIO RESPONSIVO - VERSIÓN FINAL ====================== */
+
+.grimorio-container {
+    background: url('img/grimorio.png') no-repeat center center !important;
+    background-size: 100% 100% !important;
+    width: 100% !important;
+    max-width: 1080px !important;
+    height: auto !important;
+    min-height: 620px !important;
+    margin: 20px auto !important;
+    position: relative !important;
+    padding: 45px 70px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+}
+
+/* ====================== ESCRITORIO ====================== */
+@media (min-width: 1025px) {
+    .grimorio-container {
+        padding: 65px 90px !important;
+    }
+
+    .pagina-izquierda {
+        width: 46% !important;
+        padding-right: 45px !important;
+    }
+
+    .pagina-derecha {
+        width: 46% !important;
+        padding-left: 45px !important;
+    }
+}
+
+/* ====================== MÓVIL ====================== */
+@media (max-width: 1024px) {
+    .grimorio-container {
+        padding: 35px 25px !important;
+        min-height: 680px !important;
+    }
+
+    .pagina-izquierda,
+    .pagina-derecha {
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 12px auto !important;
+        padding: 18px 15px !important;
+    }
+
+    .pagina-izquierda {
+        border-bottom: 3px solid rgba(139, 0, 0, 0.35) !important;
+    }
+
+    .pagina-derecha {
+        border-top: 3px solid rgba(139, 0, 0, 0.35) !important;
+    }
+
+    /* Ajuste fino de textos y botones */
+    .grimorio-container h2 {
+        font-size: 1.25rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .grimorio-container label,
+    .grimorio-container p {
+        font-size: 0.9rem !important;
+    }
+
+    .input-pergamino-goth {
+        padding: 13px !important;
+        font-size: 0.95rem !important;
+    }
+
+    .btn-ritual-grimorio {
+        padding: 13px !important;
+        font-size: 0.9rem !important;
+    }
+
+    #google-btn-container {
+        margin: 15px 0 !important;
+    }
+}
+
+/* ====================== PANTALLAS MUY PEQUEÑAS ====================== */
+@media (max-width: 480px) {
+    .grimorio-container {
+        padding: 25px 18px !important;
+    }
+
+    .pagina-izquierda,
+    .pagina-derecha {
+        max-width: 340px !important;
+        padding: 15px !important;
+    }
+
+    .grimorio-container h2 {
+        font-size: 1.15rem !important;
+    }
+}
+
+/* Ocultar Leyes, Oráculo y Alianzas hasta entrar al cementerio */
+.menu-textos {
+    display: none !important;
+}
+
+/* Mostrarlos solo cuando ya estés dentro del cementerio */
+#campo-santo .menu-textos {
+    display: flex !important;
+}
