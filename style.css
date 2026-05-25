@@ -1165,3 +1165,19 @@ button,
     background: #4a0000 !important;
     color: #fff !important;
 }
+@media (max-width: 1050px) {
+    /* Calculamos cuánto debe encogerse el libro para que quepa en el ancho de la pantalla */
+    .grimorio-container {
+        /* Ajusta este factor (0.8, 0.6, 0.4) según qué tan pequeño se vea bien en tu cel */
+        transform: scale(0.6); 
+        transform-origin: top center;
+        margin-top: -100px; /* Ajusta esto para subir el libro si queda muy abajo al encogerlo */
+    }
+}
+
+@media (max-width: 600px) {
+    .grimorio-container {
+        transform: scale(0.4); /* Escala más pequeña para móviles muy estrechos */
+        margin-top: -150px;
+    }
+}
