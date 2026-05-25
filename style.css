@@ -759,33 +759,37 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ============================================================
-   NUEVA ESTÉTICA MÓVIL: PERGAMINO VERTICAL (Sustituye 9.1 y 9.2)
+   ESTÉTICA MÓVIL FINAL: EL PERGAMINO SAGRADO (Sustituye 9.1 y 9.2)
    ============================================================ */
 @media screen and (max-width: 900px) {
     
-    /* 1. Quitamos el bloqueo de rotación para el Login (Grimorio) */
     #aviso-rotar { display: none !important; }
 
-    /* 2. EL GRIMORIO: Cambiamos el libro por un pergamino vertical */
+    /* 1. EL CONTENEDOR: Ahora usa tu imagen contrato.png */
     .grimorio-container {
         position: relative !important;
         top: 0 !important;
         left: 0 !important;
         transform: none !important;
-        width: 95% !important;
-        max-width: 400px !important;
-        height: auto !important;
-        margin: 20px auto !important;
-        background: rgba(20, 0, 0, 0.95) !important; /* Fondo negro rojizo */
-        border: 2px solid #8b0000 !important;
-        box-shadow: 0 0 20px #8b0000 !important;
-        padding: 30px 20px !important;
+        width: 90% !important;
+        max-width: 450px !important;
+        min-height: 650px !important; /* Altura para que luzca el pergamino */
+        margin: 40px auto !important;
+        
+        /* USAMOS TU IMAGEN DE FONDO */
+        background-image: url('img/contrato.png') !important;
+        background-size: 100% 100% !important;
+        background-repeat: no-repeat !important;
+        background-color: transparent !important;
+        
+        padding: 60px 40px !important; /* Espacio para no tocar los bordes del dibujo */
         display: flex !important;
-        flex-direction: column !important; /* Una página sobre otra */
-        border-radius: 10px;
+        flex-direction: column !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+        border: none !important;
     }
 
-    /* 3. LAS PÁGINAS: Se convierten en secciones apiladas */
+    /* 2. LAS PÁGINAS: Se apilan verticalmente dentro del pergamino */
     .grimorio-container .pagina-izquierda,
     .grimorio-container .pagina-derecha {
         position: relative !important;
@@ -795,65 +799,65 @@ button,
         width: 100% !important;
         height: auto !important;
         transform: none !important;
-        padding: 10px 0 !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
     }
 
-    /* Divisor entre el registro y google */
+    /* Separador místico entre secciones */
     .grimorio-container .pagina-izquierda::after {
-        content: '----------------' !important;
-        color: #4a0000;
+        content: '☠ • ☠ • ☠' !important;
+        color: #8b0000;
         margin: 20px 0;
-        letter-spacing: 5px;
+        font-family: 'MedievalSharp';
     }
 
-    /* 4. TEXTOS: Todo en Rojo Sangre */
+    /* 3. TEXTOS: Rojo Sangre sobre el pergamino */
     .grimorio-container h2, 
     .grimorio-container p, 
     .grimorio-container span,
     #auth-tagline, #left-desc, #right-title, #right-desc, #new-user-helper p {
-        color: #ff0000 !important;
+        color: #4a0000 !important; /* Un rojo más oscuro para que se lea bien sobre el papel */
         text-align: center !important;
-        font-size: 14px !important;
+        font-family: 'MedievalSharp', cursive !important;
     }
 
-    .grimorio-container h2 {
-        font-size: 20px !important;
-        margin-bottom: 10px !important;
-    }
+    .grimorio-container h2 { font-size: 1.4rem !important; margin-bottom: 10px !important; }
+    .grimorio-container p { font-size: 0.9rem !important; line-height: 1.2 !important; }
 
-    /* 5. INPUTS Y BOTONES: Grandes y fáciles de tocar */
+    /* 4. INPUTS: Estilo Gótico que encaja con el papel */
     .grimorio-container .input-pergamino-goth {
         width: 100% !important;
-        height: 45px !important;
-        background: #1a0000 !important;
-        border: 1px solid #8b0000 !important;
-        color: #ff0000 !important;
-        margin-bottom: 10px !important;
-        font-size: 16px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: none !important;
+        border-bottom: 2px solid #8b0000 !important;
+        color: #000 !important; /* Texto negro para que se lea en el pergamino claro */
+        margin-bottom: 15px !important;
+        font-size: 1rem !important;
+        padding: 10px !important;
     }
 
+    /* 5. BOTÓN DE ACCESO: Imponente */
     .grimorio-container .btn-ritual-grimorio {
         width: 100% !important;
-        height: 50px !important;
         background: #8b0000 !important;
         color: #fff !important;
-        font-size: 16px !important;
-        margin-top: 10px !important;
+        border: 1px solid #4a0000 !important;
+        padding: 15px !important;
+        font-size: 1rem !important;
+        cursor: pointer;
     }
 
-    /* 6. GOOGLE: Centrado y escalado */
+    /* 6. GOOGLE: Centrado al final */
     #google-btn-container {
         width: 100% !important;
         display: flex !important;
         justify-content: center !important;
-        margin-top: 15px !important;
+        transform: scale(0.9);
     }
 }
 
-/* El bloqueo de rotación solo lo dejamos para el CEMENTERIO (el juego) */
+/* BLOQUEO DE ROTACIÓN: Solo para cuando el juego está activo */
 @media screen and (max-width: 900px) and (orientation: portrait) {
     #campo-santo:not([style*="display: none"]) ~ #aviso-rotar {
         display: flex !important;
