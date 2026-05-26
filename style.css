@@ -1,11 +1,11 @@
 /* ==========================================================================
-   1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO (Se añade Creepster y MedievalSharp)
-   ========================================================================== */
+    1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO (Se añade Creepster y MedievalSharp)
+    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&family=Creepster&family=Cinzel:wght@700&display=swap');
 
 /* ==========================================================================
-   2. RESET, CONFIGURACIÓN BASE Y CURSORES
-   ========================================================================== */
+    2. RESET, CONFIGURACIÓN BASE Y CURSORES
+    ========================================================================== */
 * { 
     margin: 0; 
     padding: 0; 
@@ -59,8 +59,8 @@ button,
 }
 
 /* ==========================================================================
-   3. PORTAL DE ENTRADA Y ESCENA PRINCIPAL
-   ========================================================================== */
+    3. PORTAL DE ENTRADA Y ESCENA PRINCIPAL
+    ========================================================================== */
 #escena-portal {
     position: fixed;
     top: 0;
@@ -142,8 +142,8 @@ button,
 }
 
 /* ==========================================================================
-   4. LAS TUMBAS (ZONA CRIPTO FARCET) - DESKTOP
-   ========================================================================== */
+    4. LAS TUMBAS (ZONA CRIPTO FARCET) - DESKTOP
+    ========================================================================== */
 .zona-tumba {
     overflow: visible !important;
     position: absolute;
@@ -276,8 +276,8 @@ button,
 }
 
 /* ==========================================================================
-   5. ALMA MAESTRA (SOULGEIST SYSTEM) Y PILARES
-   ========================================================================== */
+    5. ALMA MAESTRA (SOULGEIST SYSTEM) Y PILARES
+    ========================================================================== */
 .zona-tumba.alma-maestra {
     position: absolute !important;
     transform: translate(-50%, -100%) !important;
@@ -410,8 +410,8 @@ button,
 }
 
 /* ==========================================================================
-   6. EFECTOS DE AMBIENTACIÓN (NIEBLA, VELAS Y RASTROS)
-   ========================================================================== */
+    6. EFECTOS DE AMBIENTACIÓN (NIEBLA, VELAS Y RASTROS)
+    ========================================================================== */
 .niebla-contenedor {
     position: absolute;
     bottom: 0;
@@ -492,8 +492,8 @@ button,
 }
 
 /* ==================================================================
-   MENÚ SUPERIOR (LEYES, ORÁCULO, ALIANZAS) - POSICIONES AJUSTADAS
-   ================================================================== */
+    MENÚ SUPERIOR (LEYES, ORÁCULO, ALIANZAS) - POSICIONES AJUSTADAS
+    ================================================================== */
 
 /* 1. OCULTO POR DEFECTO */
 .menu-textos {
@@ -503,35 +503,50 @@ button,
 /* 2. PC: VISIBLE EN CEMENTERIO Y ANCLADO AL CANDELABRO */
 #campo-santo .menu-textos {
     display: flex !important;
-    position: absolute !important;
-    bottom: 105px !important; /* REDUCIDO: Baja todo el menú hacia las velas */
+    position: fixed !important;
+    bottom: 120px !important; /* Posición fija sobre el candelabro */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 230px !important; /* REDUCIDO: Junta "Leyes" y "Alianzas" hacia el centro */
-    justify-content: space-between !important;
+    width: 300px !important; /* Ancho para separación */
+    height: 60px !important; /* Altura definida */
+    justify-content: space-around !important;
     align-items: center !important;
     z-index: 1001 !important;
     pointer-events: auto !important;
+    gap: 40px !important; /* Separación entre elementos */
 }
 
 #campo-santo .opcion {
     font-family: 'Nosifer', serif !important;
-    font-size: 11px !important;
+    font-size: 12px !important;
     color: #8b0000 !important;
     text-shadow: 2px 2px 4px #000 !important;
     font-weight: bold !important;
     transition: all 0.3s ease !important;
     text-decoration: none !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    top: 0 !important;
+    transform: none !important; /* Reset de transforms */
 }
 
-/* Curvatura del candelabro en PC: Arco más pronunciado */
-#campo-santo .leyes { transform: translateY(8px) rotate(-12deg) !important; }  /* Baja hacia la vela izquierda */
-#campo-santo .oraculo { transform: translateY(-15px) !important; }             /* Sube más en el centro */
-#campo-santo .alianzas { transform: translateY(8px) rotate(12deg) !important; } /* Baja hacia la vela derecha */
+/* Separación clara sin rotación - directamente encima de cada vela */
+#campo-santo .leyes { 
+    margin-left: -80px !important;
+}
+
+#campo-santo .oraculo { 
+    /* Centro - sin ajuste */
+}
+
+#campo-santo .alianzas { 
+    margin-right: -80px !important;
+}
 
 #campo-santo .opcion:hover {
     color: #ff0000 !important;
     filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) !important;
+    transform: scale(1.1) !important;
 }
 
 /* 3. MÓVIL: CANDELABRO INVISIBLE, MENÚ AL TOPE */
@@ -552,22 +567,27 @@ button,
         border-radius: 0 0 10px 10px !important; /* Solo redondea las esquinas de abajo */
         border-bottom: 2px solid #4a0000 !important;
         box-sizing: border-box !important;
+        height: auto !important;
+        gap: 0 !important;
     }
 
     #campo-santo .leyes, 
     #campo-santo .oraculo, 
     #campo-santo .alianzas {
         transform: none !important;
+        margin: 0 !important;
     }
 
     #campo-santo .opcion {
         font-size: 10px !important;
+        flex: 1 !important;
+        text-align: center !important;
     }
 }
 
 /* ==========================================================================
-   7. VENTANAS MODALES, INTERFACES Y RITUALES
-   ========================================================================== */
+    7. VENTANAS MODALES, INTERFACES Y RITUALES
+    ========================================================================== */
 #modal-ritual {
     position: fixed;
     top: 50%;
@@ -736,7 +756,7 @@ button,
 }
 
 .oraculo-titulo { font-family: 'Nosifer', cursive !important; color: #ff0000 !important; font-size: 2.2rem !important; text-shadow: 0 0 15px #ff0000, 3px 3px 5px #000000 !important; margin: 0 0 15px 0 !important; }
-.oraculo-cuerpo p { font-family: 'UnifrakturMaguntia', serif !important; color: #ffffff !important; font-size: 1.2rem !important; text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; margin: 0 0 25px 0 !important; }
+.oraculo-cuerpo p { font-family: 'UnifrakturMaguntia', serif !important; color: #ffffff !important; font-size: 1.2rem !important; text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; margin-bottom: 20px !important; }
 
 #oraculo-input {
     background: rgba(0, 0, 0, 0.6) !important;
@@ -754,9 +774,9 @@ button,
     text-shadow: 0 0 8px #ff0000 !important;
 }
 
-.btn-invocar { margin-top: 30px !important; background: #000000 !important; color: #ff0000 !important; border: 2px solid #ff0000 !important; font-family: 'Nosifer', cursive !important; font-size: 0.7rem !important; padding: 12px 35px !important; transition: all 0.3s ease !important; }
+.btn-invocar { margin-top: 30px !important; background: #000000 !important; color: #ff0000 !important; border: 2px solid #ff0000 !important; font-family: 'Nosifer', cursive !important; font-size: 1.1rem !important; padding: 10px 30px !important; }
 .btn-invocar:hover { background: #ff0000 !important; color: #000000 !important; box-shadow: 0 0 20px #ff0000 !important; }
-.cerrar-pacto { margin-top: 40px !important; color: #ff0000 !important; font-family: 'Metal Mania', cursive !important; font-size: 1.2rem !important; text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; transition: transform 0.2s !important; }
+.cerrar-pacto { margin-top: 40px !important; color: #ff0000 !important; font-family: 'Metal Mania', cursive !important; font-size: 1.2rem !important; text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; }
 .cerrar-pacto:hover { transform: scale(1.1); }
 
 /* --- ALERTAS DEL INFRAMUNDO --- */
@@ -790,8 +810,8 @@ button,
 .btn-cerrar-alerta:hover { background: #ff0000; color: #000; box-shadow: 0 0 10px #ff0000; }
 
 /* ==========================================================================
-   8. ANIMACIONES Y TIMELINES
-   ========================================================================== */
+    8. ANIMACIONES Y TIMELINES
+    ========================================================================== */
 @keyframes cieloMictlan { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes pulsoEspectral { from { filter: brightness(0.5) blur(1px); } to { filter: brightness(1.2) blur(0px); } }
 @keyframes distorsionarNiebla { 0% { transform: scale(1) skew(5deg); opacity: 0.8; } 100% { transform: scale(1.4) skew(-5deg); opacity: 0.5; } }
@@ -804,8 +824,8 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   9. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL MÓVIL
-   ========================================================================== */
+    9. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL MÓVIL
+    ========================================================================== */
 
 /* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
 @media screen and (max-height: 500px) and (orientation: landscape) {
@@ -942,9 +962,10 @@ button,
     40%, 60% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
 }
+
 /* ==================================================================
-   COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
-   ================================================================== */
+    COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
+    ================================================================== */
 
 /* Forzamos el contenedor del grimorio a ser un bloque rígido y estable */
 .grimorio-container {
@@ -999,352 +1020,142 @@ button,
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important; 
-    gap: 15px !important;       
+    justify-content: flex-start !important;
+    gap: 15px !important;
     box-sizing: border-box !important;
     padding: 10px 20px !important;
     z-index: 30 !important;
     color: #7a1c1c !important;
 }
 
-/* 📌 CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
-.grimorio-container .formulario-goth {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;       /* Separación interna de los inputs */
-    width: 90% !important;
-    margin: 0 !important;
+/* Títulos de cada página - Estilo medieval fortalecido */
+#auth-tagline, #right-title {
+    font-family: 'Nosifer', cursive;
+    color: #8b0000;
+    font-size: 1.4rem;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
 }
 
-.grimorio-container .input-pergamino-goth {
-    font-size: 0.8rem !important;
-    padding: 8px !important;
-    text-align: center !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    color: #7a1c1c !important;
+#left-desc, #right-desc {
+    font-family: 'UnifrakturMaguntia', serif;
+    color: #4a0000;
+    font-size: 0.85rem;
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: 15px;
 }
 
-.grimorio-container .btn-ritual-grimorio {
-    font-size: 0.75rem !important;
-    padding: 10px !important;
-    width: 100% !important;
-    margin-top: 5px !important;
+/* Formulario estilizado */
+.formulario-goth {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
 }
 
-/* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO CON CURSOR FORZADO */
-#google-btn-container {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    min-height: 45px !important;
-    margin: 10px 0 0 0 !important;
-    position: relative !important; /* Permite posicionar la capa encima */
+.input-pergamino-goth {
+    padding: 10px 12px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
-/* Capa transparente superior que fuerza el cursor del pentáculo */
-#google-btn-container::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 10 !important;
-    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
-    pointer-events: none !important; /* 🔥 Hace que el clic ignore esta capa y presione el botón real de Google */
+.input-pergamino-goth:focus {
+    background: rgba(42, 27, 10, 0.15) !important;
+    border-color: rgba(74, 0, 0, 0.8) !important;
+    box-shadow: 0 0 8px rgba(74, 0, 0, 0.3) !important;
 }
 
-/* El divisor sutil del lado derecho */
-.grimorio-container .divisor-arcano {
-    border-top: 1px solid rgba(139, 0, 0, 0.25) !important;
-    width: 70% !important;
-    margin: 5px 0 !important;
+.btn-ritual-grimorio {
+    margin-top: 8px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-/* 📌 PIES DE PÁGINA ACOMODADOS */
-.grimorio-container .cambio-modo-contenedor,
-.grimorio-container #new-user-helper {
-    position: relative !important;
-    font-family: 'nosifer', cursive !important;
-    font-size: 0.7rem !important;
-    color: #7a1c1c !important;
-    text-align: center !important;
-    width: 100% !important;
-    margin-top: 15px !important; /* Empuja el texto al fondo de la hoja de manera segura */
-    padding-bottom: 0 !important;
+.btn-ritual-grimorio:hover {
+    background: #7a0000 !important;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6) !important;
+    transform: translateY(-2px);
 }
 
-.grimorio-container #new-user-helper p {
-    margin-bottom: 5px !important;
-    color: #7a1c1c !important;
+/* Cambio de modo (Login/Registro) */
+.cambio-modo-contenedor {
+    margin-top: 10px;
+    text-align: center;
 }
 
-.grimorio-container .btn-ritual-secundario {
-    font-size: 0.7rem !important;
-    padding: 5px 12px !important;
-    cursor: pointer !important;
-}
-
-/* Corrección de enlaces de intercambio */
 #toggle-auth-text {
-    
-    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
-    color: #7a1c1c !important;
-    text-decoration: underline !important;
-    font-weight: bold !important;
-}
-.efecto-impacto {
-    /* Usamos filter en lugar de transform porque no altera el layout ni el tamaño */
-    filter: drop-shadow(0 0 15px white) brightness(1.5);
-    transition: filter 0.3s ease;
-}
-/* Oculta SOLO el balance de arriba a la izquierda */
-.alma-maestra .balance-actual { 
-    display: none !important; 
+    font-family: 'MedievalSharp', serif;
+    color: #8B0000;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: underline;
 }
 
-/* El balance del Soulgeist (el que generas en el script) se mantendrá visible */
-#balance-soulgeist {
-    display: block !important;
-}
-/* Busca el contenedor superior y ocúltalo */
-.nombre-de-tu-clase-superior-izquierda {
-    display: none !important;
-}
-/* ====================== MODAL COSECHA MEJORADO ====================== */
-#modal-ritual {
-    background: linear-gradient(145deg, #0a0000, #1f0a0a) !important;
-    border: 3px solid #6b0000 !important;
-    box-shadow: 0 0 45px rgba(139, 0, 0, 0.85),
-                0 0 20px rgba(0,0,0,0.95) !important;
-    width: 360px !important;
-    padding: 28px 22px !important;
+#toggle-auth-text:hover {
+    color: #ff0000;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
 }
 
-#modal-ritual #titulo-ritual {
-    color: var(--color-ritmo, #f7931a) !important;
-    text-shadow: 0 0 20px currentColor !important;
-    font-size: 1.75rem !important;
+/* Divisor arcano */
+.divisor-arcano {
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #8b0000, transparent);
+    margin: 15px 0;
 }
 
-#modal-ritual input,
-#modal-ritual select {
-    background: #0c0c0c !important;
-    border: 2px solid #4a0000 !important;
-    color: #ddd !important;
+/* Helper para nuevo usuario */
+#new-user-helper {
+    margin-top: 10px;
+    text-align: center;
 }
 
-.botones-exchange {
-    gap: 10px !important;
-    margin-top: 18px !important;
+#new-user-helper p {
+    font-family: 'UnifrakturMaguntia', serif;
+    color: #4a0000;
+    font-size: 0.8rem;
 }
 
-.botones-exchange button {
-    padding: 8px 18px !important;
-    font-size: 0.55rem !important;
-    min-width: 105px !important;
-    height: 38px !important;
-    font-family: 'Nosifer', cursive !important;
-    letter-spacing: 1px !important;
-    text-transform: uppercase !important;
-    border-radius: 4px !important;
-}
-
-/* Botón principal */
-#btn-cosecha-enviar {
-    background: #c44a00 !important;
-    color: #fff !important;
-    border: 2px solid #ff8800 !important;
-}
-
-/* Botón cancelar */
-#btn-cosecha-cancelar {
-    background: #1f1f1f !important;
-    color: #ccc !important;
-    border: 2px solid #4a0000 !important;
-}
-
-#btn-cosecha-enviar:hover {
-    background: #ff5500 !important;
-    transform: scale(1.04) !important;
-}
-
-#btn-cosecha-cancelar:hover {
-    background: #330000 !important;
-    color: #fff !important;
-}
-/* ====================== GRIMORIO RESPONSIVO - VERSIÓN FINAL ====================== */
-
-.grimorio-container {
-    background: url('img/grimorio.png') no-repeat center center !important;
-    background-size: 100% 100% !important;
-    width: 100% !important;
-    max-width: 1080px !important;
-    height: auto !important;
-    min-height: 620px !important;
-    margin: 20px auto !important;
-    position: relative !important;
-    padding: 45px 70px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-}
-
-/* ====================== ESCRITORIO ====================== */
-@media (min-width: 1025px) {
-    .grimorio-container {
-        padding: 65px 90px !important;
-    }
-
-    .pagina-izquierda {
-        width: 46% !important;
-        padding-right: 45px !important;
-    }
-
-    .pagina-derecha {
-        width: 46% !important;
-        padding-left: 45px !important;
-    }
-}
-
-/* ====================== MÓVIL ====================== */
-@media (max-width: 1024px) {
-    .grimorio-container {
-        padding: 35px 25px !important;
-        min-height: 680px !important;
-    }
-
-    .pagina-izquierda,
-    .pagina-derecha {
-        width: 100% !important;
-        max-width: 380px !important;
-        margin: 12px auto !important;
-        padding: 18px 15px !important;
-    }
-
-    .pagina-izquierda {
-        border-bottom: 3px solid rgba(139, 0, 0, 0.35) !important;
-    }
-
-    .pagina-derecha {
-        border-top: 3px solid rgba(139, 0, 0, 0.35) !important;
-    }
-
-    /* Ajuste fino de textos y botones */
-    .grimorio-container h2 {
-        font-size: 1.05rem !important;
-        margin-bottom: 12px !important;
-    }
-
-    .grimorio-container label,
-    .grimorio-container p {
-        font-size: 0.9rem !important;
-    }
-
-    .input-pergamino-goth {
-        padding: 13px !important;
-        font-size: 0.75rem !important;
-    }
-
-    .btn-ritual-grimorio {
-        padding: 13px !important;
-        font-size: 0.9rem !important;
-    }
-
-    #google-btn-container {
-        margin: 15px 0 !important;
-    }
-}
-
-/* ====================== PANTALLAS MUY PEQUEÑAS ====================== */
-@media (max-width: 480px) {
-    .grimorio-container {
-        padding: 25px 18px !important;
-    }
-
-    .pagina-izquierda,
-    .pagina-derecha {
-        max-width: 340px !important;
-        padding: 15px !important;
-    }
-
-    .grimorio-container h2 {
-        font-size: 1.15rem !important;
-    }
-}
-
-/* Ocultar Leyes, Oráculo y Alianzas hasta entrar al cementerio */
-.menu-textos {
-    display: none !important;
-}
-
-/* Mostrarlos solo cuando ya estés dentro del cementerio */
-#campo-santo .menu-textos {
-    display: flex !important;
-}
-/* ====================== BOTÓN GOOGLE AJUSTADO ====================== */
-
+/* Google Sign-In Button Container */
 #google-btn-container {
-    width: 100% !important;
-    max-width: 180px !important;     /* ← Este es el que controla el tamaño */
-    margin: 14px auto !important;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+#google-btn-container > div {
+    transform: scale(0.85) !important;
+    transform-origin: center !important;
+}
+
+/* Modal base oscura para Códice y Oráculo */
+.capa-oscura.interface-mictlan {
     display: flex !important;
-    justify-content: center !important;
+    background: rgba(10, 5, 0, 0.98) !important;
+    backdrop-filter: blur(25px) !important;
 }
 
-/* Versión móvil más ajustada */
-@media (max-width: 1024px) {
-    #google-btn-container {
-        max-width: 170px !important;
-        margin: 15px auto !important;
+#modal-contrato {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
     }
-}
-
-@media (max-width: 480px) {
-    #google-btn-container {
-        max-width: 180px !important;   /* Aún más pequeño en celulares */
-    }
-}
-
-/* Forzar que el botón interno de Google respete el tamaño */
-#google-btn-container iframe {
-    width: 100% !important;
-    max-width: 100% !important;
-}
-/* ==================================================================
-   POSICIÓN QUIRÚRGICA: MODO PC
-   ================================================================== */
-#campo-santo .menu-textos {
-    position: absolute !important;
-    top: 50% !important;        /* Lo centra verticalmente primero */
-    margin-top: -180px !important; /* Ajusta este valor: MÁS NEGATIVO = MÁS ARRIBA */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 320px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    z-index: 300 !important;
-}
-
-/* --- MÓVIL: Arriba pegado al techo --- */
-@media (max-width: 768px) {
-    #campo-santo .candelabro-central {
-        display: none !important; 
-    }
-    #campo-santo .menu-textos {
-        position: fixed !important;
-        top: 10px !important;
-        margin-top: 0 !important;
-        bottom: auto !important;
-        left: 0 !important;
-        width: 100% !important;
-        transform: none !important;
-        background: rgba(0, 0, 0, 0.8) !important;
-        padding: 10px 0 !important;
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
 }
