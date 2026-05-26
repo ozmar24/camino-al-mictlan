@@ -1434,7 +1434,7 @@ button,
     top: 50% !important;
     left: 50% !important;
     /* Controla la altura general de las 3 letras juntas */
-    margin-top: -105px !important; 
+    margin-top: -85px !important; 
     width: 0 !important;
     height: 0 !important;
     z-index: 99999 !important;
@@ -1466,23 +1466,20 @@ button,
 
 
 /* ==================================================================
-   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (SIN IMPORTAR LA PANTALLA)
+   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (BARRA LIMPIA SIN CANDELABRO)
    ================================================================== */
 @media (max-width: 1024px) {
     
-    /* 1. OCULTAMOS EL CANDELABRO EN CUALQUIER MÓVIL O TABLET */
-    #campo-santo .candelabro-central, 
-    .candelabro-central, 
-    .candelabro, 
-    #candelabro,
-    .velas,
-    #velas {
+    /* 1. OCULTAMOS RECTO Y SÓLO LA IMAGEN DEL CANDELABRO */
+    img[src*="candelabro"], 
+    img[src*="vela"],
+    .candelabro-central {
         display: none !important;
     }
 
     /* 2. EL MENÚ DE LETRAS SE QUEDA SIEMPRE VISIBLE COMO BARRA SUPERIOR */
     #campo-santo .menu-textos {
-        display: flex !important;       /* Forzamos a que SÍ se vea */
+        display: flex !important;       /* Fuerza a que SÍ aparezcan las letras */
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -1490,25 +1487,25 @@ button,
         height: 45px !important;        /* Barra compacta en el techo */
         margin-top: 0 !important;
         transform: none !important;
-        background: rgba(0, 0, 0, 0.90) !important; /* Fondo negro para que se lean las letras */
+        background: rgba(0, 0, 0, 0.90) !important; /* Fondo negro para leer las letras */
         border-bottom: 1px solid #440000 !important;
         
-        /* Alineación: de izquierda a derecha sin estorbar la cruz */
+        /* Alineación horizontal libre de la cruz */
         justify-content: flex-start !important;
         align-items: center !important;
         gap: 15px !important;           /* Espacio entre Leyes, Oráculo y Alianzas */
-        padding: 0 65px 0 15px !important; /* Protege los 65px de la derecha para la cruz */
+        padding: 0 65px 0 15px !important; /* Los 65px de la derecha protegen la cruz */
         z-index: 9999999 !important;    /* Capa por encima de todo */
     }
 
-    /* Reseteamos la posición absoluta de PC para que fluyan en línea limpia */
+    /* Reseteamos la posición de PC para que fluyan en línea recta arriba */
     #campo-santo .menu-textos .opcion {
-        display: block !important;      /* Asegura que no se oculten las letras */
+        display: block !important;      
         position: relative !important;
         left: auto !important;
         top: auto !important;
         width: auto !important;
-        font-size: 11px !important;     /* Tamaño estilizado para pantallas móviles */
+        font-size: 11px !important;     /* Tamaño fino para celulares */
     }
 
     /* 3. ACHICAMOS LA CRUZ DE SALIR PARA QUE SE ACOMODE EN LA BARRA */
@@ -1517,7 +1514,7 @@ button,
         top: 8px !important;
         right: 12px !important;
         z-index: 10000000 !important;
-        transform: scale(0.7) !important; /* Un 30% más pequeña para no saturar */
+        transform: scale(0.7) !important; /* Un 30% más pequeña */
         transform-origin: right center !important;
     }
 }
