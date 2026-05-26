@@ -1272,22 +1272,22 @@ button,
 }
 /* ====================== MENÚ SUPERIOR (LEYES - ORÁCULO - ALIANZAS) ====================== */
 
-/* Ocultar en la pantalla del grimorio (login) */
-#modal-contrato .menu-textos,
-.grimorio-container .menu-textos {
-    display: none !important;
-}
-
-/* Mostrar solo cuando ya estés dentro del cementerio */
-#campo-santo .menu-textos {
+/* FORZAMOS QUE SE VEAN EN TODAS LAS PANTALLAS */
+.menu-textos {
     display: flex !important;
-    opacity: 1 !important;
+    position: fixed !important;
+    top: 20px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 40px !important;
+    z-index: 9999999 !important; /* Prioridad máxima sobre el grimorio */
+    pointer-events: auto !important;
 }
 
-/* Ajuste de tamaño en móvil */
-@media (max-width: 1024px) {
-    .menu-textos .opcion {
-        font-size: 10px !important;
-        padding: 4px 8px !important;
-    }
+/* Aseguramos que el texto sea visible */
+.menu-textos a, .menu-textos .opcion {
+    color: #ff0000 !important; /* Rojo sangre para visibilidad */
+    text-shadow: 0 0 10px #000 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
 }
