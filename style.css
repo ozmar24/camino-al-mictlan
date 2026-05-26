@@ -475,9 +475,9 @@ button,
     z-index: 10000 !important; /* Elevado para estar por encima del fondo pero bajo los textos */
     pointer-events: none;
     filter: brightness(0.8) contrast(1.2) saturate(0.8) drop-shadow(0 0 15px #000);
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    display: none; /* Oculto por defecto */
+    opacity: 0; /* Oculto por defecto */
+    visibility: hidden; /* Oculto por defecto */
     transition: opacity 1s ease-in;
 }
 
@@ -772,17 +772,12 @@ button,
 
     /* Ajuste de fuentes: Mínimo 12px para que sea legible */
     .opcion {
-        font-size: 12px !important; 
+        font-size: 12px; 
         letter-spacing: 1px;
-        text-shadow: 2px 2px 4px #000 !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: block !important;
-    }
-    .candelabro-central {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
+        text-shadow: 2px 2px 4px #000;
+        opacity: 1;
+        visibility: visible;
+        display: block;
     }
 
     .pilar-izquierdo, .pilar-derecho {
@@ -819,14 +814,9 @@ button,
     #campo-santo, 
     #modal-contrato, 
     .overlay-contrato {
-        display: none !important;
+        display: none;
     }
-    .candelabro-central {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        z-index: 10000 !important;
-    }
+
 
     #aviso-rotar {
         display: flex !important;
