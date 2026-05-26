@@ -1316,52 +1316,35 @@ button,
     max-width: 100% !important;
 }
 /* ==================================================================
-   MENÚ AJUSTADO SOBRE LAS LLAMAS (POSICIÓN QUIRÚRGICA)
+   POSICIÓN QUIRÚRGICA: MODO PC
    ================================================================== */
-
-.menu-textos {
+#campo-santo .menu-textos {
     position: absolute !important;
-    bottom: 32% !important; /* Ajusta este valor si sube/baja mucho en tu monitor */
+    top: 50% !important;        /* Lo centra verticalmente primero */
+    margin-top: -180px !important; /* Ajusta este valor: MÁS NEGATIVO = MÁS ARRIBA */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 320px !important; /* Ancho fijo para que coincida con el candelabro */
+    width: 320px !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     z-index: 300 !important;
 }
 
-.opcion {
-    font-family: 'Nosifer', serif !important;
-    font-size: 13px !important;
-    color: #ff2222 !important;
-    text-shadow: 0 0 10px #ff0000, 2px 2px 4px #000 !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    width: 80px !important; /* Caja de texto fija */
-    text-align: center !important; /* Centra el texto dentro de su propia caja */
-}
-
 /* --- MÓVIL: Arriba pegado al techo --- */
 @media (max-width: 768px) {
-    .candelabro-central {
-        display: none !important; /* Oculta candelabro */
+    #campo-santo .candelabro-central {
+        display: none !important; 
     }
-
-    .menu-textos {
+    #campo-santo .menu-textos {
         position: fixed !important;
         top: 10px !important;
+        margin-top: 0 !important;
         bottom: auto !important;
         left: 0 !important;
         width: 100% !important;
         transform: none !important;
         background: rgba(0, 0, 0, 0.8) !important;
         padding: 10px 0 !important;
-        border-bottom: 1px solid #440000 !important;
-    }
-
-    .opcion {
-        width: auto !important;
-        font-size: 11px !important;
     }
 }
