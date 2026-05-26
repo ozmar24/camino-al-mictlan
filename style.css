@@ -1315,22 +1315,21 @@ button,
     width: 100% !important;
     max-width: 100% !important;
 }
-/* ====================== SOBREESCRITURA FINAL DEL MENÚ (LEYES - ORÁCULO - ALIANZAS) ====================== */
+/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS (AJUSTE FINAL) ====================== */
 
 .menu-textos {
     position: absolute !important;
-    bottom: 25% !important;
+    bottom: 32% !important;        /* Subido más */
     left: 50% !important;
     transform: translateX(-50%) !important;
     display: flex !important;
-    gap: 52px !important;
+    gap: 48px !important;
     z-index: 300 !important;
-    width: auto !important;
 }
 
 .opcion {
     font-family: 'Nosifer', serif !important;
-    font-size: 13.5px !important;
+    font-size: 13px !important;
     color: #ff2222 !important;
     text-shadow: 0 0 10px #ff0000, 2px 2px 4px #000 !important;
     font-weight: bold !important;
@@ -1338,10 +1337,10 @@ button,
     cursor: pointer !important;
 }
 
-/* Alineación precisa con las velas */
-.leyes   { transform: translateX(-26px) !important; }
-.oraculo { transform: translateX(0px) !important; }
-.alianzas{ transform: translateX(26px) !important; }
+/* Alineación precisa sobre cada vela */
+.leyes   { transform: translateX(-32px) !important; }
+.oraculo { transform: translateX(-2px) !important; }
+.alianzas{ transform: translateX(28px) !important; }
 
 /* Hover */
 .leyes:hover, .oraculo:hover, .alianzas:hover {
@@ -1352,8 +1351,8 @@ button,
 /* Móvil */
 @media (max-width: 1024px) {
     .menu-textos {
-        bottom: 20% !important;
-        gap: 38px !important;
+        bottom: 27% !important;
+        gap: 35px !important;
     }
     .opcion {
         font-size: 11.5px !important;
