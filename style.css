@@ -1113,3 +1113,28 @@ button,
     background: #330000 !important;
     color: #fff !important;
 }
+/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS ====================== */
+
+/* Ocultar en pantalla de entrada y en el grimorio de login */
+#escena-portal .menu-textos,
+#modal-contrato .menu-textos,
+.grimorio-container .menu-textos {
+    display: none !important;
+}
+
+/* Mostrar SOLO dentro del cementerio */
+#campo-santo .menu-textos {
+    display: flex !important;
+    opacity: 1 !important;
+    z-index: 200 !important;
+}
+
+/* Ajuste opcional de tamaño y posición dentro del cementerio */
+#campo-santo .menu-textos {
+    top: 8% !important;
+    gap: 30px !important;
+}
+
+#campo-santo .opcion {
+    font-size: 0.95rem !important;
+}
