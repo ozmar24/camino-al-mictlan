@@ -491,62 +491,73 @@ button,
     display: block;
 }
 
-/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS (CENDELABRO) ====================== */
+/* ==================================================================
+   MENÚ SUPERIOR (LEYES, ORÁCULO, ALIANZAS) - SOLUCIÓN DEFINITIVA
+   ================================================================== */
 
+/* 1. OCULTO POR DEFECTO (Así nunca saldrá en el Login/Grimorio) */
 .menu-textos {
+    display: none !important; 
+}
+
+/* 2. PC: VISIBLE SOLO EN EL CEMENTERIO Y ANCLADO AL CANDELABRO */
+#campo-santo .menu-textos {
+    display: flex !important;
     position: absolute !important;
-    bottom: 24% !important;           /* Ajustado para quedar cerca de las velas */
+    bottom: 120px !important; /* Altura sobre las velas */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: auto !important;
-    display: flex !important;
-    justify-content: center !important;
+    width: 280px !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    gap: 48px !important;             /* Espacio entre palabras */
-    z-index: 250 !important;
-}
-
-.opcion {
-    font-family: 'Nosifer', serif !important;
-    font-size: 13px !important;
-    color: #ff2222 !important;
-    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000 !important;
-    font-weight: bold !important;
+    z-index: 1001 !important;
     pointer-events: auto !important;
-    opacity: 1 !important;
+}
+
+#campo-santo .opcion {
+    font-family: 'Nosifer', serif !important;
+    font-size: 11px !important;
+    color: #8b0000 !important;
+    text-shadow: 2px 2px 4px #000 !important;
+    font-weight: bold !important;
     transition: all 0.3s ease !important;
-    white-space: nowrap !important;
+    text-decoration: none !important;
 }
 
-/* Ajustes finos por palabra para que queden bien con cada vela */
-.leyes { 
-    transform: translateX(-12px) !important; 
-}
+/* Curvatura del candelabro en PC */
+#campo-santo .leyes { transform: translateY(15px) rotate(-8deg) !important; }
+#campo-santo .oraculo { transform: translateY(-5px) !important; }
+#campo-santo .alianzas { transform: translateY(15px) rotate(8deg) !important; }
 
-.oraculo { 
-    transform: translateY(-2px) !important; 
-}
-
-.alianzas { 
-    transform: translateX(12px) !important; 
-}
-
-/* Hover */
-.leyes:hover, .oraculo:hover, .alianzas:hover {
-    color: #ffffff !important;
-    text-shadow: 0 0 12px #ff0000 !important;
-    transform: scale(1.08) !important;
-}
-
-/* ====================== MÓVIL ====================== */
-@media (max-width: 1024px) {
-    .menu-textos {
-        bottom: 19% !important;
-        gap: 35px !important;
+/* 3. MÓVIL: CANDELABRO INVISIBLE, MENÚ PEGADO ARRIBA */
+@media (max-width: 768px) {
+    /* Ocultamos la imagen del candelabro, pero el contenedor sigue existiendo */
+    #campo-santo .candelabro-central img {
+        display: none !important;
     }
-    
-    .opcion {
-        font-size: 11px !important;
+
+    /* Movemos el menú a la parte superior de la pantalla */
+    #campo-santo .menu-textos {
+        position: fixed !important;
+        top: 15px !important;
+        bottom: auto !important; /* Anulamos la posición del PC */
+        width: 95vw !important;
+        max-width: 400px !important;
+        background: rgba(20, 0, 0, 0.7) !important; /* Fondo para que se lea */
+        padding: 10px 15px !important;
+        border-radius: 8px !important;
+        border-bottom: 1px solid #4a0000 !important;
+    }
+
+    /* Quitamos la curvatura en móvil para que queden derechos */
+    #campo-santo .leyes, 
+    #campo-santo .oraculo, 
+    #campo-santo .alianzas {
+        transform: none !important;
+    }
+
+    #campo-santo .opcion {
+        font-size: 10px !important;
     }
 }
 
