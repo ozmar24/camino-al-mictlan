@@ -1464,55 +1464,56 @@ button,
 #campo-santo .oraculo { left: -70px !important; top: -5px !important; }
 #campo-santo .alianzas { left: 35px !important; top: 25px !important; }
 
-
 /* ==================================================================
-   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (SOLUCIÓN DEFINITIVA)
+   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (BARRA FIJA MAESTRA)
    ================================================================== */
 @media (max-width: 1024px) {
     
-    /* 1. OCULTAMOS ÚNICAMENTE EL DIV DEL CANDELABRO */
-    /* Usamos todos los contenedores posibles para asegurar que la imagen se vaya, sin tocar el fondo general */
-    #candelabro-contenedor,
-    .candelabro-central,
-    .contenedor-velas,
-    #campo-santo > img[src*="candelabro"],
-    #campo-santo > img[src*="vela"] {
+    /* 1. OCULTAMOS EL CANDELABRO VOLVIÉNDOLO INVISIBLE SIN ROMPER EL PADRE */
+    #candelabro, 
+    .candelabro, 
+    .candelabro-central, 
+    img[src*="candelabro"], 
+    img[src*="vela"] {
         display: none !important;
         opacity: 0 !important;
         visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        pointer-events: none !important;
     }
 
-    /* 2. FORZAMOS A QUE EL MENÚ SE CONVIERTA EN UNA BARRA VISIBLE */
+    /* 2. BARRA DE MENÚ SUPERIOR GARANTIZADA SOBRE EL FONDO */
     #campo-santo .menu-textos {
         display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
         position: fixed !important;
         
-        /* Lo pegamos al techo con prioridad absoluta */
+        /* Forzamos el anclaje total en el techo de la pantalla */
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        height: 50px !important;
+        height: 48px !important;
         margin-top: 0 !important;
         transform: none !important;
         
-        /* Fondo oscuro semi-transparente para que resalten las letras rojas */
+        /* Capa negra de fondo para asegurar que las letras rojas resalten */
         background-color: #000000 !important;
         background: rgba(0, 0, 0, 0.95) !important;
         border-bottom: 2px solid #880000 !important;
         
-        /* Alineación horizontal */
+        /* Distribución fluida */
         justify-content: flex-start !important;
         align-items: center !important;
-        gap: 18px !important;
-        padding: 0 70px 0 15px !important; /* El espacio de 70px blinda la cruz de la esquina */
-        z-index: 99999999 !important; /* Por encima de cualquier fondo negro o grimorio */
+        gap: 15px !important;
+        padding: 0 70px 0 15px !important; /* El colchón de 70px protege la cruz de la esquina */
+        z-index: 99999999 !important; /* Prioridad absoluta sobre cualquier fondo o grimorio */
     }
 
-    /* 3. FORZAMOS A LAS LETRAS A SER VISIBLES EN LÍNEA HORIZONTAL */
+    /* 3. RESETEO DE LETRAS INDIVIDUALES EN MÓVIL */
     #campo-santo .menu-textos .opcion {
-        display: inline-block !important;
+        display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
         position: relative !important;
@@ -1520,19 +1521,19 @@ button,
         top: auto !important;
         width: auto !important;
         
-        /* Tamaño ideal para que quepan las tres opciones en cualquier celular */
-        font-size: 11px !important; 
+        /* Tamaño óptimo para evitar desbordes en cualquier celular */
+        font-size: 11px !important;
         color: #ff2222 !important;
         text-shadow: 0 0 8px #ff0000, 2px 2px 3px #000 !important;
     }
 
-    /* 4. MANTENEMOS LA CRUZ DE SALIR EN SU ESQUINA ENCOJIDA */
+    /* 4. REDUCCIÓN DE LA CRUZ DE SALIR EN LA ESQUINA DE LA BARRA */
     .btn-salir, .boton-salir, #boton-salir, .close-btn, .btn-close {
         position: fixed !important;
-        top: 10px !important;
+        top: 8px !important;
         right: 15px !important;
-        z-index: 100000000 !important;
-        transform: scale(0.7) !important;
+        z-index: 100000000 !important; /* Un nivel por encima de la barra */
+        transform: scale(0.68) !important; /* Encoje la cruz para que se vea fina */
         transform-origin: right center !important;
     }
 }
