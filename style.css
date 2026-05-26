@@ -475,9 +475,9 @@ button,
     z-index: 10000 !important; /* Elevado para estar por encima del fondo pero bajo los textos */
     pointer-events: none;
     filter: brightness(0.8) contrast(1.2) saturate(0.8) drop-shadow(0 0 15px #000);
-    display: none !important; /* Oculto por defecto */
-    opacity: 0 !important; /* Oculto por defecto */
-    visibility: hidden !important; /* Oculto por defecto */
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     transition: opacity 1s ease-in;
 }
 
@@ -779,6 +779,11 @@ button,
         visibility: visible !important;
         display: block !important;
     }
+    .candelabro-central {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
 
     .pilar-izquierdo, .pilar-derecho {
         font-size: 11px !important;
@@ -816,7 +821,12 @@ button,
     .overlay-contrato {
         display: none !important;
     }
-
+    .candelabro-central {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 10000 !important;
+    }
 
     #aviso-rotar {
         display: flex !important;
