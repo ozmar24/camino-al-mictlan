@@ -181,7 +181,15 @@ function entrarAlCampoSanto(perfil = {}) {
 
     if (candelabro) {
         candelabro.style.display = 'block';
-        setTimeout(() => candelabro.style.opacity = '1', 50);
+        candelabro.style.opacity = '1';
+        candelabro.style.visibility = 'visible';
+        // Forzar visibilidad de las opciones del menú
+        const opciones = candelabro.querySelectorAll('.opcion');
+        opciones.forEach(op => {
+            op.style.display = 'block';
+            op.style.opacity = '1';
+            op.style.visibility = 'visible';
+        });
     }
 
     // Carga fuerte
@@ -404,76 +412,67 @@ guardarSaldosCriptas();
 // PASO 4: MODAL DE COSECHA DE CRIPTO Y CONFIGURACIÓN DE WALLET
 // ==================================================================
 function abrirModalCosechaFinal(pos) {
-    const modal = document.getElementById('modal-ritual');
-    const titulo = document.getElementById('titulo-ritual');
-    const info = document.getElementById('info-ritual');
-    const botones = document.querySelector('.botones-exchange');
+    const campoSanto = document.getElementById('campo-santo');
+    if (campoSanto) campoSanto.style.filter = "blur(5px) brightness(0.4)";
 
+    const modal = document.getElementById('modal-ritual');
     if (!modal) return;
 
-    window.currentCripto = pos;
-    titulo.innerText = `BÓVEDA DE ${pos.nombre.toUpperCase()}`;
-    
-    const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
-
-    info.innerHTML = `
-        <div style="text-align: center; margin: 20px 0;">
-            <p style="color: #aaa;">Saldo acumulado en esta tumba:</p>
-            <h2 style="color: ${pos.color}; font-size: 28px; text-shadow: 0 0 10px ${pos.color};">
-                ${saldoActual.toFixed(8)} ${pos.sim}
-            </h2>
-            <p style="color: #666; font-size: 12px; margin-top: 10px;">
-                ¿Qué deseas hacer con esta energía acumulada?
-            </p>
-            
-            <!-- Campo para la wallet, solo se usa si decide retirar -->
-            <div id="seccion-retiro" style="display:none; margin-top: 20px;">
-                <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                        style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
-                    <option value="bitso">BITSO (Recomendado)</option>
-                    <option value="binance">BINANCE</option>
-                    <option value="coinbase">COINBASE</option>
-                    ${pos.nombre === 'Bitcoin' ? '<option value="bitso_lightning">BITSO LIGHTNING (Instantáneo)</option>' : ''}
-                </select>
-                <input type="text" id="wallet-input" placeholder="Dirección de destino" 
-                       style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
-            </div>
-        </div>
-    `;
-
-    botones.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
-            <!-- Opción 1: Seguir acumulando -->
-            <button onclick="abrirModalSeleccionCantidad(window.currentCripto)" 
-                    style="background: #222; color: ${pos.color}; border: 1px solid ${pos.color}; padding: 12px; font-weight: bold;">
-                ➕ AÑADIR MÁS PODER
-            </button>
-            
-            <!-- Opción 2: Retirar (Muestra los campos de wallet) -->
-            <button id="btn-mostrar-retiro" 
-                    style="background: ${pos.color}; color: #000; padding: 12px; font-weight: bold;">
-                💰 RETIRAR A BILLETERA
-            </button>
-            
-            <button onclick="cerrarRitual()" style="background: transparent; color: #666; padding: 5px;">
-                CANCELAR
-            </button>
-        </div>
-    `;
-
-    // Lógica para mostrar los campos de retiro solo si pulsa el botón
-    document.getElementById('btn-mostrar-retiro').onclick = function() {
-        const seccion = document.getElementById('seccion-retiro');
-        if (seccion.style.display === 'none') {
-            seccion.style.display = 'block';
-            this.innerText = "CONFIRMAR RETIRO";
-            this.onclick = procesarRetiro; // Al segundo click, procesa el retiro
-        }
-    };
-
+    modal.style.setProperty('--color-ritmo', pos.color || "#f7931a");
     modal.style.display = 'block';
-}
 
+    const saldoAcumulado = window.tumbasConSaldo[pos.nombre] || 0;
+
+    console.log(`Abriendo retiro de ${pos.nombre} - Saldo real: ${saldoAcumulado}`);
+
+    document.getElementById('titulo-ritual').innerText = `COSECHA DE ${pos.nombre.toUpperCase()}`;
+
+    window.currentCripto = pos;
+
+    document.getElementById('info-ritual').innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <p style="color: #fff; font-size: 19px; margin: 10px 0;">
+                Saldo disponible: 
+                <b style="color: ${pos.color};">${saldoAcumulado.toFixed(8)} ${pos.sim}</b>
+            </p>
+            <small style="color:#aaa;">Mínimo aproximado: ${pos.usdMinimo || 0.15} USD</small>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            <label style="color:#bbb; font-size: 14px; display:block; margin-bottom:6px;">
+                Portal de retiro:
+            </label>
+            <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
+                    style="width: 100%; background:#111; color:#fff; border:2px solid ${pos.color}; padding:12px; border-radius:6px; font-size:15px;">
+                <option value="bitso">Bitso</option>
+                <option value="coinbase">Coinbase</option>
+                <option value="binance">Binance</option>
+            </select>
+        </div>
+
+        <div>
+            <input type="text" id="wallet-input" placeholder="Ingresa tu dirección o correo..." 
+                   style="width: 100%; background:#000; color:#fff; border:2px solid #555; padding:14px; text-align:center; border-radius:6px; font-size:15px;">
+        </div>
+    `;
+
+    const botones = document.querySelector('.botones-exchange');
+    if (botones) {
+        botones.innerHTML = `
+            <button id="btn-cosecha-enviar" class="pentaculo-cursor" 
+                    style="background:${pos.color}; color:#000; padding:12px 30px; margin-right:10px; font-weight:bold;">
+                TRANSMUTAR ALMA
+            </button>
+            <button id="btn-cosecha-cancelar" class="pentaculo-cursor" 
+                    style="background:#222; color:#fff; padding:12px 30px;">
+                VOLVER A LAS SOMBRAS
+            </button>
+        `;
+
+        document.getElementById('btn-cosecha-enviar').onclick = procesarRetiro;
+        document.getElementById('btn-cosecha-cancelar').onclick = cerrarRitual;
+    }
+}
 
 
 function adaptarPlaceholderPasarela(criptoId) {
@@ -787,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.userWallet = usuarioGuardado;
         // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
+            entrarAlCampoSanto({ balanceSG: 0 }); 
         }
     }
 });
@@ -907,72 +906,87 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
     
-    // 1. Descontamos localmente UNA SOLA VEZ
-    balanceUsuarioSG = balanceUsuarioSG - cantidad; 
-    if (balanceUsuarioSG < 0) balanceUsuarioSG = 0;
-
+    // 1. Descontamos localmente de inmediato
+    balanceUsuarioSG -= cantidad;
     actualizarBalanceSoulgeist(balanceUsuarioSG);
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
     const ganancia = cantidad * (pos.tasa || 0);
+
     cerrarRitual(); 
 
-   if (window.userWallet) {
+    // === ENVIAR EL DESCUENTO REAL A UPSTASH REDIS ===
+    // === ENVIAR ACTUALIZACIÓN DE BALANCE A UPSTASH REDIS ===
+    if (window.userWallet) {
         try {
-            // AQUÍ ES DONDE ESTABA EL ERROR: 
-            // Ya no restamos de nuevo, simplemente enviamos el balanceUsuarioSG que ya restamos arriba.
+            // CORRECCIÓN MATEMÁTICA CRÍTICA:
+            // Restamos la cantidad transmutada del balance general ANTES de enviarlo a Redis
+            balanceUsuarioSG = balanceUsuarioSG - cantidad;
+            if (balanceUsuarioSG < 0) balanceUsuarioSG = 0; // Evita que baje de cero por seguridad
+
+            // Actualizamos inmediatamente el localStorage para que el saldo persista al refrescar
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
             
-            console.log(`[RITUAL] Notificando descuento a Redis. Quedan: ${balanceUsuarioSG}`);
+            console.log(`[RITUAL] Notificando descuento a Redis. Quedan reales: ${balanceUsuarioSG}`);
             
-            await fetch('/api/acumular-sg', {
+            const res = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     wallet: window.userWallet, 
-                    nuevoBalance: balanceUsuarioSG, 
+                    nuevoBalance: balanceUsuarioSG, // Ahora sí va el valor restado (ej: 0)
                     accion: 'descontar_ritual'
                 })
             });
+            
+            const datosServidor = await res.json();
+            console.log("Servidor responde:", datosServidor);
+
         } catch (error) {
             console.error("Fallo de conexión al restar saldo en Redis:", error);
         }
     }
 
+    // 2. Ejecutar animación del alma volando
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-        const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-        localStorage.setItem(keyCriptas, JSON.stringify(window.tumbasConSaldo));
-        generarCementerio();
+        localStorage.setItem('soulgeist_criptas', JSON.stringify(window.tumbasConSaldo));
+        
+        const contenedorBalance = tumbaDestino.querySelector('.balance-proyectado');
+        if (contenedorBalance) {
+            contenedorBalance.innerText = `+${window.tumbasConSaldo[pos.nombre].toFixed(6)} ${pos.sim}`;
+            contenedorBalance.style.opacity = "1";
+        }
+
         mostrarModalFusionExitosa(pos, ganancia);
     });
 }
-
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
-// Reemplaza tu función actual por esta versión para depurar:
 async function sincronizarBalanceConRedis() {
-    if (!window.userWallet) return 0;
+    if (!window.userWallet) {
+        console.log("⚠️ No hay wallet, usando localStorage");
+        return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    }
 
     try {
-        const emailLimpio = window.userWallet.toLowerCase().trim();
-const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
-        if (!res.ok) {
-            const errorData = await res.json();
-            console.error("Detalle del error en el servidor:", errorData);
-            throw new Error(`Servidor respondió con status ${res.status}`);
-        }
+        const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(window.userWallet)}`);
+        if (!res.ok) throw new Error("Error al obtener balance");
 
         const data = await res.json();
+        
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance) || 0;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            console.log("✅ Balance cargado desde Redis:", balanceUsuarioSG);
             return balanceUsuarioSG;
         }
     } catch (e) {
-        console.warn("Fallo total de conexión:", e);
+        console.warn("No se pudo conectar con Redis, usando localStorage", e);
     }
-    return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
-}
 
+    balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+    return balanceUsuarioSG;
+}
 // Agrega esta función a tu script.js
 function resetearMemoriaUsuario() {
     localStorage.removeItem('soulgeist_balance');
@@ -1040,25 +1054,3 @@ function guardarSaldosCriptas() {
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
     console.log(`💾 Guardado criptas para ${window.userWallet}`);
 }
-function salirDelMictlan() {
-    // 1. Limpiamos la identidad del alma (sesión)
-    localStorage.removeItem('soulgeist_user_email');
-    localStorage.removeItem('usuario_email');
-    // Opcional: Si quieres limpiar el balance al salir
-    // localStorage.removeItem('soulgeist_balance'); 
-
-    lanzarAlertaMictlan("Tu rastro se desvanece... Regresando al umbral.", "ALMA EN REPOSO");
-
-    // 2. Recargamos la página después de un momento para volver al portal inicial
-    setTimeout(() => {
-        window.location.reload();
-    }, 2000);
-}
-
-// Vincular el botón al cargar el documento
-document.addEventListener("DOMContentLoaded", () => {
-    const btnSalir = document.getElementById('btn-salir-mictlan');
-    if (btnSalir) {
-        btnSalir.onclick = salirDelMictlan;
-    }
-});
