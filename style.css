@@ -1466,55 +1466,73 @@ button,
 
 
 /* ==================================================================
-   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (BARRA LIMPIA SIN CANDELABRO)
+   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (SOLUCIÓN DEFINITIVA)
    ================================================================== */
 @media (max-width: 1024px) {
     
-    /* 1. OCULTAMOS RECTO Y SÓLO LA IMAGEN DEL CANDELABRO */
-    img[src*="candelabro"], 
-    img[src*="vela"],
-    .candelabro-central {
+    /* 1. OCULTAMOS ÚNICAMENTE EL DIV DEL CANDELABRO */
+    /* Usamos todos los contenedores posibles para asegurar que la imagen se vaya, sin tocar el fondo general */
+    #candelabro-contenedor,
+    .candelabro-central,
+    .contenedor-velas,
+    #campo-santo > img[src*="candelabro"],
+    #campo-santo > img[src*="vela"] {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
     }
 
-    /* 2. EL MENÚ DE LETRAS SE QUEDA SIEMPRE VISIBLE COMO BARRA SUPERIOR */
+    /* 2. FORZAMOS A QUE EL MENÚ SE CONVIERTA EN UNA BARRA VISIBLE */
     #campo-santo .menu-textos {
-        display: flex !important;       /* Fuerza a que SÍ aparezcan las letras */
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
         position: fixed !important;
+        
+        /* Lo pegamos al techo con prioridad absoluta */
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        height: 45px !important;        /* Barra compacta en el techo */
+        height: 50px !important;
         margin-top: 0 !important;
         transform: none !important;
-        background: rgba(0, 0, 0, 0.90) !important; /* Fondo negro para leer las letras */
-        border-bottom: 1px solid #440000 !important;
         
-        /* Alineación horizontal libre de la cruz */
+        /* Fondo oscuro semi-transparente para que resalten las letras rojas */
+        background-color: #000000 !important;
+        background: rgba(0, 0, 0, 0.95) !important;
+        border-bottom: 2px solid #880000 !important;
+        
+        /* Alineación horizontal */
         justify-content: flex-start !important;
         align-items: center !important;
-        gap: 15px !important;           /* Espacio entre Leyes, Oráculo y Alianzas */
-        padding: 0 65px 0 15px !important; /* Los 65px de la derecha protegen la cruz */
-        z-index: 9999999 !important;    /* Capa por encima de todo */
+        gap: 18px !important;
+        padding: 0 70px 0 15px !important; /* El espacio de 70px blinda la cruz de la esquina */
+        z-index: 99999999 !important; /* Por encima de cualquier fondo negro o grimorio */
     }
 
-    /* Reseteamos la posición de PC para que fluyan en línea recta arriba */
+    /* 3. FORZAMOS A LAS LETRAS A SER VISIBLES EN LÍNEA HORIZONTAL */
     #campo-santo .menu-textos .opcion {
-        display: block !important;      
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
         position: relative !important;
         left: auto !important;
         top: auto !important;
         width: auto !important;
-        font-size: 11px !important;     /* Tamaño fino para celulares */
+        
+        /* Tamaño ideal para que quepan las tres opciones en cualquier celular */
+        font-size: 11px !important; 
+        color: #ff2222 !important;
+        text-shadow: 0 0 8px #ff0000, 2px 2px 3px #000 !important;
     }
 
-    /* 3. ACHICAMOS LA CRUZ DE SALIR PARA QUE SE ACOMODE EN LA BARRA */
+    /* 4. MANTENEMOS LA CRUZ DE SALIR EN SU ESQUINA ENCOJIDA */
     .btn-salir, .boton-salir, #boton-salir, .close-btn, .btn-close {
         position: fixed !important;
-        top: 8px !important;
-        right: 12px !important;
-        z-index: 10000000 !important;
-        transform: scale(0.7) !important; /* Un 30% más pequeña */
+        top: 10px !important;
+        right: 15px !important;
+        z-index: 100000000 !important;
+        transform: scale(0.7) !important;
         transform-origin: right center !important;
     }
 }
