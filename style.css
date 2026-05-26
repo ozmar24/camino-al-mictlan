@@ -491,10 +491,12 @@ button,
     display: block;
 }
 
-/* --- MENU ANCLADO AL CANDELABRO --- */
+/* =========================================================
+   MENÚ SUPERIOR: MODO ESCRITORIO (Anclado al Candelabro) 
+   ========================================================= */
 .menu-textos {
     position: absolute !important;
-    bottom: 120px !important; /* Altura perfecta sobre las velas */
+    bottom: 120px !important; /* Ajusta esto según la altura de tus velas */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 280px !important;
@@ -502,7 +504,7 @@ button,
     justify-content: space-between !important;
     align-items: center !important;
     z-index: 1001 !important;
-    pointer-events: auto !important; /* Vuelve los enlaces clickeables */
+    pointer-events: auto !important;
 }
 
 .opcion {
@@ -514,7 +516,7 @@ button,
     transition: all 0.3s ease;
 }
 
-/* Efecto de arco simétrico sobre el candelabro */
+/* Efecto de arco simétrico sobre el candelabro (PC) */
 .leyes { transform: translateY(15px) rotate(-8deg); }
 .oraculo { transform: translateY(-5px); }
 .alianzas { transform: translateY(15px) rotate(8deg); }
@@ -523,9 +525,42 @@ button,
     color: #ff0000;
     filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
 }
-.leyes:hover { transform: translateY(15px) rotate(-8deg) scale(1.15); }
-.oraculo:hover { transform: translateY(-5px) scale(1.15); }
-.alianzas:hover { transform: translateY(15px) rotate(8deg) scale(1.15); }
+
+/* =========================================================
+   MENÚ SUPERIOR: MODO MÓVIL (Arriba y sin Candelabro) 
+   ========================================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Ocultamos SOLO la imagen del candelabro, para no matar al menú */
+    .candelabro-central img,
+    .candelabro-central .velas-animadas { /* (Añade aquí la clase de tu gif de velas si está separado) */
+        display: none !important; 
+    }
+
+    /* 2. Arrancamos el menú del candelabro y lo pegamos arriba */
+    .menu-textos {
+        position: fixed !important; /* Flota sobre la pantalla */
+        top: 15px !important;       /* Pegado arriba */
+        bottom: auto !important;    /* Cancelamos la posición del PC */
+        width: 95vw !important;     /* Abarca el ancho del celular */
+        max-width: 400px !important;
+        background: rgba(20, 0, 0, 0.6) !important; /* Fondo sutil para que se lea sobre las criptas */
+        padding: 10px !important;
+        border-radius: 8px !important;
+        border-bottom: 1px solid #4a0000 !important;
+    }
+
+    /* 3. Quitamos las rotaciones para que estén derechos en el móvil */
+    .leyes, .oraculo, .alianzas {
+        transform: none !important;
+    }
+
+    /* 4. Ajustamos tamaño para dedos */
+    .opcion {
+        font-size: 10px !important;
+        padding: 5px !important;
+    }
+}
 
 /* ==========================================================================
    7. VENTANAS MODALES, INTERFACES Y RITUALES
