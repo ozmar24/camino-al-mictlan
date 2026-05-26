@@ -1483,57 +1483,25 @@ button,
         pointer-events: none !important;
     }
 
-    /* 2. BARRA DE MENÚ SUPERIOR GARANTIZADA SOBRE EL FONDO */
+/* ====================== OCULTAR CANDELABRO EN MÓVILES ====================== */
+
+@media (max-width: 1024px) {
+    .candelabro-central,
+    .candelabro-central img,
+    .img-candelabro {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+    }
+}
+
+/* Asegurar que los textos sigan visibles en móvil (refuerzo) */
+@media (max-width: 1024px) {
     #campo-santo .menu-textos {
         display: flex !important;
-        visibility: visible !important;
         opacity: 1 !important;
-        position: fixed !important;
-        
-        /* Forzamos el anclaje total en el techo de la pantalla */
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 48px !important;
-        margin-top: 0 !important;
-        transform: none !important;
-        
-        /* Capa negra de fondo para asegurar que las letras rojas resalten */
-        background-color: #000000 !important;
-        background: rgba(0, 0, 0, 0.95) !important;
-        border-bottom: 2px solid #880000 !important;
-        
-        /* Distribución fluida */
-        justify-content: flex-start !important;
-        align-items: center !important;
-        gap: 15px !important;
-        padding: 0 70px 0 15px !important; /* El colchón de 70px protege la cruz de la esquina */
-        z-index: 99999999 !important; /* Prioridad absoluta sobre cualquier fondo o grimorio */
-    }
-
-    /* 3. RESETEO DE LETRAS INDIVIDUALES EN MÓVIL */
-    #campo-santo .menu-textos .opcion {
-        display: block !important;
         visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        left: auto !important;
-        top: auto !important;
-        width: auto !important;
-        
-        /* Tamaño óptimo para evitar desbordes en cualquier celular */
-        font-size: 11px !important;
-        color: #ff2222 !important;
-        text-shadow: 0 0 8px #ff0000, 2px 2px 3px #000 !important;
-    }
-
-    /* 4. REDUCCIÓN DE LA CRUZ DE SALIR EN LA ESQUINA DE LA BARRA */
-    .btn-salir, .boton-salir, #boton-salir, .close-btn, .btn-close {
-        position: fixed !important;
-        top: 8px !important;
-        right: 15px !important;
-        z-index: 100000000 !important; /* Un nivel por encima de la barra */
-        transform: scale(0.68) !important; /* Encoje la cruz para que se vea fina */
-        transform-origin: right center !important;
     }
 }
