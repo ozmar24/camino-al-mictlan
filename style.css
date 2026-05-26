@@ -1507,7 +1507,7 @@ button,
         /* Capa negra sólida en el techo para que tus textos resalten */
         background-color: transparent !important;
         background: transparent!important; 
-        border-bottom: 2px solid #880000 !important;
+        
         
         justify-content: flex-start !important;
         align-items: center !important;
