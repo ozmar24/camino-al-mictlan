@@ -475,9 +475,9 @@ button,
     z-index: 10000 !important; /* Elevado para estar por encima del fondo pero bajo los textos */
     pointer-events: none;
     filter: brightness(0.8) contrast(1.2) saturate(0.8) drop-shadow(0 0 15px #000);
-    display: none; /* Oculto por defecto */
-    opacity: 0; /* Oculto por defecto */
-    visibility: hidden; /* Oculto por defecto */
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     transition: opacity 1s ease-in;
 }
 
@@ -772,12 +772,17 @@ button,
 
     /* Ajuste de fuentes: Mínimo 12px para que sea legible */
     .opcion {
-        font-size: 12px; 
+        font-size: 12px !important; 
         letter-spacing: 1px;
-        text-shadow: 2px 2px 4px #000;
-        opacity: 1;
-        visibility: visible;
-        display: block;
+        text-shadow: 2px 2px 4px #000 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
+    }
+    .candelabro-central {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .pilar-izquierdo, .pilar-derecho {
@@ -814,9 +819,14 @@ button,
     #campo-santo, 
     #modal-contrato, 
     .overlay-contrato {
-        display: none;
+        display: none !important;
     }
-
+    .candelabro-central {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 10000 !important;
+    }
 
     #aviso-rotar {
         display: flex !important;
@@ -1112,29 +1122,4 @@ button,
 #btn-cosecha-cancelar:hover {
     background: #330000 !important;
     color: #fff !important;
-}
-/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS ====================== */
-
-/* Ocultar en pantalla de entrada y en el grimorio de login */
-#escena-portal .menu-textos,
-#modal-contrato .menu-textos,
-.grimorio-container .menu-textos {
-    display: none !important;
-}
-
-/* Mostrar SOLO dentro del cementerio */
-#campo-santo .menu-textos {
-    display: flex !important;
-    opacity: 1 !important;
-    z-index: 200 !important;
-}
-
-/* Ajuste opcional de tamaño y posición dentro del cementerio */
-#campo-santo .menu-textos {
-    top: 8% !important;
-    gap: 30px !important;
-}
-
-#campo-santo .opcion {
-    font-size: 0.95rem !important;
 }
