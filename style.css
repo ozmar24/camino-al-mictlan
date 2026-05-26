@@ -491,14 +491,18 @@ button,
     display: block;
 }
 
+/* --- MENU ANCLADO AL CANDELABRO --- */
 .menu-textos {
-    position: absolute;
-    top: 0;
-    left: -50%; 
-    width: 200%; 
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
+    position: absolute !important;
+    bottom: 120px !important; /* Altura perfecta sobre las velas */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 280px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    z-index: 1001 !important;
+    pointer-events: auto !important; /* Vuelve los enlaces clickeables */
 }
 
 .opcion {
@@ -507,18 +511,21 @@ button,
     color: #8b0000;
     text-shadow: 2px 2px 4px #000;
     font-weight: bold;
-    pointer-events: auto;
-    opacity: 0.8;
-    transition: transform 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.leyes { transform: translate(25px, 35px) rotate(-10deg); }
-.oraculo { transform: translateY(8px); }
-.alianzas { transform: translate(-25px, 35px) rotate(10deg); }
+/* Efecto de arco simétrico sobre el candelabro */
+.leyes { transform: translateY(15px) rotate(-8deg); }
+.oraculo { transform: translateY(-5px); }
+.alianzas { transform: translateY(15px) rotate(8deg); }
 
-.leyes:hover { color: #ff0000; opacity: 1; transform: translate(25px, 35px) rotate(-10deg) scale(1.1); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
-.oraculo:hover { color: #ff0000; opacity: 1; transform: translateY(8px) scale(1.1); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
-.alianzas:hover { color: #ff0000; opacity: 1; transform: translate(-25px, 35px) rotate(10deg) scale(1.1); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)); }
+.opcion:hover {
+    color: #ff0000;
+    filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+}
+.leyes:hover { transform: translateY(15px) rotate(-8deg) scale(1.15); }
+.oraculo:hover { transform: translateY(-5px) scale(1.15); }
+.alianzas:hover { transform: translateY(15px) rotate(8deg) scale(1.15); }
 
 /* ==========================================================================
    7. VENTANAS MODALES, INTERFACES Y RITUALES
