@@ -1,5 +1,5 @@
 /* ==========================================================================
-    1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO (Se añade Creepster y MedievalSharp)
+    1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO
     ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&family=Creepster&family=Cinzel:wght@700&display=swap');
 
@@ -154,8 +154,9 @@ button,
     align-items: center;
     z-index: 150;
 }
+
 .info-tumba {
-    width: 120px !important; /* Fuerza un ancho fijo */
+    width: 120px !important; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -248,7 +249,7 @@ button,
     text-shadow: 1px 1px 2px #000, 0 0 10px var(--color-cripto); 
     filter: drop-shadow(0 0 5px rgba(0,0,0,1));
     font-weight: bold;
-    height: 14px; /* Reserva el espacio para el texto */
+    height: 14px; 
     white-space: nowrap;
 }
 
@@ -323,7 +324,6 @@ button,
     margin-top: 8px;
     letter-spacing: 1px;
 }
-
 
 .zona-tumba.alma-maestra:hover::after {
     content: '';
@@ -492,7 +492,7 @@ button,
 }
 
 /* ==================================================================
-    MENÚ SUPERIOR (LEYES, ORÁCULO, ALIANZAS) - POSICIONES AJUSTADAS
+    MENÚ SUPERIOR (LEYES, ORÁCULO, ALIANZAS) - LIMPIO Y FUNCIONAL
     ================================================================== */
 
 /* 1. OCULTO POR DEFECTO */
@@ -504,16 +504,16 @@ button,
 #campo-santo .menu-textos {
     display: flex !important;
     position: fixed !important;
-    bottom: 120px !important; /* Posición fija sobre el candelabro */
+    bottom: 120px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 300px !important; /* Ancho para separación */
-    height: 60px !important; /* Altura definida */
+    width: 300px !important;
+    height: 60px !important;
     justify-content: space-around !important;
     align-items: center !important;
     z-index: 1001 !important;
     pointer-events: auto !important;
-    gap: 40px !important; /* Separación entre elementos */
+    gap: 40px !important;
 }
 
 #campo-santo .opcion {
@@ -525,12 +525,9 @@ button,
     transition: all 0.3s ease !important;
     text-decoration: none !important;
     white-space: nowrap !important;
-    position: relative !important;
-    top: 0 !important;
-    transform: none !important; /* Reset de transforms */
 }
 
-/* Separación clara sin rotación - directamente encima de cada vela */
+/* SIN ROTACIÓN - Directamente sobre cada vela */
 #campo-santo .leyes { 
     margin-left: -80px !important;
 }
@@ -549,22 +546,18 @@ button,
     transform: scale(1.1) !important;
 }
 
-/* 3. MÓVIL: CANDELABRO INVISIBLE, MENÚ AL TOPE */
+/* 3. MÓVIL: MENÚ AL TOPE */
 @media (max-width: 768px) {
-    #campo-santo .candelabro-central img {
-        display: none !important;
-    }
-
     #campo-santo .menu-textos {
         position: fixed !important;
-        top: 0px !important; /* Pegado totalmente al techo */
+        top: 0px !important;
         bottom: auto !important; 
         left: 0 !important;
         transform: none !important;
-        width: 100% !important; /* Abarca toda la pantalla */
-        background: rgba(15, 0, 0, 0.9) !important; /* Fondo un poco más oscuro para contraste */
+        width: 100% !important;
+        background: rgba(15, 0, 0, 0.9) !important;
         padding: 10px 20px !important; 
-        border-radius: 0 0 10px 10px !important; /* Solo redondea las esquinas de abajo */
+        border-radius: 0 0 10px 10px !important;
         border-bottom: 2px solid #4a0000 !important;
         box-sizing: border-box !important;
         height: auto !important;
@@ -574,7 +567,6 @@ button,
     #campo-santo .leyes, 
     #campo-santo .oraculo, 
     #campo-santo .alianzas {
-        transform: none !important;
         margin: 0 !important;
     }
 
@@ -582,6 +574,10 @@ button,
         font-size: 10px !important;
         flex: 1 !important;
         text-align: center !important;
+    }
+
+    #campo-santo .candelabro-central img {
+        display: none !important;
     }
 }
 
@@ -606,8 +602,18 @@ button,
     display: none;
 }
 
-.contenido-ritual h3 { font-family: 'Metal Mania', cursive; color: var(--color-ritmo); font-size: 1.8rem; margin-bottom: 10px; }
-.contenido-ritual p { font-size: 0.9rem; color: #ccc; margin-bottom: 20px; }
+.contenido-ritual h3 { 
+    font-family: 'Metal Mania', cursive; 
+    color: var(--color-ritmo); 
+    font-size: 1.8rem; 
+    margin-bottom: 10px; 
+}
+
+.contenido-ritual p { 
+    font-size: 0.9rem; 
+    color: #ccc; 
+    margin-bottom: 20px; 
+}
 
 #wallet-input {
     background: #000;
@@ -621,11 +627,29 @@ button,
     font-family: monospace;
 }
 
-.botones-exchange { display: flex; gap: 10px; justify-content: center; }
-.botones-exchange button { background: transparent; color: #fff; border: 1px solid #fff; padding: 10px 15px; font-family: 'Metal Mania', cursive; flex: 1; transition: 0.3s; }
-.botones-exchange button:hover { background: #fff; color: #000; box-shadow: 0 0 10px #fff; }
+.botones-exchange { 
+    display: flex; 
+    gap: 10px; 
+    justify-content: center; 
+}
 
-/* --- CONTRATO PERGAMINO DE ENTIDADES --- */
+.botones-exchange button { 
+    background: transparent; 
+    color: #fff; 
+    border: 1px solid #fff; 
+    padding: 10px 15px; 
+    font-family: 'Metal Mania', cursive; 
+    flex: 1; 
+    transition: 0.3s; 
+}
+
+.botones-exchange button:hover { 
+    background: #fff; 
+    color: #000; 
+    box-shadow: 0 0 10px #fff; 
+}
+
+/* --- CONTRATO PERGAMINO --- */
 .modal-pergamino {
     position: fixed;
     top: 50%;
@@ -643,14 +667,52 @@ button,
     padding: 60px;
 }
 
-.pergamino-content { width: 80%; margin-top: 35px; text-align: center; color: #2a1b0a; font-family: 'Nosifer', 'Metal Mania'; }
-.pergamino-titulo { font-size: 1.5rem; margin-bottom: 15px; color: #4a0000; }
-.pergamino-texto { color: #2a1b0a; font-size: 0.8rem; line-height: 1.3; font-weight: bold; padding: 0 10px; text-align: center; }
-.pergamino-botones { margin-top: 40px; display: flex; gap: 20px; }
-.btn-ritual { padding: 10px 20px; border: none; font-family: 'Nosifer', cursive; background: #4a0000; color: #e0c097; box-shadow: 2px 2px 5px #000; transition: 0.3s; }
-.btn-ritual:hover { transform: scale(1.1); background: #ff0000; color: #fff; }
+.pergamino-content { 
+    width: 80%; 
+    margin-top: 35px; 
+    text-align: center; 
+    color: #2a1b0a; 
+    font-family: 'Nosifer', 'Metal Mania'; 
+}
 
-/* --- CÓDICE Y INTERFAZ GRIMORIO GENERAL --- */
+.pergamino-titulo { 
+    font-size: 1.5rem; 
+    margin-bottom: 15px; 
+    color: #4a0000; 
+}
+
+.pergamino-texto { 
+    color: #2a1b0a; 
+    font-size: 0.8rem; 
+    line-height: 1.3; 
+    font-weight: bold; 
+    padding: 0 10px; 
+    text-align: center; 
+}
+
+.pergamino-botones { 
+    margin-top: 40px; 
+    display: flex; 
+    gap: 20px; 
+}
+
+.btn-ritual { 
+    padding: 10px 20px; 
+    border: none; 
+    font-family: 'Nosifer', cursive; 
+    background: #4a0000; 
+    color: #e0c097; 
+    box-shadow: 2px 2px 5px #000; 
+    transition: 0.3s; 
+}
+
+.btn-ritual:hover { 
+    transform: scale(1.1); 
+    background: #ff0000; 
+    color: #fff; 
+}
+
+/* --- CÓDICE Y INTERFAZ GRIMORIO --- */
 .capa-oscura {
     position: fixed !important;
     top: 0 !important;
@@ -680,12 +742,35 @@ button,
     text-align: center;
 }
 
-#codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 1rem; margin-bottom: 20px; }
-#codice-cuerpo { font-family: 'Nosifer', serif; color: #2a1b0a; font-size: 0.85rem; line-height: 1.5; font-weight: bold; }
-.boton-cerrar-codice { margin-top: 30px; font-family: 'Nosifer', cursive; color: #600; font-size: 0.6rem; transition: 0.3s; }
-.boton-cerrar-codice:hover { color: #ff0000; transform: scale(1.1); }
+#codice-titulo { 
+    font-family: 'Nosifer', cursive; 
+    color: #4a0000; 
+    font-size: 1rem; 
+    margin-bottom: 20px; 
+}
 
-/* --- ESTILOS COMPLEMENTARIOS PARA EL GRIMORIO DE LOGIN --- */
+#codice-cuerpo { 
+    font-family: 'Nosifer', serif; 
+    color: #2a1b0a; 
+    font-size: 0.85rem; 
+    line-height: 1.5; 
+    font-weight: bold; 
+}
+
+.boton-cerrar-codice { 
+    margin-top: 30px; 
+    font-family: 'Nosifer', cursive; 
+    color: #600; 
+    font-size: 0.6rem; 
+    transition: 0.3s; 
+}
+
+.boton-cerrar-codice:hover { 
+    color: #ff0000; 
+    transform: scale(1.1); 
+}
+
+/* --- ESTILOS PARA GRIMORIO DE LOGIN --- */
 .input-pergamino-goth {
     background: rgba(42, 27, 10, 0.05);
     border: 1px solid rgba(74, 0, 0, 0.4);
@@ -695,9 +780,11 @@ button,
     border-radius: 2px;
     outline: none;
 }
+
 .input-pergamino-goth::placeholder {
     color: rgba(74, 0, 0, 0.5);
 }
+
 .btn-ritual-grimorio {
     background: #4a0000;
     color: #fff;
@@ -708,6 +795,7 @@ button,
     width: 100%;
     filter: drop-shadow(0 0 5px #000);
 }
+
 .btn-ritual-secundario {
     background: transparent;
     color: #8B0000;
@@ -755,8 +843,21 @@ button,
     margin-top: -20px;
 }
 
-.oraculo-titulo { font-family: 'Nosifer', cursive !important; color: #ff0000 !important; font-size: 2.2rem !important; text-shadow: 0 0 15px #ff0000, 3px 3px 5px #000000 !important; margin: 0 0 15px 0 !important; }
-.oraculo-cuerpo p { font-family: 'UnifrakturMaguntia', serif !important; color: #ffffff !important; font-size: 1.2rem !important; text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; margin-bottom: 20px !important; }
+.oraculo-titulo { 
+    font-family: 'Nosifer', cursive !important; 
+    color: #ff0000 !important; 
+    font-size: 2.2rem !important; 
+    text-shadow: 0 0 15px #ff0000, 3px 3px 5px #000000 !important; 
+    margin: 0 0 15px 0 !important; 
+}
+
+.oraculo-cuerpo p { 
+    font-family: 'UnifrakturMaguntia', serif !important; 
+    color: #ffffff !important; 
+    font-size: 1.2rem !important; 
+    text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; 
+    margin-bottom: 20px !important; 
+}
 
 #oraculo-input {
     background: rgba(0, 0, 0, 0.6) !important;
@@ -774,10 +875,33 @@ button,
     text-shadow: 0 0 8px #ff0000 !important;
 }
 
-.btn-invocar { margin-top: 30px !important; background: #000000 !important; color: #ff0000 !important; border: 2px solid #ff0000 !important; font-family: 'Nosifer', cursive !important; font-size: 1.1rem !important; padding: 10px 30px !important; }
-.btn-invocar:hover { background: #ff0000 !important; color: #000000 !important; box-shadow: 0 0 20px #ff0000 !important; }
-.cerrar-pacto { margin-top: 40px !important; color: #ff0000 !important; font-family: 'Metal Mania', cursive !important; font-size: 1.2rem !important; text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; }
-.cerrar-pacto:hover { transform: scale(1.1); }
+.btn-invocar { 
+    margin-top: 30px !important; 
+    background: #000000 !important; 
+    color: #ff0000 !important; 
+    border: 2px solid #ff0000 !important; 
+    font-family: 'Nosifer', cursive !important; 
+    font-size: 1.1rem !important; 
+    padding: 10px 30px !important; 
+}
+
+.btn-invocar:hover { 
+    background: #ff0000 !important; 
+    color: #000000 !important; 
+    box-shadow: 0 0 20px #ff0000 !important; 
+}
+
+.cerrar-pacto { 
+    margin-top: 40px !important; 
+    color: #ff0000 !important; 
+    font-family: 'Metal Mania', cursive !important; 
+    font-size: 1.2rem !important; 
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; 
+}
+
+.cerrar-pacto:hover { 
+    transform: scale(1.1); 
+}
 
 /* --- ALERTAS DEL INFRAMUNDO --- */
 .modal-alerta-overlay {
@@ -804,10 +928,37 @@ button,
     animation: emergerMictlan 0.3s ease-out;
 }
 
-#alerta-titulo { font-family: 'Nosifer', cursive !important; color: #ff0000; font-size: 1.3rem; margin-bottom: 15px; text-shadow: 0 0 8px #ff0000; }
-#alerta-mensaje { font-family: 'UnifrakturMaguntia', serif !important; color: #ffffff; font-size: 1.1rem; margin-bottom: 25px; line-height: 1.4; }
-.btn-cerrar-alerta { background: #000; color: #ff0000; border: 1px solid #ff0000; font-family: 'Metal Mania', cursive !important; padding: 8px 25px; font-size: 1rem; transition: all 0.2s; }
-.btn-cerrar-alerta:hover { background: #ff0000; color: #000; box-shadow: 0 0 10px #ff0000; }
+#alerta-titulo { 
+    font-family: 'Nosifer', cursive !important; 
+    color: #ff0000; 
+    font-size: 1.3rem; 
+    margin-bottom: 15px; 
+    text-shadow: 0 0 8px #ff0000; 
+}
+
+#alerta-mensaje { 
+    font-family: 'UnifrakturMaguntia', serif !important; 
+    color: #ffffff; 
+    font-size: 1.1rem; 
+    margin-bottom: 25px; 
+    line-height: 1.4; 
+}
+
+.btn-cerrar-alerta { 
+    background: #000; 
+    color: #ff0000; 
+    border: 1px solid #ff0000; 
+    font-family: 'Metal Mania', cursive !important; 
+    padding: 8px 25px; 
+    font-size: 1rem; 
+    transition: all 0.2s; 
+}
+
+.btn-cerrar-alerta:hover { 
+    background: #ff0000; 
+    color: #000; 
+    box-shadow: 0 0 10px #ff0000; 
+}
 
 /* ==========================================================================
     8. ANIMACIONES Y TIMELINES
@@ -892,7 +1043,7 @@ button,
     .pilar-derecho   { left: 56.6% !important; }
 }
 
-/* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT - CORTINA BLOQUEO) --- */
+/* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT) --- */
 @media screen and (max-width: 550px) and (orientation: portrait) {
     
     #contenedor-criptos, 
@@ -964,10 +1115,9 @@ button,
 }
 
 /* ==================================================================
-    COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
+    GRIMORIO CONTAINER - SIN DUPLICADOS
     ================================================================== */
 
-/* Forzamos el contenedor del grimorio a ser un bloque rígido y estable */
 .grimorio-container {
     background: url('img/grimorio.png') no-repeat center center !important;
     background-size: 100% 100% !important;
@@ -975,16 +1125,16 @@ button,
     height: 620px !important;
     max-width: 98vw !important;
     max-height: 95vh !important;
-    position: relative !important; /* Base sagrada de coordenadas */
-    display: block !important;     /* Estrictamente bloque para evitar herencias flex */
+    position: relative !important;
+    display: block !important;
     padding: 0 !important;
     box-sizing: border-box !important;
     filter: drop-shadow(0 0 20px #000) !important;
 }
-/* Base para el cursor del pentáculo en todos los botones e interactivos del grimorio */
+
 .grimorio-container button, 
 .grimorio-container .input-pergamino-goth,
-.grimorio-container #google-btn-container iframe, /* Asegura el cursor dentro del iframe de Google */
+.grimorio-container #google-btn-container iframe,
 .grimorio-container .btn-ritual-grimorio,
 .grimorio-container .btn-ritual-secundario,
 .grimorio-container #toggle-auth-text,
@@ -992,31 +1142,12 @@ button,
     cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
-    top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
-    left: 23% !important;       /* Margen exacto desde el borde izquierdo del libro */
-    width: 25% !important;      /* Ancho perfecto limitando con el centro del libro */
-    height: 70% !important;     /* Altura máxima para no pisar el fondo */
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important; /* Alineación limpia desde arriba */
-    gap: 15px !important;       /* Separación balanceada y constante entre elementos */
-    box-sizing: border-box !important;
-    padding: 10px 20px !important;
-    z-index: 30 !important;
-    color: #7a1c1c !important;
-}
-
-/* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
-.grimorio-container .pagina-derecha {
-    position: absolute !important;
-    top: 20% !important;        
-    right: 25% !important;      /* Margen exacto desde el borde derecho del libro */
-    width: 25% !important;      
-    height: 70% !important;     
+    top: 20% !important;
+    left: 23% !important;
+    width: 25% !important;
+    height: 70% !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -1028,134 +1159,19 @@ button,
     color: #7a1c1c !important;
 }
 
-/* Títulos de cada página - Estilo medieval fortalecido */
-#auth-tagline, #right-title {
-    font-family: 'Nosifer', cursive;
-    color: #8b0000;
-    font-size: 1.4rem;
-    text-align: center;
-    text-shadow: 2px 2px 4px #000;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-}
-
-#left-desc, #right-desc {
-    font-family: 'UnifrakturMaguntia', serif;
-    color: #4a0000;
-    font-size: 0.85rem;
-    text-align: center;
-    line-height: 1.3;
-    margin-bottom: 15px;
-}
-
-/* Formulario estilizado */
-.formulario-goth {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-
-.input-pergamino-goth {
-    padding: 10px 12px;
-    margin-bottom: 5px;
-    border-radius: 3px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.input-pergamino-goth:focus {
-    background: rgba(42, 27, 10, 0.15) !important;
-    border-color: rgba(74, 0, 0, 0.8) !important;
-    box-shadow: 0 0 8px rgba(74, 0, 0, 0.3) !important;
-}
-
-.btn-ritual-grimorio {
-    margin-top: 8px;
-    border-radius: 3px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-ritual-grimorio:hover {
-    background: #7a0000 !important;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6) !important;
-    transform: translateY(-2px);
-}
-
-/* Cambio de modo (Login/Registro) */
-.cambio-modo-contenedor {
-    margin-top: 10px;
-    text-align: center;
-}
-
-#toggle-auth-text {
-    font-family: 'MedievalSharp', serif;
-    color: #8B0000;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: underline;
-}
-
-#toggle-auth-text:hover {
-    color: #ff0000;
-    text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
-}
-
-/* Divisor arcano */
-.divisor-arcano {
-    width: 80%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #8b0000, transparent);
-    margin: 15px 0;
-}
-
-/* Helper para nuevo usuario */
-#new-user-helper {
-    margin-top: 10px;
-    text-align: center;
-}
-
-#new-user-helper p {
-    font-family: 'UnifrakturMaguntia', serif;
-    color: #4a0000;
-    font-size: 0.8rem;
-}
-
-/* Google Sign-In Button Container */
-#google-btn-container {
-    display: flex;
-    justify-content: center;
-    margin: 10px 0;
-}
-
-#google-btn-container > div {
-    transform: scale(0.85) !important;
-    transform-origin: center !important;
-}
-
-/* Modal base oscura para Códice y Oráculo */
-.capa-oscura.interface-mictlan {
+.grimorio-container .pagina-derecha {
+    position: absolute !important;
+    top: 20% !important;
+    right: 25% !important;
+    width: 25% !important;
+    height: 70% !important;
     display: flex !important;
-    background: rgba(10, 5, 0, 0.98) !important;
-    backdrop-filter: blur(25px) !important;
-}
-
-#modal-contrato {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: fadeInScale 0.6s ease-out;
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 15px !important;
+    box-sizing: border-box !important;
+    padding: 10px 20px !important;
+    z-index: 30 !important;
+    color: #7a1c1c !important;
 }
