@@ -1481,41 +1481,47 @@ button,
     width: 100% !important;
     max-width: 100% !important;
 }
-/* --- CONFIGURACIÓN MAESTRA DEL MENÚ SUPERIOR --- */
+/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS (AJUSTE FINAL SOBRE CANDELABRO) ====================== */
+
 .menu-textos {
+    position: absolute !important;
+    bottom: 29.5% !important;     /* Subido para quedar justo arriba de las llamas */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     display: flex !important;
-    position: fixed !important; /* Fijo para que nunca se mueva */
-    top: 15px !important;       /* Distancia exacta desde arriba */
-    left: 50% !important;       /* Centrado horizontal */
-    transform: translateX(-50%) !important; /* Truco para centrar perfecto */
-    width: 100% !important;
-    max-width: 600px !important;
-    justify-content: space-between !important; /* Separa los 3 enlaces equitativamente */
-    align-items: center !important;
-    z-index: 9999999 !important; /* Siempre arriba de todo */
-    padding: 0 20px !important;
-    pointer-events: auto !important;
+    gap: 58px !important;         /* Espacio entre palabras */
+    z-index: 300 !important;
+    width: auto !important;
 }
 
-/* Ajuste para los enlaces individuales */
-.menu-textos .opcion {
-    display: block !important;
-    font-family: 'Nosifer', sans-serif !important;
-    font-size: 14px !important;
-    color: #ff0000 !important;
-    text-shadow: 0 0 8px #000, 0 0 4px #000 !important;
-    cursor: pointer !important;
+.opcion {
+    font-family: 'Nosifer', serif !important;
+    font-size: 13.5px !important;
+    color: #ff2222 !important;
+    text-shadow: 0 0 10px #ff0000, 2px 2px 4px #000 !important;
+    font-weight: bold !important;
     white-space: nowrap !important;
+    cursor: pointer !important;
 }
 
-/* Ajuste para móviles: que no se amontonen */
-@media (max-width: 600px) {
+/* Alineación precisa con cada vela */
+.leyes   { transform: translateX(-32px) !important; }
+.oraculo { transform: translateX(0px) !important; }
+.alianzas{ transform: translateX(30px) !important; }
+
+/* Hover */
+.leyes:hover, .oraculo:hover, .alianzas:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 15px #ff0000 !important;
+}
+
+/* Móvil */
+@media (max-width: 1024px) {
     .menu-textos {
-        top: 10px !important;
-        gap: 10px !important;
-        padding: 0 10px !important;
+        bottom: 24% !important;
+        gap: 42px !important;
     }
-    .menu-textos .opcion {
-        font-size: 10px !important; /* Un poco más pequeño en cel */
+    .opcion {
+        font-size: 11.8px !important;
     }
 }
