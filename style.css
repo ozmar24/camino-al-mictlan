@@ -1459,7 +1459,7 @@ button,
     text-shadow: 0 0 15px #ff0000 !important;
 }
 
-/* UBICACIÓN EN PC (SOBRE LAS LLAMAS) */
+/* UBICACIÓN EN PC (SOBRE LAS LLAMAS DEL CANDELABRO) */
 #campo-santo .leyes { left: -175px !important; top: 25px !important; }
 #campo-santo .oraculo { left: -70px !important; top: -5px !important; }
 #campo-santo .alianzas { left: 35px !important; top: 25px !important; }
@@ -1469,43 +1469,44 @@ button,
    ADAPTACIÓN EXCLUSIVA PARA MÓVILES (SIN CANDELABRO)
    ================================================================== */
 @media (max-width: 768px) {
-    /* El menú se convierte en una barra fija arriba, ordenada e independiente */
+    /* El menú se convierte en una barra horizontal fija arriba */
     #campo-santo .menu-textos {
         display: flex !important;
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        height: 45px !important; /* Barra compacta */
+        height: 45px !important; /* Altura compacta para la barra */
         margin-top: 0 !important;
         transform: none !important;
         background: rgba(0, 0, 0, 0.85) !important;
         border-bottom: 1px solid #440000 !important;
         
-        /* Alinea los links a la izquierda y deja un colchón a la derecha para el botón */
+        /* Distribución: Alineados a la izquierda con separación controlada */
         justify-content: flex-start !important;
         align-items: center !important;
-        gap: 12px !important; /* Espacio controlado entre palabras */
-        padding: 0 60px 0 12px !important; /* El 60px de la derecha protege el botón */
+        gap: 14px !important; /* Espacio exacto entre las opciones */
+        /* padding-right: 60px reserva el espacio exclusivo para el botón de salir */
+        padding: 0 60px 0 12px !important; 
     }
 
-    /* Reseteamos por completo la posición absoluta de PC para que fluyan en línea */
+    /* Reseteamos los valores absolutos de PC para que se formen en línea */
     #campo-santo .menu-textos .opcion {
         position: relative !important;
         left: auto !important;
         top: auto !important;
         width: auto !important;
-        font-size: 10px !important; /* Letra más pequeña para que quepa todo */
+        font-size: 10px !important; /* Letra reducida y estilizada para móvil */
     }
 
-    /* REDUCCIÓN Y POSICIÓN DEL BOTÓN DE SALIR CRUCIAL */
-    /* Asegúrate de que use una de estas clases o cámbiala por la tuya exacta */
+    /* AJUSTE Y ACHICAMIENTO DEL BOTÓN DE SALIR (LA CRUZ) */
+    /* Modifica esta clase si tu botón usa un nombre diferente en el HTML */
     .btn-salir, .boton-salir, #boton-salir, .close-btn, .btn-close {
         position: fixed !important;
         top: 8px !important;
         right: 12px !important;
-        z-index: 1000000 !important; /* Por encima de todo */
-        transform: scale(0.7) !important; /* Hace el botón un 30% más pequeño en móvil */
+        z-index: 1000000 !important; /* Por encima de la barra negra */
+        transform: scale(0.7) !important; /* Lo reduce un 30% para que se vea fino */
         transform-origin: right center !important;
     }
 }
