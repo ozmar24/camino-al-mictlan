@@ -472,12 +472,11 @@ button,
     left: 50%;
     transform: translateX(-50%);
     width: 140px; 
-    z-index: 10000 !important; /* Elevado para estar por encima del fondo pero bajo los textos */
+    z-index: 1000;
     pointer-events: none;
     filter: brightness(0.8) contrast(1.2) saturate(0.8) drop-shadow(0 0 15px #000);
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    display: none; 
+    opacity: 0;
     transition: opacity 1s ease-in;
 }
 
@@ -508,11 +507,9 @@ button,
     color: #8b0000;
     text-shadow: 2px 2px 4px #000;
     font-weight: bold;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    pointer-events: auto;
+    opacity: 0.8;
     transition: transform 0.3s ease, color 0.3s ease, opacity 0.3s ease;
-    z-index: 10001 !important; /* Elevado para superar cualquier capa modal o de bloqueo */
 }
 
 .leyes { transform: translate(25px, 35px) rotate(-10deg); }
@@ -762,70 +759,81 @@ button,
 @keyframes levitarMictlan { 0%, 100% { transform: translateY(-50px); } 50% { transform: translateY(-65px); } }
 
 /* ==========================================================================
-   9. OPTIMIZACIÓN MÓVIL UNIFICADA (MICTLÁN STABLE)
+   9. AJUSTE DE PRECISIÓN HORIZONTAL Y BLOQUEO VERTICAL MÓVIL
    ========================================================================== */
 
-/* --- 9.1 VISTA HORIZONTAL (LANDSCAPE) - MEJORA DE LEGIBILIDAD --- */
-@media screen and (max-height: 600px) and (orientation: landscape) {
+/* --- 9.1 VISTA HORIZONTAL EN MÓVILES (LANDSCAPE) --- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
     
-    #aviso-rotar { display: none !important; }
-
-    /* Ajuste de fuentes: Mínimo 12px para que sea legible */
-    .opcion {
-        font-size: 12px !important; 
-        letter-spacing: 1px;
-        text-shadow: 2px 2px 4px #000 !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: block !important;
-    }
-    .candelabro-central {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
-
-    .pilar-izquierdo, .pilar-derecho {
-        font-size: 11px !important;
-        line-height: 1.3 !important;
-        top: 35% !important; 
-    }
-
-    /* SOLUCIÓN MAESTRA: Escalamos el contenedor completo del grimorio */
-    .grimorio-container {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        /* Calculamos la escala para que quepa en cualquier pantalla landscape */
-        transform: translate(-50%, -50%) scale(0.6) !important; 
-    }
-
-    /* En pantallas un poco más grandes, subimos la escala */
-    @media (min-width: 900px) {
-        .grimorio-container { transform: translate(-50%, -50%) scale(0.75) !important; }
-    }
-
-    /* Ocultar elementos que estorben en pantallas muy bajas */
- img {
-        max-height: 60px !important;
-    }
-}
-
-/* --- 9.2 VISTA VERTICAL (PORTRAIT) - BLOQUEO TOTAL COHERENTE --- */
-@media screen and (max-width: 550px) and (orientation: portrait) {
-    
-    /* BLOQUEO: Añadimos el Grimorio (#modal-contrato) a la lista de ocultos */
-    #contenedor-criptos, 
-    #campo-santo, 
-    #modal-contrato, 
-    .overlay-contrato {
+    #aviso-rotar {
         display: none !important;
     }
+
+    .candelabro-central img,
+    img.img-candelabro {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
     .candelabro-central {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        z-index: 10000 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 340px !important;
+        height: auto !important;
+        background: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        z-index: 999999 !important;
+    }
+
+    .menu-textos {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        position: static !important;
+        transform: none !important;
+        margin-top: 15px !important;
+    }
+
+    .opcion {
+        display: inline-block !important;
+        font-family: 'Nosifer', sans-serif !important;
+        font-size: 10px !important;
+        color: #ff0000 !important;
+        text-shadow: 0px 0px 6px #000000, 2px 2px 2px #000000 !important;
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+
+    .pilar-izquierdo, 
+    .pilar-derecho {
+        position: absolute !important;
+        top: 38% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        font-size: 8px !important;
+        line-height: 1.1 !important;
+        z-index: 995 !important;
+    }
+    
+    .pilar-izquierdo { left: 45.6% !important; }
+    .pilar-derecho   { left: 56.6% !important; }
+}
+
+/* --- 9.2 VISTA VERTICAL EN MÓVILES (PORTRAIT - CORTINA BLOQUEO) --- */
+@media screen and (max-width: 550px) and (orientation: portrait) {
+    
+    #contenedor-criptos, 
+    #campo-santo, 
+    .candelabro-central {
+        display: none !important;
     }
 
     #aviso-rotar {
@@ -842,43 +850,43 @@ button,
         z-index: 9999999 !important;
         color: #8b0000 !important;
         text-align: center !important;
-        padding: 40px !important;
+        padding: 30px !important;
+        box-sizing: border-box !important;
     }
 
     #aviso-rotar h2 {
         font-family: 'Nosifer', sans-serif !important;
-        font-size: 16px !important;
-        text-shadow: 0 0 10px #ff0000 !important;
-        margin-bottom: 20px !important;
+        font-size: 14px !important;
+        text-shadow: 0 0 8px #ff0000 !important;
+        margin-bottom: 15px !important;
     }
 
     #aviso-rotar p {
         font-family: 'Creepster', sans-serif !important;
-        font-size: 18px !important;
+        font-size: 15px !important;
         color: #fff !important;
-        line-height: 1.5 !important;
+        line-height: 1.4 !important;
     }
 
-    /* Animación del icono de rotación */
     .icono-giro {
         display: block !important;
-        width: 40px;
-        height: 65px;
-        margin-top: 30px;
+        width: 35px;
+        height: 55px;
+        margin-top: 25px;
         border: 2px solid #8b0000;
-        border-radius: 6px;
+        border-radius: 5px;
         position: relative;
-        animation: rotarMictlanFinal 2.5s infinite ease-in-out;
+        animation: rotarMictlanFinal 2.3s infinite ease-in-out;
     }
     
     .icono-giro::after {
         content: '' !important;
         position: absolute !important;
-        bottom: 5px !important;
+        bottom: 3px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 6px !important;
-        height: 6px !important;
+        width: 5px !important;
+        height: 5px !important;
         border: 1px solid #8b0000 !important;
         border-radius: 50% !important;
     }
@@ -889,7 +897,6 @@ button,
     40%, 60% { transform: rotate(-90deg); }
     100% { transform: rotate(0deg); }
 }
-
 /* ==================================================================
    COORDENADAS MILIMÉTRICAS ABSOLUTAS (SOLUCIÓN FINAL DESTRUIDORA DE CACHÉ)
    ================================================================== */
@@ -1122,4 +1129,182 @@ button,
 #btn-cosecha-cancelar:hover {
     background: #330000 !important;
     color: #fff !important;
+}
+/* ====================== GRIMORIO RESPONSIVO - VERSIÓN FINAL ====================== */
+
+.grimorio-container {
+    background: url('img/grimorio.png') no-repeat center center !important;
+    background-size: 100% 100% !important;
+    width: 100% !important;
+    max-width: 1080px !important;
+    height: auto !important;
+    min-height: 620px !important;
+    margin: 20px auto !important;
+    position: relative !important;
+    padding: 45px 70px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+}
+
+/* ====================== ESCRITORIO ====================== */
+@media (min-width: 1025px) {
+    .grimorio-container {
+        padding: 65px 90px !important;
+    }
+
+    .pagina-izquierda {
+        width: 46% !important;
+        padding-right: 45px !important;
+    }
+
+    .pagina-derecha {
+        width: 46% !important;
+        padding-left: 45px !important;
+    }
+}
+
+/* ====================== MÓVIL ====================== */
+@media (max-width: 1024px) {
+    .grimorio-container {
+        padding: 35px 25px !important;
+        min-height: 680px !important;
+    }
+
+    .pagina-izquierda,
+    .pagina-derecha {
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 12px auto !important;
+        padding: 18px 15px !important;
+    }
+
+    .pagina-izquierda {
+        border-bottom: 3px solid rgba(139, 0, 0, 0.35) !important;
+    }
+
+    .pagina-derecha {
+        border-top: 3px solid rgba(139, 0, 0, 0.35) !important;
+    }
+
+    /* Ajuste fino de textos y botones */
+    .grimorio-container h2 {
+        font-size: 1.05rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .grimorio-container label,
+    .grimorio-container p {
+        font-size: 0.9rem !important;
+    }
+
+    .input-pergamino-goth {
+        padding: 13px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .btn-ritual-grimorio {
+        padding: 13px !important;
+        font-size: 0.9rem !important;
+    }
+
+    #google-btn-container {
+        margin: 15px 0 !important;
+    }
+}
+
+/* ====================== PANTALLAS MUY PEQUEÑAS ====================== */
+@media (max-width: 480px) {
+    .grimorio-container {
+        padding: 25px 18px !important;
+    }
+
+    .pagina-izquierda,
+    .pagina-derecha {
+        max-width: 340px !important;
+        padding: 15px !important;
+    }
+
+    .grimorio-container h2 {
+        font-size: 1.15rem !important;
+    }
+}
+
+/* Ocultar Leyes, Oráculo y Alianzas hasta entrar al cementerio */
+.menu-textos {
+    display: none !important;
+}
+
+/* Mostrarlos solo cuando ya estés dentro del cementerio */
+#campo-santo .menu-textos {
+    display: flex !important;
+}
+/* ====================== BOTÓN GOOGLE AJUSTADO ====================== */
+
+#google-btn-container {
+    width: 100% !important;
+    max-width: 180px !important;     /* ← Este es el que controla el tamaño */
+    margin: 14px auto !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* Versión móvil más ajustada */
+@media (max-width: 1024px) {
+    #google-btn-container {
+        max-width: 170px !important;
+        margin: 15px auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #google-btn-container {
+        max-width: 180px !important;   /* Aún más pequeño en celulares */
+    }
+}
+
+/* Forzar que el botón interno de Google respete el tamaño */
+#google-btn-container iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+/* --- CONFIGURACIÓN MAESTRA DEL MENÚ SUPERIOR --- */
+.menu-textos {
+    display: flex !important;
+    position: fixed !important; /* Fijo para que nunca se mueva */
+    top: 15px !important;       /* Distancia exacta desde arriba */
+    left: 50% !important;       /* Centrado horizontal */
+    transform: translateX(-50%) !important; /* Truco para centrar perfecto */
+    width: 100% !important;
+    max-width: 600px !important;
+    justify-content: space-between !important; /* Separa los 3 enlaces equitativamente */
+    align-items: center !important;
+    z-index: 9999999 !important; /* Siempre arriba de todo */
+    padding: 0 20px !important;
+    pointer-events: auto !important;
+}
+
+/* Ajuste para los enlaces individuales */
+.menu-textos .opcion {
+    display: block !important;
+    font-family: 'Nosifer', sans-serif !important;
+    font-size: 14px !important;
+    color: #ff0000 !important;
+    text-shadow: 0 0 8px #000, 0 0 4px #000 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+
+/* Ajuste para móviles: que no se amontonen */
+@media (max-width: 600px) {
+    .menu-textos {
+        top: 10px !important;
+        gap: 10px !important;
+        padding: 0 10px !important;
+    }
+    .menu-textos .opcion {
+        font-size: 10px !important; /* Un poco más pequeño en cel */
+    }
 }
