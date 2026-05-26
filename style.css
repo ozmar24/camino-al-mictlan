@@ -1,5 +1,9 @@
 /* ==========================================================================
+<<<<<<< HEAD
     1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO
+=======
+    1. IMPORTACIÓN DE FUENTES DEL INFRAMUNDO (Se añade Creepster y MedievalSharp)
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
     ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&family=Creepster&family=Cinzel:wght@700&display=swap');
 
@@ -503,6 +507,7 @@ button,
 /* 2. PC: VISIBLE EN CEMENTERIO Y ANCLADO AL CANDELABRO */
 #campo-santo .menu-textos {
     display: flex !important;
+<<<<<<< HEAD
     position: fixed !important;
     bottom: 120px !important;
     left: 50% !important;
@@ -510,6 +515,14 @@ button,
     width: 300px !important;
     height: 60px !important;
     justify-content: space-around !important;
+=======
+    position: absolute !important;
+    bottom: 105px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 230px !important;
+    justify-content: space-between !important;
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
     align-items: center !important;
     z-index: 1001 !important;
     pointer-events: auto !important;
@@ -527,6 +540,7 @@ button,
     white-space: nowrap !important;
 }
 
+<<<<<<< HEAD
 /* SIN ROTACIÓN - Directamente sobre cada vela */
 #campo-santo .leyes { 
     margin-left: -80px !important;
@@ -539,6 +553,12 @@ button,
 #campo-santo .alianzas { 
     margin-right: -80px !important;
 }
+=======
+/* Curvatura del candelabro en PC: Arco más pronunciado */
+#campo-santo .leyes { transform: translateY(8px) rotate(-12deg) !important; }
+#campo-santo .oraculo { transform: translateY(-15px) !important; }
+#campo-santo .alianzas { transform: translateY(8px) rotate(12deg) !important; }
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 
 #campo-santo .opcion:hover {
     color: #ff0000 !important;
@@ -633,6 +653,7 @@ button,
     justify-content: center; 
 }
 
+<<<<<<< HEAD
 .botones-exchange button { 
     background: transparent; 
     color: #fff; 
@@ -649,6 +670,8 @@ button,
     box-shadow: 0 0 10px #fff; 
 }
 
+=======
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 /* --- CONTRATO PERGAMINO --- */
 .modal-pergamino {
     position: fixed;
@@ -675,6 +698,7 @@ button,
     font-family: 'Nosifer', 'Metal Mania'; 
 }
 
+<<<<<<< HEAD
 .pergamino-titulo { 
     font-size: 1.5rem; 
     margin-bottom: 15px; 
@@ -712,6 +736,8 @@ button,
     color: #fff; 
 }
 
+=======
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 /* --- CÓDICE Y INTERFAZ GRIMORIO --- */
 .capa-oscura {
     position: fixed !important;
@@ -749,6 +775,7 @@ button,
     margin-bottom: 20px; 
 }
 
+<<<<<<< HEAD
 #codice-cuerpo { 
     font-family: 'Nosifer', serif; 
     color: #2a1b0a; 
@@ -770,6 +797,8 @@ button,
     transform: scale(1.1); 
 }
 
+=======
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 /* --- ESTILOS PARA GRIMORIO DE LOGIN --- */
 .input-pergamino-goth {
     background: rgba(42, 27, 10, 0.05);
@@ -843,6 +872,7 @@ button,
     margin-top: -20px;
 }
 
+<<<<<<< HEAD
 .oraculo-titulo { 
     font-family: 'Nosifer', cursive !important; 
     color: #ff0000 !important; 
@@ -858,6 +888,10 @@ button,
     text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; 
     margin-bottom: 20px !important; 
 }
+=======
+.oraculo-titulo { font-family: 'Nosifer', cursive !important; color: #ff0000 !important; font-size: 2.2rem !important; text-shadow: 0 0 15px #ff0000, 3px 3px 5px #000000 !important; margin: 0 0 15px 0 !important; }
+.oraculo-cuerpo p { font-family: 'UnifrakturMaguntia', serif !important; color: #ffffff !important; font-size: 1.2rem !important; text-shadow: 2px 2px 4px #000000, 0 0 10px rgba(255, 0, 0, 0.5) !important; margin-bottom: 20px !important; }
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 
 #oraculo-input {
     background: rgba(0, 0, 0, 0.6) !important;
@@ -875,6 +909,7 @@ button,
     text-shadow: 0 0 8px #ff0000 !important;
 }
 
+<<<<<<< HEAD
 .btn-invocar { 
     margin-top: 30px !important; 
     background: #000000 !important; 
@@ -902,6 +937,12 @@ button,
 .cerrar-pacto:hover { 
     transform: scale(1.1); 
 }
+=======
+.btn-invocar { margin-top: 30px !important; background: #000000 !important; color: #ff0000 !important; border: 2px solid #ff0000 !important; font-family: 'Nosifer', cursive !important; font-size: 1.1rem !important; padding: 10px 30px !important; }
+.btn-invocar:hover { background: #ff0000 !important; color: #000000 !important; box-shadow: 0 0 20px #ff0000 !important; }
+.cerrar-pacto { margin-top: 40px !important; color: #ff0000 !important; font-family: 'Metal Mania', cursive !important; font-size: 1.2rem !important; text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; }
+.cerrar-pacto:hover { transform: scale(1.1); }
+>>>>>>> 0154c1752c74894a03994e692fa1493bd2711dde
 
 /* --- ALERTAS DEL INFRAMUNDO --- */
 .modal-alerta-overlay {
