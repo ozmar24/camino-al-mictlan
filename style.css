@@ -491,74 +491,62 @@ button,
     display: block;
 }
 
-/* =========================================================
-   MENÚ SUPERIOR: MODO ESCRITORIO (Anclado al Candelabro) 
-   ========================================================= */
+/* ====================== MENÚ LEYES - ORÁCULO - ALIANZAS (CENDELABRO) ====================== */
+
 .menu-textos {
     position: absolute !important;
-    bottom: 120px !important; /* Ajusta esto según la altura de tus velas */
+    bottom: 24% !important;           /* Ajustado para quedar cerca de las velas */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 280px !important;
+    width: auto !important;
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    z-index: 1001 !important;
-    pointer-events: auto !important;
+    gap: 48px !important;             /* Espacio entre palabras */
+    z-index: 250 !important;
 }
 
 .opcion {
-    font-family: 'Nosifer', serif;
-    font-size: 11px;
-    color: #8b0000;
-    text-shadow: 2px 2px 4px #000;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    font-family: 'Nosifer', serif !important;
+    font-size: 13px !important;
+    color: #ff2222 !important;
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000 !important;
+    font-weight: bold !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
 }
 
-/* Efecto de arco simétrico sobre el candelabro (PC) */
-.leyes { transform: translateY(15px) rotate(-8deg); }
-.oraculo { transform: translateY(-5px); }
-.alianzas { transform: translateY(15px) rotate(8deg); }
-
-.opcion:hover {
-    color: #ff0000;
-    filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+/* Ajustes finos por palabra para que queden bien con cada vela */
+.leyes { 
+    transform: translateX(-12px) !important; 
 }
 
-/* =========================================================
-   MENÚ SUPERIOR: MODO MÓVIL (Arriba y sin Candelabro) 
-   ========================================================= */
-@media (max-width: 768px) {
-    
-    /* 1. Ocultamos SOLO la imagen del candelabro, para no matar al menú */
-    .candelabro-central img,
-    .candelabro-central .velas-animadas { /* (Añade aquí la clase de tu gif de velas si está separado) */
-        display: none !important; 
-    }
+.oraculo { 
+    transform: translateY(-2px) !important; 
+}
 
-    /* 2. Arrancamos el menú del candelabro y lo pegamos arriba */
+.alianzas { 
+    transform: translateX(12px) !important; 
+}
+
+/* Hover */
+.leyes:hover, .oraculo:hover, .alianzas:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px #ff0000 !important;
+    transform: scale(1.08) !important;
+}
+
+/* ====================== MÓVIL ====================== */
+@media (max-width: 1024px) {
     .menu-textos {
-        position: fixed !important; /* Flota sobre la pantalla */
-        top: 15px !important;       /* Pegado arriba */
-        bottom: auto !important;    /* Cancelamos la posición del PC */
-        width: 95vw !important;     /* Abarca el ancho del celular */
-        max-width: 400px !important;
-        background: rgba(20, 0, 0, 0.6) !important; /* Fondo sutil para que se lea sobre las criptas */
-        padding: 10px !important;
-        border-radius: 8px !important;
-        border-bottom: 1px solid #4a0000 !important;
+        bottom: 19% !important;
+        gap: 35px !important;
     }
-
-    /* 3. Quitamos las rotaciones para que estén derechos en el móvil */
-    .leyes, .oraculo, .alianzas {
-        transform: none !important;
-    }
-
-    /* 4. Ajustamos tamaño para dedos */
+    
     .opcion {
-        font-size: 10px !important;
-        padding: 5px !important;
+        font-size: 11px !important;
     }
 }
 
