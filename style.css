@@ -1465,53 +1465,48 @@ button,
 #campo-santo .alianzas { left: 35px !important; top: 25px !important; }
 
 /* ==================================================================
-   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (BARRA FIJA MAESTRA)
+   ADAPTACIÓN TOTAL PARA DISPOSITIVOS MÓVILES (ELIMINACIÓN REAL DEL CANDELABRO)
    ================================================================== */
 @media (max-width: 1024px) {
     
-    /* 1. OCULTAMOS EL CANDELABRO VOLVIÉNDOLO INVISIBLE SIN ROMPER EL PADRE */
-    #candelabro, 
-    .candelabro, 
-    .candelabro-central, 
-    img[src*="candelabro"], 
-    img[src*="vela"] {
+    /* 1. APAGAMOS EL DIV DEL CANDELABRO DESDE SU RAÍZ (Sin tocar el fondo del campo-santo) */
+    #campo-santo div[class*="candelabro"],
+    #campo-santo div[id*="candelabro"],
+    .candelabro-central,
+    #candelabro {
         display: none !important;
         opacity: 0 !important;
         visibility: hidden !important;
-        height: 0 !important;
-        width: 0 !important;
-        pointer-events: none !important;
     }
 
-    /* 2. BARRA DE MENÚ SUPERIOR GARANTIZADA SOBRE EL FONDO */
+    /* 2. EL MENÚ SE CONVIERTA EN UNA BARRA HORIZONTAL EN EL TECHO */
     #campo-santo .menu-textos {
-        display: flex !important;
+        display: flex !important;       /* Lo volvemos una fila */
         visibility: visible !important;
         opacity: 1 !important;
         position: fixed !important;
         
-        /* Forzamos el anclaje total en el techo de la pantalla */
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        height: 48px !important;
+        height: 46px !important;        /* Barra compacta */
         margin-top: 0 !important;
         transform: none !important;
         
-        /* Capa negra de fondo para asegurar que las letras rojas resalten */
+        /* Fondo negro puro para que las letras rojas resalten sobre cualquier elemento */
         background-color: #000000 !important;
-        background: rgba(0, 0, 0, 0.95) !important;
+        background: #000000 !important; 
         border-bottom: 2px solid #880000 !important;
         
-        /* Distribución fluida */
+        /* Alineación y colchón para proteger la cruz */
         justify-content: flex-start !important;
         align-items: center !important;
-        gap: 15px !important;
-        padding: 0 70px 0 15px !important; /* El colchón de 70px protege la cruz de la esquina */
-        z-index: 99999999 !important; /* Prioridad absoluta sobre cualquier fondo o grimorio */
+        gap: 16px !important;           /* Espacio entre tus links */
+        padding: 0 75px 0 15px !important; /* Esquina derecha blindada para la cruz */
+        z-index: 999999999 !important;  /* Capa superior máxima */
     }
 
-    /* 3. RESETEO DE LETRAS INDIVIDUALES EN MÓVIL */
+    /* 3. RESETEO DE LAS LETRAS PARA QUE FLUTEN EN LÍNEA DENTRO DE LA BARRA */
     #campo-santo .menu-textos .opcion {
         display: block !important;
         visibility: visible !important;
@@ -1521,8 +1516,7 @@ button,
         top: auto !important;
         width: auto !important;
         
-        /* Tamaño óptimo para evitar desbordes en cualquier celular */
-        font-size: 11px !important;
+        font-size: 11px !important;     /* Tamaño ideal para móviles */
         color: #ff2222 !important;
         text-shadow: 0 0 8px #ff0000, 2px 2px 3px #000 !important;
     }
@@ -1532,30 +1526,8 @@ button,
         position: fixed !important;
         top: 8px !important;
         right: 15px !important;
-        z-index: 100000000 !important; /* Un nivel por encima de la barra */
-        transform: scale(0.68) !important; /* Encoje la cruz para que se vea fina */
+        z-index: 1000000000 !important; /* Un paso más arriba que la barra */
+        transform: scale(0.68) !important; /* Encoge la cruz para que se vea fina */
         transform-origin: right center !important;
-    }
-}
-/* ====================== OCULTAR CANDELABRO EN MÓVILES ====================== */
-
-@media (max-width: 1024px) {
-    .candelabro-central,
-    .candelabro-central img,
-    .img-candelabro {
-        display: none !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        width: 0 !important;
-    }
-}
-
-/* Asegurar que los textos sigan visibles en móvil (refuerzo) */
-@media (max-width: 1024px) {
-    #campo-santo .menu-textos {
-        display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
     }
 }
