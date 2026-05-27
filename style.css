@@ -1671,22 +1671,25 @@ main {
 .footer-perpetuidad {
     width: 100%;
     text-align: center;
-    padding: 10px 0; /* Reducimos el padding de 40px a 10px */
-    background: transparent !important; /* Semitransparente para que no tape el fondo */
-    border-top: transparent !important; /* Borde mucho más fino y oscuro */
+    padding: 10px 0;
+    /* Eliminamos el color de fondo y el borde */
+    background: transparent !important; 
+    border-top: none !important;
     margin-top: 10px;
     z-index: 10;
 }
 
 .footer-perpetuidad p {
     font-family: 'Nosifer', cursive;
-    color: #4a0000; /* Un rojo mucho más oscuro y desgastado */
-    font-size: 0.6rem; /* Reducido drásticamente para que sea sutil */
-    letter-spacing: 2px; /* Menos espacio entre letras para que sea compacto */
+    color: #4a0000; /* Rojo sangre */
+    font-size: 0.6rem;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    text-shadow: none; /* Quitamos el resplandor para que se vea más natural */
+    /* Ajustamos la opacidad para que se vea como marca de agua sutil */
+    opacity: 0.5; 
     margin: 0;
-    opacity: 0.8; /* Un toque de transparencia para efecto "grabado" */
+    /* Un pequeño toque para que no se pierda si el fondo es muy oscuro */
+    text-shadow: 1px 1px 2px #000; 
 }
 .sello-perpetuidad {
     position: fixed; /* Fijo para que siempre se vea */
