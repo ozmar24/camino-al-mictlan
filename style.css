@@ -1655,18 +1655,23 @@ label[for="confirm-delete"] {
     display: none; /* Esto lo hace invisible, así no rompe tu diseño */
 }
 .footer-perpetuidad {
+    position: relative; /* Cambiado a relative para asegurar su posición */
+    width: 100%;
     text-align: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     margin-top: 50px;
-    border-top: 2px solid #300; /* Borde sutil como piedra */
-    background: radial-gradient(circle, #1a0000 0%, #000 100%);
+    border-top: 2px solid #300;
+    background: #000; /* Fondo negro sólido para evitar transparencias raras */
+    z-index: 9999;    /* Fuerza a que se vea por encima de todo */
+    display: block !important; /* Fuerza a que sea visible */
 }
 
 .footer-perpetuidad p {
     font-family: 'Nosifer', cursive;
-    color: #8b0000; /* Rojo sangre */
-    font-size: 0.8rem;
+    color: #8b0000;
+    font-size: 1rem;
     letter-spacing: 5px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px #000;
+    text-shadow: 0 0 10px #ff0000;
+    margin: 0;
 }
