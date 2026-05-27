@@ -1541,3 +1541,15 @@ button,
         transform-origin: right center !important;
     }
 }
+@media (max-width: 1024px) {
+    /* Ocultamos por completo el cuadro negro del reproductor en móviles */
+    #reproductor-ad {
+        display: none !important;
+    }
+
+    /* Le quitamos el margen inferior al texto para que no quede un espacio vacío abajo */
+    .zona-patrocinadores p {
+        margin: 0 !important;
+        font-size: 0.85rem !important; /* Lo agrandamos un pinto para que sea más fácil picarle con el dedo */
+    }
+}
