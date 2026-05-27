@@ -19,6 +19,23 @@ const PRESAGIOS = [
     "Tu invocación ha sido registrada. El abismo procesa tu petición en silencio eterno.",
     "El camino es perpetuo. No busques salidas donde solo hay destino."
 ];
+const PRESAGIOS_MICTLAN = {
+    bajo: [
+        "Tu esencia es apenas un susurro en la inmensidad del abismo.",
+        "El Mictlán apenas reconoce tu existencia, alma pequeña.",
+        "Buscas respuestas, pero primero debes acumular sombras en tu haber."
+    ],
+    alto: [
+        "Tu poder resuena con fuerza en los corredores de la muerte. ¿Qué buscas, poderoso?",
+        "Las sombras se inclinan a tu paso. ¿Cuál es tu verdadera ambición?",
+        "Eres un alma marcada por la ambición. El abismo te observa con interés."
+    ],
+    general: [
+        "El destino no es un camino, es una condena que tú mismo has elegido.",
+        "Tus palabras son ecos en un vacío que no tiene fin.",
+        "Si estás aquí, es porque entregaste tu alma. No pidas lo que ya has perdido."
+    ]
+};
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
 const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com"; 
@@ -760,26 +777,36 @@ function cerrarOraculo() {
 }
 
 async function enviarOfrendaOraculo() {
-    const inputMensaje = document.getElementById('oraculo-input'); 
-    const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima";
-
+    const inputMensaje = document.getElementById('oraculo-input');
+    const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
+    
+    // Aquí obtienes tu variable de poder real de tu sistema
+    const poderUsuario = parseInt(document.getElementById('poder-valor')?.innerText) || 0; 
+    
     if (!mensaje) {
-        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
-        return; 
+        lanzarAlertaMictlan("Tu pergamino está en blanco. Las deidades no responden a la nada.", "SUSURRO VACÍO");
+        return;
     }
 
-    const presagioPersonal = await obtenerPresagio(usuarioActivo);
+    // Seleccionamos categoría
+    let pool;
+    if (poderUsuario < 50) pool = PRESAGIOS_MICTLAN.bajo;
+    else if (poderUsuario >= 50) pool = PRESAGIOS_MICTLAN.alto;
+    else pool = PRESAGIOS_MICTLAN.general;
 
+    const respuesta = pool[Math.floor(Math.random() * pool.length)];
+
+    // Efecto de inmersión
     const espejo = document.querySelector('.espejo-superficie');
     if(espejo) espejo.style.filter = "brightness(0)";
 
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    lanzarAlertaMictlan(presagioPersonal, "EL SUSURRO DEL MICTLÁN"); 
+    // Lanzamos la respuesta
+    lanzarAlertaMictlan(respuesta, "EL SUSURRO DEL MICTLÁN");
     
-    if (inputMensaje) inputMensaje.value = "";  
-    cerrarOraculo(); 
+    if (inputMensaje) inputMensaje.value = "";
+    cerrarOraculo();
     if(espejo) espejo.style.filter = "brightness(1)";
 }
 

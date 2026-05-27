@@ -1692,3 +1692,21 @@ main {
     opacity: 0.6;
     transition: transform 0.1s ease;
 }
+.cerrar-pacto {
+    margin-top: 20px !important; 
+    background: transparent !important; /* Fondo transparente para elegancia */
+    border: 1px solid #ff0000 !important; /* Borde fino rojo */
+    color: #ff0000 !important; 
+    font-family: 'Nosifer', cursive !important; 
+    font-size: 0.8rem !important; 
+    padding: 8px 20px !important; 
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-shadow: 0 0 5px #ff0000 !important;
+}
+
+.cerrar-pacto:hover {
+    background: #ff0000 !important; 
+    color: #000000 !important; 
+    box-shadow: 0 0 15px #ff0000 !important;
+}
