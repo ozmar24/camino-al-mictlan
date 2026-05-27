@@ -1541,3 +1541,39 @@ button,
         transform-origin: right center !important;
     }
 }
+@media (max-width: 1024px) {
+    /* 1. La zona de patrocinadores se vuelve un botón flotante limpio */
+    .zona-patrocinadores {
+        position: fixed !important;
+        top: 70px !important; /* Lo bajamos tantito para que no choque con tu menú de letras */
+        right: 20px !important;
+        padding: 8px 12px !important;
+        background: rgba(0, 0, 0, 0.85) !important;
+    }
+
+    /* 2. Engañamos al script: El contenedor original se vuelve invisible pero gigante */
+    #reproductor-ad {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        opacity: 0 !important; /* Se vuelve 100% invisible pero SÍ EXISTE para el script */
+        z-index: 2 !important;
+    }
+
+    /* 3. El texto se queda visible abajo, estilizado y libre de estorbos */
+    .zona-patrocinadores p {
+        position: relative !important;
+        z-index: 1 !important;
+        margin: 0 !important;
+        font-size: 0.8rem !important;
+        color: #ff2222 !important; /* Rojo encendido para que sepan que es interactivo */
+        text-shadow: 0 0 8px #ff0000 !important;
+    }
+
+    /* Ocultamos el texto secundario de los corchetes que ya no se ocupa en móvil */
+    #reproductor-ad span {
+        display: none !important;
+    }
+}
