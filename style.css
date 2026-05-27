@@ -1672,24 +1672,30 @@ main {
     width: 100%;
     text-align: center;
     padding: 10px 0;
-    /* Eliminamos el color de fondo y el borde */
+    
+    /* ELIMINAMOS TODO EL DISEÑO DEL CUADRO */
     background: transparent !important; 
-    border-top: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    
+    /* Mantenemos la posición al fondo */
     margin-top: 10px;
     z-index: 10;
 }
 
 .footer-perpetuidad p {
     font-family: 'Nosifer', cursive;
-    color: #4a0000; /* Rojo sangre */
+    color: #8b0000; /* Rojo sangre vivo */
     font-size: 0.6rem;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    /* Ajustamos la opacidad para que se vea como marca de agua sutil */
-    opacity: 0.5; 
+    
+    /* Mantenemos la transparencia para que parezca marca de agua */
+    opacity: 0.7; 
+    
+    /* Quitamos cualquier sombra que haga que parezca un botón o cuadro */
+    text-shadow: none; 
     margin: 0;
-    /* Un pequeño toque para que no se pierda si el fondo es muy oscuro */
-    text-shadow: 1px 1px 2px #000; 
 }
 .sello-perpetuidad {
     position: fixed; /* Fijo para que siempre se vea */
