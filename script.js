@@ -10,6 +10,15 @@ let esModoRegistro = false; // Alterna el formulario tradicional de la página i
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
+const PRESAGIOS = [
+    "El Mictlán no conoce el tiempo, solo el peso de las almas que lo habitan.",
+    "Tus dudas son como hojas secas en el viento del norte; se desvanecerán al llegar.",
+    "Solo aquel que ha renunciado a su nombre puede escuchar la verdadera voz del abismo.",
+    "El poder que buscas es solo un eco de lo que ya has perdido.",
+    "Las sombras no mienten, solo revelan lo que tu propia alma se niega a ver.",
+    "Tu invocación ha sido registrada. El abismo procesa tu petición en silencio eterno.",
+    "El camino es perpetuo. No busques salidas donde solo hay destino."
+];
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
 const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com"; 
@@ -697,6 +706,7 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
+// --- FUNCIONES DE CÓDICES ---
 function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice'); 
     const titulo = document.getElementById('codice-titulo'); 
@@ -716,61 +726,61 @@ function mostrarPergamino(tipo) {
     }
 }
 
-function cerrarCodice() { document.getElementById('pantalla-codice').style.display = 'none'; } 
+function cerrarCodice() { 
+    document.getElementById('pantalla-codice').style.display = 'none'; 
+} 
 
+// --- FUNCIONES DEL ORÁCULO (UNIFICADAS) ---
 function abrirSoporte() {
-    const pantalla = document.getElementById('pantalla-oraculo'); 
-    if (pantalla) {
-        pantalla.style.display = 'flex'; 
-        setTimeout(() => { pantalla.style.opacity = '1'; }, 10); 
+    const pantallaOraculo = document.getElementById('pantalla-oraculo');
+    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
+
+    // Aquí inyectamos la frase de entrada y el contenido del oráculo
+    if (oraculoCuerpo) {
+        oraculoCuerpo.innerHTML = `
+            <h2 class="oraculo-titulo">EL ORÁCULO</h2>
+            <p>Si estás aquí, es porque decidiste entregar tu alma al abismo.</p>
+            <textarea id="oraculo-input" placeholder="Susurra tu duda..."></textarea>
+            <button class="btn-invocar pentaculo-cursor" onclick="enviarOfrendaOraculo()">INVOCAR</button>
+        `;
+    }
+
+    if (pantallaOraculo) {
+        pantallaOraculo.style.display = 'flex'; 
+        setTimeout(() => { pantallaOraculo.style.opacity = "1"; }, 10);
     }
 }
 
 function cerrarOraculo() {
     const pantalla = document.getElementById('pantalla-oraculo'); 
-    if (pantalla) pantalla.style.display = 'none'; 
+    if (pantalla) {
+        pantalla.style.display = 'none';
+        pantalla.style.opacity = "0"; // Aseguramos que se oculte bien
+    }
 }
 
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input'); 
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    
+    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima";
+
     if (!mensaje) {
         lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
         return; 
     }
 
-    // Efecto visual: el espejo parece "absorber" el mensaje
+    const presagioPersonal = await obtenerPresagio(usuarioActivo);
+
     const espejo = document.querySelector('.espejo-superficie');
-    espejo.style.transition = "filter 0.5s";
-    espejo.style.filter = "brightness(0)"; 
+    if(espejo) espejo.style.filter = "brightness(0)";
 
-    // Aquí iría tu lógica de envío (fetch, etc.)
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simula espera
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-    lanzarAlertaMictlan("Tu alma ha sido escuchada. Las sombras guardan tu secreto.", "EL ABISMO RESPONDE"); 
+    lanzarAlertaMictlan(presagioPersonal, "EL SUSURRO DEL MICTLÁN"); 
     
     if (inputMensaje) inputMensaje.value = "";  
     cerrarOraculo(); 
-    
-    // Restaurar brillo
-    espejo.style.filter = "brightness(1)";
-}
-function abrirSoporte() {
-    const pantallaOraculo = document.getElementById('pantalla-oraculo');
-    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo'); // Ajusta el selector si es necesario
-
-    // Inyectamos la frase de entrada en el HTML del oráculo
-    // Asegúrate de que este div existe dentro de tu estructura .oraculo-cuerpo
-    oraculoCuerpo.innerHTML = `
-        <p>Si estás aquí, es porque decidiste entregar tu alma al abismo.</p>
-        <textarea id="oraculo-input" placeholder="Susurra tu duda..."></textarea>
-        <button class="btn-invocar pentaculo-cursor" onclick="enviarOfrecidaOraculo()">INVOCAR</button>
-    `;
-
-    pantallaOraculo.style.display = 'flex';
-    // Pequeño truco para la animación de opacidad que tienes en el CSS
-    setTimeout(() => { pantallaOraculo.style.opacity = "1"; }, 10);
+    if(espejo) espejo.style.filter = "brightness(1)";
 }
 
 // ==================================================================
@@ -1154,3 +1164,12 @@ document.addEventListener('mousemove', (e) => {
     letras[0].style.top = (e.clientY + 15) + 'px';
     letras[0].style.position = 'fixed';
 });
+async function obtenerPresagio(usuario) {
+    // Si el usuario es anónimo o nuevo
+    if (usuario === "Alma Anónima") {
+        return "El Mictlán aún no conoce tu nombre, pero pronto sabrá el sabor de tu esencia.";
+    }
+    
+    // Si ya es un usuario registrado
+    return `Las sombras de ${usuario} son pesadas... pero el abismo siempre tiene espacio para una carga más.`;
+}
