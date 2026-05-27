@@ -1671,22 +1671,22 @@ main {
 .footer-perpetuidad {
     width: 100%;
     text-align: center;
-    padding: 40px 0;
-    background: #000;
-    border-top: 2px solid #300;
-    margin-top: 50px; /* Separación del resto del contenido */
-    display: block !important;
-    position: relative; /* Cambiado a relativo para que se ubique donde debe ir */
-    z-index: 1;
+    padding: 10px 0; /* Reducimos el padding de 40px a 10px */
+    background: rgba(0, 0, 0, 0.5); /* Semitransparente para que no tape el fondo */
+    border-top: 1px solid #2a0000; /* Borde mucho más fino y oscuro */
+    margin-top: 10px;
+    z-index: 10;
 }
 
 .footer-perpetuidad p {
     font-family: 'Nosifer', cursive;
-    color: #8b0000;
-    font-size: 0.9rem;
-    letter-spacing: 5px;
+    color: #4a0000; /* Un rojo mucho más oscuro y desgastado */
+    font-size: 0.6rem; /* Reducido drásticamente para que sea sutil */
+    letter-spacing: 2px; /* Menos espacio entre letras para que sea compacto */
     text-transform: uppercase;
-    text-shadow: 0 0 5px #000;
+    text-shadow: none; /* Quitamos el resplandor para que se vea más natural */
+    margin: 0;
+    opacity: 0.8; /* Un toque de transparencia para efecto "grabado" */
 }
 .sello-perpetuidad {
     position: fixed; /* Fijo para que siempre se vea */
