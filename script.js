@@ -1086,3 +1086,9 @@ function borrarCuenta() {
         alert("Por favor, escribe BORRAR para confirmar.");
     }
 }
+const cursorPerpetuidad = document.getElementById('cursor-perpetuidad');
+
+document.addEventListener('mousemove', (e) => {
+    cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
+    cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
+});

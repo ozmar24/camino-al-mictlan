@@ -1667,46 +1667,16 @@ main {
     flex: 1;
 }
 
-/* Estilo final para el sello de perpetuidad */
-.footer-perpetuidad {
-    width: 100%;
-    text-align: center;
-    padding: 10px 0;
-    
-    /* ELIMINAMOS TODO EL DISEÑO DEL CUADRO */
-    background: transparent !important; 
-    border: none !important;
-    box-shadow: none !important;
-    
-    /* Mantenemos la posición al fondo */
-    margin-top: 10px;
-    z-index: 10;
-}
-
-.footer-perpetuidad p {
+#cursor-perpetuidad {
+    position: fixed;
+    pointer-events: none; /* No bloquea clics */
     font-family: 'Nosifer', cursive;
-    color: #8b0000; /* Rojo sangre vivo */
-    font-size: 0.6rem;
-    letter-spacing: 3px;
+    color: #4a0000;
+    font-size: 0.5rem;
     text-transform: uppercase;
-    
-    /* Mantenemos la transparencia para que parezca marca de agua */
-    opacity: 0.7; 
-    
-    /* Quitamos cualquier sombra que haga que parezca un botón o cuadro */
-    text-shadow: none; 
-    margin: 0;
-}
-.sello-perpetuidad {
-    position: fixed; /* Fijo para que siempre se vea */
-    bottom: 10px;    /* Pegado al borde inferior */
-    width: 100%;
-    text-align: center;
-    font-family: 'Nosifer', cursive;
-    color: #4a0000;  /* Rojo sangre oscura */
-    font-size: 0.7rem;
-    letter-spacing: 4px;
-    pointer-events: none; /* Esto es vital: permite que los clics pasen a través del texto */
-    z-index: 999;
-    text-shadow: 0 0 5px #000;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    z-index: 9999;
+    white-space: nowrap;
+    transition: transform 0.05s linear;
 }
