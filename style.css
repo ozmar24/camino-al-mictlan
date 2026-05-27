@@ -1688,3 +1688,16 @@ main {
     text-transform: uppercase;
     text-shadow: 0 0 5px #000;
 }
+.sello-perpetuidad {
+    position: fixed; /* Fijo para que siempre se vea */
+    bottom: 10px;    /* Pegado al borde inferior */
+    width: 100%;
+    text-align: center;
+    font-family: 'Nosifer', cursive;
+    color: #4a0000;  /* Rojo sangre oscura */
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    pointer-events: none; /* Esto es vital: permite que los clics pasen a través del texto */
+    z-index: 999;
+    text-shadow: 0 0 5px #000;
+}
