@@ -1654,3 +1654,19 @@ label[for="confirm-delete"] {
 .security-panel {
     display: none; /* Esto lo hace invisible, así no rompe tu diseño */
 }
+.footer-perpetuidad {
+    text-align: center;
+    padding: 60px 20px;
+    margin-top: 50px;
+    border-top: 2px solid #300; /* Borde sutil como piedra */
+    background: radial-gradient(circle, #1a0000 0%, #000 100%);
+}
+
+.footer-perpetuidad p {
+    font-family: 'Nosifer', cursive;
+    color: #8b0000; /* Rojo sangre */
+    font-size: 0.8rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px #000;
+}
