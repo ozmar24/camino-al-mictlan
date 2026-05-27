@@ -1577,48 +1577,47 @@ button,
         display: none !important;
     }
 }
-/* Estilo específico para el panel de configuración sangriento */
+/* Panel compacto y lateral */
 .security-panel {
-    background-color: #0d0d0d;
+    position: fixed; /* Lo fija en la pantalla */
+    top: 100px;      /* Distancia desde arriba */
+    left: 20px;      /* Alineado a la izquierda */
+    width: 300px;    /* Mucho más estrecho */
+    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro semitransparente */
+    padding: 15px;
     border: 2px solid #5a0000;
-    padding: 30px;
-    margin: 20px auto;
-    max-width: 500px;
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-    text-align: center;
+    z-index: 1000;   /* Para que esté encima de todo */
+    text-align: left; /* Texto alineado a la izquierda */
 }
 
-/* El título "Seguridad" con el estilo Nosifer */
+/* Título más pequeño */
 .security-panel h3 {
     font-family: 'Nosifer', cursive;
     color: #ff0000;
-    text-shadow: 2px 2px 4px #000;
+    font-size: 1.2rem; /* Reducido */
+    margin-bottom: 10px;
 }
 
-/* El botón de borrado con efecto de sangre */
-#btn-delete-account {
-    font-family: 'Nosifer', cursive;
-    background-color: #7a0000;
-    color: #ffcccc;
-    border: 2px solid #ff0000;
-    padding: 15px 25px;
+/* Caja de advertencia más pequeña */
+.warning-box {
+    background-color: rgba(60, 0, 0, 0.3);
+    padding: 8px;
+    font-size: 0.8rem; /* Texto pequeño */
+    margin-bottom: 15px;
+}
+
+/* Botón compacto */
+.btn-danger {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
 }
 
-#btn-delete-account:hover {
-    background-color: #ff0000;
-    color: white;
-    box-shadow: 0 0 20px #ff0000;
-}
-
-/* El input para escribir BORRAR */
+/* Input alineado */
 #confirm-delete {
-    background: #000;
-    border: 1px solid #440000;
-    color: #ff0000;
-    padding: 10px;
-    margin-right: 10px;
-    font-family: monospace;
+    width: 90%;
+    margin-bottom: 10px;
+    padding: 5px;
 }
