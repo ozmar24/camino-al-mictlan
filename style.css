@@ -1580,35 +1580,43 @@ button,
 /* Panel compacto y minimalista estilo cementerio */
 .security-panel {
     position: fixed;
-    top: 150px;       /* Ajusta esta altura para que no choque con tus menús superiores */
+    top: 150px;
     left: 20px;
-    width: 250px;     /* Reducido para que no estorbe */
+    width: 250px;
     background-color: #000;
     padding: 15px;
-    border: 2px solid #660000; /* Borde de sangre seca */
+    border: 2px solid #660000;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
     z-index: 1000;
     text-align: left;
-    font-family: 'Nosifer', cursive; /* Fuente limpia para legibilidad */
+    font-family: 'Nosifer', cursive;
 }
 
-/* Título con estilo Nosifer, pequeño y al centro */
+/* Título con estilo Nosifer */
 .security-panel h3 {
     font-family: 'Nosifer', cursive;
-    color: #cc0000; /* Rojo sangre vivo */
+    color: #cc0000;
     font-size: 0.7rem;
     margin: 0 0 8px 0;
     text-align: center;
 }
 
-/* Texto de advertencia muy compacto */
+/* Texto de advertencia (sin línea roja lateral) */
 .warning-box {
     background-color: #100000;
-    border-left: 3px solid #cc0000;
+    border-left: none; /* Eliminada la línea roja */
     padding: 5px;
     font-size: 0.75rem;
     color: #ffaaaa;
     margin-bottom: 8px;
+}
+
+/* Etiqueta "Escribe BORRAR" (gris) */
+label[for="confirm-delete"] {
+    color: #808080; /* Color gris solicitado */
+    font-size: 0.75rem;
+    display: block;
+    margin-bottom: 5px;
 }
 
 /* Input integrado */
@@ -1624,11 +1632,12 @@ button,
     margin-right: auto;
 }
 
-/* Botón con el rojo sangre deseado */
+/* Botón con fuente gótica y rojo sangre */
 #btn-delete-account {
+    font-family: 'Nosifer', cursive; /* Fuente gótica aplicada */
     width: 100%;
     padding: 8px;
-    background-color: #990000; /* Rojo sangre intenso */
+    background-color: #990000;
     color: #fff;
     border: 1px solid #ff0000;
     cursor: pointer;
@@ -1639,6 +1648,6 @@ button,
 }
 
 #btn-delete-account:hover {
-    background-color: #ff0000; /* Brillo al pasar el mouse */
+    background-color: #ff0000;
     box-shadow: 0 0 8px #ff0000;
 }
