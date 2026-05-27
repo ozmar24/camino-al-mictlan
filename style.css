@@ -2226,3 +2226,58 @@ a:hover {
 .alianzas:hover img {
     cursor: url('../img/pentaculo.png') 16 16, pointer !important;
 }
+
+/* ==================================================================
+   PANEL DE SEGURIDAD — Zona de peligro (configuracion.html)
+   ================================================================== */
+.security-panel {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #8b0000;
+    border-radius: 8px;
+    background-color: rgba(20, 0, 0, 0.85);
+    color: #ffdddd;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.security-panel h3 {
+    color: #ff2222;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+}
+
+.warning-box {
+    background-color: rgba(60, 0, 0, 0.6);
+    border-left: 5px solid #ffc107;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-danger {
+    background-color: #8b0000;
+    color: #ffdddd;
+    border: 1px solid #ff0000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'MedievalSharp', cursive;
+}
+
+.btn-danger:hover {
+    background-color: #ff0000;
+    color: #000000;
+}
+
+.delete-account-section label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.delete-account-section input {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #8b0000;
+    border-radius: 4px;
+    background: #0a0000;
+    color: #ffdddd;
+}

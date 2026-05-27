@@ -2808,3 +2808,47 @@ async function actualizarBarraProgreso() {
         console.error("Fallo de conexión:", e);
     }
 }
+
+// ==================================================================
+// ELIMINACIÓN DE CUENTA (zona de peligro de configuracion.html)
+// ==================================================================
+async function borrarCuenta() {
+    const input = document.getElementById('confirm-delete');
+    const confirmacion = input ? input.value.trim() : '';
+
+    if (confirmacion !== "BORRAR") {
+        lanzarAlertaMictlan("Por favor, escribe BORRAR para confirmar.", "RITUAL INCOMPLETO");
+        return;
+    }
+
+    const identidad = localStorage.getItem('soulgeist_user_email')
+        || localStorage.getItem('usuario_email')
+        || window.userWallet || '';
+
+    if (!identidad) {
+        lanzarAlertaMictlan("No se detectó tu alma en el portal.", "SIN IDENTIDAD");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/api/control-cuentas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identidad })
+        });
+        const data = await respuesta.json();
+
+        if (respuesta.ok && data.message) {
+            localStorage.removeItem('soulgeist_user_email');
+            localStorage.removeItem('usuario_email');
+            alert(data.message);
+            window.location.href = "/";
+        } else {
+            lanzarAlertaMictlan(data.error || "Hubo un error al eliminar tu perfil.", "RITUAL FALLIDO");
+        }
+    } catch (error) {
+        console.error('Error al borrar cuenta:', error);
+        lanzarAlertaMictlan("El inframundo no responde. Intenta de nuevo.", "RITUAL FALLIDO");
+    }
+}
+window.borrarCuenta = borrarCuenta;
