@@ -1667,16 +1667,19 @@ main {
     flex: 1;
 }
 
-#cursor-perpetuidad {
+#cursor-serpiente {
     position: fixed;
-    pointer-events: none; /* No bloquea clics */
+    pointer-events: none;
+    z-index: 9999;
+    display: flex; /* Para alinear las letras */
+    gap: 2px;
+}
+
+.letra-serpiente {
     font-family: 'Nosifer', cursive;
-    color: #4a0000;
+    color: #8b0000;
     font-size: 0.5rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
     opacity: 0.6;
-    z-index: 9999;
-    white-space: nowrap;
-    transition: transform 0.05s linear;
+    transition: transform 0.1s ease;
 }

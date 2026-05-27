@@ -1092,3 +1092,40 @@ document.addEventListener('mousemove', (e) => {
     cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
     cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
 });
+const mensaje = "ESTADO: EN PERPETUIDAD - AVANCE AL MICTLÁN";
+const contenedor = document.getElementById('cursor-serpiente');
+
+// Crear elementos de letra
+mensaje.split('').forEach(char => {
+    const span = document.createElement('span');
+    span.textContent = char;
+    span.className = 'letra-serpiente';
+    contenedor.appendChild(span);
+});
+
+const letras = document.querySelectorAll('.letra-serpiente');
+let posiciones = Array.from(letras).map(() => ({ x: 0, y: 0 }));
+
+document.addEventListener('mousemove', (e) => {
+    // La primera letra sigue al mouse directamente
+    posiciones[0] = { x: e.clientX, y: e.clientY };
+
+    // Cada letra sigue a la anterior con retraso
+    for (let i = 1; i < letras.length; i++) {
+        const dx = posiciones[i-1].x - posiciones[i].x;
+        const dy = posiciones[i-1].y - posiciones[i].y;
+        
+        // El factor 0.3 controla qué tanto "se estira" la serpiente
+        posiciones[i].x += dx * 0.3;
+        posiciones[i].y += dy * 0.3;
+
+        letras[i].style.left = (posiciones[i].x + 15) + 'px';
+        letras[i].style.top = (posiciones[i].y + 15) + 'px';
+        letras[i].style.position = 'fixed';
+    }
+    
+    // Posicionar la primera letra
+    letras[0].style.left = (e.clientX + 15) + 'px';
+    letras[0].style.top = (e.clientY + 15) + 'px';
+    letras[0].style.position = 'fixed';
+});
