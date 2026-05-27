@@ -10,30 +10,23 @@ let esModoRegistro = false; // Alterna el formulario tradicional de la página i
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
-const PRESAGIOS = [
-    "El Mictlán no conoce el tiempo, solo el peso de las almas que lo habitan.",
-    "Tus dudas son como hojas secas en el viento del norte; se desvanecerán al llegar.",
-    "Solo aquel que ha renunciado a su nombre puede escuchar la verdadera voz del abismo.",
-    "El poder que buscas es solo un eco de lo que ya has perdido.",
-    "Las sombras no mienten, solo revelan lo que tu propia alma se niega a ver.",
-    "Tu invocación ha sido registrada. El abismo procesa tu petición en silencio eterno.",
-    "El camino es perpetuo. No busques salidas donde solo hay destino."
-];
-const PRESAGIOS_MICTLAN = {
-    bajo: [
-        "Tu esencia es apenas un susurro en la inmensidad del abismo.",
-        "El Mictlán apenas reconoce tu existencia, alma pequeña.",
-        "Buscas respuestas, pero primero debes acumular sombras en tu haber."
+const SABIDURIA_ORACULO = {
+    poder: [
+        "El poder es un fuego que consume al que lo porta. ¿Estás listo para arder?",
+        "Tu poder es grande, pero en el Mictlán, incluso los reyes son ceniza."
     ],
-    alto: [
-        "Tu poder resuena con fuerza en los corredores de la muerte. ¿Qué buscas, poderoso?",
-        "Las sombras se inclinan a tu paso. ¿Cuál es tu verdadera ambición?",
-        "Eres un alma marcada por la ambición. El abismo te observa con interés."
+    pago: [
+        "El costo de tus ambiciones no se paga con oro, sino con fragmentos de alma.",
+        "Los intercambios con el abismo siempre tienen un precio que no se ve en los balances."
     ],
-    general: [
-        "El destino no es un camino, es una condena que tú mismo has elegido.",
+    futuro: [
+        "El futuro es una niebla espesa; solo aquellos que aceptan el fin pueden ver a través de ella.",
+        "Preguntas por el mañana cuando apenas puedes soportar el peso de tu presente."
+    ],
+    default: [
         "Tus palabras son ecos en un vacío que no tiene fin.",
-        "Si estás aquí, es porque entregaste tu alma. No pidas lo que ya has perdido."
+        "El abismo no responde a curiosidades vacías, sino a la voluntad de hierro.",
+        "Tu pregunta ha sido devorada por las sombras. Haz otra, si te atreves."
     ]
 };
 
@@ -779,35 +772,32 @@ function cerrarOraculo() {
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input');
     const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
-    
-    // Aquí obtienes tu variable de poder real de tu sistema
-    const poderUsuario = parseInt(document.getElementById('poder-valor')?.innerText) || 0; 
-    
+
     if (!mensaje) {
-        lanzarAlertaMictlan("Tu pergamino está en blanco. Las deidades no responden a la nada.", "SUSURRO VACÍO");
+        lanzarAlertaMictlan("Tu pergamino está en blanco.", "SUSURRO VACÍO");
         return;
     }
 
-    // Seleccionamos categoría
-    let pool;
-    if (poderUsuario < 50) pool = PRESAGIOS_MICTLAN.bajo;
-    else if (poderUsuario >= 50) pool = PRESAGIOS_MICTLAN.alto;
-    else pool = PRESAGIOS_MICTLAN.general;
+    // 1. Obtener respuesta coherente
+    const respuesta = obtenerRespuestaCoherente(mensaje);
 
-    const respuesta = pool[Math.floor(Math.random() * pool.length)];
-
-    // Efecto de inmersión
+    // 2. Efecto visual
     const espejo = document.querySelector('.espejo-superficie');
     if(espejo) espejo.style.filter = "brightness(0)";
-
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Lanzamos la respuesta
-    lanzarAlertaMictlan(respuesta, "EL SUSURRO DEL MICTLÁN");
+    // 3. Mostrar respuesta dentro del espejo
+    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
+    if (oraculoCuerpo) {
+        oraculoCuerpo.innerHTML = `
+            <p style="color: #ff0000;">${respuesta}</p>
+            <button class="btn-invocar" onclick="abrirSoporte()">CONSULTAR OTRA VEZ</button>
+            <button class="cerrar-pacto" onclick="cerrarOraculo()">VOLVER A LAS SOMBRAS</button>
+        `;
+    }
     
-    if (inputMensaje) inputMensaje.value = "";
-    cerrarOraculo();
     if(espejo) espejo.style.filter = "brightness(1)";
+    if (inputMensaje) inputMensaje.value = "";
 }
 
 // ==================================================================
@@ -1199,4 +1189,13 @@ async function obtenerPresagio(usuario) {
     
     // Si ya es un usuario registrado
     return `Las sombras de ${usuario} son pesadas... pero el abismo siempre tiene espacio para una carga más.`;
+}
+function obtenerRespuestaCoherente(mensaje) {
+    const texto = mensaje.toLowerCase();
+
+    if (texto.includes("poder")) return SABIDURIA_ORACULO.poder[Math.floor(Math.random() * SABIDURIA_ORACULO.poder.length)];
+    if (texto.includes("pago") || texto.includes("cobro") || texto.includes("dinero")) return SABIDURIA_ORACULO.pago[Math.floor(Math.random() * SABIDURIA_ORACULO.pago.length)];
+    if (texto.includes("futuro") || texto.includes("destino") || texto.includes("pasará")) return SABIDURIA_ORACULO.futuro[Math.floor(Math.random() * SABIDURIA_ORACULO.futuro.length)];
+    
+    return SABIDURIA_ORACULO.default[Math.floor(Math.random() * SABIDURIA_ORACULO.default.length)];
 }
