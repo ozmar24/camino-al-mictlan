@@ -1577,47 +1577,68 @@ button,
         display: none !important;
     }
 }
-/* Panel compacto y lateral */
+/* Panel compacto y minimalista estilo cementerio */
 .security-panel {
-    position: fixed; /* Lo fija en la pantalla */
-    top: 100px;      /* Distancia desde arriba */
-    left: 20px;      /* Alineado a la izquierda */
-    width: 300px;    /* Mucho más estrecho */
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro semitransparente */
+    position: fixed;
+    top: 150px;       /* Ajusta esta altura para que no choque con tus menús superiores */
+    left: 20px;
+    width: 250px;     /* Reducido para que no estorbe */
+    background-color: #000;
     padding: 15px;
-    border: 2px solid #5a0000;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-    z-index: 1000;   /* Para que esté encima de todo */
-    text-align: left; /* Texto alineado a la izquierda */
+    border: 2px solid #660000; /* Borde de sangre seca */
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+    z-index: 1000;
+    text-align: left;
+    font-family: 'Arial', sans-serif; /* Fuente limpia para legibilidad */
 }
 
-/* Título más pequeño */
+/* Título con estilo Nosifer, pequeño y al centro */
 .security-panel h3 {
     font-family: 'Nosifer', cursive;
-    color: #ff0000;
-    font-size: 1.2rem; /* Reducido */
+    color: #cc0000; /* Rojo sangre vivo */
+    font-size: 1.1rem;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+/* Texto de advertencia muy compacto */
+.warning-box {
+    background-color: #100000;
+    border-left: 3px solid #cc0000;
+    padding: 5px;
+    font-size: 0.75rem;
+    color: #ffaaaa;
     margin-bottom: 10px;
 }
 
-/* Caja de advertencia más pequeña */
-.warning-box {
-    background-color: rgba(60, 0, 0, 0.3);
-    padding: 8px;
-    font-size: 0.8rem; /* Texto pequeño */
-    margin-bottom: 15px;
-}
-
-/* Botón compacto */
-.btn-danger {
-    width: 100%;
-    padding: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-/* Input alineado */
+/* Input integrado */
 #confirm-delete {
     width: 90%;
-    margin-bottom: 10px;
     padding: 5px;
+    background: #111;
+    border: 1px solid #440000;
+    color: #cc0000;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Botón con el rojo sangre deseado */
+#btn-delete-account {
+    width: 100%;
+    padding: 8px;
+    background-color: #990000; /* Rojo sangre intenso */
+    color: #fff;
+    border: 1px solid #ff0000;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+#btn-delete-account:hover {
+    background-color: #ff0000; /* Brillo al pasar el mouse */
+    box-shadow: 0 0 8px #ff0000;
 }
