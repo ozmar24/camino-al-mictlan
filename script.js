@@ -734,18 +734,43 @@ function cerrarOraculo() {
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input'); 
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima"; 
-
+    
     if (!mensaje) {
         lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
         return; 
     }
 
-    console.log(`Invocación de soporte recibida de [${usuarioActivo}]: ${mensaje}`); 
+    // Efecto visual: el espejo parece "absorber" el mensaje
+    const espejo = document.querySelector('.espejo-superficie');
+    espejo.style.transition = "filter 0.5s";
+    espejo.style.filter = "brightness(0)"; 
+
+    // Aquí iría tu lógica de envío (fetch, etc.)
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simula espera
+
+    lanzarAlertaMictlan("Tu alma ha sido escuchada. Las sombras guardan tu secreto.", "EL ABISMO RESPONDE"); 
     
-    lanzarAlertaMictlan("Tu mensaje ha cruzado el umbral. Las deidades responderán pronto.", "INVOCACIÓN ENVIADA"); 
     if (inputMensaje) inputMensaje.value = "";  
     cerrarOraculo(); 
+    
+    // Restaurar brillo
+    espejo.style.filter = "brightness(1)";
+}
+function abrirSoporte() {
+    const pantallaOraculo = document.getElementById('pantalla-oraculo');
+    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo'); // Ajusta el selector si es necesario
+
+    // Inyectamos la frase de entrada en el HTML del oráculo
+    // Asegúrate de que este div existe dentro de tu estructura .oraculo-cuerpo
+    oraculoCuerpo.innerHTML = `
+        <p>Si estás aquí, es porque decidiste entregar tu alma al abismo.</p>
+        <textarea id="oraculo-input" placeholder="Susurra tu duda..."></textarea>
+        <button class="btn-invocar pentaculo-cursor" onclick="enviarOfrecidaOraculo()">INVOCAR</button>
+    `;
+
+    pantallaOraculo.style.display = 'flex';
+    // Pequeño truco para la animación de opacidad que tienes en el CSS
+    setTimeout(() => { pantallaOraculo.style.opacity = "1"; }, 10);
 }
 
 // ==================================================================
