@@ -1672,7 +1672,7 @@ main {
     width: 100%;
     text-align: center;
     padding: 10px 0; /* Reducimos el padding de 40px a 10px */
-    background: rgba(0, 0, 0, 0.5); /* Semitransparente para que no tape el fondo */
+    background: transparent !important; /* Semitransparente para que no tape el fondo */
     border-top: 1px solid #2a0000; /* Borde mucho más fino y oscuro */
     margin-top: 10px;
     z-index: 10;
