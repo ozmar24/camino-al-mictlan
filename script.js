@@ -738,7 +738,7 @@ function abrirSoporte() {
     // Aquí inyectamos la frase de entrada y el contenido del oráculo
     if (oraculoCuerpo) {
         oraculoCuerpo.innerHTML = `
-            <h2 class="oraculo-titulo">EL ORÁCULO</h2>
+           
             <p>Si estás aquí, es porque decidiste entregar tu alma al abismo.</p>
             <textarea id="oraculo-input" placeholder="Susurra tu duda..."></textarea>
             <button class="btn-invocar pentaculo-cursor" onclick="enviarOfrendaOraculo()">INVOCAR</button>
