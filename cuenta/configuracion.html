@@ -1,17 +1,26 @@
-<div class="security-panel">
-    <h3>Seguridad y Privacidad</h3>
-    
-    <div class="warning-box">
-        <p><strong>⚠️ Zona de peligro:</strong> Eliminar tu perfil borrará tu acceso al portal y todo tu historial de actividad aquí.</p>
-        <p><small>Nota: Tus monedas (tokens) en tu billetera digital NO se verán afectadas y seguirán siendo tuyas.</small></p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuración</title>
+    <link rel="stylesheet" href="../style.css"> 
+</head>
+<body>
+
+    <div class="security-panel">
+        <h3>Seguridad y Privacidad</h3>
+        <div class="warning-box">
+            <p><strong>⚠️ Zona de peligro:</strong> Eliminar tu perfil...</p>
+        </div>
+        <div class="delete-account-section">
+            <label for="confirm-delete">Escribe "BORRAR" para confirmar:</label>
+            <input type="text" id="confirm-delete" placeholder="Escribe aquí...">
+            <button id="btn-delete-account" class="btn-danger" onclick="borrarCuenta()">
+                Eliminar mi perfil del portal
+            </button>
+        </div>
     </div>
 
-    <div class="delete-account-section">
-        <label for="confirm-delete">Escribe "BORRAR" para confirmar:</label>
-        <input type="text" id="confirm-delete" placeholder="Escribe aquí...">
-        
-        <button id="btn-delete-account" class="btn-danger" onclick="borrarCuenta()">
-            Eliminar mi perfil del portal
-        </button>
-    </div>
-</div>
+    <script src="../script.js"></script>
+</body>
+</html>
