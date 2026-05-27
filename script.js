@@ -1092,7 +1092,7 @@ document.addEventListener('mousemove', (e) => {
     cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
     cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
 });
-const mensaje = "ESTADO: EN PERPETUIDAD - AVANCE AL MICTLÁN";
+const mensaje = "ESTADO: EN PERPETUIDAD";
 const contenedor = document.getElementById('cursor-serpiente');
 
 // Crear elementos de letra
