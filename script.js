@@ -1062,3 +1062,27 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSalir.onclick = salirDelMictlan;
     }
 });
+// Añade esto en tu archivo 'script'
+function borrarCuenta() {
+    const confirmacion = document.getElementById('confirm-delete').value;
+    
+    if (confirmacion === "BORRAR") {
+        fetch('/api/control-cuentas', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmacion: "BORRAR" }) // Enviamos la confirmación al backend
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message); // Muestra "Perfil borrado correctamente"
+                window.location.href = "/"; // Recarga la página o manda al index
+            } else {
+                alert("Hubo un error: " + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert("Por favor, escribe BORRAR para confirmar.");
+    }
+}

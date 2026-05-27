@@ -1,3 +1,5 @@
+import { ethers } from "ethers"; // Inyectamos ethers para conectar con Amoy
+
 export default async function handler(req, res) {
     // 1. Configurar cabeceras CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
         "Pepe":     { tasa: 15000,        simFP: "PEPE", minimoNativo: 180 }, 
         "Solana":   { tasa: 0.0008,       simFP: "SOL", minimoNativo: 0.000096 },     
         "Dogecoin": { tasa: 1.5,          simFP: "DOGE", minimoNativo: 0.18 },     
-        "USDT":     { tasa: 0.25,         simFP: "USDT", minimoNativo: 0.03 },      
+        "USDT":     { tasa: 0.25,         simFP: "USDT", minimoNativo: 0.03 },     
         "Bitcoin":  { tasa: 0.000002,     simFP: "BTC", minimoNativo: 0.0000002 } 
     };
 
@@ -55,11 +57,10 @@ export default async function handler(req, res) {
             return res.status(403).json({ error: 'Debes esperar 24h para otro retiro de esta cripto.' });
         }
 
-        // 7. Validación de Saldo (CORREGIDO: El juego ya envía el saldo convertido)
+        // 7. Validación de Saldo
         const balanceReal = parseFloat(cantidadRetiro || 0);
         if (balanceReal <= 0) return res.status(400).json({ error: 'La cripta está vacía.' });
 
-        // CORRECCIÓN CRÍTICA: No multiplicamos de nuevo, usamos el valor directo
         const cantidadAEnviar = balanceReal; 
 
         if (cantidadAEnviar < infoCripta.minimoNativo) {
@@ -83,10 +84,13 @@ export default async function handler(req, res) {
                 mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`; 
             }
         } else if (["bitso", "binance", "coinbase"].includes(pasarela)) {
+            // El backend procesará el envío usando el contrato inteligente en Amoy
             const resOC = await procesarRetiroOnChain(pasarela, wallet, cantidadAEnviar, cripto);
             if (resOC.success) { 
                 pagoExitoso = true; 
-                mensajeRetorno = "Cosecha autorizada y enviada a la blockchain."; 
+                mensajeRetorno = `Cosecha autorizada en Amoy. Tx: ${resOC.txHash.slice(0,10)}...`; 
+            } else {
+                return res.status(500).json({ error: resOC.error || 'La blockchain rechazó la transferencia.' });
             }
         }
 
@@ -110,20 +114,67 @@ export default async function handler(req, res) {
                 })
             ]);
 
-            await enviarAlertaTelegram(`💀 *RETIRO EXITOSO*\n*Wallet:* \`${wallet}\`\n*Monto:* \`${cantidadAEnviar.toFixed(8)}\` ${infoCripta.simFP}\n*Pasarela:* ${pasarela.toUpperCase()}`);
+            await enviarAlertaTelegram(`💀 *RETIRO EN AMOY EXITOSO*\n*Hacia:* \`${wallet}\`\n*Monto simulado:* \`${cantidadAEnviar.toFixed(8)}\` ${infoCripta.simFP}\n*Pasarela:* ${pasarela.toUpperCase()}`);
             
             return res.status(200).json({ success: true, mensaje: mensajeRetorno, balanceAlmas: 0 });
         }
 
     } catch (err) {
-        console.error("Error:", err);
+        console.error("Error global del backend:", err);
         return res.status(500).json({ error: 'Error de conexión con el inframundo.' });
     }
 }
 
-// --- FUNCIONES AUXILIARES ---
+// --- FUNCIONES AUXILIARES REPARADAS ---
 async function ejecutarRetiroBitsoLightning(invoice, monto) { return { success: true }; }
-async function procesarRetiroOnChain(plat, add, monto, token) { return { success: true }; }
+
+// EJECUCIÓN BLOCKCHAIN REAL (TU BILLETERA FIRMA TRAS BAMBALINAS)
+async function procesarRetiroOnChain(pasarela, walletUsuario, monto, tokenOriginal) { 
+    try {
+        // 1. Configuramos el nodo RPC de Polygon Amoy
+        // Usamos una RPC pública estable para testnet
+        const RPC_AMOY = "https://rpc-amoy.polygon.technology";
+        const provider = new ethers.JsonRpcProvider(RPC_AMOY);
+
+        // 2. Extraemos las credenciales secretas desde las variables de entorno de Vercel
+        const CLAVE_PRIVADA_ADMIN = process.env.ADMIN_PRIVATE_KEY; 
+        const CONTRATO_ADDRESS = process.env.SOULGEIST_CONTRACT_ADDRESS;
+
+        if (!CLAVE_PRIVADA_ADMIN || !CONTRATO_ADDRESS) {
+            console.error("Faltan variables de entorno Web3 en Vercel.");
+            return { success: false, error: "Servidor Web3 no configurado completamente." };
+        }
+
+        // 3. Inicializamos tu billetera de deidad para firmar en automático
+        const walletAdministradora = new ethers.Wallet(CLAVE_PRIVADA_ADMIN, provider);
+
+        // 4. El mapa JSON mínimo (ABI) de tu token de Remix para ejecutar 'transfer'
+        const MIN_ABI = [
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
+
+        // 5. Conectamos al contrato desplegado
+        const contratoToken = new ethers.Contract(CONTRATO_ADDRESS, MIN_ABI, walletAdministradora);
+
+        // 6. Convertimos la cantidad a formato blockchain (18 decimales)
+        // Puedes ajustar si deseas mandar el equivalente directo o un valor fijo por prueba
+        const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
+
+        console.log(`🤖 Servidor enviando ${monto} tokens a la dirección: ${walletUsuario}`);
+
+        // 7. Ejecutamos la transacción real en Polygon Amoy
+        const tx = await contratoToken.transfer(walletUsuario, cantidadConDecimales);
+        
+        // Esperamos a que el bloque sea minado por la red de pruebas
+        const receipt = await tx.wait();
+
+        return { success: true, txHash: receipt.hash };
+
+    } catch (error) {
+        console.error("Fallo crítico en la blockchain de Amoy:", error);
+        return { success: false, error: error.message };
+    }
+}
 
 async function verificarFraudeIP(ip) {
     try {
