@@ -1651,3 +1651,6 @@ label[for="confirm-delete"] {
     background-color: #ff0000;
     box-shadow: 0 0 8px #ff0000;
 }
+.security-panel {
+    display: none; /* Esto lo hace invisible, así no rompe tu diseño */
+}
