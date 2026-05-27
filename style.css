@@ -1654,24 +1654,37 @@ label[for="confirm-delete"] {
 .security-panel {
     display: none; /* Esto lo hace invisible, así no rompe tu diseño */
 }
+/* Limpieza del cuerpo para el layout de pie de página */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* El main debe crecer para empujar el footer hacia abajo */
+main {
+    flex: 1;
+}
+
+/* Estilo final para el sello de perpetuidad */
 .footer-perpetuidad {
-    position: relative; /* Cambiado a relative para asegurar su posición */
     width: 100%;
     text-align: center;
-    padding: 80px 20px;
-    margin-top: 50px;
+    padding: 40px 0;
+    background: #000;
     border-top: 2px solid #300;
-    background: #000; /* Fondo negro sólido para evitar transparencias raras */
-    z-index: 9999;    /* Fuerza a que se vea por encima de todo */
-    display: block !important; /* Fuerza a que sea visible */
+    margin-top: 50px; /* Separación del resto del contenido */
+    display: block !important;
+    position: relative; /* Cambiado a relativo para que se ubique donde debe ir */
+    z-index: 1;
 }
 
 .footer-perpetuidad p {
     font-family: 'Nosifer', cursive;
     color: #8b0000;
-    font-size: 1rem;
+    font-size: 0.9rem;
     letter-spacing: 5px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px #ff0000;
-    margin: 0;
+    text-shadow: 0 0 5px #000;
 }
