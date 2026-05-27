@@ -10,6 +10,10 @@ let esModoRegistro = false; // Alterna el formulario tradicional de la página i
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
+const CONFIG_ORACULO = {
+    deidadPorDefecto: 'gemini', // Podrías cambiar a 'claude' o 'tradicional'
+    estiloRespuesta: "Eres una deidad del Mictlán. Tu estilo es oscuro, enigmático y antiguo. Responde como una deidad, usando terminología del inframundo azteca. Si el usuario pregunta por temas técnicos o financieros, dales respuestas precisas disfrazadas de profecía."
+};
 const SABIDURIA_ORACULO = {
     poder: [
         "El poder es un fuego que consume al que lo porta. ¿Estás listo para arder?",
@@ -772,32 +776,55 @@ function cerrarOraculo() {
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input');
     const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
-
+    
     if (!mensaje) {
-        lanzarAlertaMictlan("Tu pergamino está en blanco.", "SUSURRO VACÍO");
+        lanzarAlertaMictlan("Tu pergamino está vacío.", "SUSURRO VACÍO");
         return;
     }
 
-    // 1. Obtener respuesta coherente
-    const respuesta = obtenerRespuestaCoherente(mensaje);
-
-    // 2. Efecto visual
+    // Efecto visual de inicio de invocación
     const espejo = document.querySelector('.espejo-superficie');
     if(espejo) espejo.style.filter = "brightness(0)";
-    await new Promise(resolve => setTimeout(resolve, 800));
 
-    // 3. Mostrar respuesta dentro del espejo
+    // Delegamos al "Mensajero" (consultarDeidad)
+    await consultarDeidad(mensaje, CONFIG_ORACULO.deidadPorDefecto);
+    
+    // Limpiamos al terminar
+    if (inputMensaje) inputMensaje.value = "";
+    if(espejo) espejo.style.filter = "brightness(1)";
+}
+
+/* =========================================================================
+   3. EL MENSAJERO (Habla con el más allá - API)
+   ========================================================================= */
+async function consultarDeidad(pregunta, modelo) {
     const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
-    if (oraculoCuerpo) {
+    oraculoCuerpo.innerHTML = `<p>El Mictlán está consultando los hilos del destino a través de ${modelo.toUpperCase()}...</p>`;
+
+    try {
+        // Aquí llamarás a tu backend (Vercel Function)
+        // Nota: El endpoint '/api/invocar' es tu puente seguro.
+        const response = await fetch('/api/invocar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                modelo: modelo, 
+                prompt: pregunta,
+                sistema: CONFIG_ORACULO.estiloRespuesta 
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Actualizamos el espejo con la respuesta de la IA
         oraculoCuerpo.innerHTML = `
-            <p style="color: #ff0000;">${respuesta}</p>
+            <p style="color: #ff0000; font-family: 'Nosifer', cursive; line-height: 1.6;">${data.texto}</p>
             <button class="btn-invocar" onclick="abrirSoporte()">CONSULTAR OTRA VEZ</button>
             <button class="cerrar-pacto" onclick="cerrarOraculo()">VOLVER A LAS SOMBRAS</button>
         `;
+    } catch (e) {
+        oraculoCuerpo.innerHTML = `<p>La conexión con el más allá ha fallado. Las sombras están en silencio.</p>`;
     }
-    
-    if(espejo) espejo.style.filter = "brightness(1)";
-    if (inputMensaje) inputMensaje.value = "";
 }
 
 // ==================================================================
