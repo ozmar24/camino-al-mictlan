@@ -1,14 +1,22 @@
 export default async function handler(req, res) {
-    // 1. Cabeceras estándar
+    // Aseguramos que el navegador sepa que SIEMPRE enviamos JSON
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
-        // 2. Parsear el prompt
-        const body = JSON.parse(req.body);
+        // Validación básica de que recibimos algo
+        if (!req.body) {
+            return res.status(400).json({ error: "Cuerpo de solicitud vacío" });
+        }
+
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         const API_KEY = process.env.GOOGLE_API_KEY;
 
-        // 3. Petición HTTP pura y dura (Sin SDK)
+        if (!API_KEY) {
+            return res.status(500).json({ error: "Llave de API no configurada en servidor" });
+        }
+
+        // Llamada REST directa (Sin SDKs que causen 404s)
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -19,13 +27,15 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // 4. Devolver respuesta
-        if (data.candidates) {
+        // Si la respuesta de Google tiene texto, lo devolvemos limpio
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
             return res.status(200).json({ texto: data.candidates[0].content.parts[0].text });
         } else {
-            return res.status(500).json({ error: "Google respondió con error: " + JSON.stringify(data) });
+            // Si Google devuelve error, lo enviamos como JSON limpio para que el frontend no se rompa
+            return res.status(500).json({ error: "Error de Google: " + JSON.stringify(data) });
         }
     } catch (e) {
-        return res.status(500).json({ error: "Error de ejecución: " + e.message });
+        // CATCH: Si algo explota aquí, devolvemos JSON válido obligatoriamente
+        return res.status(500).json({ error: "Error fatal: " + e.message });
     }
 }
