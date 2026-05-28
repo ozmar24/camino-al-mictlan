@@ -40,17 +40,17 @@ export default async function handler(req, res) {
             }
         });
 
-        // Hacemos la petición usando HTTPS nativo de Node.js (Evita el error de fetch)
+        // 👁️ CORRECCIÓN: El hostname va completamente limpio, sin "https://" ni diagonales
         const URL_API = `/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
         
         const respuestaGoogle = await new Promise((resolve, reject) => {
             const options = {
-                hostname: '://googleapis.com',
-                path: URL_API,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(postData)
+                hostname: 'generativelanguage.googleapis.com', 
+    path: URL_API,
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
                 }
             };
 
