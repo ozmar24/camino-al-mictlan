@@ -1144,13 +1144,16 @@ function borrarCuenta() {
         alert("Por favor, escribe BORRAR para confirmar.");
     }
 }
-const cursorPerpetuidad = document.getElementById('cursor-perpetuidad');
+const cursorSerpiente = document.getElementById('cursor-serpiente');
 
 document.addEventListener('mousemove', (e) => {
     // Validamos que el elemento exista antes de intentar cambiar su estilo
-    if (cursorPerpetuidad) {
-        cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
-        cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
+    if (cursorSerpiente && cursorSerpiente.style) {
+        cursorSerpiente.style.left = (e.clientX + 15) + 'px';
+        cursorSerpiente.style.top = (e.clientY + 15) + 'px';
+        // Asegúrate de que tenga posición fija o absoluta en tu CSS
+        cursorSerpiente.style.position = 'fixed'; 
+        cursorSerpiente.style.pointerEvents = 'none'; // Para que no bloquee los clics
     }
 });
 const mensaje = "ANCLADO AL ABISMO";
