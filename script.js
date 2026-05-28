@@ -763,24 +763,27 @@ async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input'); 
     const oraculoRespuestaDiv = document.getElementById('oraculo-respuesta');
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima"; 
 
     if (!mensaje) {
-        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
+        if (oraculoRespuestaDiv) {
+            oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>La pregunta es obligatoria.</p>";
+        }
         return; 
     }
 
-    // Mostramos que la IA está pensando
+    // Mostramos estado de carga
     if (oraculoRespuestaDiv) {
         oraculoRespuestaDiv.innerHTML = "<p style='color: #00ffff;'>Las deidades consultan el éter...</p>";
         oraculoRespuestaDiv.style.opacity = '1';
     }
 
     try {
-        // Llamamos a TU archivo de API (ajusta 'api/invocar' si el nombre es distinto)
+        // Forzamos el envío como un objeto JSON limpio con el campo 'prompt'
         const respuesta = await fetch('/api/invocar', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ 
                 prompt: `Eres el Oráculo del Mictlán. Responde con sabiduría mística y breve a: ${mensaje}` 
             })
@@ -789,12 +792,18 @@ async function enviarOfrendaOraculo() {
         const data = await respuesta.json();
 
         if (oraculoRespuestaDiv) {
-            // 'data.texto' es como lo devuelve tu archivo invocar.js
-            oraculoRespuestaDiv.innerHTML = `<p>${data.texto || data.error || "El silencio reina en el Mictlán."}</p>`;
+            // Usamos 'data.texto' que es como lo devuelve tu invocar.js
+            if (data.texto) {
+                oraculoRespuestaDiv.innerHTML = `<p>${data.texto}</p>`;
+            } else {
+                oraculoRespuestaDiv.innerHTML = `<p style='color: #ff0000;'>${data.error || "El silencio reina en el Mictlán."}</p>`;
+            }
         }
     } catch (error) {
-        console.error("Error:", error);
-        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>El velo es demasiado denso hoy.</p>";
+        console.error("Error en la invocación:", error);
+        if (oraculoRespuestaDiv) {
+            oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>El velo es demasiado denso hoy. Intenta de nuevo.</p>";
+        }
     } finally {
         if (inputMensaje) inputMensaje.value = "";  
     }
