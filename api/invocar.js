@@ -13,8 +13,8 @@ export default async function handler(req, res) {
         const { prompt } = JSON.parse(req.body);
         
         if (!process.env.GOOGLE_API_KEY) {
-            return res.status(500).json({ error: "Configuración de servidor faltante" });
-        }
+    return res.status(500).json({ error: "DEBUG: La llave no existe en Vercel" });
+}
 
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
