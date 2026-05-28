@@ -34,11 +34,10 @@ export default async function handler(req, res) {
 
         // Datos que enviaremos a Google
         const postData = JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
-            system_Instruction: {
-                parts: [{ text: instruccionSistema }]
-            }
-        });
+    contents: [{ 
+        parts: [{ text: `${instruccionSistema}\n\nPregunta del viajero: ${promptText}` }] 
+    }]
+});
 
         // 👁️ CORRECCIÓN: El hostname va completamente limpio, sin "https://" ni diagonales
         const URL_API = `/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
