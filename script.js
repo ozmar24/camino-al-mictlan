@@ -1144,11 +1144,11 @@ function borrarCuenta() {
         alert("Por favor, escribe BORRAR para confirmar.");
     }
 }
-const cursorSerpiente = document.getElementById('cursor-serpiente');
 
 document.addEventListener('mousemove', (e) => {
-    // Validamos que el elemento exista antes de intentar cambiar su estilo
-    if (cursorSerpiente && cursorSerpiente.style) {
+   const cursorSerpiente = document.getElementById('cursor-serpiente');
+
+    if (cursorSerpiente) {
         cursorSerpiente.style.left = (e.clientX + 15) + 'px';
         cursorSerpiente.style.top = (e.clientY + 15) + 'px';
         
