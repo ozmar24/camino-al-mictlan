@@ -799,31 +799,29 @@ async function enviarOfrendaOraculo() {
    ========================================================================= */
 async function consultarDeidad(pregunta, modelo) {
     const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
-    oraculoCuerpo.innerHTML = `<p>El Mictlán está consultando los hilos del destino a través de ${modelo.toUpperCase()}...</p>`;
+    oraculoCuerpo.innerHTML = `<p>Consultando los hilos del destino...</p>`;
 
     try {
-        // Aquí llamarás a tu backend (Vercel Function)
-        // Nota: El endpoint '/api/invocar' es tu puente seguro.
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                modelo: modelo, 
-                prompt: pregunta,
-                sistema: CONFIG_ORACULO.estiloRespuesta 
-            })
+            body: JSON.stringify({ modelo: modelo, prompt: pregunta, sistema: CONFIG_ORACULO.estiloRespuesta })
         });
         
         const data = await response.json();
         
-        // Actualizamos el espejo con la respuesta de la IA
+        // DEPURACIÓN: Esto nos dirá en la consola qué está pasando
+        console.log("Respuesta del servidor:", data); 
+
+        // Si data.texto es undefined, mostramos el error en pantalla
+        const mensajeFinal = data.texto || data.error || "El abismo susurra un silencio sin forma.";
+        
         oraculoCuerpo.innerHTML = `
-            <p style="color: #ff0000; font-family: 'Nosifer', cursive; line-height: 1.6;">${data.texto}</p>
-            <button class="btn-invocar" onclick="abrirSoporte()">CONSULTAR OTRA VEZ</button>
-            <button class="cerrar-pacto" onclick="cerrarOraculo()">VOLVER A LAS SOMBRAS</button>
+            <p style="color: #ff0000;">${mensajeFinal}</p>
+            <button onclick="abrirSoporte()">CONSULTAR OTRA VEZ</button>
         `;
     } catch (e) {
-        oraculoCuerpo.innerHTML = `<p>La conexión con el más allá ha fallado. Las sombras están en silencio.</p>`;
+        oraculoCuerpo.innerHTML = `<p>Error de conexión con el Mictlán.</p>`;
     }
 }
 
