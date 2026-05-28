@@ -1,32 +1,23 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
     if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: "Método no permitido" });
 
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "model": "google/gemini-flash-1.5",
-                "messages": [{ "role": "user", "content": body.prompt }]
-            })
-        });
-
-        const data = await response.json();
-
-        // REVISIÓN CRÍTICA: ¿Qué nos respondió OpenRouter?
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            return res.status(200).json({ texto: data.choices[0].message.content });
-        } else {
-            // Si llega aquí, es que OpenRouter nos dio un error (Key inválida, sin saldo, etc.)
-            return res.status(500).json({ error: "Respuesta inválida de OpenRouter", detalles: data });
-        }
+        const result = await model.generateContent(body.prompt);
+        const response = await result.response;
+        
+        return res.status(200).json({ texto: response.text() });
     } catch (error) {
-        return res.status(500).json({ error: "Error de servidor", detalles: error.message });
+        return res.status(500).json({ error: "Error al consultar al Oráculo", detalles: error.message });
     }
 }
