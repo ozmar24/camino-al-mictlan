@@ -759,39 +759,47 @@ function cerrarOraculo() {
     if (pantalla) pantalla.style.display = 'none'; 
 }
 
-window.enviarOfrendaOraculo = async function() {
-    const inputMensaje = document.getElementById('oraculo-input');
-    const cajaRespuesta = document.getElementById('oraculo-respuesta'); // Asegúrate que este ID existe en tu HTML
-    const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
+async function enviarOfrendaOraculo() {
+    const inputMensaje = document.getElementById('oraculo-input'); 
+    const oraculoRespuestaDiv = document.getElementById('oraculo-respuesta');
+    const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
+    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima"; 
 
     if (!mensaje) {
-        console.warn("Mensaje vacío");
-        return;
+        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
+        return; 
     }
 
-    // Feedback visual inmediato
-    if (cajaRespuesta) cajaRespuesta.innerHTML = "<i>El Oráculo está consultando las sombras...</i>";
+    // Mostramos que la IA está pensando
+    if (oraculoRespuestaDiv) {
+        oraculoRespuestaDiv.innerHTML = "<p style='color: #00ffff;'>Las deidades consultan el éter...</p>";
+        oraculoRespuestaDiv.style.opacity = '1';
+    }
 
     try {
-        const response = await fetch('/api/invocar', {
+        // Llamamos a TU archivo de API (ajusta 'api/invocar' si el nombre es distinto)
+        const respuesta = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: mensaje })
+            body: JSON.stringify({ 
+                prompt: `Eres el Oráculo del Mictlán. Responde con sabiduría mística y breve a: ${mensaje}` 
+            })
         });
 
-        const data = await response.json();
+        const data = await respuesta.json();
 
-        if (data.texto && cajaRespuesta) {
-            cajaRespuesta.innerHTML = data.texto;
-        } else {
-            console.error("Error en la respuesta de la API:", data);
-            if (cajaRespuesta) cajaRespuesta.innerHTML = "Las sombras no han respondido esta vez.";
+        if (oraculoRespuestaDiv) {
+            // 'data.texto' es como lo devuelve tu archivo invocar.js
+            oraculoRespuestaDiv.innerHTML = `<p>${data.texto || data.error || "El silencio reina en el Mictlán."}</p>`;
         }
     } catch (error) {
-        console.error("Error crítico de conexión:", error);
-        if (cajaRespuesta) cajaRespuesta.innerHTML = "El camino al Mictlán está bloqueado.";
+        console.error("Error:", error);
+        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>El velo es demasiado denso hoy.</p>";
+    } finally {
+        if (inputMensaje) inputMensaje.value = "";  
     }
-};
+}
+
 // ==================================================================
 // CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
 // ==================================================================
