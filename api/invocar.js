@@ -5,30 +5,20 @@ export default async function handler(req, res) {
 
     try {
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) throw new Error("GEMINI_API_KEY no configurada en Vercel");
+        if (!apiKey) throw new Error("API KEY no configurada");
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash"
-        });
+        
+        // --- CAMBIO AQUÍ ---
+        // Usaremos 'getGenerativeModel' con el nombre de modelo estándar
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const { prompt, sistema } = req.body;
-
-        const result = await model.generateContent(
-            `${sistema || ''}\n\nUsuario: ${prompt}`
-        );
-
-        // ✅ Solución: Acceder correctamente al texto de la respuesta
-        const textoRespuesta = result.response.text();
-
-        return res.status(200).json({ 
-            texto: textoRespuesta
-        });
-
+        const { prompt } = req.body;
+        const result = await model.generateContent(prompt);
+        
+        return res.status(200).json({ texto: result.response.text() });
     } catch (error) {
-        console.error("ERROR ORÁCULO:", error.message);
-        return res.status(500).json({ 
-            error: "Error en el servidor: " + error.message 
-        });
+        console.error("Error en servidor:", error);
+        return res.status(500).json({ error: error.message });
     }
 }
