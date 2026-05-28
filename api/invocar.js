@@ -1,34 +1,37 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
-        const apiKey = process.env.GOOGLE_API_KEY;
-        if (!apiKey) throw new Error("GOOGLE_API_KEY no configurada en Vercel");
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        
+        // Aceptamos 'prompt' (del frontend actual) o 'pregunta' (por si acaso)
+        const mensaje = body.prompt || body.pregunta;
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash"   
+        if (!mensaje) {
+            return res.status(400).json({ error: "La ofrenda (pregunta) está vacía." });
+        }
+
+        const API_KEY = process.env.GOOGLE_API_KEY;
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        const response = await fetch(URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: mensaje }] }]
+            })
         });
 
-        const { prompt, sistema } = req.body;
+        const data = await response.json();
 
-        const result = await model.generateContent(
-            `${sistema || ''}\n\nUsuario: ${prompt}`
-        );
-
-        // ✅ Acceder correctamente al texto de la respuesta
-        const textoRespuesta = result.response.text();
-
-        return res.status(200).json({ 
-            texto: textoRespuesta
-        });
-
-    } catch (error) {
-        console.error("ERROR ORÁCULO:", error.message);
-        return res.status(500).json({ 
-            error: "Error en el servidor: " + error.message 
-        });
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            // Devolvemos el texto en la clave 'texto' para que coincida con tu frontend (data.texto)
+            return res.status(200).json({ texto: data.candidates[0].content.parts[0].text });
+        } else {
+            return res.status(500).json({ error: "Las deidades no pueden leer este mensaje." });
+        }
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
     }
 }
