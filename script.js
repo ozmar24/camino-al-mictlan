@@ -765,48 +765,42 @@ async function enviarOfrendaOraculo() {
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
 
     if (!mensaje) {
-        if (oraculoRespuestaDiv) {
-            oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>La pregunta es obligatoria.</p>";
-        }
+        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>La pregunta es obligatoria.</p>";
         return; 
     }
 
-    // Mostramos estado de carga
     if (oraculoRespuestaDiv) {
         oraculoRespuestaDiv.innerHTML = "<p style='color: #00ffff;'>Las deidades consultan el éter...</p>";
         oraculoRespuestaDiv.style.opacity = '1';
     }
 
     try {
-        // Forzamos el envío como un objeto JSON limpio con el campo 'prompt'
         const response = await fetch('/api/invocar', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-        pregunta: mensaje,   // Esto coincide con const { pregunta ... }
-        usuario: "Viajero"   // Esto coincide con const { ... usuario }
-    })
-});
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                prompt: `Eres el Oráculo del Mictlán. Responde con sabiduría mística y breve a: ${mensaje}` 
+            })
+        });
 
-        const data = await respuesta.json();
+        const data = await response.json();
 
         if (oraculoRespuestaDiv) {
-            // Usamos 'data.texto' que es como lo devuelve tu invocar.js
-            if (data.texto) {
-                oraculoRespuestaDiv.innerHTML = `<p>${data.texto}</p>`;
+            // Si hay error (500), mostramos el mensaje de error que viene del servidor
+            if (!response.ok) {
+                oraculoRespuestaDiv.innerHTML = `<p style='color: #ff0000;'>Error: ${data.error}</p>`;
             } else {
-                oraculoRespuestaDiv.innerHTML = `<p style='color: #ff0000;'>${data.error || "El silencio reina en el Mictlán."}</p>`;
+                oraculoRespuestaDiv.innerHTML = `<p>${data.texto || "El silencio reina."}</p>`;
             }
         }
     } catch (error) {
-        console.error("Error en la invocación:", error);
-        if (oraculoRespuestaDiv) {
-            oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>El velo es demasiado denso hoy. Intenta de nuevo.</p>";
-        }
+        console.error("Error:", error);
+        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>Fallo de conexión con el inframundo.</p>";
     } finally {
         if (inputMensaje) inputMensaje.value = "";  
     }
 }
+
 
 // ==================================================================
 // CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
