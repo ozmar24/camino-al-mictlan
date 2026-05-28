@@ -4,8 +4,8 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
     try {
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) throw new Error("GEMINI_API_KEY no configurada en Vercel");
+        const apiKey = process.env.GOOGLE_API_KEY;
+        if (!apiKey) throw new Error("GOOGLE_API_KEY no configurada en Vercel");
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ 
