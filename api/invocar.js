@@ -1,7 +1,5 @@
-// Backend alternativo usando Puter (100% gratuito y sin configurar llaves)
-import puter from "@heyputer/puter.js";
-
 export default async function handler(req, res) {
+    // Configuración de cabeceras CORS
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -27,15 +25,32 @@ export default async function handler(req, res) {
         Sé muy breve (máximo 2 o 3 líneas) para mantener el misticismo del altar.
         `;
 
-        // Petición directa a través del ecosistema de Puter
-        const respuestaIA = await puter.ai.chat(
-            `${instruccionSistema}\n\nUn alma te pregunta: "${promptText}"`
-        );
+        // Consumo directo del servicio de IA de Puter por HTTP libre de bloqueos
+        const urlPuter = 'https://puter.com';
+        const responsePuter = await fetch(urlPuter, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [
+                    { role: 'system', content: instruccionSistema },
+                    { role: 'user', content: promptText }
+                ]
+            })
+        });
 
-        if (respuestaIA) {
-            return res.status(200).json({ respuesta: respuestaIA });
+        // Validamos si la respuesta del servidor externo es correcta
+        if (!responsePuter.ok) {
+            const textoError = await responsePuter.text();
+            return res.status(500).json({ error: "El Oráculo no pudo canalizar la energía.", detalles: textoError });
+        }
+
+        const dataPuter = await responsePuter.json();
+        
+        // Extraemos el texto de la respuesta según el formato oficial de Puter
+        if (dataPuter && dataPuter.message && dataPuter.message.content) {
+            return res.status(200).json({ respuesta: dataPuter.message.content });
         } else {
-            return res.status(500).json({ error: "Las deidades guardan silencio temporalmente." });
+            return res.status(500).json({ error: "Las deidades guardan silencio místico.", debug: dataPuter });
         }
 
     } catch (e) {
