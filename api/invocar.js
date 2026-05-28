@@ -1,29 +1,34 @@
 export default async function handler(req, res) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    // CORS necesario
+    res.setHeader('Access-Control-Allow-Origin', '*');
     
-    // LOG DE SEGURIDAD: Esto aparecerá en los Logs de Vercel (no en la consola del navegador)
-    console.log("¿Existe API Key?:", !!apiKey); 
-
-    if (!apiKey) {
-        return res.status(500).json({ error: "API Key no detectada por Vercel" });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: "Solo POST" });
 
     try {
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${apiKey}`,
+                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 "model": "google/gemini-flash-1.5",
-                "messages": [{ "role": "user", "content": req.body.prompt }]
+                "messages": [{ "role": "user", "content": body.prompt }]
             })
         });
 
         const data = await response.json();
+        
+        // DEPURACIÓN: Si hay error, lo devolvemos para verlo en la consola
+        if (!data.choices) {
+            return res.status(500).json({ error: "Error de OpenRouter", raw: data });
+        }
+
         return res.status(200).json({ texto: data.choices[0].message.content });
+        
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: "Error interno", details: error.message });
     }
 }
