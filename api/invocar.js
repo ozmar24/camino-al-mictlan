@@ -1,3 +1,5 @@
+import https from 'https';
+
 export default async function handler(req, res) {
     // Configuración de cabeceras CORS
     res.setHeader('Content-Type', 'application/json');
@@ -5,7 +7,6 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Manejar petición OPTIONS (Preflight de CORS)
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
@@ -18,16 +19,12 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: "La ofrenda está vacía. Formula una pregunta." });
         }
 
-        // Llamamos a tu variable con su nuevo nombre
         const API_KEY = process.env.GEMINI_API_KEY;
         if (!API_KEY) {
             return res.status(500).json({ error: "Falta configurar la GEMINI_API_KEY en tu panel de Vercel." });
         }
 
-        // Endpoint oficial actualizado para Gemini 2.5 Flash
-        const URL = `https://googleapis.com{API_KEY}`;
-
-        // Personalidad mística del Oráculo
+        // Configuración mística del Oráculo
         const instruccionSistema = `
         Eres el "Oráculo del Mictlán", una deidad ancestral y sabia del inframundo mexica en la web https://vercel.app.
         Responde a las dudas de las almas viajeras con un tono místico, poético y enigmático.
@@ -35,37 +32,56 @@ export default async function handler(req, res) {
         Sé muy breve (máximo 2 o 3 líneas) para mantener el misterio.
         `;
 
-        // Petición HTTP directa a Google
-        const response = await fetch(URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }],
-                systemInstruction: {
-                    parts: [{ text: instruccionSistema }]
-                }
-            })
+        // Datos que enviaremos a Google
+        const postData = JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+            systemInstruction: {
+                parts: [{ text: instruccionSistema }]
+            }
         });
 
-        const data = await response.json();
+        // Hacemos la petición usando HTTPS nativo de Node.js (Evita el error de fetch)
+        const URL_API = `/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+        
+        const respuestaGoogle = await new Promise((resolve, reject) => {
+            const options = {
+                hostname: '://googleapis.com',
+                path: URL_API,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(postData)
+                }
+            };
 
-        // Captura directa de errores de Google (como el bloqueo de créditos)
-        if (data.error) {
-            return res.status(response.status || 500).json({ 
-                error: `Google Gemini dice: ${data.error.message}` 
+            const reqGoogle = https.request(options, (resGoogle) => {
+                let dataChunks = '';
+                resGoogle.on('data', (chunk) => { dataChunks += chunk; });
+                resGoogle.on('end', () => {
+                    try {
+                        resolve(JSON.parse(dataChunks));
+                    } catch (e) {
+                        reject(new Error("La respuesta de los dioses no pudo ser leída."));
+                    }
+                });
             });
+
+            reqGoogle.on('error', (e) => { reject(e); });
+            reqGoogle.write(postData);
+            reqGoogle.end();
+        });
+
+        // Validamos si Google reportó un error
+        if (respuestaGoogle.error) {
+            return res.status(500).json({ error: `Google Gemini dice: ${respuestaGoogle.error.message}` });
         }
 
-        // Mapeo seguro de la respuesta de texto estructurada de Gemini
-        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            const respuestaTexto = data.candidates[0].content.parts[0].text;
+        // Mapeo seguro del texto final
+        if (respuestaGoogle && respuestaGoogle.candidates && respuestaGoogle.candidates[0] && respuestaGoogle.candidates[0].content && respuestaGoogle.candidates[0].content.parts && respuestaGoogle.candidates[0].content.parts[0]) {
+            const respuestaTexto = respuestaGoogle.candidates[0].content.parts[0].text;
             return res.status(200).json({ respuesta: respuestaTexto });
         } else {
-            return res.status(500).json({ 
-                error: "Las deidades guardan silencio místico.", 
-                debug: "Estructura de datos inesperada o vacía.",
-                dataRecibida: data 
-            });
+            return res.status(500).json({ error: "Las deidades guardan silencio místico.", debug: respuestaGoogle });
         }
 
     } catch (e) {
