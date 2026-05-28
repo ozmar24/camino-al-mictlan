@@ -768,29 +768,43 @@ async function enviarOfrendaOraculo() {
         return;
     }
 
+    const preguntaGuardada = inputMensaje.value.trim();
+
     try {
+        // Mostrar estado de carga místico en el contenedor de tu pantalla
+        if (oraculoRespuestaDiv) {
+            oraculoRespuestaDiv.style.color = "#ffb380";
+            oraculoRespuestaDiv.innerHTML = "<i>El humo del copal se eleva... Las deidades escuchan tu susurro...</i>";
+        }
+        
+        // Limpiamos el input de inmediato para mejorar la experiencia de usuario
+        inputMensaje.value = "";
+
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: inputMensaje.value.trim() })
+            body: JSON.stringify({ prompt: preguntaGuardada })
         });
 
         const data = await response.json();
 
         if (oraculoRespuestaDiv) {
             if (response.ok) {
+                oraculoRespuestaDiv.style.color = "#ffffff"; // Color normal para la respuesta
                 oraculoRespuestaDiv.innerHTML = data.respuesta;
             } else {
+                oraculoRespuestaDiv.style.color = "#ff5555"; // Color rojo para errores
                 oraculoRespuestaDiv.innerHTML = "Error: " + (data.error || "Fallo en la comunicación.");
             }
         }
     } catch (error) {
         console.error("Error:", error);
-    } finally {
-        if (inputMensaje) inputMensaje.value = "";
+        if (oraculoRespuestaDiv) {
+            oraculoRespuestaDiv.style.color = "#ff5555";
+            oraculoRespuestaDiv.innerHTML = "Error técnico: Las deidades guardan silencio.";
+        }
     }
 }
-
 
 // ==================================================================
 // CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
