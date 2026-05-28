@@ -779,15 +779,14 @@ async function enviarOfrendaOraculo() {
 
     try {
         // Forzamos el envío como un objeto JSON limpio con el campo 'prompt'
-        const respuesta = await fetch('/api/invocar', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                prompt: `Eres el Oráculo del Mictlán. Responde con sabiduría mística y breve a: ${mensaje}` 
-            })
-        });
+        const response = await fetch('/api/invocar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        pregunta: mensaje,   // Esto coincide con const { pregunta ... }
+        usuario: "Viajero"   // Esto coincide con const { ... usuario }
+    })
+});
 
         const data = await respuesta.json();
 
