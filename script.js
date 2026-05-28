@@ -762,18 +762,41 @@ function cerrarOraculo() {
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input'); 
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima"; 
-
+    
     if (!mensaje) {
         lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
         return; 
     }
 
-    console.log(`Invocación de soporte recibida de [${usuarioActivo}]: ${mensaje}`); 
-    
-    lanzarAlertaMictlan("Tu mensaje ha cruzado el umbral. Las deidades responderán pronto.", "INVOCACIÓN ENVIADA"); 
+    // 1. Avisamos al usuario que estamos consultando
+    lanzarAlertaMictlan("Consultando al Mictlán...", "ESPERA..."); 
+
+    try {
+        // 2. Aquí llamamos a tu API que ya configuramos en OpenRouter
+        const response = await fetch('/api/invocar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: mensaje })
+        });
+
+        const data = await response.json();
+
+        if (data.texto) {
+            // 3. Mostramos la respuesta en el contenedor que ya tenías
+            const contenedorRespuesta = document.getElementById('id-de-tu-caja-de-respuesta');
+            if (contenedorRespuesta) {
+                contenedorRespuesta.innerHTML = data.texto;
+            }
+            console.log("Respuesta recibida:", data.texto);
+        } else {
+            lanzarAlertaMictlan("El Oráculo no pudo susurrar.", "ERROR");
+        }
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        lanzarAlertaMictlan("El camino al Mictlán está bloqueado.", "ERROR");
+    }
+
     if (inputMensaje) inputMensaje.value = "";  
-    cerrarOraculo(); 
 }
 
 // ==================================================================
