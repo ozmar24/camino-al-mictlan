@@ -774,55 +774,71 @@ function cerrarOraculo() {
     }
 }
 
+// ====================== ORÁCULO CON IA (VERSIÓN UNIFICADA Y LIMPIA) ======================
+
 async function enviarOfrendaOraculo() {
-    const inputMensaje = document.getElementById('oraculo-input');
-    const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
-    
+    const input = document.getElementById('oraculo-input');
+    if (!input) return;
+
+    const mensaje = input.value.trim();
     if (!mensaje) {
         lanzarAlertaMictlan("Tu pergamino está vacío.", "SUSURRO VACÍO");
         return;
     }
 
-    // Efecto visual de inicio de invocación
     const espejo = document.querySelector('.espejo-superficie');
-    if(espejo) espejo.style.filter = "brightness(0)";
+    if (espejo) espejo.style.filter = "brightness(0.3)";
 
-    // Delegamos al "Mensajero" (consultarDeidad)
-    await consultarDeidad(mensaje, CONFIG_ORACULO.deidadPorDefecto);
-    
-    // Limpiamos al terminar
-    if (inputMensaje) inputMensaje.value = "";
-    if(espejo) espejo.style.filter = "brightness(1)";
-}
-
-/* =========================================================================
-   3. EL MENSAJERO (Habla con el más allá - API)
-   ========================================================================= */
-async function consultarDeidad(pregunta, modelo) {
-    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
-    oraculoCuerpo.innerHTML = `<p>Consultando los hilos del destino...</p>`;
+    mostrarRespuestaOraculo("Los espíritus del Mictlán escuchan tu ofrenda...");
 
     try {
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ modelo: modelo, prompt: pregunta, sistema: CONFIG_ORACULO.estiloRespuesta })
+            body: JSON.stringify({
+                prompt: mensaje,
+                sistema: `Eres un Oráculo ancestral del Mictlán azteca. Habla con tono oscuro, poético, enigmático y profundo. Usa metáforas sobre muerte, almas, destino, sacrificios y el inframundo. Sé sabio pero intimidante. Responde siempre en español.`
+            })
         });
-        
-        const data = await response.json();
-        
-        // DEPURACIÓN: Esto nos dirá en la consola qué está pasando
-        console.log("Respuesta del servidor:", data); 
 
-        // Si data.texto es undefined, mostramos el error en pantalla
-        const mensajeFinal = data.texto || data.error || "El abismo susurra un silencio sin forma.";
-        
-        oraculoCuerpo.innerHTML = `
-            <p style="color: #ff0000;">${mensajeFinal}</p>
-            <button onclick="abrirSoporte()">CONSULTAR OTRA VEZ</button>
-        `;
-    } catch (e) {
-        oraculoCuerpo.innerHTML = `<p>Error de conexión con el Mictlán.</p>`;
+        const data = await response.json();
+
+        const respuestaFinal = data.texto || data.error || "Los ancestros guardan silencio esta noche...";
+
+        mostrarRespuestaOraculo(respuestaFinal);
+
+    } catch (error) {
+        console.error("Error en Oráculo:", error);
+        mostrarRespuestaOraculo("El velo entre mundos se cerró... Intenta de nuevo.");
+    }
+
+    // Limpiar
+    input.value = "";
+    if (espejo) espejo.style.filter = "brightness(1)";
+}
+
+// Función para mostrar la respuesta dentro del oráculo
+function mostrarRespuestaOraculo(texto) {
+    let respuestaDiv = document.getElementById('oraculo-respuesta');
+
+    if (!respuestaDiv) {
+        const cuerpo = document.querySelector('.oraculo-cuerpo');
+        if (cuerpo) {
+            respuestaDiv = document.createElement('div');
+            respuestaDiv.id = 'oraculo-respuesta';
+            respuestaDiv.style.marginTop = "20px";
+            respuestaDiv.style.padding = "18px";
+            respuestaDiv.style.border = "1px solid #6b0000";
+            respuestaDiv.style.borderRadius = "8px";
+            respuestaDiv.style.background = "rgba(20, 0, 0, 0.8)";
+            respuestaDiv.style.color = "#e0c0c0";
+            respuestaDiv.style.lineHeight = "1.6";
+            cuerpo.appendChild(respuestaDiv);
+        }
+    }
+
+    if (respuestaDiv) {
+        respuestaDiv.innerHTML = `<p>${texto}</p>`;
     }
 }
 
@@ -1207,21 +1223,3 @@ document.addEventListener('mousemove', (e) => {
     letras[0].style.top = (e.clientY + 15) + 'px';
     letras[0].style.position = 'fixed';
 });
-async function obtenerPresagio(usuario) {
-    // Si el usuario es anónimo o nuevo
-    if (usuario === "Alma Anónima") {
-        return "El Mictlán aún no conoce tu nombre, pero pronto sabrá el sabor de tu esencia.";
-    }
-    
-    // Si ya es un usuario registrado
-    return `Las sombras de ${usuario} son pesadas... pero el abismo siempre tiene espacio para una carga más.`;
-}
-function obtenerRespuestaCoherente(mensaje) {
-    const texto = mensaje.toLowerCase();
-
-    if (texto.includes("poder")) return SABIDURIA_ORACULO.poder[Math.floor(Math.random() * SABIDURIA_ORACULO.poder.length)];
-    if (texto.includes("pago") || texto.includes("cobro") || texto.includes("dinero")) return SABIDURIA_ORACULO.pago[Math.floor(Math.random() * SABIDURIA_ORACULO.pago.length)];
-    if (texto.includes("futuro") || texto.includes("destino") || texto.includes("pasará")) return SABIDURIA_ORACULO.futuro[Math.floor(Math.random() * SABIDURIA_ORACULO.futuro.length)];
-    
-    return SABIDURIA_ORACULO.default[Math.floor(Math.random() * SABIDURIA_ORACULO.default.length)];
-}
