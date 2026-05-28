@@ -23,8 +23,8 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: "Configuración incompleta: Falta GOOGLE_API_KEY en las variables de entorno de Vercel." });
         }
 
-        // Endpoint oficial para Gemini 1.5 Flash
-        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        // Endpoint oficial para Gemini 2.5 Flash
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
         // Definimos la personalidad mística del Oráculo
         const instruccionSistema = `
