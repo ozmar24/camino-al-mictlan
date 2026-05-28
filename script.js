@@ -762,17 +762,17 @@ function cerrarOraculo() {
 async function enviarOfrendaOraculo() {
     const inputMensaje = document.getElementById('oraculo-input'); 
     const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-    
+
     if (!mensaje) {
         lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
         return; 
     }
 
-    // 1. Avisamos al usuario que estamos consultando
+    // 1. Avisamos que la invocación está en curso
     lanzarAlertaMictlan("Consultando al Mictlán...", "ESPERA..."); 
 
     try {
-        // 2. Aquí llamamos a tu API que ya configuramos en OpenRouter
+        // 2. Llamada directa a tu archivo en la carpeta /api/
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -782,23 +782,25 @@ async function enviarOfrendaOraculo() {
         const data = await response.json();
 
         if (data.texto) {
-            // 3. Mostramos la respuesta en el contenedor que ya tenías
-            const contenedorRespuesta = document.getElementById('id-de-tu-caja-de-respuesta');
-            if (contenedorRespuesta) {
-                contenedorRespuesta.innerHTML = data.texto;
+            // 3. AQUÍ ES DONDE APARECE LA RESPUESTA
+            // IMPORTANTE: Asegúrate de que este ID (oraculo-respuesta) 
+            // sea el que tienes en tu HTML para mostrar el texto de la IA.
+            const caja = document.getElementById('oraculo-respuesta');
+            if (caja) {
+                caja.innerHTML = data.texto;
+                caja.style.display = 'block'; // Aseguramos que sea visible
             }
-            console.log("Respuesta recibida:", data.texto);
+            lanzarAlertaMictlan("Las deidades han hablado.", "MENSAJE RECIBIDO");
         } else {
-            lanzarAlertaMictlan("El Oráculo no pudo susurrar.", "ERROR");
+            throw new Error("Respuesta vacía");
         }
     } catch (error) {
-        console.error("Error de conexión:", error);
+        console.error("Error:", error);
         lanzarAlertaMictlan("El camino al Mictlán está bloqueado.", "ERROR");
     }
 
     if (inputMensaje) inputMensaje.value = "";  
 }
-
 // ==================================================================
 // CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
 // ==================================================================
