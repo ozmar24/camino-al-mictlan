@@ -1147,8 +1147,11 @@ function borrarCuenta() {
 const cursorPerpetuidad = document.getElementById('cursor-perpetuidad');
 
 document.addEventListener('mousemove', (e) => {
-    cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
-    cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
+    // Validamos que el elemento exista antes de intentar cambiar su estilo
+    if (cursorPerpetuidad) {
+        cursorPerpetuidad.style.left = (e.clientX + 15) + 'px';
+        cursorPerpetuidad.style.top = (e.clientY + 15) + 'px';
+    }
 });
 const mensaje = "ANCLADO AL ABISMO";
 const contenedor = document.getElementById('cursor-serpiente');
