@@ -759,20 +759,20 @@ function cerrarOraculo() {
     if (pantalla) pantalla.style.display = 'none'; 
 }
 
-async function enviarOfrendaOraculo() {
-    const inputMensaje = document.getElementById('oraculo-input'); 
-    const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
+window.enviarOfrendaOraculo = async function() {
+    const inputMensaje = document.getElementById('oraculo-input');
+    const cajaRespuesta = document.getElementById('oraculo-respuesta'); // Asegúrate que este ID existe en tu HTML
+    const mensaje = inputMensaje ? inputMensaje.value.trim() : "";
 
     if (!mensaje) {
-        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
-        return; 
+        console.warn("Mensaje vacío");
+        return;
     }
 
-    // 1. Avisamos que la invocación está en curso
-    lanzarAlertaMictlan("Consultando al Mictlán...", "ESPERA..."); 
+    // Feedback visual inmediato
+    if (cajaRespuesta) cajaRespuesta.innerHTML = "<i>El Oráculo está consultando las sombras...</i>";
 
     try {
-        // 2. Llamada directa a tu archivo en la carpeta /api/
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -781,26 +781,17 @@ async function enviarOfrendaOraculo() {
 
         const data = await response.json();
 
-        if (data.texto) {
-            // 3. AQUÍ ES DONDE APARECE LA RESPUESTA
-            // IMPORTANTE: Asegúrate de que este ID (oraculo-respuesta) 
-            // sea el que tienes en tu HTML para mostrar el texto de la IA.
-            const caja = document.getElementById('oraculo-respuesta');
-            if (caja) {
-                caja.innerHTML = data.texto;
-                caja.style.display = 'block'; // Aseguramos que sea visible
-            }
-            lanzarAlertaMictlan("Las deidades han hablado.", "MENSAJE RECIBIDO");
+        if (data.texto && cajaRespuesta) {
+            cajaRespuesta.innerHTML = data.texto;
         } else {
-            throw new Error("Respuesta vacía");
+            console.error("Error en la respuesta de la API:", data);
+            if (cajaRespuesta) cajaRespuesta.innerHTML = "Las sombras no han respondido esta vez.";
         }
     } catch (error) {
-        console.error("Error:", error);
-        lanzarAlertaMictlan("El camino al Mictlán está bloqueado.", "ERROR");
+        console.error("Error crítico de conexión:", error);
+        if (cajaRespuesta) cajaRespuesta.innerHTML = "El camino al Mictlán está bloqueado.";
     }
-
-    if (inputMensaje) inputMensaje.value = "";  
-}
+};
 // ==================================================================
 // CARGA INICIAL Y VINCULACIÓN PROTEGIDA (REPARADO)
 // ==================================================================
