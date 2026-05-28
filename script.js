@@ -1151,9 +1151,7 @@ document.addEventListener('mousemove', (e) => {
     if (cursorSerpiente && cursorSerpiente.style) {
         cursorSerpiente.style.left = (e.clientX + 15) + 'px';
         cursorSerpiente.style.top = (e.clientY + 15) + 'px';
-        // Asegúrate de que tenga posición fija o absoluta en tu CSS
-        cursorSerpiente.style.position = 'fixed'; 
-        cursorSerpiente.style.pointerEvents = 'none'; // Para que no bloquee los clics
+        
     }
 });
 const mensaje = "ANCLADO AL ABISMO";
