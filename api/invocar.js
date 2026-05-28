@@ -1,20 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-    // CORS básico
+    // 1. Cabeceras obligatorias para evitar problemas de CORS y formato
+    res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: "No permitido" });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: "Método no permitido" });
+    }
 
     try {
         const { prompt } = JSON.parse(req.body);
         
-        // Verifica que la llave llegue al servidor
         if (!process.env.GOOGLE_API_KEY) {
-            throw new Error("GOOGLE_API_KEY no definida en Vercel");
+            return res.status(500).json({ error: "Configuración de servidor faltante" });
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
@@ -22,11 +21,13 @@ export default async function handler(req, res) {
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const text = response.text();
-
-        return res.status(200).json({ texto: text });
+        
+        // 2. Éxito: siempre devolvemos un objeto con la propiedad 'texto'
+        return res.status(200).json({ texto: response.text() });
+        
     } catch (error) {
-        console.error("Error capturado:", error);
-        return res.status(500).json({ error: error.message });
+        // 3. Error: siempre devolvemos un objeto JSON, nunca texto plano
+        console.error("Error en API:", error);
+        return res.status(500).json({ error: "El Oráculo no pudo procesar tu ofrenda" });
     }
 }
