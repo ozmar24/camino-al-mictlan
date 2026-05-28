@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         if (!apiKey) throw new Error("La variable GEMINI_API_KEY está vacía o no existe en Vercel.");
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
         const { prompt, sistema } = req.body;
         const result = await model.generateContent(`${sistema || ''} Usuario: ${prompt}`);
