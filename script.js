@@ -760,44 +760,34 @@ function cerrarOraculo() {
 }
 
 async function enviarOfrendaOraculo() {
-    const inputMensaje = document.getElementById('oraculo-input'); 
+    const inputMensaje = document.getElementById('oraculo-input');
     const oraculoRespuestaDiv = document.getElementById('oraculo-respuesta');
-    const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
-
-    if (!mensaje) {
-        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>La pregunta es obligatoria.</p>";
-        return; 
-    }
-
-    if (oraculoRespuestaDiv) {
-        oraculoRespuestaDiv.innerHTML = "<p style='color: #00ffff;'>Las deidades consultan el éter...</p>";
-        oraculoRespuestaDiv.style.opacity = '1';
+    
+    if (!inputMensaje || !inputMensaje.value.trim()) {
+        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "La pregunta es obligatoria.";
+        return;
     }
 
     try {
         const response = await fetch('/api/invocar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                prompt: `Eres el Oráculo del Mictlán. Responde con sabiduría mística y breve a: ${mensaje}` 
-            })
+            body: JSON.stringify({ prompt: inputMensaje.value.trim() })
         });
 
         const data = await response.json();
 
         if (oraculoRespuestaDiv) {
-            // Si hay error (500), mostramos el mensaje de error que viene del servidor
-            if (!response.ok) {
-                oraculoRespuestaDiv.innerHTML = `<p style='color: #ff0000;'>Error: ${data.error}</p>`;
+            if (response.ok) {
+                oraculoRespuestaDiv.innerHTML = data.respuesta;
             } else {
-                oraculoRespuestaDiv.innerHTML = `<p>${data.texto || "El silencio reina."}</p>`;
+                oraculoRespuestaDiv.innerHTML = "Error: " + (data.error || "Fallo en la comunicación.");
             }
         }
     } catch (error) {
         console.error("Error:", error);
-        if (oraculoRespuestaDiv) oraculoRespuestaDiv.innerHTML = "<p style='color: #ff0000;'>Fallo de conexión con el inframundo.</p>";
     } finally {
-        if (inputMensaje) inputMensaje.value = "";  
+        if (inputMensaje) inputMensaje.value = "";
     }
 }
 
