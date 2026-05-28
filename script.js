@@ -745,101 +745,35 @@ function cerrarCodice() {
     document.getElementById('pantalla-codice').style.display = 'none'; 
 } 
 
-// --- FUNCIONES DEL ORÁCULO (UNIFICADAS) ---
+// ❌ BUSCA ESTO:
 function abrirSoporte() {
-    const pantallaOraculo = document.getElementById('pantalla-oraculo');
-    const oraculoCuerpo = document.querySelector('.oraculo-cuerpo');
-
-    // Aquí inyectamos la frase de entrada y el contenido del oráculo
-    if (oraculoCuerpo) {
-        oraculoCuerpo.innerHTML = `
-           
-            <p>Si estás aquí, es porque decidiste entregar tu alma al abismo.</p>
-            <textarea id="oraculo-input" placeholder="Susurra tu duda..."></textarea>
-            <button class="btn-invocar pentaculo-cursor" onclick="enviarOfrendaOraculo()">INVOCAR</button>
-        `;
-    }
-
-    if (pantallaOraculo) {
-        pantallaOraculo.style.display = 'flex'; 
-        setTimeout(() => { pantallaOraculo.style.opacity = "1"; }, 10);
+    const pantalla = document.getElementById('pantalla-oraculo'); 
+    if (pantalla) {
+        pantalla.style.display = 'flex'; 
+        setTimeout(() => { pantalla.style.opacity = '1'; }, 10); 
     }
 }
 
 function cerrarOraculo() {
     const pantalla = document.getElementById('pantalla-oraculo'); 
-    if (pantalla) {
-        pantalla.style.display = 'none';
-        pantalla.style.opacity = "0"; // Aseguramos que se oculte bien
-    }
+    if (pantalla) pantalla.style.display = 'none'; 
 }
-
-// ====================== ORÁCULO CON IA (VERSIÓN UNIFICADA Y LIMPIA) ======================
 
 async function enviarOfrendaOraculo() {
-    const input = document.getElementById('oraculo-input');
-    if (!input) return;
+    const inputMensaje = document.getElementById('oraculo-input'); 
+    const mensaje = inputMensaje ? inputMensaje.value.trim() : ""; 
+    const usuarioActivo = localStorage.getItem('soulgeist_user_email') || "Alma Anónima"; 
 
-    const mensaje = input.value.trim();
     if (!mensaje) {
-        lanzarAlertaMictlan("Tu pergamino está vacío.", "SUSURRO VACÍO");
-        return;
+        lanzarAlertaMictlan("No puedes invocar a las deidades con un pergamino vacío.", "SUSURRO VACÍO"); 
+        return; 
     }
 
-    const espejo = document.querySelector('.espejo-superficie');
-    if (espejo) espejo.style.filter = "brightness(0.3)";
-
-    mostrarRespuestaOraculo("Los espíritus del Mictlán escuchan tu ofrenda...");
-
-    try {
-        const response = await fetch('/api/invocar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                prompt: mensaje,
-                sistema: `Eres un Oráculo ancestral del Mictlán azteca. Habla con tono oscuro, poético, enigmático y profundo. Usa metáforas sobre muerte, almas, destino, sacrificios y el inframundo. Sé sabio pero intimidante. Responde siempre en español.`
-            })
-        });
-
-        const data = await response.json();
-
-        const respuestaFinal = data.texto || data.error || "Los ancestros guardan silencio esta noche...";
-
-        mostrarRespuestaOraculo(respuestaFinal);
-
-    } catch (error) {
-        console.error("Error en Oráculo:", error);
-        mostrarRespuestaOraculo("El velo entre mundos se cerró... Intenta de nuevo.");
-    }
-
-    // Limpiar
-    input.value = "";
-    if (espejo) espejo.style.filter = "brightness(1)";
-}
-
-// Función para mostrar la respuesta dentro del oráculo
-function mostrarRespuestaOraculo(texto) {
-    let respuestaDiv = document.getElementById('oraculo-respuesta');
-
-    if (!respuestaDiv) {
-        const cuerpo = document.querySelector('.oraculo-cuerpo');
-        if (cuerpo) {
-            respuestaDiv = document.createElement('div');
-            respuestaDiv.id = 'oraculo-respuesta';
-            respuestaDiv.style.marginTop = "20px";
-            respuestaDiv.style.padding = "18px";
-            respuestaDiv.style.border = "1px solid #6b0000";
-            respuestaDiv.style.borderRadius = "8px";
-            respuestaDiv.style.background = "rgba(20, 0, 0, 0.8)";
-            respuestaDiv.style.color = "#e0c0c0";
-            respuestaDiv.style.lineHeight = "1.6";
-            cuerpo.appendChild(respuestaDiv);
-        }
-    }
-
-    if (respuestaDiv) {
-        respuestaDiv.innerHTML = `<p>${texto}</p>`;
-    }
+    console.log(`Invocación de soporte recibida de [${usuarioActivo}]: ${mensaje}`); 
+    
+    lanzarAlertaMictlan("Tu mensaje ha cruzado el umbral. Las deidades responderán pronto.", "INVOCACIÓN ENVIADA"); 
+    if (inputMensaje) inputMensaje.value = "";  
+    cerrarOraculo(); 
 }
 
 // ==================================================================
