@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash"   // ← Modelo actual y más rápido
+            model: "gemini-1.5-flash"
         });
 
         const { prompt, sistema } = req.body;
@@ -18,8 +18,11 @@ export default async function handler(req, res) {
             `${sistema || ''}\n\nUsuario: ${prompt}`
         );
 
+        // ✅ Solución: Acceder correctamente al texto de la respuesta
+        const textoRespuesta = result.response.text();
+
         return res.status(200).json({ 
-            texto: result.response.text() 
+            texto: textoRespuesta
         });
 
     } catch (error) {
