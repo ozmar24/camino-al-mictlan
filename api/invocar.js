@@ -7,10 +7,11 @@ export default async function handler(req, res) {
         const API_KEY = process.env.GOOGLE_API_KEY;
 
         if (!API_KEY) {
-            return res.status(500).json({ error: "La llave GOOGLE_API_KEY no aparece en el servidor. ¿Ya hiciste un nuevo Deploy?" });
+            return res.status(500).json({ error: "Llave de API no configurada." });
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        // Usamos v1 que es la versión estable y compatible con gemini-1.5-flash
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -23,10 +24,9 @@ export default async function handler(req, res) {
         if (data.candidates && data.candidates[0].content.parts[0].text) {
             return res.status(200).json({ texto: data.candidates[0].content.parts[0].text });
         } else {
-            // Aquí nos dirá el error real de Google
-            return res.status(500).json({ error: "Respuesta inesperada de Google: " + (data.error ? data.error.message : JSON.stringify(data)) });
+            return res.status(500).json({ error: "Error de Gemini: " + (data.error ? data.error.message : "Respuesta vacía") });
         }
     } catch (e) {
-        return res.status(500).json({ error: "Error fatal en el servidor: " + e.message });
+        return res.status(500).json({ error: "Error fatal: " + e.message });
     }
 }
