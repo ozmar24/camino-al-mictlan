@@ -1,22 +1,28 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-        
-        const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        
-        // CAMBIO AQUÍ: Usaremos 'gemini-pro' que es el estándar más estable
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const API_KEY = process.env.GOOGLE_API_KEY;
+        const MODEL = "gemini-1.5-flash";
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
-        const result = await model.generateContent(body.prompt);
-        const response = await result.response;
+        const response = await fetch(URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: body.prompt }] }]
+            })
+        });
+
+        const data = await response.json();
         
-        return res.status(200).json({ texto: response.text() });
-        
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            return res.status(200).json({ texto: data.candidates[0].content.parts[0].text });
+        } else {
+            throw new Error(JSON.stringify(data));
+        }
     } catch (error) {
         return res.status(500).json({ error: "DEBUG: " + error.message });
     }
