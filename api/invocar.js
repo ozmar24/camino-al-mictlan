@@ -1,12 +1,10 @@
 export default async function handler(req, res) {
-    // CORS necesario
     res.setHeader('Access-Control-Allow-Origin', '*');
-    
-    if (req.method !== 'POST') return res.status(405).json({ error: "Solo POST" });
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-        
+
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -20,15 +18,15 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        
-        // DEPURACIÓN: Si hay error, lo devolvemos para verlo en la consola
-        if (!data.choices) {
-            return res.status(500).json({ error: "Error de OpenRouter", raw: data });
-        }
 
-        return res.status(200).json({ texto: data.choices[0].message.content });
-        
+        // REVISIÓN CRÍTICA: ¿Qué nos respondió OpenRouter?
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return res.status(200).json({ texto: data.choices[0].message.content });
+        } else {
+            // Si llega aquí, es que OpenRouter nos dio un error (Key inválida, sin saldo, etc.)
+            return res.status(500).json({ error: "Respuesta inválida de OpenRouter", detalles: data });
+        }
     } catch (error) {
-        return res.status(500).json({ error: "Error interno", details: error.message });
+        return res.status(500).json({ error: "Error de servidor", detalles: error.message });
     }
 }
