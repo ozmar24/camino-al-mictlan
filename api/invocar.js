@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         // Datos que enviaremos a Google
         const postData = JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
-            systemInstruction: {
+            system_Instruction: {
                 parts: [{ text: instruccionSistema }]
             }
         });
