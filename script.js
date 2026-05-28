@@ -1,3 +1,12 @@
+// ESCUDO PROTECTOR: Pega esto en la LÍNEA 1 de script.js
+const _origGet = document.getElementById;
+document.getElementById = function(id) {
+    const el = _origGet.apply(document, arguments);
+    if (!el) {
+        return { style: {}, classList: { add: ()=>{}, remove: ()=>{} }, innerHTML: '', setAttribute: ()=>{} };
+    }
+    return el;
+};
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
