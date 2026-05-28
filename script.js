@@ -33,16 +33,7 @@ const SABIDURIA_ORACULO = {
         "Tu pregunta ha sido devorada por las sombras. Haz otra, si te atreves."
     ]
 };
-// Escudo protector para elementos del DOM
-const originalGetElementById = document.getElementById;
-document.getElementById = function(id) {
-    const el = originalGetElementById.apply(document, arguments);
-    if (!el) {
-        // Devuelve un objeto "fantasma" que evita el error pero no hace nada
-        return { style: {}, classList: { add: ()=>{}, remove: ()=>{} }, innerHTML: '' };
-    }
-    return el;
-};
+
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
 const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com"; 
 
