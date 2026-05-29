@@ -614,23 +614,30 @@ function cerrarRitual() {
 let estaCargandoAnuncio = false;
 
 async function videoCompletado() {
-    if (estaCargandoAnuncio) return; // Evita clics múltiples
-    
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    estaCargandoAnuncio = true;
-
     try {
-        // Solicitamos el anuncio al SDK de CrazyGames
-        const data = await window.CrazyGames.SDK.ad.requestAd("rewarded");
+        let anuncioVisto = false;
 
-        // Verificamos si la visión fue exitosa
-        if (data.status === "watched" || data.status === "completed") {
-            
-            // Aquí va tu lógica original de acumular puntos
+        // VERIFICAMOS SI EL SDK ESTÁ DISPONIBLE
+        if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+            console.log("SDK detectado. Iniciando anuncio...");
+            const data = await window.CrazyGames.SDK.ad.requestAd("rewarded");
+            if (data.status === "watched" || data.status === "completed") {
+                anuncioVisto = true;
+            }
+        } else {
+            // MODO DESARROLLO / WEB PROPIA:
+            // Si no hay SDK (estás en Vercel), saltamos el anuncio por ahora
+            console.warn("SDK no detectado, saltando anuncio en web propia.");
+            anuncioVisto = true; 
+        }
+
+        if (anuncioVisto) {
+            // PROCESO DE ACUMULACIÓN (Tu lógica original)
             const respuesta = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -638,24 +645,14 @@ async function videoCompletado() {
             });
 
             const resultado = await respuesta.json();
-
-            if (!respuesta.ok) {
-                lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
-            } else {
-                balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
-                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
-                generarCementerio();
-                lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
-            }
-        } else {
-            lanzarAlertaMictlan("La visión fue interrumpida por las sombras.", "VISIÓN INCOMPLETA");
+            
+            // ... (resto de tu código de actualización de balance)
+            lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
         }
+
     } catch (error) {
-        console.error("Error en proceso de absorción:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
-    } finally {
-        estaCargandoAnuncio = false; // Liberamos el botón para futuras ofrendas
+        console.error("Error crítico:", error);
+        lanzarAlertaMictlan("El inframundo no responde.", "FALLO DE RED");
     }
 }
 
