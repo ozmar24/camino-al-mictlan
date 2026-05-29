@@ -173,7 +173,7 @@ async function manejarAuth() {
 async function manejarLoginGoogle(response) {
     try {
         // Reemplaza 'tu-dominio-en-vercel.vercel.app' por tu dirección real de Vercel
-        const DOMINIO_VERCEL = 'https://vercel.app'; 
+        const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app'; 
 
         const res = await fetch(`${DOMINIO_VERCEL}/api/auth-google`, {
             method: 'POST',
@@ -1044,7 +1044,7 @@ async function sincronizarBalanceConRedis() {
         const emailLimpio = window.userWallet.toLowerCase().trim();
         
         // Pon aquí tu dominio real de Vercel
-        const DOMINIO_VERCEL = 'https://vercel.app'; 
+        const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app'; 
         
         // Modificado a URL absoluta:
         const res = await fetch(`${DOMINIO_VERCEL}/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
