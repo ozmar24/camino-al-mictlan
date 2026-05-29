@@ -1,20 +1,33 @@
 export default async function handler(req, res) {
-    // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    // 1. Manejo seguro y dinámico de CORS para entornos de videojuegos en iframes
+    const origin = req.headers.origin;
+    if (origin && (origin.endsWith('.crazygames.com') || origin.includes('vercel.app') || origin.includes('localhost'))) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', '*'); // Respaldo global
+    }
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const { wallet } = req.query;
+    // 2. Extraer la wallet/email sin importar si viene por GET (query) o POST (body)
+    let wallet = req.query.wallet;
+    if (req.method === 'POST' && req.body) {
+        wallet = req.body.wallet;
+    }
+
     if (!wallet) return res.status(400).json({ error: "Falta la wallet/email" });
 
     try {
         const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, "");
         const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
         
-        // Forzamos minúsculas para que siempre coincida
         const walletKey = `user:balance:${wallet.toLowerCase().trim()}`;
 
-        // USAMOS EL MÉTODO POST HACIA REDIS (Más seguro para emails)
+        // Conexión interna segura hacia Upstash Redis
         const respuesta = await fetch(redisUrl, {
             method: 'POST',
             headers: { 
@@ -25,8 +38,6 @@ export default async function handler(req, res) {
         });
 
         const data = await respuesta.json();
-
-        // Upstash devuelve el valor en data.result
         const balance = parseFloat(data.result || 0);
 
         console.log(`✅ Balance consultado para ${walletKey}: ${balance}`);

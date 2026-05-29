@@ -172,7 +172,10 @@ async function manejarAuth() {
 
 async function manejarLoginGoogle(response) {
     try {
-        const res = await fetch('/api/auth-google', {
+        // Reemplaza 'tu-dominio-en-vercel.vercel.app' por tu dirección real de Vercel
+        const DOMINIO_VERCEL = 'https://vercel.app'; 
+
+        const res = await fetch(`${DOMINIO_VERCEL}/api/auth-google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: response.credential })
@@ -194,7 +197,6 @@ async function manejarLoginGoogle(response) {
         lanzarAlertaMictlan("Fallo en la autenticación.", "FALLO DE RED");
     }
 }
-
 function entrarAlCampoSanto(perfil = {}) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
@@ -1040,7 +1042,13 @@ async function sincronizarBalanceConRedis() {
 
     try {
         const emailLimpio = window.userWallet.toLowerCase().trim();
-const res = await fetch(`/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
+        
+        // Pon aquí tu dominio real de Vercel
+        const DOMINIO_VERCEL = 'https://vercel.app'; 
+        
+        // Modificado a URL absoluta:
+        const res = await fetch(`${DOMINIO_VERCEL}/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
+        
         if (!res.ok) {
             const errorData = await res.json();
             console.error("Detalle del error en el servidor:", errorData);
