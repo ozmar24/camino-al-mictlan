@@ -6,7 +6,7 @@ const client = new OAuth2Client("25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.ap
 
 export default async function handler(req, res) {
     // 1. Configuración de CORS obligatoria para que el iframe acepte la conexión
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Usa * para descartar problemas de dominio
+    res.setHeader('Access-Control-Allow-Origin', 'https://camino-al-mictlan.game-files.crazygames.com');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
