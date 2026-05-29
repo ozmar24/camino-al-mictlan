@@ -5,7 +5,18 @@ import { OAuth2Client } from 'google-auth-library';
 const client = new OAuth2Client("25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.googleusercontent.com");
 
 export default async function handler(req, res) {
-    // El ritual solo acepta almas vía POST
+    // 1. Configuración de CORS obligatoria para que el iframe acepte la conexión
+    res.setHeader('Access-Control-Allow-Origin', 'https://camino-al-mictlan.game-files.crazygames.com');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    // 2. Manejo de la petición OPTIONS (preflight)
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    // 3. El ritual solo acepta almas vía POST
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
