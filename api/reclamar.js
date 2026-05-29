@@ -57,17 +57,30 @@ export default async function handler(req, res) {
             return res.status(403).json({ error: 'Debes esperar 24h para otro retiro de esta cripto.' });
         }
 
-        // 7. Validación de Saldo
-        const balanceReal = parseFloat(cantidadRetiro || 0);
-        if (balanceReal <= 0) return res.status(400).json({ error: 'La cripta está vacía.' });
+        // --- Lógica de validación mejorada ---
+function validarDireccion(wallet, pasarela) {
+    // Ejemplo de Regex para direcciones (puedes ajustar según la red)
+    const regexEVM = /^0x[a-fA-F0-9]{40}$/; // Para Binance/Coinbase/Metamask (Ethereum/Polygon)
+    const regexBTC = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/; // Para Bitcoin
+    const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/; // Para Litecoin
 
-        const cantidadAEnviar = balanceReal; 
+    if (pasarela === 'bitso') {
+        // Si Bitso usa un identificador específico (ej. un formato corto), valídalo aquí.
+        // Si Bitso usa direcciones on-chain, usa el regex correspondiente.
+        return wallet.length > 5; // Ajusta según el formato real de Bitso
+    } 
+    
+    if (pasarela === 'binance' || pasarela === 'coinbase') {
+        return regexEVM.test(wallet); // Todas estas aceptan direcciones de red (EVM)
+    }
 
-        if (cantidadAEnviar < infoCripta.minimoNativo) {
-            return res.status(400).json({ 
-                error: `Monto insuficiente. Mínimo: ${infoCripta.minimoNativo} ${infoCripta.simFP}. Tienes: ${cantidadAEnviar.toFixed(8)}.` 
-            });
-        }
+    return true; // Si es genérico
+}
+
+// En tu handler, antes de procesar el pago:
+if (!validarDireccion(wallet, pasarela)) {
+    return res.status(400).json({ error: 'El formato de la billetera no coincide con la pasarela seleccionada.' });
+}
 
         // 8. Escudo Anti-VPN
         const auditoriaIP = await verificarFraudeIP(ipLimpia);
