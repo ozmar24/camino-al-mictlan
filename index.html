@@ -12,6 +12,14 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+<script>
+    // Inicialización obligatoria del SDK
+    window.CrazyGames.SDK.init().then(() => {
+        console.log("SDK de CrazyGames inicializado correctamente.");
+    }).catch((err) => {
+        console.error("Error al inicializar el SDK:", err);
+    });
+</script>
 </head>
 <body>
 
