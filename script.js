@@ -3,11 +3,14 @@
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
 let retiroEnProceso = false;
-let balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0; // Controlará tu balance dinámico desde Redis
-let tumbaSeleccionada = null; // Almacenará la tumba de destino elegida
-let ritualActivo = false; // Bloquea o desbloquea la selección de destino
-let esModoRegistro = false; // Alterna el formulario tradicional de la página izquierda
-// Reemplaza la parte vieja de window.tumbasConSaldo
+let balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0; 
+let tumbaSeleccionada = null; 
+let ritualActivo = false; 
+let esModoRegistro = false; 
+
+// UNIFICACIÓN DEL DOMINIO ABSOLUTO DE VERCEL
+const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app';
+
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
