@@ -1235,3 +1235,12 @@ function abrirCompraTarjeta() {
     console.log("Portal de pago solicitado...");
     alert("El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.");
 }
+function mostrarAlerta(titulo, mensaje) {
+    document.getElementById('alerta-titulo').innerText = titulo;
+    document.getElementById('alerta-mensaje').innerText = mensaje;
+    document.getElementById('modal-alerta').style.display = 'flex';
+}
+
+function cerrarAlerta() {
+    document.getElementById('modal-alerta').style.display = 'none';
+}
