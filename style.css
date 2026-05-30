@@ -1562,7 +1562,7 @@ transform: scale(0.7);
     /* 1. La zona de patrocinadores se vuelve un botón flotante limpio */
     .zona-patrocinadores {
         position: fixed !important;
-        top: 180px !important; /* Ajusta este valor: Súbelo o bájalo para no encimar */
+        top: 250px !important; /* Ajusta este valor: Súbelo o bájalo para no encimar */
         left: 20px !important; /* CAMBIAMOS RIGHT POR LEFT */
         right: auto !important; /* IMPORTANTE: Esto libera la derecha */
         padding: 8px 12px !important;
