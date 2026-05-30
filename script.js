@@ -1230,12 +1230,24 @@ function abrirQuickSwap() {
 }
 
 function abrirCompraTarjeta() {
-    // Esto es un placeholder elegante. 
-    // Cuando Transak/Servicio te apruebe, solo cambias esta línea.
-    console.log("Portal de pago solicitado...");
-    alert("El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.");
-}
-function mostrarAlerta(titulo, mensaje) {
+    // 1. Buscamos tu modal existente
+    const modal = document.getElementById('modal-boveda');
+    
+    // 2. Cambiamos el contenido del modal dinámicamente
+    // Asegúrate de que el ID dentro del modal sea el que usas para mostrar el texto
+    const cuerpo = document.getElementById('boveda-cuerpo');
+    
+    cuerpo.innerHTML = `
+        <div style="text-align: center; font-family: 'MedievalSharp'; color: #d1d1d1;">
+            <p>SABIDURÍA DEL PORTAL</p>
+            <p style="margin: 20px 0;">El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.</p>
+            <button class="btn-ritual-grimorio" onclick="location.reload()">[ VOLVER AL CEMENTERIO ]</button>
+        </div>
+    `;
+
+    // 3. Nos aseguramos de que el modal sea visible
+    modal.style.display = 'flex';
+}function mostrarAlerta(titulo, mensaje) {
     document.getElementById('alerta-titulo').innerText = titulo;
     document.getElementById('alerta-mensaje').innerText = mensaje;
     document.getElementById('modal-alerta').style.display = 'flex';
