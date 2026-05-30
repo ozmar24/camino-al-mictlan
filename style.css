@@ -1337,14 +1337,14 @@ button,
         transform-origin: top center; 
         
         /* Centrado absoluto */
-        position: fixed !important;
-        top: 5% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
+        position: obsolute !important;
+        top: 20% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
         left: 50% !important;
         transform: translate(-50%, 0) scale(0.7); /* El translate(-50%) lo centra horizontalmente */
-        
+        border: none !important;
         /* Aseguramos que no ocupe espacio extra */
         width: 90% !important;
-        margin: 0 !important;
+        background: transparent !important; /* Por si el borde viene del background *
     }
 
     .pagina-izquierda,
