@@ -1334,6 +1334,10 @@ button,
     .grimorio-container {
         padding: 35px 25px !important;
         min-height: 680px !important;
+transform: scale(0.85); 
+        transform-origin: top center; /* Hace que se encoja desde arriba */
+        margin-top: -30px !important; /* Compensa el espacio que deja el scale */
+        margin-bottom: -30px !important;
     }
 
     .pagina-izquierda,
