@@ -1750,3 +1750,20 @@ main {
     padding: 10px;
     background: rgba(139, 0, 0, 0.7);
 }
+/* Aseguramos uniformidad en los botones del modal */
+.btn-ritual-grimorio {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: rgba(139, 0, 0, 0.7); /* Rojo oscuro estilo Mictlán */
+    border: 1px solid #4a0000;
+    color: #d1d1d1; /* Un tono grisáceo/blanco hueso, no blanco puro */
+    font-family: 'MedievalSharp', cursive;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-ritual-grimorio:hover {
+    background: rgba(200, 0, 0, 0.8);
+}
