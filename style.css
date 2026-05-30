@@ -1711,11 +1711,11 @@ main {
     box-shadow: 0 0 15px #ff0000 !important;
 }
 /* --- AJUSTE MÓVIL PARA BOTÓN VIDEO --- */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .zona-patrocinadores {
         right: auto !important; /* Desactiva el derecho */
         left: 20px !important;  /* Lo mueve a la izquierda */
         top: 50px !important;   /* Ajusta la altura para que no estorbe */
-        transform: scale(0.6);  /* Lo hace un poco más pequeño en móvil */
+        transform: scale(0.8);  /* Lo hace un poco más pequeño en móvil */
     }
 }
