@@ -1386,6 +1386,10 @@ transform: scale(0.7);
 @media (max-width: 480px) {
     .grimorio-container {
         padding: 25px 18px !important;
+transform: scale(0.7); 
+        transform-origin: top center; /* Hace que se encoja desde arriba */
+        margin-top: -30px !important; /* Compensa el espacio que deja el scale */
+        margin-bottom: -30px !important;
     }
 
     .pagina-izquierda,
@@ -1558,8 +1562,9 @@ transform: scale(0.7);
     /* 1. La zona de patrocinadores se vuelve un botón flotante limpio */
     .zona-patrocinadores {
         position: fixed !important;
-        top: 70px !important; /* Lo bajamos tantito para que no choque con tu menú de letras */
-        right: 20px !important;
+        top: 180px !important; /* Ajusta este valor: Súbelo o bájalo para no encimar */
+        left: 20px !important; /* CAMBIAMOS RIGHT POR LEFT */
+        right: auto !important; /* IMPORTANTE: Esto libera la derecha */
         padding: 8px 12px !important;
         background: rgba(0, 0, 0, 0.85) !important;
     }
