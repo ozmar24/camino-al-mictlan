@@ -1338,7 +1338,7 @@ button,
         
         /* Centrado absoluto */
         position: fixed !important;
-        top: 10% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
+        top: 20% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
         left: 50% !important;
         transform: translate(-50%, 0) scale(0.7); /* El translate(-50%) lo centra horizontalmente */
         
