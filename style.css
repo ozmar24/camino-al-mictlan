@@ -1715,7 +1715,7 @@ main {
     .zona-patrocinadores {
         right: auto !important; /* Desactiva el derecho */
         left: 20px !important;  /* Lo mueve a la izquierda */
-        top: 130px !important;   /* Ajusta la altura para que no estorbe */
+        top: 50px !important;   /* Ajusta la altura para que no estorbe */
         transform: scale(0.8);  /* Lo hace un poco más pequeño en móvil */
     }
 }
