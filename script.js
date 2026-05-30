@@ -1215,3 +1215,22 @@ document.addEventListener('mousemove', (e) => {
     letras[0].style.top = (e.clientY + 15) + 'px';
     letras[0].style.position = 'fixed';
 });
+function abrirModalWallet() {
+    const modal = document.getElementById('modal-boveda');
+    modal.style.display = 'flex'; // Cambiamos a flex para que se centre igual que el código
+}
+
+function cerrarBoveda() {
+    document.getElementById('modal-boveda').style.display = 'none';
+}
+
+function conectarWallet() {
+    // Aquí integraremos la conexión Web3 en el siguiente paso
+    console.log("Iniciando conexión a la wallet...");
+    alert("Invocando conexión con el tejido de Polygon...");
+}
+
+function abrirQuickSwap() {
+    // Redirección profesional a QuickSwap
+    window.open('https://quickswap.exchange/#/swap', '_blank');
+}

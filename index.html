@@ -108,6 +108,9 @@
                     <span style="font-size: 0.6rem; color: #666; font-family: 'MedievalSharp';">[ VER VIDEO ADS ]</span>
                 </div>
             </div>
+<div class="icono-billetera" onclick="abrirModalWallet()" style="position: absolute; top: 20px; right: 20px; z-index: 100; cursor: pointer;">
+    <img src="img/cartera.png" alt="Bóveda del Mictlán" style="width: 60px; height: 60px; filter: drop-shadow(0 0 8px rgba(139,0,0,0.8));">
+</div>
 
             <div id="contenedor-criptos"></div>
 
@@ -176,6 +179,18 @@
             <button class="btn-cerrar-alerta pentaculo-cursor" onclick="cerrarAlertaMictlan()">RETROCEDE</button>
         </div>
     </div>
+<div id="modal-boveda" class="capa-oscura" style="display: none;">
+    <div class="pergamino-quemado"> <h2>BÓVEDA DEL MICTLÁN</h2>
+        <div id="boveda-cuerpo" style="padding: 20px; text-align: center;">
+            <p>El portal a la riqueza del inframundo está abierto.</p>
+            
+            <button class="btn-ritual-grimorio" onclick="conectarWallet()" style="width: 100%; margin-bottom: 10px;">CONECTAR CARTERA</button>
+            <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()" style="width: 100%; background: #333; margin-bottom: 10px;">COMPRAR TOKENS</button>
+            
+            <button class="boton-cerrar-codice" onclick="cerrarBoveda()">[ VOLVER AL CEMENTERIO ]</button>
+        </div>
+    </div>
+</div>
 <div id="cursor-serpiente"></div>
 
     <script src="script.js" defer></script>

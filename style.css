@@ -1734,3 +1734,19 @@ main {
         transform: scale(0.8);  /* Lo hace un poco más pequeño en móvil */
     }
 }
+@media (max-width: 1024px) {
+    .icono-billetera {
+        top: 20px !important; 
+        right: 20px !important;
+        transform: scale(0.8); /* Lo ajustamos un poco para que no estorbe en pantallas pequeñas */
+    }
+}
+/* Asegurar que los botones dentro del modal de la bóveda tengan el estilo correcto */
+#modal-boveda .btn-ritual-grimorio {
+    font-family: 'MedievalSharp', cursive;
+    cursor: pointer;
+    border: 1px solid #8B0000;
+    color: white;
+    padding: 10px;
+    background: rgba(139, 0, 0, 0.7);
+}
