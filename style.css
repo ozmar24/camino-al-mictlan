@@ -1710,3 +1710,12 @@ main {
     color: #000000 !important; 
     box-shadow: 0 0 15px #ff0000 !important;
 }
+/* --- AJUSTE MÓVIL PARA BOTÓN VIDEO --- */
+@media (max-width: 768px) {
+    .zona-patrocinadores {
+        right: auto !important; /* Desactiva el derecho */
+        left: 20px !important;  /* Lo mueve a la izquierda */
+        top: 10px !important;   /* Ajusta la altura para que no estorbe */
+        transform: scale(0.8);  /* Lo hace un poco más pequeño en móvil */
+    }
+}
