@@ -1230,31 +1230,23 @@ function abrirQuickSwap() {
 }
 
 function abrirCompraTarjeta() {
+    // 1. Buscamos tu modal existente
     const modal = document.getElementById('modal-boveda');
+    
+    // 2. Cambiamos el contenido del modal dinámicamente
+    // Asegúrate de que el ID dentro del modal sea el que usas para mostrar el texto
     const cuerpo = document.getElementById('boveda-cuerpo');
-
-    // Guardamos el contenido original para poder restaurarlo después
-    const contenidoOriginal = cuerpo.innerHTML;
-
-    // Ponemos el mensaje del portal
+    
     cuerpo.innerHTML = `
         <div style="text-align: center; font-family: 'MedievalSharp'; color: #d1d1d1;">
-            <h2 style="color: #8B0000;">SABIDURÍA DEL PORTAL</h2>
+            <p>SABIDURÍA DEL PORTAL</p>
             <p style="margin: 20px 0;">El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.</p>
-            <button class="btn-ritual-grimorio" onclick="cerrarCompraTarjeta('${contenidoOriginal.replace(/"/g, "'")}')">
-                [ VOLVER AL CEMENTERIO ]
-            </button>
+            <button class="btn-ritual-grimorio" onclick="location.reload()">[ VOLVER AL CEMENTERIO ]</button>
         </div>
     `;
 
+    // 3. Nos aseguramos de que el modal sea visible
     modal.style.display = 'flex';
-}
-
-// Nueva función para restaurar el estado original sin recargar
-function cerrarCompraTarjeta(contenidoOriginal) {
-    const cuerpo = document.getElementById('boveda-cuerpo');
-    cuerpo.innerHTML = contenidoOriginal; // Restauramos los botones originales
-    document.getElementById('modal-boveda').style.display = 'none'; // Cerramos modal
 }
 function mostrarAlerta(titulo, mensaje) {
     document.getElementById('alerta-titulo').innerText = titulo;
