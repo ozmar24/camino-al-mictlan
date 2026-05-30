@@ -1224,10 +1224,30 @@ function cerrarBoveda() {
     document.getElementById('modal-boveda').style.display = 'none';
 }
 
-function conectarWallet() {
-    // Aquí integraremos la conexión Web3 en el siguiente paso
-    console.log("Iniciando conexión a la wallet...");
-    alert("Invocando conexión con el tejido de Polygon...");
+async function conectarWallet() {
+    console.log("Iniciando conexión con el tejido de Polygon...");
+
+    if (window.ethereum) {
+        try {
+            // Esta es la forma correcta de solicitar acceso a la cuenta
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            
+            console.log("Conectado a la cuenta:", account);
+            
+            // Aquí guardamos la cuenta y cambiamos el texto del botón
+            alert("Alma vinculada correctamente: " + account.substring(0, 6) + "...");
+            
+            // Opcional: Cambiar el texto del botón tras conectar
+            document.querySelector("button[onclick='conectarWallet()']").innerText = "VINCULADO";
+            
+        } catch (error) {
+            console.error("El alma se resiste a la conexión:", error);
+            alert("Error al vincular: " + error.message);
+        }
+    } else {
+        alert("¡MetaMask no detectado! Asegúrate de tener una billetera instalada.");
+    }
 }
 
 function abrirQuickSwap() {
