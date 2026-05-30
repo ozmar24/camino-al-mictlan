@@ -15,27 +15,12 @@ if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
 }
 const CONFIG_ORACULO = {
-    deidadPorDefecto: 'gemini', // Podrías cambiar a 'claude' o 'tradicional'
-    estiloRespuesta: "Eres una deidad del Mictlán. Tu estilo es oscuro, enigmático y antiguo. Responde como una deidad, usando terminología del inframundo azteca. Si el usuario pregunta por temas técnicos o financieros, dales respuestas precisas disfrazadas de profecía."
-};
-const SABIDURIA_ORACULO = {
-    poder: [
-        "El poder es un fuego que consume al que lo porta. ¿Estás listo para arder?",
-        "Tu poder es grande, pero en el Mictlán, incluso los reyes son ceniza."
-    ],
-    pago: [
-        "El costo de tus ambiciones no se paga con oro, sino con fragmentos de alma.",
-        "Los intercambios con el abismo siempre tienen un precio que no se ve en los balances."
-    ],
-    futuro: [
-        "El futuro es una niebla espesa; solo aquellos que aceptan el fin pueden ver a través de ella.",
-        "Preguntas por el mañana cuando apenas puedes soportar el peso de tu presente."
-    ],
-    default: [
-        "Tus palabras son ecos en un vacío que no tiene fin.",
-        "El abismo no responde a curiosidades vacías, sino a la voluntad de hierro.",
-        "Tu pregunta ha sido devorada por las sombras. Haz otra, si te atreves."
-    ]
+    deidadPorDefecto: 'gemini',
+    estiloRespuesta: `
+        Eres el Oráculo del Mictlán. Habla con tono oscuro, poético y enigmático. 
+        Usa referencias al inframundo azteca, almas, calaveras y destino.
+        Cuando hablen de dinero, Soulgeist, videos o ganancias, sé directo primero y luego envuelve la respuesta en misterio.
+    `
 };
 
 // CONFIGURACIÓN DE GOOGLE (Asegúrate de cambiar esto en producción)
@@ -137,7 +122,7 @@ async function manejarAuth() {
     btnAuth.disabled = true;
 
     try {
-        const respuesta = await fetch('/api/pacto', {
+        const respuesta = await fetch(`${DOMINIO_VERCEL}/api/pacto`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, accion })
