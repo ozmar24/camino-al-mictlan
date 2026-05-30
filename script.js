@@ -1215,6 +1215,7 @@ document.addEventListener('mousemove', (e) => {
     letras[0].style.top = (e.clientY + 15) + 'px';
     letras[0].style.position = 'fixed';
 });
+
 // Funciones para gestionar el Modal de la Bóveda
 function abrirModalWallet() {
     document.getElementById('modal-boveda').style.display = 'flex';
@@ -1229,24 +1230,34 @@ function abrirQuickSwap() {
     window.open('https://quickswap.exchange/#/swap', '_blank');
 }
 
+// Variable global para guardar el contenido original de la Bóveda
+let contenidoOriginalBoveda = "";
+
 function abrirCompraTarjeta() {
-    // 1. Buscamos tu modal existente
     const modal = document.getElementById('modal-boveda');
-    
-    // 2. Cambiamos el contenido del modal dinámicamente
-    // Asegúrate de que el ID dentro del modal sea el que usas para mostrar el texto
     const cuerpo = document.getElementById('boveda-cuerpo');
+
+    // 1. Guardamos el contenido actual solo la primera vez o cada vez que abrimos
+    contenidoOriginalBoveda = cuerpo.innerHTML;
     
+    // 2. Cambiamos el contenido por el mensaje de "Consagración"
     cuerpo.innerHTML = `
         <div style="text-align: center; font-family: 'MedievalSharp'; color: #d1d1d1;">
-            <p>SABIDURÍA DEL PORTAL</p>
+            <p style="font-size: 1.2em; color: #8B0000;">SABIDURÍA DEL PORTAL</p>
             <p style="margin: 20px 0;">El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.</p>
-            <button class="btn-ritual-grimorio" onclick="location.reload()">[ VOLVER AL CEMENTERIO ]</button>
+            <button class="btn-ritual-grimorio" onclick="cerrarCompraTarjeta()">[ VOLVER AL CEMENTERIO ]</button>
         </div>
     `;
 
-    // 3. Nos aseguramos de que el modal sea visible
     modal.style.display = 'flex';
+}
+
+function cerrarCompraTarjeta() {
+    const cuerpo = document.getElementById('boveda-cuerpo');
+    // 1. Restauramos los botones originales que guardamos antes
+    cuerpo.innerHTML = contenidoOriginalBoveda;
+    // 2. Cerramos el modal usando tu función original
+    cerrarBoveda();
 }
 function mostrarAlerta(titulo, mensaje) {
     document.getElementById('alerta-titulo').innerText = titulo;
