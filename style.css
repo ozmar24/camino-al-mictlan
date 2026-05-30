@@ -1741,29 +1741,35 @@ main {
         transform: scale(0.8); /* Lo ajustamos un poco para que no estorbe en pantallas pequeñas */
     }
 }
-/* Asegurar que los botones dentro del modal de la bóveda tengan el estilo correcto */
-#modal-boveda .btn-ritual-grimorio {
-    font-family: 'MedievalSharp', cursive;
-    cursor: pointer;
-    border: 1px solid #8B0000;
-    color: white;
-    padding: 10px;
-    background: rgba(139, 0, 0, 0.7);
-}
-/* Aseguramos uniformidad en los botones del modal */
+/* Estilo unificado para todos los botones de ritual/bóveda */
 .btn-ritual-grimorio {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: 15px; /* Ajustamos un poco para dar aire */
     padding: 12px;
-    background: rgba(139, 0, 0, 0.7); /* Rojo oscuro estilo Mictlán */
+    background: rgba(139, 0, 0, 0.7);
     border: 1px solid #4a0000;
-    color: #d1d1d1; /* Un tono grisáceo/blanco hueso, no blanco puro */
+    color: #d1d1d1;
     font-family: 'MedievalSharp', cursive;
     cursor: pointer;
     transition: background 0.3s ease;
+    text-align: center;
 }
 
 .btn-ritual-grimorio:hover {
     background: rgba(200, 0, 0, 0.8);
+}
+
+/* Estilo para la invocación de Google */
+.invocacion-goth {
+    margin-top: 20px;
+    text-align: center;
+    font-family: 'MedievalSharp', cursive;
+    color: #8B0000;
+}
+
+#google-btn-container iframe {
+    filter: invert(1) hue-rotate(180deg) brightness(0.8);
+    border-radius: 5px;
+    cursor: pointer;
 }

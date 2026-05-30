@@ -68,7 +68,11 @@
             <h2 id="right-title">VINCULACIÓN RÁPIDA</h2>
             <p id="right-desc">GRABA TU RASTRO MÍSTICO PARA ENTRAR.</p>
 
-            <div id="google-btn-container"></div>
+           <div class="invocacion-goth">
+    <p>Invoca tu identidad con un clic</p>
+    <div id="google-btn-container" class="btn-ritual-grimorio" style="background: #2a0000; border: 1px solid #8B0000; padding: 10px;">
+        </div>
+</div>
             
             <div class="divisor-arcano"></div>
 
@@ -184,18 +188,17 @@
 <div id="modal-boveda" class="capa-oscura" style="display: none;">
     <div class="pergamino-quemado">
         <h2>BÓVEDA DEL MICTLÁN</h2>
-        <div id="boveda-cuerpo" style="padding: 20px; text-align: center;">
+        <div id="boveda-cuerpo">
             <p>El portal a la riqueza del inframundo está abierto.</p>
-            <p style="font-size: 0.8rem; color: #8B0000; margin-bottom: 15px;">--- Intercambio Arcano ---</p>
             
-            <button class="btn-ritual-grimorio" onclick="conectarWallet()">CONECTAR CARTERA</button>
-            <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()" style="background: #333;">COMPRAR TOKENS</button>
+            <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()">COMPRAR TOKENS (VÍA METAMASK)</button>
             
-            <button class="btn-ritual-grimorio" onclick="cerrarBoveda()" style="margin-top: 20px; background: rgba(50,0,0,0.8);">[ VOLVER AL CEMENTERIO ]</button>
+            <button class="btn-ritual-grimorio" onclick="abrirCompraTarjeta()">COMPRAR CON TARJETA DE CRÉDITO</button>
+            
+            <button class="btn-ritual-grimorio" onclick="cerrarBoveda()" style="margin-top: 20px; background: rgba(20, 0, 0, 0.6);">[ VOLVER AL CEMENTERIO ]</button>
         </div>
     </div>
 </div>
-
 <div id="cursor-serpiente"></div>
 
     <script src="script.js" defer></script>

@@ -1215,42 +1215,23 @@ document.addEventListener('mousemove', (e) => {
     letras[0].style.top = (e.clientY + 15) + 'px';
     letras[0].style.position = 'fixed';
 });
+// Funciones para gestionar el Modal de la Bóveda
 function abrirModalWallet() {
-    const modal = document.getElementById('modal-boveda');
-    modal.style.display = 'flex'; // Cambiamos a flex para que se centre igual que el código
+    document.getElementById('modal-boveda').style.display = 'flex';
 }
 
 function cerrarBoveda() {
     document.getElementById('modal-boveda').style.display = 'none';
 }
 
-async function conectarWallet() {
-    console.log("Iniciando conexión con el tejido de Polygon...");
-
-    if (window.ethereum) {
-        try {
-            // Esta es la forma correcta de solicitar acceso a la cuenta
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const account = accounts[0];
-            
-            console.log("Conectado a la cuenta:", account);
-            
-            // Aquí guardamos la cuenta y cambiamos el texto del botón
-            alert("Alma vinculada correctamente: " + account.substring(0, 6) + "...");
-            
-            // Opcional: Cambiar el texto del botón tras conectar
-            document.querySelector("button[onclick='conectarWallet()']").innerText = "VINCULADO";
-            
-        } catch (error) {
-            console.error("El alma se resiste a la conexión:", error);
-            alert("Error al vincular: " + error.message);
-        }
-    } else {
-        alert("¡MetaMask no detectado! Asegúrate de tener una billetera instalada.");
-    }
+// Redirecciones directas sin rodeos
+function abrirQuickSwap() {
+    window.open('https://quickswap.exchange/#/swap', '_blank');
 }
 
-function abrirQuickSwap() {
-    // Redirección profesional a QuickSwap
-    window.open('https://quickswap.exchange/#/swap', '_blank');
+function abrirCompraTarjeta() {
+    // Esto es un placeholder elegante. 
+    // Cuando Transak/Servicio te apruebe, solo cambias esta línea.
+    console.log("Portal de pago solicitado...");
+    alert("El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.");
 }
