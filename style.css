@@ -1356,11 +1356,11 @@ button,
     }
 
     .pagina-izquierda {
-        border-bottom: 3px solid rgba(139, 0, 0, 0.35) !important;
+        border-bottom: none !important;
     }
 
     .pagina-derecha {
-        border-top: 3px solid rgba(139, 0, 0, 0.35) !important;
+        border-top: none !important;
     }
 
     /* Ajuste fino de textos y botones */
