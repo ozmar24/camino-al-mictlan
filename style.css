@@ -1332,12 +1332,19 @@ button,
 /* ====================== MÓVIL ====================== */
 @media (max-width: 1024px) {
     .grimorio-container {
-        padding: 35px 25px !important;
-        min-height: 680px !important;
-transform: scale(0.7); 
-        transform-origin: top center; /* Hace que se encoja desde arriba */
-        margin-top: -30px !important; /* Compensa el espacio que deja el scale */
-        margin-bottom: -30px !important;
+        /* Mantenemos tu escala que ya funciona bien */
+        transform: scale(0.7);
+        transform-origin: top center; 
+        
+        /* Centrado absoluto */
+        position: fixed !important;
+        top: 15% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
+        left: 50% !important;
+        transform: translate(-50%, 0) scale(0.7); /* El translate(-50%) lo centra horizontalmente */
+        
+        /* Aseguramos que no ocupe espacio extra */
+        width: 90% !important;
+        margin: 0 !important;
     }
 
     .pagina-izquierda,
@@ -1562,9 +1569,8 @@ transform: scale(0.7);
     /* 1. La zona de patrocinadores se vuelve un botón flotante limpio */
     .zona-patrocinadores {
         position: fixed !important;
-        top: 250px !important; /* Ajusta este valor: Súbelo o bájalo para no encimar */
-        left: 20px !important; /* CAMBIAMOS RIGHT POR LEFT */
-        right: auto !important; /* IMPORTANTE: Esto libera la derecha */
+        top: 70px !important; /* Lo bajamos tantito para que no choque con tu menú de letras */
+        right: 20px !important;
         padding: 8px 12px !important;
         background: rgba(0, 0, 0, 0.85) !important;
     }
