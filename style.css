@@ -1601,51 +1601,6 @@ transform: scale(0.7);
         display: none !important;
     }
 }
-/* Panel compacto y minimalista estilo cementerio */
-.security-panel {
-    position: fixed;
-    top: 150px;
-    left: 20px;
-    width: 250px;
-    background-color: #000;
-    padding: 15px;
-    border: 2px solid #660000;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
-    z-index: 1000;
-    text-align: left;
-    font-family: 'Nosifer', cursive;
-}
-
-/* Título con estilo Nosifer */
-.security-panel h3 {
-    font-family: 'Nosifer', cursive;
-    color: #cc0000;
-    font-size: 0.7rem;
-    margin: 0 0 8px 0;
-    text-align: center;
-}
-
-/* Texto de advertencia (sin línea roja lateral) */
-.warning-box {
-    background-color: #100000;
-    border-left: none; /* Eliminada la línea roja */
-    padding: 5px;
-    font-size: 0.75rem;
-    color: #ffaaaa;
-    margin-bottom: 8px;
-}
-
-
-.security-panel {
-    display: none; /* Esto lo hace invisible, así no rompe tu diseño */
-}
-/* Limpieza del cuerpo para el layout de pie de página */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-}
 
 /* El main debe crecer para empujar el footer hacia abajo */
 main {

@@ -9,17 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="style.css?v=999">
     
-<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 <script>
-    // Inicialización obligatoria del SDK
-    window.CrazyGames.SDK.init().then(() => {
-        console.log("SDK de CrazyGames inicializado correctamente.");
-    }).catch((err) => {
-        console.error("Error al inicializar el SDK:", err);
-    });
+    if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
+        window.CrazyGames.SDK.init().then(() => {
+            console.log("SDK de CrazyGames inicializado correctamente.");
+        }).catch((err) => {
+            console.error("Error al inicializar el SDK:", err);
+        });
+    } else {
+        console.warn("CrazyGames SDK no disponible en este entorno.");
+    }
 </script>
 </head>
 <body>
@@ -54,8 +57,10 @@
             <p id="left-desc">Sella tu rastro en el Mictlán con credenciales directas.</p>
             
             <div class="formulario-goth">
-                <input type="email" id="email" placeholder="CORREO DEL PACTO" class="input-pergamino-goth">
-                <input type="password" id="password" placeholder="LLAVE SECRETA" class="input-pergamino-goth">
+                <input type="email" id="email" placeholder="CORREO DEL PACTO" 
+       autocomplete="email" class="input-pergamino-goth">
+<input type="password" id="password" placeholder="LLAVE SECRETA" 
+       autocomplete="current-password" class="input-pergamino-goth">
                 <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
             </div>
             
@@ -92,19 +97,6 @@
         onclick="salirDelMictlan()">
     DESVANECERSE EN LAS SOMBRAS
 </button>
- <div class="security-panel">
-        <h3>Seguridad y Privacidad</h3>
-        <div class="warning-box">
-            <p><strong>⚠️ Recuperar alma:</strong> Resucitar</p>
-        </div>
-        <div class="delete-account-section">
-            <label for="confirm-delete">Escribe "BORRAR" para confirmar:</label>
-            <input type="text" id="confirm-delete" placeholder="Escribe aquí...">
-            <button id="btn-delete-account" class="btn-danger" onclick="borrarCuenta()">
-                Eliminar mi perfil
-            </button>
-        </div>
-    </div>
 
 
             <div class="zona-patrocinadores" style="position: absolute; top: 60px; left: 20px; z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px;">

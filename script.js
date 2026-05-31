@@ -380,7 +380,7 @@ function generarCementerio() {
 guardarSaldosCriptas();
 
     // === ACTUALIZACIÓN CRÍTICA EN REDIS ===
-    await descontarBalanceEnRedis(balanceUsuarioSG);
+    await descontarBalanceEnRedis(cantidadEnviada);
 
 
 
@@ -626,10 +626,11 @@ async function videoCompletado() {
                     anuncioVisto = true;
                 }
             } catch (err) {
-                // AQUÍ CAPTURAMOS SI EL SDK ESTÁ DESACTIVADO
-                console.warn("SDK deshabilitado o error en anuncio, permitiendo acceso:", err);
-                anuncioVisto = true; // Permite continuar aunque el SDK falle por dominio no autorizado
-            }
+    console.warn("SDK deshabilitado o error en anuncio:", err);
+    // Solo permitir en desarrollo, bloquear en producción
+    anuncioVisto = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1';
+}
         } else {
             anuncioVisto = true; 
         }
@@ -1073,7 +1074,7 @@ async function loginExitoso(datosUsuario) {
     window.userWallet = datosUsuario.email; // Define la identidad
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
-async function descontarBalanceEnRedis(nuevoBalance) {
+async function descontarBalanceEnRedis(costoRitual) {
     if (!window.userWallet) return;
 
     try {
@@ -1082,7 +1083,7 @@ async function descontarBalanceEnRedis(nuevoBalance) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 wallet: window.userWallet,
-                nuevoBalance: nuevoBalance,
+                costoRitual: costoRitual,
                 accion: 'descontar_ritual'
             })
         });
@@ -1144,30 +1145,6 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSalir.onclick = salirDelMictlan;
     }
 });
-// Añade esto en tu archivo 'script'
-function borrarCuenta() {
-    const confirmacion = document.getElementById('confirm-delete').value;
-    
-    if (confirmacion === "BORRAR") {
-        fetch('/api/control-cuentas', { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ confirmacion: "BORRAR" }) // Enviamos la confirmación al backend
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message); // Muestra "Perfil borrado correctamente"
-                window.location.href = "/"; // Recarga la página o manda al index
-            } else {
-                alert("Hubo un error: " + data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    } else {
-        alert("Por favor, escribe BORRAR para confirmar.");
-    }
-}
 
 document.addEventListener('mousemove', (e) => {
    const cursorSerpiente = document.getElementById('cursor-serpiente');

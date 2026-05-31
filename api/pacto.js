@@ -1,93 +1,188 @@
+// api/pacto.js
+// REQUIERE: npm install bcryptjs
+import bcrypt from 'bcryptjs';
+
 export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Content-Type', 'application/json');
 
-    const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
-    
-    if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
-        return res.status(200).json({ success: false, error: "ERROR: Conexión al Abismo no configurada." });
+    // ── CORS dinámico ──────────────────────────────────────────────────────────
+    const ORIGENES_PERMITIDOS = [
+        'https://camino-al-mictlan.vercel.app',
+        'https://camino-al-mictlan.game-files.crazygames.com'
+    ];
+    const origin = req.headers.origin;
+    if (ORIGENES_PERMITIDOS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
     }
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    const cleanUrl = UPSTASH_REDIS_REST_URL.replace(/\/$/, "");
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    // ── Variables de entorno ───────────────────────────────────────────────────
+    const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
+
+    if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
+        return res.status(500).json({ success: false, error: 'Conexión al Abismo no configurada.' });
+    }
 
     if (req.method !== 'POST') {
-        return res.status(200).json({ success: false, error: 'MÉTODO NO PERMITIDO' });
+        return res.status(405).json({ success: false, error: 'Método no permitido.' });
     }
 
+    const cleanUrl = UPSTASH_REDIS_REST_URL.replace(/\/$/, '');
+
+    // ── Helpers Redis ──────────────────────────────────────────────────────────
+    const redisGet = async (key) => {
+        const r = await fetch(`${cleanUrl}/get/${key}`, {
+            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+        });
+        return r.json();
+    };
+
+    const redisSet = async (key, value, exSeconds = null) => {
+        const url = exSeconds
+            ? `${cleanUrl}/set/${key}/${encodeURIComponent(value)}/EX/${exSeconds}`
+            : `${cleanUrl}/set/${key}`;
+
+        const options = exSeconds
+            ? { method: 'POST', headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` } }
+            : {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(value)
+              };
+
+        return fetch(url, options).then(r => r.json());
+    };
+
+    const redisIncr = async (key) => {
+        return fetch(`${cleanUrl}/incr/${key}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+        }).then(r => r.json());
+    };
+
+    const redisExpire = async (key, seconds) => {
+        return fetch(`${cleanUrl}/expire/${key}/${seconds}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+        }).then(r => r.json());
+    };
+
+    // ── Validar body ───────────────────────────────────────────────────────────
     const { email, password, accion, action } = req.body || {};
     const accionReal = accion || action;
 
     if (!email || !password || !accionReal) {
-        return res.status(200).json({ success: false, error: 'FALTAN CREDENCIALES EN EL FORMULARIO.' });
+        return res.status(400).json({ success: false, error: 'Faltan credenciales en el formulario.' });
+    }
+
+    // Validación básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ success: false, error: 'Formato de email inválido.' });
+    }
+
+    // Validación de contraseña (mínimo 8 caracteres)
+    if (password.length < 8) {
+        return res.status(400).json({ success: false, error: 'La llave secreta debe tener al menos 8 caracteres.' });
     }
 
     const emailNormalizado = email.toLowerCase().trim();
-    // Creamos la llave limpia idéntica al formato de Void Onyx
-    const userKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const userKey = `usuario:${emailNormalizado.replace(/[^a-zA-Z0-9@._]/g, '_')}`;
+
+    // ── Rate limiting (aplica solo a login) ───────────────────────────────────
+    if (accionReal === 'login') {
+        const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const intentosRes = await redisGet(intentosKey);
+        const intentos = parseInt(intentosRes?.result || 0);
+
+        if (intentos >= 5) {
+            return res.status(429).json({
+                success: false,
+                error: 'Demasiados intentos fallidos. Espera 15 minutos antes de intentarlo de nuevo.'
+            });
+        }
+    }
 
     try {
-        // === 1. LEER USUARIO (Método String plano estilo Onyx) ===
-        const urlGet = `${cleanUrl}/get/${userKey}`;
-        const checkUser = await fetch(urlGet, {
-            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
-        }).then(r => r.json());
-
+        // ── Leer usuario existente ─────────────────────────────────────────────
+        const checkUser = await redisGet(userKey);
         let usuario = null;
-        
-        // Si hay un resultado, lo parseamos de JSON a objeto JS
-        if (checkUser && checkUser.result) {
+
+        if (checkUser?.result) {
             try {
-                usuario = typeof checkUser.result === 'string' ? JSON.parse(checkUser.result) : checkUser.result;
+                usuario = typeof checkUser.result === 'string'
+                    ? JSON.parse(checkUser.result)
+                    : checkUser.result;
             } catch (e) {
-                console.error("Error al parsear usuario existente:", e);
+                console.error('Error al parsear usuario:', e);
             }
         }
 
         const existeUsuario = usuario !== null;
 
-        // === 2. LÓGICA DE REGISTRO ===
+        // ══════════════════════════════════════════════════════════════════════
+        // REGISTRO
+        // ══════════════════════════════════════════════════════════════════════
         if (accionReal === 'registro') {
             if (existeUsuario) {
-                return res.status(200).json({ success: false, error: 'ESTE EMAIL YA TIENE UN PACTO ACTIVO.' });
+                return res.status(409).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
             }
 
-            // Creamos el objeto del espíritu completo
-            const nuevoUsuarioObjeto = {
+            // ✅ Hash de contraseña — NUNCA se guarda en texto plano
+            const passwordHash = await bcrypt.hash(password, 12);
+
+            const nuevoUsuario = {
                 email: emailNormalizado,
-                password: password,
-                wallet: "wallet-temp-" + Date.now(),
-                balance_soulgeist: "0",
+                password: passwordHash,               // hash, no texto plano
+                wallet: `wallet-temp-${Date.now()}`,
+                balance_soulgeist: '0',
                 creado_en: new Date().toISOString()
             };
 
-            // Lo guardamos directo como un String JSON usando /set/ igual que en Onyx
-            const urlSet = `${cleanUrl}/set/${userKey}`;
-            const writeResponse = await fetch(urlSet, {
-                method: 'POST',
-                headers: { 
-                    Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(nuevoUsuarioObjeto) // Guardado directo sin arreglos raros
-            });
-
-            if (!writeResponse.ok) throw new Error("Fallo en la respuesta REST de Upstash");
+            await redisSet(userKey, JSON.stringify(nuevoUsuario));
 
             return res.status(200).json({
                 success: true,
                 message: 'Pacto sellado con éxito.'
             });
-        } 
+        }
 
-        // === 3. LÓGICA DE LOGIN ===
+        // ══════════════════════════════════════════════════════════════════════
+        // LOGIN
+        // ══════════════════════════════════════════════════════════════════════
         if (accionReal === 'login') {
+            const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+            // Mismo mensaje para usuario inexistente o contraseña incorrecta
+            // (evita enumeración de usuarios)
             if (!existeUsuario) {
-                return res.status(200).json({ success: false, error: 'IDENTIDAD NO REGISTRADA.' });
+                await redisIncr(intentosKey);
+                await redisExpire(intentosKey, 900); // 15 minutos
+                return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
 
-            if (usuario.password !== password) {
-                return res.status(200).json({ success: false, error: 'CONTRASEÑA INCORRECTA.' });
+            // ✅ Comparación segura con bcrypt
+            const passwordValida = await bcrypt.compare(password, usuario.password);
+
+            if (!passwordValida) {
+                await redisIncr(intentosKey);
+                await redisExpire(intentosKey, 900);
+                return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
+
+            // Login exitoso — limpiar contador de intentos
+            await fetch(`${cleanUrl}/del/${intentosKey}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+            });
 
             return res.status(200).json({
                 success: true,
@@ -98,13 +193,13 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(200).json({ success: false, error: 'ACCCIÓN NO VÁLIDA.' });
+        return res.status(400).json({ success: false, error: 'Acción no válida.' });
 
     } catch (error) {
-        console.error('ERROR CRÍTICO EN EL BACKEND:', error);
-        return res.status(200).json({ 
-            success: false, 
-            error: 'Error interno de comunicación con las criptas de Upstash.' 
+        console.error('Error crítico en pacto.js:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Error interno. Intenta de nuevo.'
         });
     }
 }
