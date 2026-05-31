@@ -554,7 +554,6 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
     wallet:    walletUsuario,
     cripto:    criptoSeleccionada,
     pasarela:  pasarela
-})
             })
         });
 
