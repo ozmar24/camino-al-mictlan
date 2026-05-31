@@ -21,14 +21,10 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido.' });
 
     // ── Variables de entorno ───────────────────────────────────────────────────
-    const redisUrl    = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
-    const redisToken  = process.env.UPSTASH_REDIS_REST_TOKEN;
-    const claveAdmin  = process.env.ADMIN_PRIVATE_KEY;
+    const redisUrl     = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
+    const redisToken   = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const claveAdmin   = process.env.ADMIN_PRIVATE_KEY;
     const contratoAddr = process.env.SOULGEIST_CONTRACT_ADDRESS;
-
-    // ✅ RPC configurable — cambia solo la variable en Vercel para pasar a mainnet
-    // Testnet Amoy:  https://rpc-amoy.polygon.technology
-    // Mainnet Polygon: https://polygon-rpc.com
     const blockchainRPC = process.env.BLOCKCHAIN_RPC || 'https://rpc-amoy.polygon.technology';
     const blockchainEnv = process.env.BLOCKCHAIN_ENV || 'testnet';
 
@@ -40,7 +36,8 @@ export default async function handler(req, res) {
     }
 
     // ── Extraer datos del body ─────────────────────────────────────────────────
-    const { identidad, wallet, cripto, pasarela } = req.body || {};
+    const { identidad, cripto, pasarela } = req.body || {};
+    const wallet = req.body?.wallet?.toLowerCase().trim() || '';
 
     if (!identidad) return res.status(400).json({ error: 'Falta la identidad del alma.' });
     if (!wallet || wallet.length < 8) return res.status(400).json({ error: 'Wallet inválida.' });
@@ -48,7 +45,7 @@ export default async function handler(req, res) {
     if (!pasarela) return res.status(400).json({ error: 'Falta la pasarela de retiro.' });
 
     // ── IP y país ──────────────────────────────────────────────────────────────
-    const rawIp  = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
+    const rawIp    = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
     const country  = req.headers['x-vercel-ip-country'] || 'XX';
 
@@ -72,8 +69,8 @@ export default async function handler(req, res) {
         return res.status(403).json({ error: 'Región no disponible.' });
     }
 
-    // ── Validar formato de wallet según pasarela ───────────────────────────────
-    if (!validarDireccion(wallet, pasarela)) {
+    // ── Validar formato de wallet según pasarela Y cripto ─────────────────────
+    if (!validarDireccion(wallet, pasarela, cripto)) {
         return res.status(400).json({ error: 'El formato de la billetera no coincide con la pasarela seleccionada.' });
     }
 
@@ -114,7 +111,6 @@ export default async function handler(req, res) {
         }
 
         // ── 3. Leer balance REAL desde Redis ───────────────────────────────────
-        // ✅ FIX CRÍTICO: cantidadAEnviar se calcula aquí, no viene del cliente
         const balanceRes = await redisCmd(['GET', balanceKey]);
         const balanceSG  = parseInt(balanceRes?.result || 0);
 
@@ -132,11 +128,10 @@ export default async function handler(req, res) {
         }
 
         // ── 5. Procesar pago según pasarela ────────────────────────────────────
-        let pagoExitoso  = false;
+        let pagoExitoso    = false;
         let mensajeRetorno = '';
 
         if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
-            // ⚠️ PENDIENTE DE IMPLEMENTAR: integración real con Bitso Lightning
             const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
             if (resLN.success) {
                 pagoExitoso    = true;
@@ -144,7 +139,6 @@ export default async function handler(req, res) {
             }
 
         } else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
-            // ✅ Retiro on-chain usando la red configurada en BLOCKCHAIN_RPC
             const resOC = await procesarRetiroOnChain(
                 wallet,
                 cantidadAEnviar,
@@ -170,7 +164,7 @@ export default async function handler(req, res) {
             await Promise.all([
                 redisCmd(['SET', walletKey, 'activo', 'EX', '86400']),
                 redisCmd(['SET', ipKey,     'activo', 'EX', '86400']),
-                redisCmd(['SET', balanceKey, '0'])   // resetear saldo tras retiro exitoso
+                redisCmd(['SET', balanceKey, '0'])
             ]);
 
             await enviarAlertaTelegram(
@@ -184,7 +178,7 @@ export default async function handler(req, res) {
                 success: true,
                 mensaje: mensajeRetorno,
                 balanceAlmas: 0,
-                red: blockchainEnv  // útil para mostrar en frontend si es testnet o mainnet
+                red: blockchainEnv
             });
         }
 
@@ -198,10 +192,10 @@ export default async function handler(req, res) {
 // FUNCIONES AUXILIARES
 // ══════════════════════════════════════════════════════════════════════════════
 
-// ── Validar formato de wallet según pasarela ──────────────────────────────────
+// ── Validar formato de wallet según pasarela Y cripto ────────────────────────
 function validarDireccion(wallet, pasarela, cripto) {
     const regexEVM = /^0x[a-fA-F0-9]{40}$/;
-    const regexBTC = /^(bc1[a-zA-Z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
+    const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
     const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/;
 
     if (pasarela === 'binance' || pasarela === 'coinbase') {
@@ -209,10 +203,9 @@ function validarDireccion(wallet, pasarela, cripto) {
     }
 
     if (pasarela === 'bitso') {
-        // ✅ Bitso acepta BTC, LTC y EVM según la cripto
-        if (cripto === 'Bitcoin') return regexBTC.test(wallet);
+        if (cripto === 'Bitcoin')  return regexBTC.test(wallet);
         if (cripto === 'Litecoin') return regexLTC.test(wallet);
-        return regexEVM.test(wallet); // USDT, ETH, etc.
+        return regexEVM.test(wallet);
     }
 
     if (pasarela === 'bitso_lightning') {
@@ -222,17 +215,17 @@ function validarDireccion(wallet, pasarela, cripto) {
     return wallet.length > 5;
 }
 
-// ── Retiro on-chain (Amoy testnet ahora, mainnet después) ─────────────────────
+// ── Retiro on-chain ───────────────────────────────────────────────────────────
 async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl, entorno) {
     try {
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        const provider    = new ethers.JsonRpcProvider(rpcUrl);
         const walletAdmin = new ethers.Wallet(claveAdmin, provider);
 
         const MIN_ABI = [
             'function transfer(address to, uint256 amount) returns (bool)'
         ];
 
-        const contrato = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
+        const contrato             = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
         const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
 
         console.log(`🤖 [${entorno}] Enviando ${monto} tokens a: ${walletUsuario}`);
@@ -250,7 +243,6 @@ async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoA
 
 // ── Bitso Lightning (⚠️ pendiente de implementación real) ────────────────────
 async function ejecutarRetiroBitsoLightning(invoice, monto) {
-    // TODO: Implementar integración real con API de Bitso cuando esté listo
     console.warn('⚠️ ejecutarRetiroBitsoLightning: implementación pendiente.');
     return { success: false, error: 'Bitso Lightning aún no implementado.' };
 }
@@ -259,7 +251,7 @@ async function ejecutarRetiroBitsoLightning(invoice, monto) {
 async function verificarFraudeIP(ip) {
     try {
         const apiKey = process.env.PROXYCHECK_API_KEY;
-        if (!apiKey) return { bloquear: false }; // Si no hay key, no bloquear
+        if (!apiKey) return { bloquear: false };
 
         const res  = await fetch(`https://proxycheck.io/v2/${ip}?key=${apiKey}&vpn=1`);
         const data = await res.json();
@@ -270,7 +262,7 @@ async function verificarFraudeIP(ip) {
         return { bloquear: false };
 
     } catch {
-        return { bloquear: false }; // En caso de error, no bloquear
+        return { bloquear: false };
     }
 }
 
