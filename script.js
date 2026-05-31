@@ -550,12 +550,11 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                identidad: identidad,
-                wallet: walletUsuario,
-                cripto: criptoSeleccionada,
-                pasarela: pasarela,
-                cantidadRetiro: saldoCripto,     // ← Esto es lo importante
-                cantidadSG: saldoCripto
+    identidad: identidad,
+    wallet:    walletUsuario,
+    cripto:    criptoSeleccionada,
+    pasarela:  pasarela
+})
             })
         });
 
@@ -1023,6 +1022,7 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
         mostrarModalFusionExitosa(pos, ganancia);
     });
 }
+
 
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
 // Reemplaza tu función actual por esta versión para depurar:
