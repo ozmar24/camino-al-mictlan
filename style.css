@@ -1749,7 +1749,7 @@ main {
     padding: 12px;
     background: rgba(139, 0, 0, 0.7);
     border: 1px solid #4a0000;
-    color: #ff0000 !important;
+    color: #d1d1d1;
     font-family: 'MedievalSharp', cursive;
     cursor: pointer;
     transition: background 0.3s ease;
@@ -1764,8 +1764,8 @@ main {
 .invocacion-goth {
     margin-top: 20px;
     text-align: center;
-    font-family: 'Nosifer', cursive;
-    color: #ff0000 !important;
+    font-family: 'MedievalSharp', cursive;
+    color: #8B0000;
 }
 
 #google-btn-container iframe {
@@ -1781,7 +1781,7 @@ main {
     width: 300px;
     text-align: center;
     font-family: 'Nosifer', cursive;
-    color: #ff0000 !important;
+    color: #cc0000;
     position: absolute;
     top: 50%;
     left: 50%;
