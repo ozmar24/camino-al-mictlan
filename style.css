@@ -1741,41 +1741,26 @@ main {
         transform: scale(0.8); /* Lo ajustamos un poco para que no estorbe en pantallas pequeñas */
     }
 }
-/* ==================== BOTONES DE LA BÓVEDA (MÁS PEQUEÑOS Y ROJOS) ==================== */
-
-#modal-boveda button {
-    padding: 10px 18px !important;
-    font-size: 0.7rem !important;        /* Letra más pequeña */
-    min-height: 40px !important;
-    width: 78% !important;
-    max-width: 280px !important;
-    margin: 8px auto !important;
-    background: #3a0000 !important;
-    color: #ffdddd !important;
-    border: 2px solid #8b0000 !important;
+/* Estilo unificado para todos los botones de ritual/bóveda */
+/* Botones de la Bóveda - Más pequeños y elegantes */
+.btn-ritual-grimorio {
+    padding: 8px px !important;
+    font-size: 0.7rem !important;        /* Más pequeño */
+    min-height: 38px !important;
+    letter-spacing: 1px !important;
+    border-radius: 4px !important;
+    margin: 10px auto !important;
+    width: 75% !important;                /* No tan ancho */
+    max-width: 320px !important;
+    text-transform: uppercase !important;
     font-family: 'Nosifer', cursive !important;
-    text-shadow: 1px 1px 2px #000 !important;
-    box-shadow: 0 0 8px rgba(139, 0, 0, 0.6) !important;
-    transition: all 0.3s ease !important;
 }
 
-#modal-boveda button:hover {
-    background: #6b0000 !important;
-    color: #ffffff !important;
-    border-color: #ff0000 !important;
-    transform: scale(1.04) !important;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7) !important;
-}
-
-/* Título y texto de la bóveda */
-#boveda-cuerpo p:first-child {
-    font-size: 1.45rem !important;
-    color: #ff2222 !important;
-}
-
-#boveda-cuerpo p {
-    font-size: 0.95rem !important;
-    color: #ccaaaa !important;
+/* Hover más sutil */
+.btn-ritual-grimorio:hover {
+    background: #8b0000 !important;
+    transform: scale(1.03) !important;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.6) !important;
 }
 
 /* Estilo para la invocación de Google */
