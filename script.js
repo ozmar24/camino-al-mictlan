@@ -1242,7 +1242,7 @@ function abrirCompraTarjeta() {
     
     // 2. Cambiamos el contenido por el mensaje de "Consagración"
     cuerpo.innerHTML = `
-        <div style="text-align: center; font-family: 'Nosifer'; color: #d1d1d1;">
+        <div style="text-align: center; font-family: 'Nosifer'; color: #ff0000;">
             <p style="font-size: 1.2em; color: #ff0000;">SABIDURÍA DEL PORTAL</p>
             <p style="margin: 20px 0;">El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.</p>
             <button class="btn-ritual-grimorio" onclick="cerrarCompraTarjeta()">[ VOLVER AL CEMENTERIO ]</button>
