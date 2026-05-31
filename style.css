@@ -1635,46 +1635,7 @@ transform: scale(0.7);
     margin-bottom: 8px;
 }
 
-/* Etiqueta "Escribe BORRAR" (gris) */
-label[for="confirm-delete"] {
-    color: #808080; /* Color gris solicitado */
-    font-size: 0.75rem;
-    display: block;
-    margin-bottom: 5px;
-}
 
-/* Input integrado */
-#confirm-delete {
-    width: 90%;
-    padding: 5px;
-    background: #111;
-    border: 1px solid #440000;
-    color: #cc0000;
-    margin-bottom: 10px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Botón con fuente gótica y rojo sangre */
-#btn-delete-account {
-    font-family: 'Nosifer', cursive; /* Fuente gótica aplicada */
-    width: 100%;
-    padding: 8px;
-    background-color: #990000;
-    color: #fff;
-    border: 1px solid #ff0000;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.5rem;
-    transition: 0.3s;
-}
-
-#btn-delete-account:hover {
-    background-color: #ff0000;
-    box-shadow: 0 0 8px #ff0000;
-}
 .security-panel {
     display: none; /* Esto lo hace invisible, así no rompe tu diseño */
 }
