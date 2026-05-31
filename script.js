@@ -1242,12 +1242,30 @@ function abrirCompraTarjeta() {
     
     // 2. Cambiamos el contenido por el mensaje de "Consagración"
     cuerpo.innerHTML = `
-        <div style="text-align: center; font-family: 'Nosifer'; color: #cc0000;">
-            <p style="font-size: 1.2em; color: #cc0000;">SABIDURÍA DEL PORTAL</p>
-            <p style="margin: 20px 0;">El canal de compra con tarjeta está siendo consagrado. Recibirás un aviso en cuanto el portal esté abierto al mundo mortal.</p>
-            <button class="btn-ritual-grimorio" onclick="cerrarCompraTarjeta()">[ VOLVER AL CEMENTERIO ]</button>
-        </div>
-    `;
+    <div style="text-align: center; font-family: 'MedievalSharp', cursive;">
+        <!-- TÍTULO: Rojo intenso forzado con sombra negra para que resalte -->
+        <p style="
+            font-size: 1.5em; 
+            color: #ff0000 !important; 
+            text-shadow: 2px 2px 2px #000000;
+            margin-bottom: 10px;
+            font-weight: 900;
+        ">SABIDURÍA DEL PORTAL</p>
+        
+        <!-- CUERPO: Texto rojo un poco más oscuro y nítido -->
+        <p style="
+            color: #cc0000 !important; 
+            text-shadow: 1px 1px 1px #000000;
+            margin-bottom: 20px;
+            font-weight: bold;
+        ">
+            EL CANAL DE COMPRA CON TARJETA ESTÁ SIENDO CONSAGRADO. 
+            RECIBIRÁS UN AVISO EN CUANTO EL PORTAL ESTÉ ABIERTO AL MUNDO MORTAL.
+        </p>
+        
+        <button class="btn-ritual-grimorio" onclick="cerrarBoveda()">[ VOLVER AL CEMENTERIO ]</button>
+    </div>
+`;
 
     modal.style.display = 'flex';
 }
