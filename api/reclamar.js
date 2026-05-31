@@ -199,16 +199,26 @@ export default async function handler(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── Validar formato de wallet según pasarela ──────────────────────────────────
-function validarDireccion(wallet, pasarela) {
+function validarDireccion(wallet, pasarela, cripto) {
     const regexEVM = /^0x[a-fA-F0-9]{40}$/;
     const regexBTC = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/;
+    const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/;
 
-    if (pasarela === 'bitso' || pasarela === 'binance' || pasarela === 'coinbase') {
+    if (pasarela === 'binance' || pasarela === 'coinbase') {
         return regexEVM.test(wallet);
     }
+
+    if (pasarela === 'bitso') {
+        // ✅ Bitso acepta BTC, LTC y EVM según la cripto
+        if (cripto === 'Bitcoin') return regexBTC.test(wallet);
+        if (cripto === 'Litecoin') return regexLTC.test(wallet);
+        return regexEVM.test(wallet); // USDT, ETH, etc.
+    }
+
     if (pasarela === 'bitso_lightning') {
         return regexBTC.test(wallet);
     }
+
     return wallet.length > 5;
 }
 
