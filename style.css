@@ -1742,22 +1742,25 @@ main {
     }
 }
 /* Estilo unificado para todos los botones de ritual/bóveda */
+/* Botones de la Bóveda - Más pequeños y elegantes */
 .btn-ritual-grimorio {
-    display: block;
-    width: 100%;
-    margin-bottom: 15px; /* Ajustamos un poco para dar aire */
-    padding: 12px;
-    background: rgba(139, 0, 0, 0.7);
-    border: 1px solid #4a0000;
-    color: #d1d1d1;
-    font-family: 'MedievalSharp', cursive;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-align: center;
+    padding: 8px px !important;
+    font-size: 0.7rem !important;        /* Más pequeño */
+    min-height: 38px !important;
+    letter-spacing: 1px !important;
+    border-radius: 4px !important;
+    margin: 10px auto !important;
+    width: 75% !important;                /* No tan ancho */
+    max-width: 320px !important;
+    text-transform: uppercase !important;
+    font-family: 'Nosifer', cursive !important;
 }
 
+/* Hover más sutil */
 .btn-ritual-grimorio:hover {
-    background: rgba(200, 0, 0, 0.8);
+    background: #8b0000 !important;
+    transform: scale(1.03) !important;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.6) !important;
 }
 
 /* Estilo para la invocación de Google */
