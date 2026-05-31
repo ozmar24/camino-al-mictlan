@@ -1237,26 +1237,26 @@ function abrirCompraTarjeta() {
     const modal = document.getElementById('modal-boveda');
     const cuerpo = document.getElementById('boveda-cuerpo');
 
-    // Mantenemos tus botones originales intactos al construir el aviso
-cuerpo.innerHTML = `
-    <div style="text-align: center; font-family: 'MedievalSharp', cursive;">
-        <p style="font-size: 1.5em; color: #ff0000 !important; text-shadow: 2px 2px 2px #000; margin-bottom: 10px; font-weight: 900;">SABIDURÍA DEL PORTAL</p>
-        <p style="color: #cc0000 !important; text-shadow: 1px 1px 1px #000; margin-bottom: 20px; font-weight: bold; font-size: 0.9em;">
-            EL CANAL DE COMPRA CON TARJETA ESTÁ SIENDO CONSAGRADO.
-        </p>
-        
-        <!-- Botones con padding vertical mínimo (2px) para que sean delgados -->
-        <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()" 
-            style="padding: 2px 10px !important; line-height: 1.2 !important; font-size: 0.8em; margin-bottom: 8px; height: auto;">
-            [ COMPRAR TOKENS (VÍA QUICKSWAP) ]
-        </button>
-        <br>
-        <button class="btn-ritual-grimorio" onclick="cerrarBoveda()" 
-            style="padding: 2px 10px !important; line-height: 1.2 !important; font-size: 0.8em; height: auto;">
-            [ VOLVER AL CEMENTERIO ]
-        </button>
-    </div>
-`;
+    cuerpo.innerHTML = `
+        <div style="text-align: center;">
+            <p style="font-size: 1.6em; color: #ff0000; text-shadow: 2px 2px 4px #000; margin-bottom: 15px; font-weight: 900;">
+                SABIDURÍA DEL PORTAL
+            </p>
+            <p style="color: #cc0000; text-shadow: 1px 1px 3px #000; margin-bottom: 25px; font-weight: bold;">
+                EL CANAL DE COMPRA CON TARJETA ESTÁ SIENDO CONSAGRADO.
+            </p>
+            
+            <button onclick="abrirQuickSwap()" 
+                style="display: block; width: 85%; margin: 12px auto; padding: 14px; background: #4a0000; color: #ffdddd; border: 2px solid #ff0000; font-family: 'Nosifer', cursive; font-size: 0.95em; cursor: pointer; text-shadow: 1px 1px 2px #000;">
+                [ COMPRAR TOKENS (VÍA QUICKSWAP) ]
+            </button>
+            
+            <button onclick="cerrarBoveda()" 
+                style="display: block; width: 85%; margin: 12px auto; padding: 14px; background: #2a0000; color: #ffdddd; border: 2px solid #880000; font-family: 'Nosifer', cursive; font-size: 0.95em; cursor: pointer; text-shadow: 1px 1px 2px #000;">
+                [ VOLVER AL CEMENTERIO ]
+            </button>
+        </div>
+    `;
 
     modal.style.display = 'flex';
 }
