@@ -1770,13 +1770,13 @@ main {
 #boveda-cuerpo p {
     color: #ff4444 !important;
     text-shadow: 1px 1px 3px #000 !important;
-    font-size: 1.05rem !important;
+    font-size: 0.8rem !important;
     margin-bottom: 18px !important;
 }
 
 #boveda-cuerpo p:first-child {
     color: #ff0000 !important;
-    font-size: 1.5rem !important;
+    font-size: 0.9rem !important;
 }
 
 /* Estilo para la invocación de Google */
