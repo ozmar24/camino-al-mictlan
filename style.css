@@ -1744,16 +1744,16 @@ main {
 /* ==================== BÓVEDA DEL MICTLÁN - AJUSTE FINO ==================== */
 
 #modal-boveda button {
-    padding: 11px 22px !important;
-    font-size: 0.88rem !important;
+    padding: 8px 12px !important;
+    font-size: 0.6rem !important;
     font-family: 'Nosifer', cursive !important;
     color: #ffdddd !important;
     background: #3f0000 !important;
     border: 2px solid #b30000 !important;
     text-shadow: 1px 1px 3px #000 !important;
     margin: 10px auto !important;
-    width: 82% !important;
-    max-width: 290px !important;
+    width: 60% !important;
+    max-width: 190px !important;
     border-radius: 4px !important;
     box-shadow: 0 0 10px rgba(180, 0, 0, 0.5) !important;
     transition: all 0.3s ease !important;
@@ -1763,7 +1763,7 @@ main {
     background: #6b0000 !important;
     color: #ffffff !important;
     border-color: #ff2222 !important;
-    transform: scale(1.03) !important;
+    transform: scale(0.7) !important;
 }
 
 /* Texto dentro del pergamino */
