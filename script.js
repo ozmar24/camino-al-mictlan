@@ -1240,15 +1240,14 @@ function abrirCompraTarjeta() {
     // Mantenemos tus botones originales intactos al construir el aviso
     cuerpo.innerHTML = `
         <div style="text-align: center; font-family: 'MedievalSharp', cursive;">
-            <p style="font-size: 1.5em; color: #8b0000 !important; text-shadow: 2px 2px 2px #000; margin-bottom: 10px; font-weight: 900;">SABIDURÍA DEL PORTAL</p>
-            <p style="color: #8b0000 !important; text-shadow: 1px 1px 1px #000; margin-bottom: 20px; font-weight: bold;">
+            <p style="font-size: 1.5em; color: #ff0000 !important; text-shadow: 2px 2px 2px #000; margin-bottom: 10px; font-weight: 900;">SABIDURÍA DEL PORTAL</p>
+            <p style="color: #cc0000 !important; text-shadow: 1px 1px 1px #000; margin-bottom: 20px; font-weight: bold; font-size: 0.9em;">
                 EL CANAL DE COMPRA CON TARJETA ESTÁ SIENDO CONSAGRADO.
             </p>
             
-            <!-- RECONSTRUIMOS TUS BOTONES ORIGINALES AQUÍ -->
-            <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()">[ COMPRAR TOKENS (VÍA QUICKSWAP) ]</button>
-            <div style="margin: 10px 0;"></div>
-            <button class="btn-ritual-grimorio" onclick="cerrarBoveda()">[ VOLVER AL CEMENTERIO ]</button>
+            <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()" style="padding: 5px 10px; font-size: 0.8em; margin-bottom: 5px;">[ COMPRAR TOKENS (VÍA QUICKSWAP) ]</button>
+            <br>
+            <button class="btn-ritual-grimorio" onclick="cerrarBoveda()" style="padding: 5px 10px; font-size: 0.8em;">[ VOLVER AL CEMENTERIO ]</button>
         </div>
     `;
 
