@@ -1246,7 +1246,7 @@ function abrirCompraTarjeta() {
         <!-- TÍTULO: Rojo intenso forzado con sombra negra para que resalte -->
         <p style="
             font-size: 1.5em; 
-            color: #ff0000 !important; 
+            color: #8b0000 !important; 
             text-shadow: 2px 2px 2px #000000;
             margin-bottom: 10px;
             font-weight: 900;
@@ -1254,7 +1254,7 @@ function abrirCompraTarjeta() {
         
         <!-- CUERPO: Texto rojo un poco más oscuro y nítido -->
         <p style="
-            color: #cc0000 !important; 
+            color: #8b0000 !important; 
             text-shadow: 1px 1px 1px #000000;
             margin-bottom: 20px;
             font-weight: bold;
