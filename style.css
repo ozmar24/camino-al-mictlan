@@ -1741,26 +1741,42 @@ main {
         transform: scale(0.8); /* Lo ajustamos un poco para que no estorbe en pantallas pequeñas */
     }
 }
-/* Estilo unificado para todos los botones de ritual/bóveda */
-/* Botones de la Bóveda - Más pequeños y elegantes */
-.btn-ritual-grimorio {
-    padding: 8px px !important;
-    font-size: 0.7rem !important;        /* Más pequeño */
-    min-height: 38px !important;
-    letter-spacing: 1px !important;
-    border-radius: 4px !important;
-    margin: 10px auto !important;
-    width: 75% !important;                /* No tan ancho */
-    max-width: 320px !important;
-    text-transform: uppercase !important;
+/* ==================== BÓVEDA DEL MICTLÁN - AJUSTE FINO ==================== */
+
+#modal-boveda button {
+    padding: 11px 22px !important;
+    font-size: 0.88rem !important;
     font-family: 'Nosifer', cursive !important;
+    color: #ffdddd !important;
+    background: #3f0000 !important;
+    border: 2px solid #b30000 !important;
+    text-shadow: 1px 1px 3px #000 !important;
+    margin: 10px auto !important;
+    width: 82% !important;
+    max-width: 290px !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 10px rgba(180, 0, 0, 0.5) !important;
+    transition: all 0.3s ease !important;
 }
 
-/* Hover más sutil */
-.btn-ritual-grimorio:hover {
-    background: #8b0000 !important;
+#modal-boveda button:hover {
+    background: #6b0000 !important;
+    color: #ffffff !important;
+    border-color: #ff2222 !important;
     transform: scale(1.03) !important;
-    box-shadow: 0 0 12px rgba(255, 0, 0, 0.6) !important;
+}
+
+/* Texto dentro del pergamino */
+#boveda-cuerpo p {
+    color: #ff4444 !important;
+    text-shadow: 1px 1px 3px #000 !important;
+    font-size: 1.05rem !important;
+    margin-bottom: 18px !important;
+}
+
+#boveda-cuerpo p:first-child {
+    color: #ff0000 !important;
+    font-size: 1.5rem !important;
 }
 
 /* Estilo para la invocación de Google */
