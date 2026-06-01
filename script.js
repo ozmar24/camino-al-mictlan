@@ -7,6 +7,7 @@ let balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 
 let tumbaSeleccionada = null; 
 let ritualActivo = false; 
 let esModoRegistro = false; 
+window.estaCargandoAnuncio = false;
 
 // UNIFICACIÓN DEL DOMINIO ABSOLUTO DE VERCEL
 const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app';
@@ -598,33 +599,28 @@ function cerrarRitual() {
 // ==================================================================
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
-// Tu función principal, ahora mejorada para manejar el SDK
-window.estaCargandoAnuncio = false;
-
 async function videoCompletado() {
-    // 1. Verificamos si ya está cargando
-    if (window.estaCargandoAnuncio) return;
+    // 1. Prevención de clics múltiples
+    if (window.estaCargandoAnuncio) {
+        console.warn("El anuncio ya está en proceso.");
+        return;
+    }
 
-    // 2. Verificamos que Unity esté cargado
+    // 2. Validación crítica de Unity
     if (typeof Unity === 'undefined' || !Unity.Ads) {
-        console.error("Unity Ads no ha cargado aún");
-        return;
-    }
-    
-    if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet.", "SANTUARIO SIN DUEÑO");
+        console.error("Unity Ads no está disponible. ¿Bloqueador de anuncios activo?");
+        lanzarAlertaMictlan("El portal publicitario está inactivo.", "SIN CONEXIÓN");
         return;
     }
 
-    // 3. Bloqueamos clics adicionales
     window.estaCargandoAnuncio = true;
 
     try {
-        // Llamamos a Unity Ads
         Unity.Ads.show('Rewarded_Extraction', {
             onComplete: async () => {
-                // Ejecutamos la lógica de acumulación directamente aquí
-                const respuesta = await fetch('/api/acumular-sg', {
+                console.log("Anuncio visto, enviando tributo al servidor...");
+                
+                const respuesta = await fetch(`${DOMINIO_VERCEL}/api/acumular-sg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ wallet: window.userWallet })
@@ -632,31 +628,28 @@ async function videoCompletado() {
 
                 const resultado = await respuesta.json();
 
-                if (!respuesta.ok) {
-                    lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
-                } else {
+                if (respuesta.ok) {
                     balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
                     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
                     actualizarBalanceSoulgeist(balanceUsuarioSG);
                     generarCementerio();
-                    lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
+                    lanzarAlertaMictlan(resultado.mensaje || "+10 SG absorbidos", "ENERGÍA ABSORBIDA");
+                } else {
+                    lanzarAlertaMictlan(resultado.error || "Fallo en la ofrenda.", "ERROR");
                 }
-                
-                // Liberamos al terminar el anuncio
                 window.estaCargandoAnuncio = false;
             },
-            onSkipped: () => {
-                window.estaCargandoAnuncio = false;
+            onSkipped: () => { 
+                console.log("Anuncio saltado.");
+                window.estaCargandoAnuncio = false; 
             },
-            onError: (err) => {
-                console.error("Error en Unity:", err);
-                window.estaCargandoAnuncio = false;
+            onError: (err) => { 
+                console.error("Error en Unity Ads:", err); 
+                window.estaCargandoAnuncio = false; 
             }
         });
-
     } catch (error) {
-        console.error("Error en proceso:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
+        console.error("Error crítico en proceso:", error);
         window.estaCargandoAnuncio = false;
     }
 }
