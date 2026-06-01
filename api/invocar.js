@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
         'https://camino-al-mictlan.vercel.app',
-        'https://camino-al-mictlan.game-files.crazygames.com'
+        'http://localhost:3000'
     ];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {

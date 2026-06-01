@@ -599,8 +599,6 @@ function cerrarRitual() {
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
 // Tu función principal, ahora mejorada para manejar el SDK
-let estaCargandoAnuncio = false;
-
 async function videoCompletado() {
     if (estaCargandoAnuncio) return;
     
@@ -614,44 +612,34 @@ async function videoCompletado() {
     try {
         let anuncioVisto = false;
 
-        // Verificamos si el SDK existe Y si está habilitado
-        if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
-            try {
-                console.log("Solicitando visión publicitaria...");
-                const data = await window.CrazyGames.SDK.ad.requestAd("rewarded");
-                
-                if (data.status === "watched" || data.status === "completed") {
-                    anuncioVisto = true;
+        // Llamamos a Unity Ads
+        Unity.Ads.show('Rewarded_Extraction', {
+            onComplete: async () => {
+                // Al completarse el video, marcamos la variable como true
+                anuncioVisto = true;
+
+                // Y ejecutamos la lógica de acumulación
+                if (anuncioVisto) {
+                    const respuesta = await fetch('/api/acumular-sg', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ wallet: window.userWallet })
+                    });
+
+                    const resultado = await respuesta.json();
+
+                    if (!respuesta.ok) {
+                        lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+                    } else {
+                        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
+                        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+                        actualizarBalanceSoulgeist(balanceUsuarioSG);
+                        generarCementerio();
+                        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
+                    }
                 }
-            } catch (err) {
-    console.warn("SDK deshabilitado o error en anuncio:", err);
-    // Solo permitir en desarrollo, bloquear en producción
-    anuncioVisto = window.location.hostname === 'localhost' || 
-                   window.location.hostname === '127.0.0.1';
-}
-        } else {
-            anuncioVisto = true; 
-        }
-
-        if (anuncioVisto) {
-            const respuesta = await fetch('/api/acumular-sg', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wallet: window.userWallet })
-            });
-
-            const resultado = await respuesta.json();
-
-            if (!respuesta.ok) {
-                lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
-            } else {
-                balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
-                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
-                generarCementerio();
-                lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
             }
-        }
+        });
 
     } catch (error) {
         console.error("Error en proceso:", error);

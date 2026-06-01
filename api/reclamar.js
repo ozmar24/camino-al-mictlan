@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
         'https://camino-al-mictlan.vercel.app',
-        'https://camino-al-mictlan.game-files.crazygames.com'
+        'http://localhost:3000'
     ];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {
@@ -126,6 +126,17 @@ export default async function handler(req, res) {
                 error: `Mínimo no alcanzado. Necesitas más SG para retirar ${infoCripta.simFP}.`
             });
         }
+const { adToken } = req.body; // El token que viene del frontend tras ver el video
+
+if (!adToken) {
+    return res.status(403).json({ error: 'Para extraer, primero debes canalizar la energía visual (ver video).' });
+}
+
+// Aquí validamos el token (puedes usar un SDK de Unity o simplemente un registro en Redis)
+const adVerificado = await verificarTokenPublicidad(adToken); 
+if (!adVerificado) {
+    return res.status(403).json({ error: 'Publicidad no validada.' });
+}
 
 // ── 5. Procesar pago según pasarela ────────────────────────────────────
 let pagoExitoso = false;
