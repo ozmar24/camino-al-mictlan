@@ -13,9 +13,15 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnt.unityads.unity3d.com/sdk/unityads.js"></script>
+
 <script>
-    // Esto es OBLIGATORIO para que Unity Ads cargue
-    Unity.Ads.init('800002174', { debug: false });
+    // Usamos un intervalo para asegurar que Unity exista antes de llamar al init
+    const checkUnity = setInterval(() => {
+        if (typeof Unity !== 'undefined' && Unity.Ads) {
+            Unity.Ads.init('800002174', { debug: false });
+            clearInterval(checkUnity);
+        }
+    }, 100);
 </script>
 <script>
     if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {

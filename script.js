@@ -602,53 +602,62 @@ function cerrarRitual() {
 window.estaCargandoAnuncio = false;
 
 async function videoCompletado() {
-    // Usa window.estaCargandoAnuncio aquí también
+    // 1. Verificamos si ya está cargando
     if (window.estaCargandoAnuncio) return;
+
+    // 2. Verificamos que Unity esté cargado
+    if (typeof Unity === 'undefined' || !Unity.Ads) {
+        console.error("Unity Ads no ha cargado aún");
+        return;
+    }
     
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
+    // 3. Bloqueamos clics adicionales
     window.estaCargandoAnuncio = true;
 
     try {
-        let anuncioVisto = false;
-
         // Llamamos a Unity Ads
         Unity.Ads.show('Rewarded_Extraction', {
             onComplete: async () => {
-                // Al completarse el video, marcamos la variable como true
-                anuncioVisto = true;
+                // Ejecutamos la lógica de acumulación directamente aquí
+                const respuesta = await fetch('/api/acumular-sg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ wallet: window.userWallet })
+                });
 
-                // Y ejecutamos la lógica de acumulación
-                if (anuncioVisto) {
-                    const respuesta = await fetch('/api/acumular-sg', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ wallet: window.userWallet })
-                    });
+                const resultado = await respuesta.json();
 
-                    const resultado = await respuesta.json();
-
-                    if (!respuesta.ok) {
-                        lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
-                    } else {
-                        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
-                        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                        actualizarBalanceSoulgeist(balanceUsuarioSG);
-                        generarCementerio();
-                        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
-                    }
+                if (!respuesta.ok) {
+                    lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+                } else {
+                    balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
+                    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+                    actualizarBalanceSoulgeist(balanceUsuarioSG);
+                    generarCementerio();
+                    lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
                 }
+                
+                // Liberamos al terminar el anuncio
+                window.estaCargandoAnuncio = false;
+            },
+            onSkipped: () => {
+                window.estaCargandoAnuncio = false;
+            },
+            onError: (err) => {
+                console.error("Error en Unity:", err);
+                window.estaCargandoAnuncio = false;
             }
         });
 
     } catch (error) {
         console.error("Error en proceso:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
-    } finally {
-        estaCargandoAnuncio = false;
+        window.estaCargandoAnuncio = false;
     }
 }
 
