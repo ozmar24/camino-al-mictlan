@@ -604,13 +604,13 @@ function cerrarRitual() {
 // ==================================================================
 function mostrarVideoUnityAds() {
     if (typeof Unity !== 'undefined' && Unity.Ads) {
-        if (Unity.Ads.isReady('video')) {
+        if (Unity.Ads.isReady('Rewarded_Android')) {
             const showOptions = {
                 onComplete: videoCompletado,
                 onSkipped: videoSaltado,
                 onError: errorVideo
             };
-            Unity.Ads.show('video', showOptions);
+            Unity.Ads.show('Rewarded_Android', showOptions);
         } else {
             lanzarAlertaMictlan("Los videos del Mictlán aún no están listos.", "RITUAL INCOMPLETO");
         }
