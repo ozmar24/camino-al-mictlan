@@ -23,17 +23,7 @@
         }
     }, 100);
 </script>
-<script>
-    if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
-        window.CrazyGames.SDK.init().then(() => {
-            console.log("SDK de CrazyGames inicializado correctamente.");
-        }).catch((err) => {
-            console.error("Error al inicializar el SDK:", err);
-        });
-    } else {
-        console.warn("CrazyGames SDK no disponible en este entorno.");
-    }
-</script>
+
 </head>
 <body>
 

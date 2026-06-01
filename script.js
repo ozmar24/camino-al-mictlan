@@ -599,61 +599,68 @@ function cerrarRitual() {
 // ==================================================================
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
-async function videoCompletado() {
-    // 1. Prevención de clics múltiples
-    if (window.estaCargandoAnuncio) {
-        console.warn("El anuncio ya está en proceso.");
-        return;
-    }
-
-    // 2. Validación crítica de Unity
-    if (typeof Unity === 'undefined' || !Unity.Ads) {
-        console.error("Unity Ads no está disponible. ¿Bloqueador de anuncios activo?");
-        lanzarAlertaMictlan("El portal publicitario está inactivo.", "SIN CONEXIÓN");
-        return;
-    }
-
-    window.estaCargandoAnuncio = true;
-
-    try {
-        Unity.Ads.show('Rewarded_Extraction', {
-            onComplete: async () => {
-                console.log("Anuncio visto, enviando tributo al servidor...");
-                
-                const respuesta = await fetch(`${DOMINIO_VERCEL}/api/acumular-sg`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ wallet: window.userWallet })
-                });
-
-                const resultado = await respuesta.json();
-
-                if (respuesta.ok) {
-                    balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
-                    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                    actualizarBalanceSoulgeist(balanceUsuarioSG);
-                    generarCementerio();
-                    lanzarAlertaMictlan(resultado.mensaje || "+10 SG absorbidos", "ENERGÍA ABSORBIDA");
-                } else {
-                    lanzarAlertaMictlan(resultado.error || "Fallo en la ofrenda.", "ERROR");
-                }
-                window.estaCargandoAnuncio = false;
-            },
-            onSkipped: () => { 
-                console.log("Anuncio saltado.");
-                window.estaCargandoAnuncio = false; 
-            },
-            onError: (err) => { 
-                console.error("Error en Unity Ads:", err); 
-                window.estaCargandoAnuncio = false; 
-            }
-        });
-    } catch (error) {
-        console.error("Error crítico en proceso:", error);
-        window.estaCargandoAnuncio = false;
+// ==================================================================
+// UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
+// ==================================================================
+function mostrarVideoUnityAds() {
+    if (typeof Unity !== 'undefined' && Unity.Ads) {
+        if (Unity.Ads.isReady('video')) {
+            const showOptions = {
+                onComplete: videoCompletado,
+                onSkipped: videoSaltado,
+                onError: errorVideo
+            };
+            Unity.Ads.show('video', showOptions);
+        } else {
+            lanzarAlertaMictlan("Los videos del Mictlán aún no están listos.", "RITUAL INCOMPLETO");
+        }
+    } else {
+        lanzarAlertaMictlan("El sistema de videos no está disponible.", "ERROR DEL SISTEMA");
     }
 }
 
+async function videoCompletado() {
+    if (!window.userWallet) {
+        lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+            return;
+        }
+
+        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
+        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+
+        actualizarBalanceSoulgeist(balanceUsuarioSG);
+        generarCementerio();
+
+        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
+
+    } catch (error) {
+        console.error("Error en video:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
+    }
+}
+
+function videoSaltado() {
+    lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
+}
+
+function errorVideo(error) {
+    console.error("Error en video de Unity Ads:", error);
+    lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
+}
 // ==================================================================
 // EXTRAS Y MODALES SECUNDARIOS
 // ==================================================================
