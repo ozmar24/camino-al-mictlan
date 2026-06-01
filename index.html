@@ -11,13 +11,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
-    <!-- Unity Ads SDK - CORREGIDO -->
-    <script src="https://cdn.unityads.unity3d.com/latest/unityads.js"></script>
-    <script>
-        if (typeof Unity !== 'undefined' && Unity.Ads) {
-            Unity.Ads.init('800002174', { debug: false });
+    <!-- ✅ ESTO SÍ FUNCIONA: -->
+<script>
+    window.unityAdConfig = {
+        gameId: '800002174',
+        testMode: false
+    };
+</script>
+<script src="https://cdn.unityads.unity3d.com/latest/unityads.js" async></script>
+<script>
+    // Esperar a que Unity Ads cargue
+    var unityAdsLoaded = false;
+    
+    function initUnityAds() {
+        if (typeof unityads !== 'undefined' && !unityAdsLoaded) {
+            unityads.initialize('800002174', false, function(success) {
+                if (success) {
+                    console.log('✅ Unity Ads inicializado correctamente');
+                    unityAdsLoaded = true;
+                } else {
+                    console.error('❌ Error al inicializar Unity Ads');
+                }
+            });
         }
-    </script>
+    }
+    
+    // Reintentar cada 500ms hasta que cargue
+    var unityCheckInterval = setInterval(function() {
+        if (typeof unityads !== 'undefined') {
+            clearInterval(unityCheckInterval);
+            initUnityAds();
+        }
+    }, 500);
+</script>
 </head>
 <body>
 
