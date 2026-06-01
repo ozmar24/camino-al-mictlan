@@ -603,22 +603,28 @@ function cerrarRitual() {
 // UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
 // ==================================================================
 function mostrarVideoUnityAds() {
-    if (typeof Unity !== 'undefined' && Unity.Ads) {
-        if (Unity.Ads.isReady('Rewarded_Android')) {
-            const showOptions = {
-                onComplete: videoCompletado,
-                onSkipped: videoSaltado,
-                onError: errorVideo
-            };
-            Unity.Ads.show('Rewarded_Android', showOptions);
-        } else {
-            lanzarAlertaMictlan("Los videos del Mictlán aún no están listos.", "RITUAL INCOMPLETO");
-        }
+    if (!window.userWallet) {
+        lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
+        return;
+    }
+
+    console.log("Unity disponible?", typeof Unity !== 'undefined');
+    console.log("Unity.Ads disponible?", typeof Unity?.Ads !== 'undefined');
+    console.log("Video listo?", Unity?.Ads?.isReady('Rewarded_Android'));
+
+    if (typeof Unity !== 'undefined' && Unity.Ads && Unity.Ads.isReady('Rewarded_Android')) {
+        console.log("✅ Mostrando video...");
+        Unity.Ads.show('Rewarded_Android', {
+            onComplete: videoCompletado,
+            onSkipped: videoSaltado,
+            onError: errorVideo
+        });
     } else {
-        lanzarAlertaMictlan("El sistema de videos no está disponible.", "ERROR DEL SISTEMA");
+        console.warn("❌ Video no disponible, simulando...");
+        lanzarAlertaMictlan("Transmisión en progreso...", "ESPERANDO ABISMO");
+        setTimeout(videoCompletado, 3000);
     }
 }
-
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");

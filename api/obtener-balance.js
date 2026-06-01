@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
     // 1. Manejo seguro y dinámico de CORS para entornos de videojuegos en iframes
     const origin = req.headers.origin;
-    onst permitidos = ['https://camino-al-mictlan.vercel.app', 'http://localhost:3000'];
+    const permitidos = ['https://camino-al-mictlan.vercel.app', 'http://localhost:3000'];
 
 if (origin && (permitidos.includes(origin) || origin.includes('vercel.app'))) {
         res.setHeader('Access-Control-Allow-Origin', origin);
