@@ -599,6 +599,7 @@ function cerrarRitual() {
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
 // Tu función principal, ahora mejorada para manejar el SDK
+let estaCargandoAnuncio = false;
 async function videoCompletado() {
     if (estaCargandoAnuncio) return;
     

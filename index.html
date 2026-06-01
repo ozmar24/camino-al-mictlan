@@ -14,6 +14,10 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnt.unityads.unity3d.com/sdk/unityads.js"></script>
 <script>
+    // Esto es OBLIGATORIO para que Unity Ads cargue
+    Unity.Ads.init('800002174', { debug: false });
+</script>
+<script>
     if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
         window.CrazyGames.SDK.init().then(() => {
             console.log("SDK de CrazyGames inicializado correctamente.");
