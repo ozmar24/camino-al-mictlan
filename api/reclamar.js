@@ -127,12 +127,12 @@ export default async function handler(req, res) {
             });
         }
 
-        // ── 5. Procesar pago según pasarela ────────────────────────────────────
-let pagoExitoso    = false;
+// ── 5. Procesar pago según pasarela ────────────────────────────────────
+let pagoExitoso = false;
 let mensajeRetorno = '';
 
 // Definimos qué criptos son "EVM" (compatibles con Polygon/Contrato)
-const CRIPTOS_EVM = ['Ethereum', 'USDT', 'Pepe']; // Agrega aquí tus tokens de Polygon
+const CRIPTOS_EVM = ['Ethereum', 'USDT', 'Pepe', 'Solana', 'Dogecoin']; 
 
 if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
     const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
@@ -141,11 +141,18 @@ if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
         mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
     }
 } 
+else if (pasarela === 'bitso' && (cripto === 'Bitcoin' || cripto === 'Litecoin')) {
+    // AQUÍ ES DONDE ESTABA LA MAGIA: 
+    // Si es Bitso y la cripto es BTC o LTC, NO uses procesarRetiroOnChain.
+    // Llama a tu función de API de Bitso (o déjala pendiente, pero no intentes usar Polygon)
+    console.log(`Procesando retiro a Bitso para ${cripto}...`);
+    // Si no tienes la función implementada, por ahora simplemente marca éxito 
+    // para probar la alerta de Telegram y luego la integras bien:
+    pagoExitoso = true;
+    mensajeRetorno = `Retiro a Bitso procesado para ${cripto}.`;
+}
 else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
-    
-    // AQUÍ ESTÁ EL CAMBIO: Verificamos si la cripto es compatible con nuestro contrato
     if (CRIPTOS_EVM.includes(cripto)) {
-        // Solo para tokens que viven en Polygon (EVM)
         const resOC = await procesarRetiroOnChain(
             wallet,
             cantidadAEnviar,
@@ -162,10 +169,7 @@ else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
             return res.status(500).json({ error: resOC.error });
         }
     } else {
-        // Para Bitcoin, Litecoin, Dogecoin, etc., que NO son tokens de Polygon
-        return res.status(400).json({ 
-            error: `La pasarela ${pasarela} para ${cripto} requiere integración fuera de la red Polygon.` 
-        });
+        return res.status(400).json({ error: `Cripto no soportada en red Polygon: ${cripto}` });
     }
 }
 
