@@ -128,36 +128,46 @@ export default async function handler(req, res) {
         }
 
         // ── 5. Procesar pago según pasarela ────────────────────────────────────
-        let pagoExitoso    = false;
-        let mensajeRetorno = '';
+let pagoExitoso    = false;
+let mensajeRetorno = '';
 
-        if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
-            const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-            if (resLN.success) {
-                pagoExitoso    = true;
-                mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
-            }
+// Definimos qué criptos son "EVM" (compatibles con Polygon/Contrato)
+const CRIPTOS_EVM = ['Ethereum', 'USDT', 'Pepe']; // Agrega aquí tus tokens de Polygon
 
-        } else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
-            const resOC = await procesarRetiroOnChain(
-                wallet,
-                cantidadAEnviar,
-                claveAdmin,
-                contratoAddr,
-                blockchainRPC,
-                blockchainEnv
-            );
+if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
+    const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
+    if (resLN.success) {
+        pagoExitoso = true;
+        mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
+    }
+} 
+else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
+    
+    // AQUÍ ESTÁ EL CAMBIO: Verificamos si la cripto es compatible con nuestro contrato
+    if (CRIPTOS_EVM.includes(cripto)) {
+        // Solo para tokens que viven en Polygon (EVM)
+        const resOC = await procesarRetiroOnChain(
+            wallet,
+            cantidadAEnviar,
+            claveAdmin,
+            contratoAddr,
+            blockchainRPC,
+            blockchainEnv
+        );
 
-            if (resOC.success) {
-                pagoExitoso    = true;
-                mensajeRetorno = `Cosecha autorizada${blockchainEnv === 'testnet' ? ' en Amoy (testnet)' : ''}. Tx: ${resOC.txHash.slice(0, 10)}...`;
-            } else {
-                return res.status(500).json({ error: resOC.error || 'La blockchain rechazó la transferencia.' });
-            }
-
+        if (resOC.success) {
+            pagoExitoso = true;
+            mensajeRetorno = `Cosecha autorizada. Tx: ${resOC.txHash.slice(0, 10)}...`;
         } else {
-            return res.status(400).json({ error: 'Pasarela no reconocida.' });
+            return res.status(500).json({ error: resOC.error });
         }
+    } else {
+        // Para Bitcoin, Litecoin, Dogecoin, etc., que NO son tokens de Polygon
+        return res.status(400).json({ 
+            error: `La pasarela ${pasarela} para ${cripto} requiere integración fuera de la red Polygon.` 
+        });
+    }
+}
 
         // ── 6. Cerrar candados y resetear balance ──────────────────────────────
         if (pagoExitoso) {
