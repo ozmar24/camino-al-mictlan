@@ -215,22 +215,33 @@ function validarDireccion(wallet, pasarela, cripto) {
     return wallet.length > 5;
 }
 
-// ── Retiro on-chain ───────────────────────────────────────────────────────────
+// ── Retiro on-chain corregido ────────────────────────────────────────────────
 async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl, entorno) {
     try {
-        const provider    = new ethers.JsonRpcProvider(rpcUrl);
-        const walletAdmin = new ethers.Wallet(claveAdmin, provider);
+        // 1. Limpieza y validación de la llave
+        if (!claveAdmin || claveAdmin.length < 64) {
+            throw new Error(`Llave privada inválida: longitud ${claveAdmin?.length || 0}`);
+        }
+        
+        // Quitamos prefijo '0x' si lo tuviera para asegurar limpieza y lo volvemos a poner
+        const cleanKey = claveAdmin.startsWith('0x') ? claveAdmin : `0x${claveAdmin}`;
+        
+        // 2. Configuración del provider y wallet
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        const walletAdmin = new ethers.Wallet(cleanKey, provider);
 
         const MIN_ABI = [
             'function transfer(address to, uint256 amount) returns (bool)'
         ];
 
-        const contrato             = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
+        const contrato = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
+        
+        // 3. Conversión de monto
         const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
 
         console.log(`🤖 [${entorno}] Enviando ${monto} tokens a: ${walletUsuario}`);
 
-        const tx      = await contrato.transfer(walletUsuario, cantidadConDecimales);
+        const tx = await contrato.transfer(walletUsuario, cantidadConDecimales);
         const receipt = await tx.wait();
 
         return { success: true, txHash: receipt.hash };
