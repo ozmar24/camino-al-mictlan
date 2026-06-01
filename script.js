@@ -599,16 +599,18 @@ function cerrarRitual() {
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
 // ==================================================================
 // Tu función principal, ahora mejorada para manejar el SDK
-let estaCargandoAnuncio = false;
+window.estaCargandoAnuncio = false;
+
 async function videoCompletado() {
-    if (estaCargandoAnuncio) return;
+    // Usa window.estaCargandoAnuncio aquí también
+    if (window.estaCargandoAnuncio) return;
     
     if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
+        lanzarAlertaMictlan("Debes ligar tu wallet.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    estaCargandoAnuncio = true;
+    window.estaCargandoAnuncio = true;
 
     try {
         let anuncioVisto = false;
