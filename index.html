@@ -2,28 +2,22 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cementerio - El Umbral del Mictlán</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="style.css?v=999">
     
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnt.unityads.unity3d.com/sdk/unityads.js"></script>
-
-<script>
-    // Usamos un intervalo para asegurar que Unity exista antes de llamar al init
-    const checkUnity = setInterval(() => {
+    
+    <!-- Unity Ads SDK - CORREGIDO -->
+    <script src="https://cdn.unityads.unity3d.com/latest/unityads.js"></script>
+    <script>
         if (typeof Unity !== 'undefined' && Unity.Ads) {
             Unity.Ads.init('800002174', { debug: false });
-            clearInterval(checkUnity);
         }
-    }, 100);
-</script>
-
+    </script>
 </head>
 <body>
 
