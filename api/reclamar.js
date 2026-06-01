@@ -243,7 +243,8 @@ async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoA
         ];
 
         const contrato = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
-        const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
+        const cantidadFormateada = parseFloat(monto).toFixed(18); // Limita a 18 decimales
+	const cantidadConDecimales = ethers.parseUnits(cantidadFormateada, 18);
 
         console.log(`🤖 [${entorno}] Enviando ${monto} tokens a: ${walletUsuario}`);
 
