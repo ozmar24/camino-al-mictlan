@@ -516,26 +516,15 @@ function procesarRetiro() {
         return;
     }
 
+    // ELIMINAMOS CUALQUIER VERIFICACIÓN DE VIDEO AQUÍ
+    // Retiro directo a backend
     const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
-
-    if (!identidadUsuario) {
-        lanzarAlertaMictlan("Tu alma no está autenticada.", "ERROR DE IDENTIDAD");
-        cerrarRitual();
-        return;
-    }
-
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "bitso";
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
-    const saldoActual = window.tumbasConSaldo[nombreCripto] || 0;
-
-    if (saldoActual <= 0) {
-        lanzarAlertaMictlan("No tienes saldo en esta cripta.", "CRIPTAS VACÍAS");
-        return;
-    }
-
     cerrarRitual();
     
+    // Llamada directa a tu API de reclamos
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 
