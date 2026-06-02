@@ -1722,3 +1722,43 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+/* ==================== ESTILO PARA LEYES Y SUB-MODALES ==================== */
+
+#codice-titulo {
+    color: #ff2222 !important;
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000 !important;
+    font-size: 1.6rem !important;
+    margin-bottom: 20px !important;
+}
+
+#codice-cuerpo {
+    color: #ffdddd !important;
+    line-height: 1.7 !important;
+    font-size: 1.05rem !important;
+    text-shadow: 1px 1px 2px #000 !important;
+}
+
+#codice-cuerpo p {
+    color: #ffdddd !important;
+    margin-bottom: 18px !important;
+}
+
+.btn-subley {
+    background: #3a0000 !important;
+    color: #ffdddd !important;
+    border: 2px solid #b30000 !important;
+    padding: 12px 20px !important;
+    font-family: 'Nosifer', cursive !important;
+    font-size: 0.95rem !important;
+    margin: 8px 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    transition: all 0.3s !important;
+}
+
+.btn-subley:hover {
+    background: #6b0000 !important;
+    color: #ffffff !important;
+    border-color: #ff4444 !important;
+    transform: scale(1.03) !important;
+}
