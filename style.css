@@ -535,7 +535,7 @@ button,
         width: 180px !important;
     }
     .menu-textos .opcion {
-        font-size: 9px !important; /* Más pequeño */
+        font-size: 8px !important; /* Más pequeño */
     }
     /* Hacemos el botón de salir más pequeño */
     .boton-salir { 
