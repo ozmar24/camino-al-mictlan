@@ -126,16 +126,22 @@ export default async function handler(req, res) {
                 error: `Mínimo no alcanzado. Necesitas más SG para retirar ${infoCripta.simFP}.`
             });
         }
-const { adToken } = req.body; // El token que viene del frontend tras ver el video
+const { adToken } = req.body;
 
-if (!adToken) {
-    return res.status(403).json({ error: 'Para extraer, primero debes canalizar la energía visual (ver video).' });
+// LÓGICA CORREGIDA:
+// Solo requerimos el token si NO es un retiro hacia una wallet externa
+const esRetiroExterno = ['bitso', 'binance', 'coinbase', 'bitso_lightning'].includes(pasarela);
+
+if (!esRetiroExterno && !adToken) {
+    return res.status(403).json({ error: 'Para extraer Soulgeist, debes canalizar la energía visual.' });
 }
 
-// Aquí validamos el token (puedes usar un SDK de Unity o simplemente un registro en Redis)
-const adVerificado = await verificarTokenPublicidad(adToken); 
-if (!adVerificado) {
-    return res.status(403).json({ error: 'Publicidad no validada.' });
+// Si es retiro externo, podemos saltar la validación o hacerla opcional
+if (adToken) {
+    const adVerificado = await verificarTokenPublicidad(adToken); 
+    if (!adVerificado) {
+        return res.status(403).json({ error: 'Publicidad no validada.' });
+    }
 }
 
 // ── 5. Procesar pago según pasarela ────────────────────────────────────

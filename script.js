@@ -735,6 +735,9 @@ function abrirConfirmacionFinal() {
 }
 
 function lanzarAlertaMictlan(mensaje, titulo = "¡ADVERTENCIA MORTAL!") {
+    // ESTA LÍNEA TE DIRÁ EXACTAMENTE QUIÉN BLOQUEA EL RETIRO
+    console.trace("Rastreo de la alerta:"); 
+    
     document.getElementById('alerta-titulo').innerText = titulo; 
     document.getElementById('alerta-mensaje').innerText = mensaje; 
     const modal = document.getElementById('alerta-mictlan'); 
