@@ -1788,3 +1788,9 @@ main {
     color: #ff4444 !important;
     text-shadow: 0 0 15px #ff4444 !important;
 }
+#pantalla-codice .pergamino-quemado #codice-cuerpo *,
+#pantalla-codice .pergamino-quemado #codice-cuerpo {
+    color: #ff0000 !important;
+    text-shadow: 0 0 8px #ff0000, 1px 1px 2px #000 !important;
+    font-family: 'MedievalSharp', cursive !important;
+}
