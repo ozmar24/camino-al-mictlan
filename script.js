@@ -503,7 +503,7 @@ function adaptarPlaceholderPasarela(criptoId) {
     }
 }
 
-async function procesarRetiro
+function procesarRetiro() {
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
    
@@ -535,7 +535,7 @@ async function procesarRetiro
     }
 
     cerrarRitual();
-    await asegurarRedProduccion();
+    
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 
