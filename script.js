@@ -765,10 +765,10 @@ function mostrarPergamino(tipo) {
         Elige la sabiduría que deseas consultar:
     </p>
     <div style="display:flex; flex-direction:column; gap:18px; text-align:center; margin-top:10px;">
-        <span onclick="mostrarSubLey('privacidad')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— SEGURIDAD Y PRIVACIDAD —</span>
-<span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— REGLAS ETERNAS —</span>
-<span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
-<span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— CONSECUENCIAS —</span>
+        <span onclick="mostrarSubLey('privacidad')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— SEGURIDAD Y PRIVACIDAD —</span>
+<span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— REGLAS ETERNAS —</span>
+<span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
+<span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
     </div>
 `;
 
