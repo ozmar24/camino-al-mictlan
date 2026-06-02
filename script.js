@@ -1297,3 +1297,4 @@ async function asegurarRedProduccion() {
         lanzarAlertaMictlan("No se detectó billetera Web3.", "SIN BILLETERA");
     }
 }
+window.entrarAlMictlan = entrarAlMictlan;
