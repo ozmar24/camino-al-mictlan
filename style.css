@@ -678,8 +678,8 @@ button,
     text-align: center;
 }
 
-#codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 1rem; margin-bottom: 20px; }
-#codice-cuerpo { font-family: 'Nosifer', serif; color: #2a1b0a; font-size: 0.85rem; line-height: 1.5; font-weight: bold; }
+#codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 09rem; margin-bottom: 20px; }
+#codice-cuerpo { font-family: 'Nosifer', serif; color: #2a1b0a; font-size: 0.75rem; line-height: 1.5; font-weight: bold; }
 .boton-cerrar-codice { margin-top: 30px; font-family: 'Nosifer', cursive; color: #600; font-size: 0.6rem; transition: 0.3s; }
 .boton-cerrar-codice:hover { color: #ff0000; transform: scale(1.1); }
 
