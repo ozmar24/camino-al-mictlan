@@ -761,14 +761,14 @@ function mostrarPergamino(tipo) {
     if (tipo === 'leyes') {
         titulo.innerText = "LEYES DEL MICTLÁN";
         cuerpo.innerHTML = `
-    <p style="text-align:center; color:#ccaaaa; margin-bottom:25px;">
+    <p style="text-align:center; color:#8B0000; margin-bottom:25px;">
         Elige la sabiduría que deseas consultar:
     </p>
     <div style="display:flex; flex-direction:column; gap:18px; text-align:center; margin-top:10px;">
-        <span onclick="mostrarSubLey('privacidad')" style="color:#cc0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:1rem; letter-spacing:2px;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='#cc0000'">— SEGURIDAD Y PRIVACIDAD —</span>
-        <span onclick="mostrarSubLey('reglas')" style="color:#cc0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:1rem; letter-spacing:2px;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='#cc0000'">— REGLAS ETERNAS —</span>
-        <span onclick="mostrarSubLey('prohibiciones')" style="color:#cc0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:1rem; letter-spacing:2px;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='#cc0000'">— PROHIBICIONES DEL INFRAMUNDO —</span>
-        <span onclick="mostrarSubLey('consecuencias')" style="color:#cc0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:1rem; letter-spacing:2px;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='#cc0000'">— CONSECUENCIAS —</span>
+        <span onclick="mostrarSubLey('privacidad')" style="color:#8B0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:0.7rem; letter-spacing:2px;" onmouseover="this.style.color='#8B0000'" onmouseout="this.style.color='#8B0000'">— SEGURIDAD Y PRIVACIDAD —</span>
+        <span onclick="mostrarSubLey('reglas')" style="color:#8B0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:1rem; letter-spacing:2px;" onmouseover="this.style.color='#8B0000'" onmouseout="this.style.color='#8B0000'">— REGLAS ETERNAS —</span>
+        <span onclick="mostrarSubLey('prohibiciones')" style="color:#8B0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:0.7rem; letter-spacing:2px;" onmouseover="this.style.color='#8B0000'" onmouseout="this.style.color='#8B0000'">— PROHIBICIONES DEL INFRAMUNDO —</span>
+        <span onclick="mostrarSubLey('consecuencias')" style="color:#8B0000; font-family:'MedievalSharp',cursive; cursor:pointer; font-size:0.7rem; letter-spacing:2px;" onmouseover="this.style.color='#8B0000'" onmouseout="this.style.color='#8B0000'">— CONSECUENCIAS —</span>
     </div>
 `;
 
