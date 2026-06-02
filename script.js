@@ -779,7 +779,8 @@ function mostrarPergamino(tipo) {
         }
 
     } else if (tipo === 'alianzas') {
-        // tu código actual de alianzas aquí
+        titulo.innerText = "ALIANZAS OSCURAS"; 
+        cuerpo.innerHTML = "<br><br>• BITSO<br>• COINBASE<br>• BINANCE";
     }
 
     if (pantalla) {
