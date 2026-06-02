@@ -751,33 +751,33 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
-// --- FUNCIONES DE CÓDICES (MEJORADO) ---
 // ====================== MENÚ PRINCIPAL DE LEYES ======================
 function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
-    const titulo = document.getElementById('codice-titulo');
-    const cuerpo = document.getElementById('codice-cuerpo');
-    const botonCerrar = document.querySelector('.boton-cerrar-codice');
+    const titulo   = document.getElementById('codice-titulo');
+    const cuerpo   = document.getElementById('codice-cuerpo');
+    const boton    = document.querySelector('.boton-cerrar-codice');
 
     if (tipo === 'leyes') {
         titulo.innerText = "LEYES DEL MICTLÁN";
         cuerpo.innerHTML = `
-            <p style="text-align:center; color:#ccaaaa; margin-bottom:25px;">Elige la sabiduría que deseas consultar:</p>
-            
+            <p style="text-align:center; color:#ccaaaa; margin-bottom:25px;">
+                Elige la sabiduría que deseas consultar:
+            </p>
             <button onclick="mostrarSubLey('privacidad')" class="btn-subley">Seguridad y Privacidad</button>
             <button onclick="mostrarSubLey('reglas')" class="btn-subley">Reglas Eternas</button>
             <button onclick="mostrarSubLey('prohibiciones')" class="btn-subley">Prohibiciones del Inframundo</button>
             <button onclick="mostrarSubLey('consecuencias')" class="btn-subley">Consecuencias</button>
         `;
 
-        // Botón principal de Leyes
-        if (botonCerrar) {
-            botonCerrar.innerHTML = '[ CERRAR PACTO ]';
-            botonCerrar.onclick = cerrarCodice;
+        // ✅ Botón principal → cierra el pergamino
+        if (boton) {
+            boton.innerHTML = '[ CERRAR PACTO ]';
+            boton.onclick = cerrarCodice;
         }
-    } 
-    else if (tipo === 'alianzas') {
-        // ... tu código actual de alianzas
+
+    } else if (tipo === 'alianzas') {
+        // tu código actual de alianzas aquí
     }
 
     if (pantalla) {
@@ -790,48 +790,43 @@ function mostrarPergamino(tipo) {
 function mostrarSubLey(seccion) {
     const titulo = document.getElementById('codice-titulo');
     const cuerpo = document.getElementById('codice-cuerpo');
-    const botonCerrar = document.querySelector('.boton-cerrar-codice');
+    const boton  = document.querySelector('.boton-cerrar-codice');
 
-    // Cambiamos el botón a "REGRESAR A LEYES"
-    if (botonCerrar) {
-        botonCerrar.innerHTML = '[ REGRESAR A LEYES ]';
-        botonCerrar.onclick = () => mostrarPergamino('leyes');
+    // ✅ Botón cambia a "REGRESAR A LEYES"
+    if (boton) {
+        boton.innerHTML = '[ REGRESAR A LEYES ]';
+        boton.onclick = () => mostrarPergamino('leyes');
     }
 
-    if (seccion === 'privacidad') {
-        titulo.innerText = "VELO DE PRIVACIDAD";
-        cuerpo.innerHTML = `<p>No recopilamos datos sensibles como nombre completo, dirección física, teléfono o información bancaria.<br><br>Únicamente almacenamos wallet y correo para el funcionamiento del portal.</p>`;
-    } else if (seccion === 'reglas') {
-        titulo.innerText = "REGLAS ETERNAS";
-        cuerpo.innerHTML = `<p>Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br>Todo intento de manipulación será considerado traición.</p>`;
-    } else if (seccion === 'prohibiciones') {
-        titulo.innerText = "PROHIBICIONES DEL INFRAMUNDO";
-        cuerpo.innerHTML = `<p>Actividades fraudulentas o distribución de información falsa serán castigadas.</p>`;
-    } else if (seccion === 'consecuencias') {
-        titulo.innerText = "CONSECUENCIAS";
-        cuerpo.innerHTML = `<p>La violación de estas leyes puede resultar en la suspensión permanente de la cuenta y la quema de recompensas.<br>El Mictlán no olvida.</p>`;
-    }
-}
+    const contenidos = {
+        privacidad: {
+            titulo: "VELO DE PRIVACIDAD",
+            texto: `No recopilamos datos sensibles como nombre completo, dirección física, 
+                    teléfono o información bancaria.<br><br>
+                    Únicamente almacenamos wallet y correo para el funcionamiento del portal.`
+        },
+        reglas: {
+            titulo: "REGLAS ETERNAS",
+            texto: `Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br><br>
+                    Todo intento de manipulación será considerado traición.`
+        },
+        prohibiciones: {
+            titulo: "PROHIBICIONES DEL INFRAMUNDO",
+            texto: `Actividades fraudulentas o distribución de información falsa 
+                    serán castigadas con severidad.`
+        },
+        consecuencias: {
+            titulo: "CONSECUENCIAS",
+            texto: `La violación de estas leyes puede resultar en la suspensión permanente 
+                    de la cuenta y la quema de recompensas.<br><br>
+                    El Mictlán no olvida.`
+        }
+    };
 
-function mostrarSubLey(seccion) {
-    const titulo = document.getElementById('codice-titulo');
-    const cuerpo = document.getElementById('codice-cuerpo');
-
-    if (seccion === 'privacidad') {
-        titulo.innerText = "VELO DE PRIVACIDAD";
-        cuerpo.innerHTML = `<p>No recopilamos datos sensibles como nombre completo, dirección física, teléfono o información bancaria.<br>Únicamente almacenamos wallet y correo para el funcionamiento del portal.</p>`;
-    } 
-    else if (seccion === 'reglas') {
-        titulo.innerText = "REGLAS ETERNAS";
-        cuerpo.innerHTML = `<p>Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br>Todo intento de manipulación será considerado traición.</p>`;
-    } 
-    else if (seccion === 'prohibiciones') {
-        titulo.innerText = "PROHIBICIONES DEL INFRAMUNDO";
-        cuerpo.innerHTML = `<p>Actividades fraudulentas o distribución de información falsa serán castigadas.</p>`;
-    } 
-    else if (seccion === 'consecuencias') {
-        titulo.innerText = "CONSECUENCIAS";
-        cuerpo.innerHTML = `<p>La violación de estas leyes puede resultar en la suspensión permanente de la cuenta y quema de recompensas.<br>El Mictlán no olvida.</p>`;
+    const data = contenidos[seccion];
+    if (data) {
+        titulo.innerText = data.titulo;
+        cuerpo.innerHTML = `<p>${data.texto}</p>`;
     }
 }
 
