@@ -1768,3 +1768,23 @@ main {
     border-color: #ff4444 !important;
     transform: scale(1.03) !important;
 }
+/* ── Pergamino Códice — texto estilo candelabro ── */
+#pantalla-codice #codice-cuerpo,
+#pantalla-codice #codice-cuerpo p,
+#pantalla-codice #codice-cuerpo span {
+    color: #8B0000 !important;
+    text-shadow: 0 0 6px #ff0000, 1px 1px 2px #000 !important;
+    font-family: 'MedievalSharp', cursive !important;
+}
+
+#pantalla-codice #codice-cuerpo span.link-ley {
+    color: #ff0000 !important;
+    text-shadow: 0 0 10px #ff0000, 0 0 20px #800000 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 2px !important;
+}
+
+#pantalla-codice #codice-cuerpo span.link-ley:hover {
+    color: #ff4444 !important;
+    text-shadow: 0 0 15px #ff4444 !important;
+}
