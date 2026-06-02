@@ -756,28 +756,37 @@ function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
     const titulo = document.getElementById('codice-titulo');
     const cuerpo = document.getElementById('codice-cuerpo');
+    const botonCerrar = document.querySelector('.boton-cerrar-codice');
 
     if (tipo === 'leyes') {
         titulo.innerText = "LEYES DEL MICTLÁN";
         cuerpo.innerHTML = `
-            <p style="text-align:center; margin-bottom:25px; color:#ccaaaa;">Elige la sabiduría que deseas consultar:</p>
+            <p style="text-align:center; color:#ccaaaa; margin-bottom:25px;">Elige la sabiduría que deseas consultar:</p>
             
             <button onclick="mostrarSubLey('privacidad')" class="btn-subley">Seguridad y Privacidad</button>
             <button onclick="mostrarSubLey('reglas')" class="btn-subley">Reglas Eternas</button>
             <button onclick="mostrarSubLey('prohibiciones')" class="btn-subley">Prohibiciones del Inframundo</button>
             <button onclick="mostrarSubLey('consecuencias')" class="btn-subley">Consecuencias</button>
         `;
-    } 
-    else if (tipo === 'alianzas') {
+        
+        // Cambiamos el texto del botón para Leyes
+        if (botonCerrar) botonCerrar.innerHTML = '[ REGRESAR A LEYES ]';
+        if (botonCerrar) botonCerrar.onclick = () => mostrarPergamino('leyes'); // Vuelve al menú principal
+
+    } else if (tipo === 'alianzas') {
         titulo.innerText = "ALIANZAS OSCURAS";
         cuerpo.innerHTML = `
             <p style="text-align:center; margin:20px 0;">Socios del Inframundo</p>
-            <ul style="color:#ccaaaa; line-height:1.8;">
+            <ul style="color:#ccaaaa; line-height:1.8; text-align:center;">
                 <li>• BITSO</li>
                 <li>• COINBASE</li>
                 <li>• BINANCE</li>
             </ul>
         `;
+        
+        // Botón normal para Alianzas
+        if (botonCerrar) botonCerrar.innerHTML = '[ CERRAR PACTO ]';
+        if (botonCerrar) botonCerrar.onclick = cerrarCodice;
     }
 
     if (pantalla) {
