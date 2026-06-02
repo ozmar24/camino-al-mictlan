@@ -1738,9 +1738,13 @@ main {
     text-shadow: 1px 1px 2px #000 !important;
 }
 
-#codice-cuerpo p {
-    color: #ffdddd !important;
-    margin-bottom: 18px !important;
+#codice-cuerpo span.link-ley {
+    color: #ff0000 !important;
+    text-shadow: 0 0 8px #ff0000 !important;
+}
+
+#codice-cuerpo span.link-ley:hover {
+    color: #ff6666 !important;
 }
 
 .btn-subley {

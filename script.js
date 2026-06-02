@@ -765,10 +765,10 @@ function mostrarPergamino(tipo) {
         Elige la sabiduría que deseas consultar:
     </p>
     <div style="display:flex; flex-direction:column; gap:18px; text-align:center; margin-top:10px;">
-        <span onclick="mostrarSubLey('privacidad')" class="pentaculo-cursor" style="color:#ff0000; font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; text-shadow: 0 0 8px #ff0000;" onmouseover="this.style.color='#ff6666'" onmouseout="this.style.color='#ff0000'">— SEGURIDAD Y PRIVACIDAD —</span>
-        <span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor" style="color:#ff0000; font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; text-shadow: 0 0 8px #ff0000;" onmouseover="this.style.color='#ff6666'" onmouseout="this.style.color='#ff0000'">— REGLAS ETERNAS —</span>
-        <span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor" style="color:#ff0000; font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; text-shadow: 0 0 8px #ff0000;" onmouseover="this.style.color='#ff6666'" onmouseout="this.style.color='#ff0000'">— PROHIBICIONES DEL INFRAMUNDO —</span>
-        <span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor" style="color:#ff0000; font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; text-shadow: 0 0 8px #ff0000;" onmouseover="this.style.color='#ff6666'" onmouseout="this.style.color='#ff0000'">— CONSECUENCIAS —</span>
+        <span onclick="mostrarSubLey('privacidad')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— SEGURIDAD Y PRIVACIDAD —</span>
+<span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— REGLAS ETERNAS —</span>
+<span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
+<span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:1rem; letter-spacing:2px; display:block;">— CONSECUENCIAS —</span>
     </div>
 `;
 
