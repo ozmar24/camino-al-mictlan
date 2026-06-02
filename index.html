@@ -11,38 +11,52 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
-    <!-- ✅ ESTO SÍ FUNCIONA: -->
+    <!-- Unity Ads SDK - Versión mejorada -->
 <script>
-    window.unityAdConfig = {
-        gameId: '800002174',
-        testMode: false
-    };
-</script>
-<script src="https://cdn.unityads.unity3d.com/latest/unityads.js" async></script>
-<script>
-    // Esperar a que Unity Ads cargue
-    var unityAdsLoaded = false;
+    // Variables globales
+    window.unityAdsInitialized = false;
     
-    function initUnityAds() {
-        if (typeof unityads !== 'undefined' && !unityAdsLoaded) {
-            unityads.initialize('800002174', false, function(success) {
-                if (success) {
-                    console.log('✅ Unity Ads inicializado correctamente');
-                    unityAdsLoaded = true;
-                } else {
-                    console.error('❌ Error al inicializar Unity Ads');
+    // Cargar el SDK
+    (function() {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.unityads.unity3d.com/latest/unityads.js';
+        script.async = true;
+        script.onload = function() {
+            console.log('✅ Script de Unity Ads cargado');
+            initializeUnityAds();
+        };
+        script.onerror = function() {
+            console.error('❌ Error al cargar Unity Ads SDK');
+        };
+        document.head.appendChild(script);
+    })();
+    
+    // Inicializar Unity Ads
+    function initializeUnityAds() {
+        if (window.unityads && window.unityads.initialize) {
+            console.log('🎬 Inicializando Unity Ads...');
+            window.unityads.initialize(
+                '800002174',  // Game ID
+                function(initSuccess) {
+                    if (initSuccess) {
+                        console.log('✅ Unity Ads inicializado exitosamente');
+                        window.unityAdsInitialized = true;
+                    } else {
+                        console.error('❌ Error al inicializar Unity Ads');
+                    }
                 }
-            });
+            );
+        } else {
+            setTimeout(initializeUnityAds, 500);
         }
     }
     
-    // Reintentar cada 500ms hasta que cargue
-    var unityCheckInterval = setInterval(function() {
-        if (typeof unityads !== 'undefined') {
-            clearInterval(unityCheckInterval);
-            initUnityAds();
+    // Reintentar cada 2 segundos si no está listo
+    setInterval(function() {
+        if (!window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
+            initializeUnityAds();
         }
-    }, 500);
+    }, 2000);
 </script>
 </head>
 <body>

@@ -609,30 +609,35 @@ function mostrarVideoUnityAds() {
     }
 
     console.log("🎬 Intentando mostrar video de Unity Ads...");
+    console.log("Unity Ads inicializado?", window.unityAdsInitialized);
+    console.log("window.unityads disponible?", typeof window.unityads !== 'undefined');
 
-    if (typeof unityads === 'undefined' || !unityads.sdk) {
-        console.warn("❌ Unity Ads no está listo, simulando video...");
+    // Intentar mostrar video real
+    if (window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
+        console.log("✅ Mostrando video real de Unity Ads...");
+        
+        window.unityads.show('Rewarded_Android', {
+            onComplete: function() {
+                console.log("✅ Video completado correctamente");
+                videoCompletado();
+            },
+            onSkipped: function() {
+                console.log("⏭️ Usuario saltó el video");
+                lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
+            },
+            onError: function(error) {
+                console.error("❌ Error en video:", error);
+                // Fallback: simular video
+                lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
+                setTimeout(videoCompletado, 3000);
+            }
+        });
+    } else {
+        // Fallback: simular video si Unity Ads no está disponible
+        console.warn("❌ Unity Ads no disponible, simulando video...");
         lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
         setTimeout(videoCompletado, 3000);
-        return;
     }
-
-    // Mostrar video recompensado
-    unityads.sdk.showVideo({
-        placementId: 'Rewarded_Android',  // ← CAMBIO AQUÍ
-        onComplete: function() {
-            console.log("✅ Video completado correctamente");
-            videoCompletado();
-        },
-        onSkipped: function() {
-            console.log("⏭️ Usuario saltó el video");
-            lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
-        },
-        onError: function(error) {
-            console.error("❌ Error en video:", error);
-            lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
-        }
-    });
 }
 async function videoCompletado() {
     if (!window.userWallet) {
