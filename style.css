@@ -656,8 +656,8 @@ button,
     left: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background: rgba(0, 0, 0, 0.95) !important;
-    backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(2px);
     display: none;
     justify-content: center; align-items: center;
     z-index: 100000 !important;
@@ -665,17 +665,18 @@ button,
 
 .pergamino-quemado {
     position: relative;
-    width: 700px;
-    height: 500px;
+    width: 750px;
+    height: 580px;
     background: url('img/contrato.png') no-repeat center center !important;
     background-size: contain !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 80px 120px;
+    padding: 100px 130px 80px 130px;
     box-sizing: border-box;
     text-align: center;
+    overflow: hidden;
 }
 
 #codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 09rem; margin-bottom: 20px; }
