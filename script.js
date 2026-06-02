@@ -759,23 +759,67 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
-// --- FUNCIONES DE CÓDICES ---
+// --- FUNCIONES DE CÓDICES (MEJORADO) ---
 function mostrarPergamino(tipo) {
-    const pantalla = document.getElementById('pantalla-codice'); 
-    const titulo = document.getElementById('codice-titulo'); 
-    const cuerpo = document.getElementById('codice-cuerpo'); 
+    const pantalla = document.getElementById('pantalla-codice');
+    const titulo = document.getElementById('codice-titulo');
+    const cuerpo = document.getElementById('codice-cuerpo');
 
     if (tipo === 'leyes') {
-        titulo.innerText = "DERECHOS ETERNOS"; 
-        cuerpo.innerHTML = "EL CONTRATO ES DE POR VIDA.<br>LOS RECLAMOS REQUIEREN SACRIFICIO.<br>EL MICTLÁN NO OLVIDA."; 
-    } else if (tipo === 'alianzas') {
-        titulo.innerText = "ALIANZAS OSCURAS"; 
-        cuerpo.innerHTML = "<br><br>• BITSO<br>• COINBASE<br>• BINANCE"; 
+        titulo.innerText = "LEYES DEL MICTLÁN";
+        cuerpo.innerHTML = `
+            <p style="text-align:center; margin-bottom:25px; color:#ccaaaa;">Elige la sabiduría que deseas consultar:</p>
+            
+            <button onclick="mostrarSubLey('privacidad')" class="btn-subley">Seguridad y Privacidad</button>
+            <button onclick="mostrarSubLey('reglas')" class="btn-subley">Reglas Eternas</button>
+            <button onclick="mostrarSubLey('prohibiciones')" class="btn-subley">Prohibiciones del Inframundo</button>
+            <button onclick="mostrarSubLey('consecuencias')" class="btn-subley">Consecuencias</button>
+        `;
+    } 
+    else if (tipo === 'alianzas') {
+        titulo.innerText = "ALIANZAS OSCURAS";
+        cuerpo.innerHTML = `
+            <p style="text-align:center; margin:20px 0;">Socios del Inframundo</p>
+            <ul style="color:#ccaaaa; line-height:1.8;">
+                <li>• BITSO</li>
+                <li>• COINBASE</li>
+                <li>• BINANCE</li>
+            </ul>
+        `;
     }
 
     if (pantalla) {
-        pantalla.style.display = 'flex'; 
-        setTimeout(() => { pantalla.style.opacity = '1'; }, 10); 
+        pantalla.style.display = 'flex';
+        setTimeout(() => { pantalla.style.opacity = '1'; }, 10);
+    }
+}
+
+function mostrarSubLey(seccion) {
+    const titulo = document.getElementById('codice-titulo');
+    const cuerpo = document.getElementById('codice-cuerpo');
+
+    if (seccion === 'privacidad') {
+        titulo.innerText = "VELO DE PRIVACIDAD";
+        cuerpo.innerHTML = `<p>No recopilamos datos sensibles como nombre completo, dirección física, teléfono o información bancaria.<br>Únicamente almacenamos wallet y correo para el funcionamiento del portal.</p>`;
+    } 
+    else if (seccion === 'reglas') {
+        titulo.innerText = "REGLAS ETERNAS";
+        cuerpo.innerHTML = `<p>Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br>Todo intento de manipulación será considerado traición.</p>`;
+    } 
+    else if (seccion === 'prohibiciones') {
+        titulo.innerText = "PROHIBICIONES DEL INFRAMUNDO";
+        cuerpo.innerHTML = `<p>Actividades fraudulentas o distribución de información falsa serán castigadas.</p>`;
+    } 
+    else if (seccion === 'consecuencias') {
+        titulo.innerText = "CONSECUENCIAS";
+        cuerpo.innerHTML = `<p>La violación de estas leyes puede resultar en la suspensión permanente de la cuenta y quema de recompensas.<br>El Mictlán no olvida.</p>`;
+    }
+}
+
+function cerrarCodice() {
+    const pantalla = document.getElementById('pantalla-codice');
+    if (pantalla) {
+        pantalla.style.display = 'none';
     }
 }
 
