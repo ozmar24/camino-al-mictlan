@@ -759,7 +759,6 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
-
 // --- FUNCIONES DE CÓDICES (MEJORADO) ---
 function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
@@ -832,7 +831,7 @@ function mostrarSubLey(seccion) {
 function cerrarCodice() {
     const pantalla = document.getElementById('pantalla-codice');
     if (pantalla) pantalla.style.display = 'none';
-}
+} 
 
 // ❌ BUSCA ESTO:
 function abrirSoporte() {
