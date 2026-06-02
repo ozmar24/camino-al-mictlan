@@ -664,19 +664,20 @@ button,
 }
 
 .pergamino-quemado {
-    position: relative;
-    width: 750px;
-    height: 580px;
-    background: url('img/contrato.png') no-repeat center center !important;
-    background-size: contain !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 750px;
+    background: url('img/contrato.png') no-repeat center center;
+    background-size: contain;
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 100px 130px 80px 130px;
-    box-sizing: border-box;
-    text-align: center;
-    overflow: hidden;
+    padding: 60px;
 }
 
 #codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 09rem; margin-bottom: 20px; }
