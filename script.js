@@ -608,25 +608,31 @@ function mostrarVideoUnityAds() {
         return;
     }
 
-    console.log("🎬 Intentando mostrar video...");
-    console.log("unityads disponible?", typeof unityads !== 'undefined');
+    console.log("🎬 Intentando mostrar video de Unity Ads...");
 
-    if (typeof unityads !== 'undefined') {
-        console.log("✅ Mostrando video de Unity Ads...");
-        unityads.showVideo(function(result) {
-            if (result === 'completed' || result === 'skipped') {
-                console.log("✅ Video completado/saltado, procesando recompensa...");
-                videoCompletado();
-            } else {
-                console.warn("Video error:", result);
-                lanzarAlertaMictlan("Error al mostrar el video.", "FALLO ASTRAL");
-            }
-        });
-    } else {
-        console.warn("❌ Unity Ads no disponible, simulando...");
+    if (typeof unityads === 'undefined' || !unityads.sdk) {
+        console.warn("❌ Unity Ads no está listo, simulando video...");
         lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
         setTimeout(videoCompletado, 3000);
+        return;
     }
+
+    // Mostrar video recompensado
+    unityads.sdk.showVideo({
+        placementId: 'Rewarded_Android',  // ← CAMBIO AQUÍ
+        onComplete: function() {
+            console.log("✅ Video completado correctamente");
+            videoCompletado();
+        },
+        onSkipped: function() {
+            console.log("⏭️ Usuario saltó el video");
+            lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
+        },
+        onError: function(error) {
+            console.error("❌ Error en video:", error);
+            lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
+        }
+    });
 }
 async function videoCompletado() {
     if (!window.userWallet) {
