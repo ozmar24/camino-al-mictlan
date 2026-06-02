@@ -503,7 +503,7 @@ function adaptarPlaceholderPasarela(criptoId) {
     }
 }
 
-function procesarRetiro() {
+async function procesarRetiro
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
    
