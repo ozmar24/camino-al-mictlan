@@ -752,6 +752,7 @@ function cerrarAlertaMictlan() {
 }
 
 // --- FUNCIONES DE CÓDICES (MEJORADO) ---
+// ====================== MENÚ PRINCIPAL DE LEYES ======================
 function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
     const titulo = document.getElementById('codice-titulo');
@@ -769,20 +770,14 @@ function mostrarPergamino(tipo) {
             <button onclick="mostrarSubLey('consecuencias')" class="btn-subley">Consecuencias</button>
         `;
 
-        // En el menú principal de Leyes
+        // Botón principal de Leyes
         if (botonCerrar) {
             botonCerrar.innerHTML = '[ CERRAR PACTO ]';
             botonCerrar.onclick = cerrarCodice;
         }
     } 
     else if (tipo === 'alianzas') {
-        titulo.innerText = "ALIANZAS OSCURAS";
-        cuerpo.innerHTML = `...`; // tu contenido actual
-
-        if (botonCerrar) {
-            botonCerrar.innerHTML = '[ CERRAR PACTO ]';
-            botonCerrar.onclick = cerrarCodice;
-        }
+        // ... tu código actual de alianzas
     }
 
     if (pantalla) {
@@ -791,12 +786,13 @@ function mostrarPergamino(tipo) {
     }
 }
 
+// ====================== SUB-SECCIONES DE LEYES ======================
 function mostrarSubLey(seccion) {
     const titulo = document.getElementById('codice-titulo');
     const cuerpo = document.getElementById('codice-cuerpo');
     const botonCerrar = document.querySelector('.boton-cerrar-codice');
 
-    // Cambiamos el botón a "REGRESAR A LEYES" cuando estamos en sub-sección
+    // Cambiamos el botón a "REGRESAR A LEYES"
     if (botonCerrar) {
         botonCerrar.innerHTML = '[ REGRESAR A LEYES ]';
         botonCerrar.onclick = () => mostrarPergamino('leyes');
