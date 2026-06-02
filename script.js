@@ -830,7 +830,9 @@ function mostrarSubLey(seccion) {
 
 function cerrarCodice() {
     const pantalla = document.getElementById('pantalla-codice');
-    if (pantalla) pantalla.style.display = 'none';
+    if (pantalla) {
+        pantalla.style.display = 'none';
+    }
 } 
 
 // ❌ BUSCA ESTO:
