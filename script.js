@@ -768,30 +768,52 @@ function mostrarPergamino(tipo) {
             <button onclick="mostrarSubLey('prohibiciones')" class="btn-subley">Prohibiciones del Inframundo</button>
             <button onclick="mostrarSubLey('consecuencias')" class="btn-subley">Consecuencias</button>
         `;
-        
-        // Cambiamos el texto del botón para Leyes
-        if (botonCerrar) botonCerrar.innerHTML = '[ REGRESAR A LEYES ]';
-        if (botonCerrar) botonCerrar.onclick = () => mostrarPergamino('leyes'); // Vuelve al menú principal
 
-    } else if (tipo === 'alianzas') {
+        // En el menú principal de Leyes
+        if (botonCerrar) {
+            botonCerrar.innerHTML = '[ CERRAR PACTO ]';
+            botonCerrar.onclick = cerrarCodice;
+        }
+    } 
+    else if (tipo === 'alianzas') {
         titulo.innerText = "ALIANZAS OSCURAS";
-        cuerpo.innerHTML = `
-            <p style="text-align:center; margin:20px 0;">Socios del Inframundo</p>
-            <ul style="color:#ccaaaa; line-height:1.8; text-align:center;">
-                <li>• BITSO</li>
-                <li>• COINBASE</li>
-                <li>• BINANCE</li>
-            </ul>
-        `;
-        
-        // Botón normal para Alianzas
-        if (botonCerrar) botonCerrar.innerHTML = '[ CERRAR PACTO ]';
-        if (botonCerrar) botonCerrar.onclick = cerrarCodice;
+        cuerpo.innerHTML = `...`; // tu contenido actual
+
+        if (botonCerrar) {
+            botonCerrar.innerHTML = '[ CERRAR PACTO ]';
+            botonCerrar.onclick = cerrarCodice;
+        }
     }
 
     if (pantalla) {
         pantalla.style.display = 'flex';
         setTimeout(() => { pantalla.style.opacity = '1'; }, 10);
+    }
+}
+
+function mostrarSubLey(seccion) {
+    const titulo = document.getElementById('codice-titulo');
+    const cuerpo = document.getElementById('codice-cuerpo');
+    const botonCerrar = document.querySelector('.boton-cerrar-codice');
+
+    // Cambiamos el botón a "REGRESAR A LEYES" cuando estamos en sub-sección
+    if (botonCerrar) {
+        botonCerrar.innerHTML = '[ REGRESAR A LEYES ]';
+        botonCerrar.onclick = () => mostrarPergamino('leyes');
+    }
+
+    if (seccion === 'privacidad') {
+        titulo.innerText = "VELO DE PRIVACIDAD";
+        cuerpo.innerHTML = `<p>No recopilamos datos sensibles como nombre completo, dirección física, teléfono o información bancaria.<br><br>Únicamente almacenamos wallet y correo para el funcionamiento del portal.</p>`;
+    } else if (seccion === 'reglas') {
+        titulo.innerText = "REGLAS ETERNAS";
+        cuerpo.innerHTML = `<p>Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br>Todo intento de manipulación será considerado traición.</p>`;
+    } else if (seccion === 'prohibiciones') {
+        titulo.innerText = "PROHIBICIONES DEL INFRAMUNDO";
+        cuerpo.innerHTML = `<p>Actividades fraudulentas o distribución de información falsa serán castigadas.</p>`;
+    } else if (seccion === 'consecuencias') {
+        titulo.innerText = "CONSECUENCIAS";
+        cuerpo.innerHTML = `<p>La violación de estas leyes puede resultar en la suspensión permanente de la cuenta y la quema de recompensas.<br>El Mictlán no olvida.</p>`;
     }
 }
 
