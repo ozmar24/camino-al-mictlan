@@ -586,55 +586,57 @@ function cerrarRitual() {
     if(cementerio) cementerio.style.filter = "none"; 
 }
 
+/// ==================================================================
+// ABSORCIÓN DE VIDEOS - SISTEMA ADSTERRA + RECOMPENSA
 // ==================================================================
-// ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA)
-// ==================================================================
-// ==================================================================
-// UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
-// ==================================================================
-function mostrarVideoUnityAds() {
+let anuncioEnProceso = false;
+
+function videoCompletado() {
+    if (anuncioEnProceso) return;
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    console.log("🎬 Intentando mostrar video de Unity Ads...");
-    console.log("Unity Ads inicializado?", window.unityAdsInitialized);
-    console.log("window.unityads disponible?", typeof window.unityads !== 'undefined');
+    anuncioEnProceso = true;
 
-    // Intentar mostrar video real
-    if (window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
-        console.log("✅ Mostrando video real de Unity Ads...");
-        
-        window.unityads.show('Rewarded_Android', {
-            onComplete: function() {
-                console.log("✅ Video completado correctamente");
-                videoCompletado();
-            },
-            onSkipped: function() {
-                console.log("⏭️ Usuario saltó el video");
-                lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
-            },
-            onError: function(error) {
-                console.error("❌ Error en video:", error);
-                // Fallback: simular video
-                lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
-                setTimeout(videoCompletado, 3000);
-            }
-        });
-    } else {
-        // Fallback: simular video si Unity Ads no está disponible
-        console.warn("❌ Unity Ads no disponible, simulando video...");
-        lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
-        setTimeout(videoCompletado, 3000);
-    }
+    // Countdown en el reproductor
+    const reproductor = document.getElementById('reproductor-ad');
+    let segundos = 15;
+
+    reproductor.innerHTML = `
+        <div style="text-align:center; padding:5px;">
+            <p style="font-family:'MedievalSharp'; color:#ff0000; font-size:0.6rem; margin:0;">ABSORBIENDO...</p>
+            <p id="countdown-ad" style="font-family:'MedievalSharp'; color:#ff4444; font-size:1.2rem; margin:5px 0;">${segundos}</p>
+        </div>
+    `;
+
+    const intervalo = setInterval(() => {
+        segundos--;
+        const el = document.getElementById('countdown-ad');
+        if (el) el.innerText = segundos;
+        if (segundos <= 0) {
+            clearInterval(intervalo);
+            mostrarBotonReclamar();
+        }
+    }, 1000);
 }
-async function videoCompletado() {
-    if (!window.userWallet) {
-        lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
-        return;
-    }
 
+function mostrarBotonReclamar() {
+    const reproductor = document.getElementById('reproductor-ad');
+    reproductor.innerHTML = `
+        <div style="text-align:center; padding:5px;">
+            <p style="font-family:'MedievalSharp'; color:#ff0000; font-size:0.55rem; margin:0 0 5px 0;">ENERGÍA LISTA</p>
+            <button onclick="reclamarRecompensaAd()" class="pentaculo-cursor"
+                style="background:#4a0000; border:1px solid #ff0000; color:#ff4444; 
+                       font-family:'MedievalSharp'; font-size:0.55rem; padding:5px 8px;">
+                ⚡ RECLAMAR +10 SG
+            </button>
+        </div>
+    `;
+}
+
+async function reclamarRecompensaAd() {
     try {
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
@@ -644,33 +646,19 @@ async function videoCompletado() {
 
         const resultado = await respuesta.json();
 
-        if (!respuesta.ok) {
+        // Resetear reproductor siempre
+        const reproductor = document.getElementById('reproductor-ad');
+        reproductor.innerHTML = `
+            <span style="font-size:0.6rem; color:#666; font-family:'MedievalSharp'">[ VER VIDEO ADS ]</span>
+        `;
+        anuncioEnProceso = false;
+
+        if (!respuesta.ok || resultado.error) {
             lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
             return;
         }
 
-        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
-        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
-        actualizarBalanceSoulgeist(balanceUsuarioSG);
-        generarCementerio();
-
-        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
-
-    } catch (error) {
-        console.error("Error en video:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
-    }
-}
-
-function videoSaltado() {
-    lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
-}
-
-function errorVideo(error) {
-    console.error("Error en video de Unity Ads:", error);
-    lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
-}
+        balanceUsuarioS
 // ==================================================================
 // EXTRAS Y MODALES SECUNDARIOS
 // ==================================================================
