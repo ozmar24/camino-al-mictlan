@@ -589,43 +589,37 @@ function cerrarRitual() {
 // ==================================================================
 // UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
 // ==================================================================
-function mostrarVideoUnityAds() {
+// ==================================================================
+// ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA DE MONLIX)
+// ==================================================================
+
+// 1. ESTA FUNCIÓN ABRE EL PORTAL AL DAR CLIC (Limpia sin los 3 segundos de simulación)
+function mostrarVideoUnityAds() { 
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    console.log("🎬 Intentando mostrar video de Unity Ads...");
-    console.log("Unity Ads inicializado?", window.unityAdsInitialized);
-    console.log("window.unityads disponible?", typeof window.unityads !== 'undefined');
+    console.log("🎬 Abriendo el pergamino de ofertas de Monlix...");
+    
+    const appId = window.monlixAppId || "TU_ID_REAL_DE_MONLIX";
+    const userIdSafe = encodeURIComponent(window.userWallet.toLowerCase().trim());
+    const urlMuro = `https://monlix.com{appId}&user_id=${userIdSafe}`;
 
-    // Intentar mostrar video real
-    if (window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
-        console.log("✅ Mostrando video real de Unity Ads...");
-        
-        window.unityads.show('Rewarded_Android', {
-            onComplete: function() {
-                console.log("✅ Video completado correctamente");
-                videoCompletado();
-            },
-            onSkipped: function() {
-                console.log("⏭️ Usuario saltó el video");
-                lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
-            },
-            onError: function(error) {
-                console.error("❌ Error en video:", error);
-                // Fallback: simular video
-                lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
-                setTimeout(videoCompletado, 3000);
-            }
-        });
+    const modalPortal = document.getElementById('portal-monlix-modal');
+    const iframePortal = document.getElementById('iframe-monlix-portal');
+
+    if (modalPortal && iframePortal) {
+        iframePortal.src = urlMuro;
+        modalPortal.style.display = 'flex';
+        lanzarAlertaMictlan("El grimorio de ofrendas se ha manifestado en el abismo.", "PORTAL ABIERTO");
     } else {
-        // Fallback: simular video si Unity Ads no está disponible
-        console.warn("❌ Unity Ads no disponible, simulando video...");
-        lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
-        setTimeout(videoCompletado, 3000);
+        console.error("❌ Los elementos del DOM de Monlix no fueron hallados.");
+        lanzarAlertaMictlan("Fallo en la invocación del portal publicitario.", "ERROR MÍSTICO");
     }
 }
+
+// 2. AQUÍ ESTÁ TU BLOQUE TOTALMENTE INTACTO (Se ejecuta al cerrar el portal de Monlix)
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
@@ -633,6 +627,7 @@ async function videoCompletado() {
     }
 
     try {
+        // Envia el POST real a tu API para acumular los 10 SG en Redis
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -646,12 +641,15 @@ async function videoCompletado() {
             return;
         }
 
+        // Actualiza las variables globales y el localStorage con el nuevo balance del servidor
         balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
+        // Actualiza el contador y dibuja de nuevo tu cementerio
         actualizarBalanceSoulgeist(balanceUsuarioSG);
         generarCementerio();
 
+        // Despliega tu alerta mística con el mensaje de éxito original
         lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
 
     } catch (error) {
@@ -660,14 +658,6 @@ async function videoCompletado() {
     }
 }
 
-function videoSaltado() {
-    lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
-}
-
-function errorVideo(error) {
-    console.error("Error en video de Unity Ads:", error);
-    lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
-}
 // ==================================================================
 // EXTRAS Y MODALES SECUNDARIOS
 // ==================================================================
