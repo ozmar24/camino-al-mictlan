@@ -1769,38 +1769,38 @@ main {
     transform: scale(1.03) !important;
 }
 /* ==================================================================
-   ESTILO DEFINITIVO: TEXTO NEGRO CÓDICE Y TÍTULOS ROJO SANGRE
+   ESTILO GRIMORIO PURIFICADO: TEXTO NEGRO Y TÍTULOS EN ROJO SANGRE
    ================================================================== */
 
-/* 1. EL TÍTULO DEL PERGAMINO (ROJO ESPECTRAL ESTILO CANDELABRO) */
+/* 1. EL TÍTULO DEL PERGAMINO (ROJO SANGRE OPACO, SIN RESPLANDOR NEÓN) */
 #codice-titulo,
 #pantalla-codice h2,
 #pantalla-codice .pergamino-titulo {
-    color: #8b0000 !important; /* Rojo sangre oscuro base */
-    text-shadow: 0 0 10px #ff0000, 0 0 20px #8b0000 !important; /* Brillo de flama */
-    font-size: 1.6rem !important;
+    color: #8b0000 !important; /* Rojo sangre oscuro base de tu contrato */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important; /* Sombra sutil casi invisible para dar profundidad */
+    font-size: 1.1rem !important;
     margin-bottom: 25px !important;
     font-weight: bold !important;
     opacity: 1 !important;
     text-align: center !important;
 }
 
-/* 2. TODO EL CUERPO DE TEXTO, PÁRRAFOS Y LISTAS (NEGRO PURO TINTA) */
+/* 2. EL CUERPO GENERAL DE TEXTO (BITSO, BINANCE, LEYES, PRIVACIDAD, ETC.) */
 #pantalla-codice #codice-cuerpo,
 #pantalla-codice #codice-cuerpo p,
 #pantalla-codice #codice-cuerpo ul,
 #pantalla-codice #codice-cuerpo li,
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #000000 !important; /* Negro tinta sólido */
-    text-shadow: none !important; /* QUITAMOS EL BRILLO ROJO para que la letra no se aclare */
-    font-family: 'MedievalSharp', cursive !important;
+    color: #000000 !important; /* Negro tinta sólido e imponente */
+    text-shadow: none !important; /* SE ELIMINA CUALQUIER HALO O BRILLO ROJO FEO */
+    font-family: 'Nosifer', cursive !important;
     font-weight: bold !important;
-    text-align: center !important; /* Mantén el centrado que definimos */
+    text-align: center !important; /* Mantiene la simetría central */
     opacity: 1 !important;
 }
 
-/* 3. BLINDAJE DE SEGURIDAD PARA PÁRRAFOS LARGOS (VELO DE PRIVACIDAD) */
+/* 3. COBERTURA DE MÁRGENES PARA TEXTOS LARGOS (VELO DE PRIVACIDAD) */
 #pantalla-codice #codice-cuerpo p {
     width: 80% !important;
     max-width: 480px !important;
@@ -1809,7 +1809,7 @@ main {
     word-wrap: break-word !important;
 }
 
-/* 4. ENLACES INTERACTIVOS EN REPOSO (MANTIENEN TONO OSCURO PARA DESTACAR) */
+/* 4. ENLACES INTERACTIVOS EN REPOSO (MANTIENEN EL TONO OSCURO) */
 #pantalla-codice #codice-cuerpo span,
 #pantalla-codice #codice-cuerpo span.link-ley,
 #pantalla-codice #codice-cuerpo a,
@@ -1817,7 +1817,7 @@ main {
     display: block !important;
     width: fit-content !important;
     margin: 20px auto !important;
-    color: #220000 !important; /* Un tono café/negro muy oscuro para botones en reposo */
+    color: #111111 !important; /* Negro ceniza oscuro para denotar interacción */
     text-shadow: none !important;
     letter-spacing: 2px !important;
     font-weight: bold !important;
@@ -1825,10 +1825,16 @@ main {
     text-align: center !important;
 }
 
-/* 5. EFECTO HOVER (CUANDO EL MOUSE SE POSA ENCIMA SE ENCIENDE EN FUEGO) */
+/* 5. EFECTO HOVER (CUANDO EL MOUSE SE POSA ENCIMA ENCIENDE EN ROJO SANGRE CLEAN) */
 #pantalla-codice #codice-cuerpo span.link-ley:hover,
 #pantalla-codice #codice-cuerpo a:hover {
-    color: #ff0000 !important; /* La opción seleccionada brilla en rojo */
-    text-shadow: 0 0 8px #ff0000 !important;
+    color: #8b0000 !important; /* Cambia al mismo rojo místico del título */
+    text-shadow: none !important; /* Sin resplandores molestos */
     cursor: pointer;
+}
+
+/* 6. ENTORNO DEL ABISMO */
+#pantalla-codice {
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(2px) !important;
 }
