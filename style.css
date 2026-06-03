@@ -1769,10 +1769,22 @@ main {
     transform: scale(1.03) !important;
 }
 /* ==================================================================
-   REPARACIÓN DE CONTRASTE ABSOLUTO: PERGAMINO DE ALIANZAS Y CÓDICES
+   ESTILO CANDELABRO: COLOR SANGRE ABSOLUTO SIN CONTORNO NEGRO
    ================================================================== */
 
-/* Forzar a TODO el texto dentro del pergamino a usar rojo sangre profundo y contorno negro */
+/* 1. EL TÍTULO DEL PERGAMINO (ALIANZAS OSCURAS / LEYES DEL MICTLÁN) */
+#codice-titulo,
+#pantalla-codice h2,
+#pantalla-codice .pergamino-titulo {
+    color: #8b0000 !important; /* Rojo sangre oscuro base */
+    text-shadow: 0 0 10px #ff0000, 0 0 20px #8b0000 !important; /* Resplandor espectral rojo idéntico al candelabro */
+    font-size: 1.6rem !important;
+    margin-bottom: 20px !important;
+    font-weight: bold !important;
+    opacity: 1 !important;
+}
+
+/* 2. LAS LISTAS Y TEXTOS (BITSO, COINBASE, BINANCE, ETC.) */
 #pantalla-codice,
 #pantalla-codice #codice-cuerpo,
 #pantalla-codice #codice-cuerpo p,
@@ -1781,30 +1793,31 @@ main {
 #pantalla-codice #codice-cuerpo li,
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #990000 !important; /* Rojo oscuro profundo tipo sangre, no chillón */
-    text-shadow: 1px 1px 1px #000000, -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000 !important; /* Contorno negro 360° para recortar la letra contra el pergamino claro */
+    color: #8b0000 !important; /* Rojo sangre oscuro base */
+    text-shadow: 0 0 8px #ff0000, 0 0 15px #8b0000 !important; /* Brillo espectral suave que elimina el contorno negro */
     font-family: 'MedievalSharp', cursive !important;
-    opacity: 1 !important; /* Anula cualquier transparencia heredada del contenedor */
-    font-weight: 900 !important; /* Hace la letra más gruesa para que se lea mejor */
+    opacity: 1 !important; /* Anula transparencias lavadas */
+    font-weight: bold !important;
 }
 
-/* Estilo místico para los botones o links interactivos dentro del pergamino */
+/* 3. ENLACES INTERACTIVOS EN REPOSO DENTRO DEL PERGAMINO */
 #pantalla-codice #codice-cuerpo span.link-ley,
 #pantalla-codice #codice-cuerpo a {
-    color: #800000 !important; /* Aún más oscuro en reposo para denotar misterio */
+    color: #8b0000 !important;
+    text-shadow: 0 0 8px #ff0000 !important;
     letter-spacing: 2px !important;
     transition: all 0.3s ease !important;
 }
 
-/* Efecto de encendido controlado cuando pasas el mouse por encima */
+/* 4. EFECTO HOVER (CUANDO EL MOUSE SE POSA ENCIMA) */
 #pantalla-codice #codice-cuerpo span.link-ley:hover,
 #pantalla-codice #codice-cuerpo a:hover {
-    color: #ff0000 !important; /* Se enciende en rojo fuego puro */
-    text-shadow: 0 0 6px #ff0000, 2px 2px 3px #000000 !important; /* Brillo controlado */
+    color: #ff2222 !important; /* Se enciende levemente en un tono más vivo */
+    text-shadow: 0 0 12px #ff0000, 0 0 25px #ff0000 !important; /* Incrementa la energía visual */
 }
 
-/* Ajuste del fondo del contenedor absoluto para mantener la atmósfera oscura */
+/* 5. FONDO OSCURECIDO DEL ENTORNO */
 #pantalla-codice {
-    background: rgba(0, 0, 0, 0.75) !important; /* Oscurece más el cementerio de atrás para que resalte el pergamino */
-    backdrop-filter: blur(3px) !important;
+    background: rgba(0, 0, 0, 0.75) !important; /* Mantiene el fondo oscuro para que resalte la luz del pergamino */
+    backdrop-filter: blur(2px) !important;
 }
