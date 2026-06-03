@@ -1768,32 +1768,43 @@ main {
     border-color: #ff4444 !important;
     transform: scale(1.03) !important;
 }
-/* ── Pergamino Códice — texto estilo candelabro — CORREGIDO ── */
+/* ==================================================================
+   REPARACIÓN DE CONTRASTE ABSOLUTO: PERGAMINO DE ALIANZAS Y CÓDICES
+   ================================================================== */
+
+/* Forzar a TODO el texto dentro del pergamino a usar rojo sangre profundo y contorno negro */
+#pantalla-codice,
 #pantalla-codice #codice-cuerpo,
 #pantalla-codice #codice-cuerpo p,
-#pantalla-codice #codice-cuerpo span {
-    color: #ff0000 !important; /* Cambiado a rojo intenso puro */
-    text-shadow: 2px 2px 3px #000000, -1px -1px 0px #000000 !important; /* Sombra negra sólida de recorte */
-    font-family: 'MedievalSharp', cursive !important;
-    opacity: 1 !important; /* Fuerza la opacidad al 100% */
-}
-
-#pantalla-codice #codice-cuerpo span.link-ley {
-    color: #b30000 !important; /* Un rojo sangre más profundo para los enlaces en reposo */
-    text-shadow: 2px 2px 3px #000000 !important;
-    font-size: 0.9rem !important;
-    letter-spacing: 2px !important;
-    font-weight: bold !important;
-}
-
-#pantalla-codice #codice-cuerpo span.link-ley:hover {
-    color: #ff0000 !important; /* Se enciende en rojo brillante al pasar el mouse */
-    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; /* Efecto fuego controlado */
-}
-
+#pantalla-codice #codice-cuerpo span,
+#pantalla-codice #codice-cuerpo ul,
+#pantalla-codice #codice-cuerpo li,
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #ff0000 !important;
-    text-shadow: 2px 2px 3px #000000 !important;
+    color: #990000 !important; /* Rojo oscuro profundo tipo sangre, no chillón */
+    text-shadow: 1px 1px 1px #000000, -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000 !important; /* Contorno negro 360° para recortar la letra contra el pergamino claro */
     font-family: 'MedievalSharp', cursive !important;
+    opacity: 1 !important; /* Anula cualquier transparencia heredada del contenedor */
+    font-weight: 900 !important; /* Hace la letra más gruesa para que se lea mejor */
+}
+
+/* Estilo místico para los botones o links interactivos dentro del pergamino */
+#pantalla-codice #codice-cuerpo span.link-ley,
+#pantalla-codice #codice-cuerpo a {
+    color: #800000 !important; /* Aún más oscuro en reposo para denotar misterio */
+    letter-spacing: 2px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Efecto de encendido controlado cuando pasas el mouse por encima */
+#pantalla-codice #codice-cuerpo span.link-ley:hover,
+#pantalla-codice #codice-cuerpo a:hover {
+    color: #ff0000 !important; /* Se enciende en rojo fuego puro */
+    text-shadow: 0 0 6px #ff0000, 2px 2px 3px #000000 !important; /* Brillo controlado */
+}
+
+/* Ajuste del fondo del contenedor absoluto para mantener la atmósfera oscura */
+#pantalla-codice {
+    background: rgba(0, 0, 0, 0.75) !important; /* Oscurece más el cementerio de atrás para que resalte el pergamino */
+    backdrop-filter: blur(3px) !important;
 }
