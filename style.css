@@ -1769,7 +1769,7 @@ main {
     transform: scale(1.03) !important;
 }
 /* ==================================================================
-   ESTILO CANDELABRO: COLOR SANGRE ABSOLUTO SIN CONTORNO NEGRO
+   ESTILO CANDELABRO + CENTRADO ABSOLUTO (UNIFICADO SIN CHOQUES)
    ================================================================== */
 
 /* 1. EL TÍTULO DEL PERGAMINO (ALIANZAS OSCURAS / LEYES DEL MICTLÁN) */
@@ -1782,92 +1782,82 @@ main {
     margin-bottom: 20px !important;
     font-weight: bold !important;
     opacity: 1 !important;
+    text-align: center !important; /* Fuerza al título a centrarse */
 }
 
-/* 2. LAS LISTAS Y TEXTOS (BITSO, COINBASE, BINANCE, ETC.) */
+/* 2. LAS LISTAS, CONTENEDORES Y TEXTOS (BITSO, COINBASE, BINANCE, ETC.) */
 #pantalla-codice,
 #pantalla-codice #codice-cuerpo,
-#pantalla-codice #codice-cuerpo p,
-#pantalla-codice #codice-cuerpo span,
-#pantalla-codice #codice-cuerpo ul,
-#pantalla-codice #codice-cuerpo li,
-#pantalla-codice .pergamino-quemado #codice-cuerpo *,
+#pantalla-codice .pergamino-quemado,
+#pantalla-codice .pergamino-content,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #8b0000 !important; /* Rojo sangre oscuro base */
-    text-shadow: 0 0 8px #ff0000, 0 0 15px #8b0000 !important; /* Brillo espectral suave que elimina el contorno negro */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;      /* Centra todo el contenido horizontalmente */
+    justify-content: center !important;     
+    color: #8b0000 !important;            /* Rojo sangre oscuro base */
+    text-shadow: 0 0 8px #ff0000, 0 0 15px #8b0000 !important; /* Brillo espectral suave */
     font-family: 'MedievalSharp', cursive !important;
-    opacity: 1 !important; /* Anula transparencias lavadas */
+    opacity: 1 !important; 
     font-weight: bold !important;
+    text-align: center !important;       /* Alinea el texto renglón por renglón al centro */
 }
 
-/* 3. ENLACES INTERACTIVOS EN REPOSO DENTRO DEL PERGAMINO */
+/* 3. BLINDAJE DE PÁRRAFOS LARGOS: Evita que el texto del Velo de Privacidad choque con los bordes */
+#pantalla-codice #codice-cuerpo p {
+    display: block !important;
+    width: 80% !important;               /* Reduce el área para no tocar los bordes del pergamino */
+    max-width: 500px !important;         /* Evita que se estire demasiado en monitores gigantes */
+    margin: 15px auto !important;        /* Centra el bloque de texto con márgenes simétricos */
+    text-align: center !important;       
+    line-height: 1.6 !important;         /* Espaciado de lectura mística */
+    word-wrap: break-word !important;
+    color: #8b0000 !important;
+}
+
+/* 4. ENLACES INTERACTIVOS Y TEXTOS CORTOS (BOTÓN DE REGRESAR A LEYES) */
+#pantalla-codice #codice-cuerpo span,
 #pantalla-codice #codice-cuerpo span.link-ley,
-#pantalla-codice #codice-cuerpo a {
+#pantalla-codice #codice-cuerpo a,
+.link-ley {
+    display: inline-block !important;    /* Evita que ocupen todo el ancho y se desalineen */
+    width: auto !important;              /* Su tamaño se adapta solo a sus letras */
     color: #8b0000 !important;
     text-shadow: 0 0 8px #ff0000 !important;
     letter-spacing: 2px !important;
+    margin: 20px auto !important;        /* Centrado horizontal automático */
     transition: all 0.3s ease !important;
+    text-align: center !important;
 }
 
-/* 4. EFECTO HOVER (CUANDO EL MOUSE SE POSA ENCIMA) */
+/* 5. EFECTO HOVER (CUANDO EL MOUSE SE POSA ENCIMA) */
 #pantalla-codice #codice-cuerpo span.link-ley:hover,
 #pantalla-codice #codice-cuerpo a:hover {
-    color: #ff2222 !important; /* Se enciende levemente en un tono más vivo */
+    color: #ff2222 !important;           /* Se enciende en un tono más vivo */
     text-shadow: 0 0 12px #ff0000, 0 0 25px #ff0000 !important; /* Incrementa la energía visual */
 }
 
-/* 5. FONDO OSCURECIDO DEL ENTORNO */
+/* 6. FONDO OSCURECIDO DEL ENTORNO Y CENTRADO DE LA BÓVEDA DE COMPRA */
 #pantalla-codice {
-    background: rgba(0, 0, 0, 0.75) !important; /* Mantiene el fondo oscuro para que resalte la luz del pergamino */
+    background: rgba(0, 0, 0, 0.75) !important; 
     backdrop-filter: blur(2px) !important;
 }
-/* ==================================================================
-   CENTRADO ABSOLUTO DE TEXTOS Y BOTONES (BÓVEDA Y LEYES)
-   ================================================================== */
 
-/* 1. CENTRADO DE LA BÓVEDA (BOTONES Y TEXTOS DE COMPRA) */
+/* Forzar el centrado exacto de los botones dentro de la Bóveda del Mictlán */
 #modal-boveda #boveda-cuerpo,
-#modal-boveda .pergamino-quemado,
-#modal-boveda .pergamino-content {
+#modal-boveda .pergamino-quemado {
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;      /* Centra los botones en el eje horizontal */
-    justify-content: center !important;  /* Centra el contenido en el eje vertical */
+    align-items: center !important;
+    justify-content: center !important;
     width: 100% !important;
-    text-align: center !important;       /* Centra los textos pequeños inline */
 }
-
-/* Forzar a cada botón individual dentro de la bóveda a centrarse y tener márgenes simétricos */
 #modal-boveda button,
 #modal-boveda .btn-ritual-grimorio,
 #modal-boveda button[onclick] {
     display: block !important;
-    margin: 12px auto !important;        /* El "auto" en los lados fuerza el centrado horizontal */
-    width: 85% !important;               /* Mantiene el tamaño estilizado que ya tenías */
-    max-width: 320px !important;         /* Evita que se estiren de más en pantallas grandes */
+    margin: 12px auto !important;        /* Centrado simétrico de botones */
+    width: 85% !important;
+    max-width: 320px !important;
     text-align: center !important;
 }
-
-/* 2. CENTRADO DE LAS LEYES DEL MICTLÁN (TEXTOS Y ENLACES) */
-#pantalla-codice #codice-cuerpo,
-#pantalla-codice .pergamino-quemado,
-#pantalla-codice .pergamino-content {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;      /* Centra los spans y párrafos en el medio */
-    justify-content: center !important;
-    width: 100% !important;
-    text-align: center !important;       /* Fuerza a que los renglones de texto se alineen al centro */
-}
-
-/* Asegurar que las listas o bloques de enlaces de las leyes no se carguen a la izquierda */
-#pantalla-codice #codice-cuerpo div,
-#pantalla-codice #codice-cuerpo p,
-#pantalla-codice #codice-cuerpo span {
-    text-align: center !important;
-    width: 100% !important;
-    display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
-
