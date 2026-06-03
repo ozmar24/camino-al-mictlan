@@ -1726,52 +1726,48 @@ main {
 }
 /* ==================== ESTILO PARA LEYES Y SUB-MODALES ==================== */
 
-/* ====================== ESTILO MEJORADO PARA LEYES ====================== */
+/* ====================== CSS LIMPIO Y FUERTE PARA LEYES ====================== */
 
-/* Título principal (más impactante) */
 #codice-titulo {
-    color: #ff2222 !important;
-    text-shadow: 0 0 15px #ff0000, 
-                 3px 3px 8px #000, 
-                 -3px -3px 8px #000 !important;
-    font-size: 2.1rem !important;
-    margin-bottom: 30px !important;
-    letter-spacing: 2px;
+    color: #ff1a1a !important;
+    text-shadow: 0 0 20px #ff0000, 
+                 4px 4px 10px #000, 
+                 -4px -4px 10px #000 !important;
+    font-size: 1.3rem !important;
+    margin-bottom: 35px !important;
+    letter-spacing: 3px;
 }
 
-/* Cuerpo general del pergamino */
+/* Texto del cuerpo y botones */
 #codice-cuerpo,
-#pantalla-codice .pergamino-quemado #codice-cuerpo,
-#pantalla-codice .pergamino-quemado #codice-cuerpo * {
-    color: #ff4444 !important;
+#codice-cuerpo * {
+    color: #ff3333 !important;
     font-family: 'Nosifer', cursive !important;
-    text-shadow: 0 0 10px #ff0000, 
-                 2px 2px 4px #000 !important;
-    line-height: 1.8 !important;
-    font-size: 1.05rem !important;
+    text-shadow: 0 0 12px #ff0000, 
+                 3px 3px 6px #000 !important;
+    line-height: 1.75 !important;
 }
 
-/* Botones de sub-secciones (los más importantes) */
+/* Botones de las opciones */
 .btn-subley {
-    background: rgba(70, 0, 0, 0.9) !important;
-    color: #ff5555 !important;
-    border: 3px solid #b30000 !important;
-    padding: 16px 25px !important;
-    font-family: 'Nosifer', cursive !important;
-    font-size: 1.1rem !important;
-    margin: 14px auto !important;
-    width: 90% !important;
+    background: #2a0000 !important;
+    color: #ff4444 !important;
+    border: 3px solid #9c0000 !important;
+    padding: 18px 30px !important;
+    font-size: 0.7rem !important;
+    margin: 16px auto !important;
+    width: 85% !important;
     max-width: 520px;
-    text-align: center !important;
-    text-shadow: 0 0 12px #ff0000, 2px 2px 5px #000 !important;
+    text-align: center;
+    text-shadow: 0 0 15px #ff0000, 3px 3px 8px #000 !important;
+    box-shadow: 0 6px 20px rgba(180, 0, 0, 0.7) !important;
     transition: all 0.4s ease !important;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4) !important;
 }
 
 .btn-subley:hover {
-    background: rgba(140, 0, 0, 0.95) !important;
+    background: #4a0000 !important;
     color: #ffeeee !important;
-    border-color: #ff4444 !important;
-    transform: scale(1.05) !important;
-    text-shadow: 0 0 20px #ff0000, 3px 3px 8px #000 !important;
+    border-color: #ff2222 !important;
+    transform: scale(1.04) !important;
+    text-shadow: 0 0 22px #ff0000 !important;
 }
