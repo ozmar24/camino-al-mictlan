@@ -1724,44 +1724,95 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-/* ====================== CSS FUERZA BRUTA - LEYES ====================== */
+/* ==================== ESTILO PARA LEYES Y SUB-MODALES ==================== */
 
 #codice-titulo {
-    color: #ff0000 !important;
-    text-shadow: 0 0 20px #ff0000,
-                 0 0 35px #ff0000,
-                 5px 5px 12px #000,
-                 -5px -5px 12px #000 !important;
-    font-size: 1.3rem !important;
-}
-
-#codice-cuerpo,
-#codice-cuerpo *,
-.pergamino-quemado #codice-cuerpo,
-.pergamino-quemado #codice-cuerpo * {
-    color: #cc0000 !important;           /* Rojo sangre fuerte */
-    font-family: 'Nosifer', cursive !important;
-    text-shadow: 0 0 15px #ff0000,
-                 0 0 25px #ff0000,
-                 4px 4px 10px #000000,
-                 -3px -3px 8px #000000 !important;
-    font-size: 0.8rem !important;
-    line-height: 1.95 !important;
-}
-
-/* Botones */
-.btn-subley {
-    background: #2f0000 !important;
     color: #ff2222 !important;
-    border: 3px solid #b30000 !important;
-    padding: 20px 25px !important;
-    font-size: 0.7rem !important;
-    text-shadow: 0 0 18px #ff0000 !important;
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000 !important;
+    font-size: 1.6rem !important;
+    margin-bottom: 20px !important;
+}
+
+#codice-cuerpo {
+    color: #ffdddd !important;
+    line-height: 1.7 !important;
+    font-size: 1.05rem !important;
+    text-shadow: 1px 1px 2px #000 !important;
+}
+
+#codice-cuerpo span.link-ley {
+    color: #ff0000 !important;
+    text-shadow: 0 0 8px #ff0000 !important;
+}
+
+#codice-cuerpo span.link-ley:hover {
+    color: #ff6666 !important;
+}
+
+.btn-subley {
+    background: #3a0000 !important;
+    color: #ffdddd !important;
+    border: 2px solid #b30000 !important;
+    padding: 12px 20px !important;
+    font-family: 'Nosifer', cursive !important;
+    font-size: 0.95rem !important;
+    margin: 8px 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    transition: all 0.3s !important;
 }
 
 .btn-subley:hover {
-    background: #5c0000 !important;
-    color: #ffeeee !important;
+    background: #6b0000 !important;
+    color: #ffffff !important;
     border-color: #ff4444 !important;
-    text-shadow: 0 0 25px #ffffff, 0 0 35px #ff0000 !important;
+    transform: scale(1.03) !important;
+}
+/* ── Pergamino Códice — texto estilo candelabro ── */
+#pantalla-codice #codice-cuerpo,
+#pantalla-codice #codice-cuerpo p,
+#pantalla-codice #codice-cuerpo span {
+    color: #8B0000 !important;
+    text-shadow: 0 0 6px #ff0000, 1px 1px 2px #000 !important;
+    font-family: 'MedievalSharp', cursive !important;
+}
+
+#pantalla-codice #codice-cuerpo span.link-ley {
+    color: #ff0000 !important;
+    text-shadow: 0 0 10px #ff0000, 0 0 20px #800000 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 2px !important;
+}
+
+#pantalla-codice #codice-cuerpo span.link-ley:hover {
+    color: #ff4444 !important;
+    text-shadow: 0 0 15px #ff4444 !important;
+}
+#pantalla-codice .pergamino-quemado #codice-cuerpo *,
+#pantalla-codice .pergamino-quemado #codice-cuerpo {
+    color: #ff0000 !important;
+    text-shadow: 0 0 8px #ff0000, 1px 1px 2px #000 !important;
+    font-family: 'MedievalSharp', cursive !important;
+}#pantalla-codice {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(1px) !important;
+}
+#modal-boveda .pergamino-quemado {
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#modal-boveda #boveda-cuerpo {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+}
+
+#modal-boveda .btn-ritual-grimorio {
+    width: 70% !important;
+    text-align: center !important;
+    margin: 8px auto !important;
 }
