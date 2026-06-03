@@ -1768,51 +1768,32 @@ main {
     border-color: #ff4444 !important;
     transform: scale(1.03) !important;
 }
-/* ── Pergamino Códice — texto estilo candelabro ── */
+/* ── Pergamino Códice — texto estilo candelabro — CORREGIDO ── */
 #pantalla-codice #codice-cuerpo,
 #pantalla-codice #codice-cuerpo p,
 #pantalla-codice #codice-cuerpo span {
-    color: #8B0000 !important;
-    text-shadow: 0 0 6px #ff0000, 1px 1px 2px #000 !important;
+    color: #ff0000 !important; /* Cambiado a rojo intenso puro */
+    text-shadow: 2px 2px 3px #000000, -1px -1px 0px #000000 !important; /* Sombra negra sólida de recorte */
     font-family: 'MedievalSharp', cursive !important;
+    opacity: 1 !important; /* Fuerza la opacidad al 100% */
 }
 
 #pantalla-codice #codice-cuerpo span.link-ley {
-    color: #ff0000 !important;
-    text-shadow: 0 0 10px #ff0000, 0 0 20px #800000 !important;
+    color: #b30000 !important; /* Un rojo sangre más profundo para los enlaces en reposo */
+    text-shadow: 2px 2px 3px #000000 !important;
     font-size: 0.9rem !important;
     letter-spacing: 2px !important;
+    font-weight: bold !important;
 }
 
 #pantalla-codice #codice-cuerpo span.link-ley:hover {
-    color: #ff4444 !important;
-    text-shadow: 0 0 15px #ff4444 !important;
+    color: #ff0000 !important; /* Se enciende en rojo brillante al pasar el mouse */
+    text-shadow: 0 0 8px #ff0000, 2px 2px 4px #000000 !important; /* Efecto fuego controlado */
 }
+
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
     color: #ff0000 !important;
-    text-shadow: 0 0 8px #ff0000, 1px 1px 2px #000 !important;
+    text-shadow: 2px 2px 3px #000000 !important;
     font-family: 'MedievalSharp', cursive !important;
-}#pantalla-codice {
-    background: rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(1px) !important;
-}
-#modal-boveda .pergamino-quemado {
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#modal-boveda #boveda-cuerpo {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    text-align: center !important;
-}
-
-#modal-boveda .btn-ritual-grimorio {
-    width: 70% !important;
-    text-align: center !important;
-    margin: 8px auto !important;
 }
