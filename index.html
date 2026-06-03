@@ -11,7 +11,53 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
- 
+    <!-- Unity Ads SDK - Versión mejorada -->
+<script>
+    // Variables globales
+    window.unityAdsInitialized = false;
+    
+    // Cargar el SDK
+    (function() {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.unityads.unity3d.com/latest/unityads.js';
+        script.async = true;
+        script.onload = function() {
+            console.log('✅ Script de Unity Ads cargado');
+            initializeUnityAds();
+        };
+        script.onerror = function() {
+            console.error('❌ Error al cargar Unity Ads SDK');
+        };
+        document.head.appendChild(script);
+    })();
+    
+    // Inicializar Unity Ads
+    function initializeUnityAds() {
+        if (window.unityads && window.unityads.initialize) {
+            console.log('🎬 Inicializando Unity Ads...');
+            window.unityads.initialize(
+                '800002174',  // Game ID
+                function(initSuccess) {
+                    if (initSuccess) {
+                        console.log('✅ Unity Ads inicializado exitosamente');
+                        window.unityAdsInitialized = true;
+                    } else {
+                        console.error('❌ Error al inicializar Unity Ads');
+                    }
+                }
+            );
+        } else {
+            setTimeout(initializeUnityAds, 500);
+        }
+    }
+    
+    // Reintentar cada 2 segundos si no está listo
+    setInterval(function() {
+        if (!window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
+            initializeUnityAds();
+        }
+    }, 2000);
+</script>
 </head>
 <body>
 
@@ -89,7 +135,7 @@
 
           <div class="zona-patrocinadores" style="position: absolute; top: 60px; left: 20px; z-index: 100; text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px;">
     <p style="font-family: 'MedievalSharp'; color: #8B0000; font-size: 0.7rem; margin: 0 0 5px 0;">ABSORBER ENERGÍA</p>
-    <div id="reproductor-ad" onclick="videoCompletado()" style="width: 160px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px;">
+    <div id="reproductor-ad" onclick="mostrarVideoUnityAds()" style="width: 160px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px;">
         <span style="font-size: 0.6rem; color: #666; font-family: 'MedievalSharp';">[ VER VIDEO ADS ]</span>
     </div>
 </div>
@@ -183,7 +229,7 @@
 
 
 <div id="cursor-serpiente"></div>
-<script src="https://pl29623812.effectivecpmnetwork.com/c4/17/08/c417081df3f9d224380dd1f24e0d6166.js"></script>
+
     <script src="script.js" defer></script>
 </body>
 </html>
