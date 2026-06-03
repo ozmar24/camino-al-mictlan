@@ -1724,50 +1724,49 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-/* ==================== ESTILO PARA LEYES Y SUB-MODALES ==================== */
-
-/* ====================== CSS LIMPIO Y FUERTE PARA LEYES ====================== */
+/* ====================== ESTILO FUERTE PARA PERGAMINO ====================== */
 
 #codice-titulo {
     color: #ff1a1a !important;
-    text-shadow: 0 0 20px #ff0000, 
-                 4px 4px 10px #000, 
-                 -4px -4px 10px #000 !important;
-    font-size: 1.3rem !important;
-    margin-bottom: 35px !important;
-    letter-spacing: 3px;
+    text-shadow: 0 0 22px #ff0000, 
+                 4px 4px 12px #000, 
+                 -4px -4px 12px #000 !important;
+    font-size: 1.4rem !important;
+    margin-bottom: 30px !important;
+    letter-spacing: 2px;
 }
 
-/* Texto del cuerpo y botones */
+/* Texto dentro del pergamino (el más importante) */
 #codice-cuerpo,
-#codice-cuerpo * {
-    color: #ff3333 !important;
+.pergamino-quemado #codice-cuerpo,
+.pergamino-quemado #codice-cuerpo * {
+    color: #c80000 !important;           /* Rojo sangre fuerte */
     font-family: 'Nosifer', cursive !important;
     text-shadow: 0 0 12px #ff0000, 
-                 3px 3px 6px #000 !important;
-    line-height: 1.75 !important;
+                 3px 3px 8px #000000 !important;
+    line-height: 1.85 !important;
+    font-size: 0.7rem !important;
 }
 
-/* Botones de las opciones */
+/* Botones dentro del pergamino */
 .btn-subley {
-    background: #2a0000 !important;
-    color: #ff4444 !important;
-    border: 3px solid #9c0000 !important;
-    padding: 18px 30px !important;
+    background: #2c0000 !important;
+    color: #ff3333 !important;
+    border: 3px solid #9f0000 !important;
+    padding: 18px 25px !important;
+    font-family: 'Nosifer', cursive !important;
     font-size: 0.7rem !important;
     margin: 16px auto !important;
-    width: 85% !important;
+    width: 88% !important;
     max-width: 520px;
     text-align: center;
     text-shadow: 0 0 15px #ff0000, 3px 3px 8px #000 !important;
-    box-shadow: 0 6px 20px rgba(180, 0, 0, 0.7) !important;
-    transition: all 0.4s ease !important;
+    box-shadow: 0 6px 25px rgba(200, 0, 0, 0.6) !important;
 }
 
 .btn-subley:hover {
-    background: #4a0000 !important;
-    color: #ffeeee !important;
-    border-color: #ff2222 !important;
+    background: #5a0000 !important;
+    color: #ffdddd !important;
+    border-color: #ff1a1a !important;
     transform: scale(1.04) !important;
-    text-shadow: 0 0 22px #ff0000 !important;
 }
