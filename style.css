@@ -1816,46 +1816,44 @@ main {
     text-align: center !important;
     margin: 8px auto !important;
 }
-/* Parche mínimo: scope overlay de login y aislar códice */
-.interface-mictlan, .capa-oscura {
-  background: rgba(0,0,0,0.85); /* oscurece sin blur agresivo */
-  backdrop-filter: none !important; /* evitar blur que altera composición */
+/* 1) Overlay de login: menos opaco y sin blur que "lava" colores */
+.capa-oscura, .interface-mictlan {
+  background: rgba(0,0,0,0.65) !important; /* menos negro */
+  backdrop-filter: none !important;         /* evita blur que aclara colores */
   mix-blend-mode: normal !important;
   filter: none !important;
-  z-index: 9000; /* suficiente para login, pero no por encima del códice */
+  z-index: 9000 !important;
 }
 
-/* Asegurar que pseudo-elementos del overlay queden por debajo */
-.interface-mictlan::before,
-.interface-mictlan::after,
-.capa-oscura::before,
-.capa-oscura::after {
+/* 2) Asegurar pseudo-elementos del overlay por debajo */
+.capa-oscura::before, .capa-oscura::after,
+.interface-mictlan::before, .interface-mictlan::after {
+  z-index: 8000 !important;
   mix-blend-mode: normal !important;
-  z-index: 8000;
   pointer-events: none;
 }
 
-/* Forzar que el códice tenga su propio stacking context y prioridad visual */
+/* 3) Hacer que el códice sea un modal independiente y por encima */
 #pantalla-codice {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10050;
+  z-index: 10050 !important; /* por encima del overlay */
   isolation: isolate;
   display: none; /* controlado por tu JS: .visible -> display:block */
+  background: transparent !important; /* permitir que la imagen del pergamino muestre transparencia */
 }
 
-/* Pergamino dentro del modal: aislar composición y prioridad */
+/* 4) Aislar el pergamino dentro del modal */
 #pantalla-codice .pergamino-quemado {
   position: relative;
   z-index: 10051;
   mix-blend-mode: normal !important;
   filter: none !important;
   opacity: 1 !important;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+  background-color: transparent !important; /* si la imagen del pergamino tiene fondo, cámbiala por PNG con transparencia */
 }
 
-/* Clase para mostrar códice desde JS */
+/* 5) Clase para mostrar códice desde JS */
 #pantalla-codice.visible { display: block; }
