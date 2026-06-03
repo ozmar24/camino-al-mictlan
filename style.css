@@ -1816,7 +1816,7 @@ main {
 .link-ley {
     display: block !important;
     width: fit-content !important;
-    margin: 20px auto !important;
+    margin: 8px auto !important;
     color: #111111 !important; /* Negro ceniza oscuro para denotar interacción */
     text-shadow: none !important;
     letter-spacing: 2px !important;
