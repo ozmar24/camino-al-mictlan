@@ -1728,17 +1728,12 @@ main {
 
 #codice-titulo {
     color: #ff0000 !important;
-    text-shadow: 
-        0 0 10px #ff0000,
-        0 0 25px #ff3333,
-        0 0 40px #ff6666,
-        3px 3px 8px #000,
-        -3px -3px 8px #000 !important;
-    font-size: 1.5rem !important;
-    font-family: 'Nosifer', cursive !important;
-    letter-spacing: 2px;
+    text-shadow: 0 0 20px #ff0000,
+                 0 0 35px #ff0000,
+                 5px 5px 12px #000,
+                 -5px -5px 12px #000 !important;
+    font-size: 1.3rem !important;
 }
-
 
 #codice-cuerpo,
 #codice-cuerpo *,
@@ -1769,47 +1764,4 @@ main {
     color: #ffeeee !important;
     border-color: #ff4444 !important;
     text-shadow: 0 0 25px #ffffff, 0 0 35px #ff0000 !important;
-}
-/* Aislar pergamino y asegurar prioridad visual del texto */
-.pergamino-quemado {
-  position: relative;
-  isolation: isolate;
-}
-
-/* Estilos aplicados cuando el pergamino está listo/visible */
-.pergamino-quemado.visible #codice-titulo {
-  color: #ff0000;
-  font-family: 'Nosifer', cursive;
-  font-size: 1.3rem;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 10px #ff0000,
-    0 0 25px #ff3333,
-    0 0 40px #ff6666,
-    3px 3px 8px rgba(0,0,0,0.95);
-  -webkit-text-stroke: 0.4px rgba(0,0,0,0.6);
-  z-index: 9999;
-  mix-blend-mode: normal;
-  position: relative;
-}
-
-.pergamino-quemado.visible #codice-cuerpo {
-  color: #cc0000;
-  font-family: 'Nosifer', cursive;
-  font-size: 0.85rem;
-  line-height: 1.95;
-  text-shadow:
-    0 0 12px #ff0000,
-    0 0 22px #ff3333,
-    2px 2px 8px rgba(0,0,0,0.9);
-  z-index: 9998;
-  position: relative;
-}
-
-/* Pseudo-elementos y overlays deben quedar por debajo del texto */
-.pergamino-quemado::before,
-.pergamino-quemado::after {
-  pointer-events: none;
-  z-index: 5;
-  mix-blend-mode: normal;
 }
