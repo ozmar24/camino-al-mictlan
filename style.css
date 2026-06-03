@@ -1724,53 +1724,44 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-/* ====================== ESTILO ÉPICO PARA LEYES ====================== */
+/* ====================== CSS FUERZA BRUTA - LEYES ====================== */
 
 #codice-titulo {
-    color: #ff1a1a !important;
-    text-shadow: 0 0 25px #ff0000,
-                 0 0 40px #ff0000,
-                 4px 4px 12px #000,
-                 -4px -4px 12px #000 !important;
+    color: #ff0000 !important;
+    text-shadow: 0 0 20px #ff0000,
+                 0 0 35px #ff0000,
+                 5px 5px 12px #000,
+                 -5px -5px 12px #000 !important;
     font-size: 1.3rem !important;
-    margin-bottom: 35px !important;
-    letter-spacing: 4px;
 }
 
-/* Texto principal del pergamino (igual que el título) */
 #codice-cuerpo,
 #codice-cuerpo *,
 .pergamino-quemado #codice-cuerpo,
 .pergamino-quemado #codice-cuerpo * {
-    color: #ff2222 !important;
+    color: #cc0000 !important;           /* Rojo sangre fuerte */
     font-family: 'Nosifer', cursive !important;
-    text-shadow: 0 0 18px #ff0000,
-                 0 0 30px #ff0000,
-                 3px 3px 10px #000,
-                 -2px -2px 8px #000 !important;
-    line-height: 1.9 !important;
-    font-size: 0.7rem !important;
-    text-align: center;
+    text-shadow: 0 0 15px #ff0000,
+                 0 0 25px #ff0000,
+                 4px 4px 10px #000000,
+                 -3px -3px 8px #000000 !important;
+    font-size: 0.8rem !important;
+    line-height: 1.95 !important;
 }
 
-/* Hover en botones con detalle blanco como pediste */
+/* Botones */
 .btn-subley {
-    background: #2a0000 !important;
-    color: #ff4444 !important;
-    border: 3px solid #9f0000 !important;
-    padding: 18px 25px !important;
+    background: #2f0000 !important;
+    color: #ff2222 !important;
+    border: 3px solid #b30000 !important;
+    padding: 20px 25px !important;
     font-size: 0.7rem !important;
-    margin: 16px auto !important;
-    width: 88% !important;
-    max-width: 520px;
-    text-shadow: 0 0 18px #ff0000, 3px 3px 8px #000 !important;
+    text-shadow: 0 0 18px #ff0000 !important;
 }
 
 .btn-subley:hover {
-    background: #5a0000 !important;
-    color: #ffeeee !important;        /* Detalle blanco con glow */
-    border-color: #ff5555 !important;
-    transform: scale(1.05) !important;
-    text-shadow: 0 0 25px #ffffff, 
-                 0 0 35px #ff0000 !important;
+    background: #5c0000 !important;
+    color: #ffeeee !important;
+    border-color: #ff4444 !important;
+    text-shadow: 0 0 25px #ffffff, 0 0 35px #ff0000 !important;
 }
