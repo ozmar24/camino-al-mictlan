@@ -1821,3 +1821,53 @@ main {
     background: rgba(0, 0, 0, 0.75) !important; /* Mantiene el fondo oscuro para que resalte la luz del pergamino */
     backdrop-filter: blur(2px) !important;
 }
+/* ==================================================================
+   CENTRADO ABSOLUTO DE TEXTOS Y BOTONES (BÓVEDA Y LEYES)
+   ================================================================== */
+
+/* 1. CENTRADO DE LA BÓVEDA (BOTONES Y TEXTOS DE COMPRA) */
+#modal-boveda #boveda-cuerpo,
+#modal-boveda .pergamino-quemado,
+#modal-boveda .pergamino-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;      /* Centra los botones en el eje horizontal */
+    justify-content: center !important;  /* Centra el contenido en el eje vertical */
+    width: 100% !important;
+    text-align: center !important;       /* Centra los textos pequeños inline */
+}
+
+/* Forzar a cada botón individual dentro de la bóveda a centrarse y tener márgenes simétricos */
+#modal-boveda button,
+#modal-boveda .btn-ritual-grimorio,
+#modal-boveda button[onclick] {
+    display: block !important;
+    margin: 12px auto !important;        /* El "auto" en los lados fuerza el centrado horizontal */
+    width: 85% !important;               /* Mantiene el tamaño estilizado que ya tenías */
+    max-width: 320px !important;         /* Evita que se estiren de más en pantallas grandes */
+    text-align: center !important;
+}
+
+/* 2. CENTRADO DE LAS LEYES DEL MICTLÁN (TEXTOS Y ENLACES) */
+#pantalla-codice #codice-cuerpo,
+#pantalla-codice .pergamino-quemado,
+#pantalla-codice .pergamino-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;      /* Centra los spans y párrafos en el medio */
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;       /* Fuerza a que los renglones de texto se alineen al centro */
+}
+
+/* Asegurar que las listas o bloques de enlaces de las leyes no se carguen a la izquierda */
+#pantalla-codice #codice-cuerpo div,
+#pantalla-codice #codice-cuerpo p,
+#pantalla-codice #codice-cuerpo span {
+    text-align: center !important;
+    width: 100% !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
