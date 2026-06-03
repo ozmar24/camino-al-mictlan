@@ -589,36 +589,43 @@ function cerrarRitual() {
 // ==================================================================
 // UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
 // ==================================================================
-// ==================================================================
-// ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA DE MONLIX)
-// ==================================================================
-function mostrarVideoUnityAds() { // Mantenemos el nombre para no alterar tus enlaces visuales
+function mostrarVideoUnityAds() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    console.log("🎬 Abriendo el pergamino de ofertas de Monlix...");
-    
-    const appId = window.monlixAppId || "TU_ID_REAL_DE_MONLIX";
-    const userIdSafe = encodeURIComponent(window.userWallet.toLowerCase().trim());
-    
-    // Construcción de la URL mística del Muro de Ofertas
-    const urlMuro = `https://monlix.com{appId}&user_id=${userIdSafe}`;
+    console.log("🎬 Intentando mostrar video de Unity Ads...");
+    console.log("Unity Ads inicializado?", window.unityAdsInitialized);
+    console.log("window.unityads disponible?", typeof window.unityads !== 'undefined');
 
-    const modalPortal = document.getElementById('portal-monlix-modal');
-    const iframePortal = document.getElementById('iframe-monlix-portal');
-
-    if (modalPortal && iframePortal) {
-        iframePortal.src = urlMuro;
-        modalPortal.style.display = 'flex';
-        lanzarAlertaMictlan("El grimorio de ofrendas se ha manifestado en el abismo.", "PORTAL ABIERTO");
+    // Intentar mostrar video real
+    if (window.unityAdsInitialized && typeof window.unityads !== 'undefined') {
+        console.log("✅ Mostrando video real de Unity Ads...");
+        
+        window.unityads.show('Rewarded_Android', {
+            onComplete: function() {
+                console.log("✅ Video completado correctamente");
+                videoCompletado();
+            },
+            onSkipped: function() {
+                console.log("⏭️ Usuario saltó el video");
+                lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
+            },
+            onError: function(error) {
+                console.error("❌ Error en video:", error);
+                // Fallback: simular video
+                lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
+                setTimeout(videoCompletado, 3000);
+            }
+        });
     } else {
-        console.error("❌ Los elementos del DOM de Monlix no fueron hallados.");
-        lanzarAlertaMictlan("Fallo en la invocación del portal publicitario.", "ERROR MÍSTICO");
+        // Fallback: simular video si Unity Ads no está disponible
+        console.warn("❌ Unity Ads no disponible, simulando video...");
+        lanzarAlertaMictlan("Transmisión en progreso... Espera 3 segundos", "ESPERANDO ABISMO");
+        setTimeout(videoCompletado, 3000);
     }
 }
-
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
@@ -626,27 +633,41 @@ async function videoCompletado() {
     }
 
     try {
-        console.log("🔄 Sincronizando pozo central de Soulgeist con Redis...");
-        
-        // Ejecutamos tu función nativa de sincronización para descargar el saldo actualizado por el Webhook
-        const balanceActualizado = await sincronizarBalanceConRedis();
-        
-        balanceUsuarioSG = balanceActualizado;
+        const respuesta = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wallet: window.userWallet })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
+            return;
+        }
+
+        balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
-        // Actualizamos los contadores visuales del mapa del juego
         actualizarBalanceSoulgeist(balanceUsuarioSG);
         generarCementerio();
 
-        lanzarAlertaMictlan("El pozo central de Soulgeist se ha sincronizado con el abismo.", "RITUAL DE ACTUALIZACIÓN");
+        lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
 
     } catch (error) {
-        console.error("Error al sincronizar el balance post-video:", error);
-        lanzarAlertaMictlan("No se pudo conectar con las corrientes del inframundo.", "FALLO DE RED");
+        console.error("Error en video:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
     }
 }
 
-// Eliminamos las funciones videoSaltado y errorVideo de Unity Ads ya que Monlix controla eso dentro del iframe.
+function videoSaltado() {
+    lanzarAlertaMictlan("Los espíritus no recompensarán tu prisa.", "VIDEO SALTADO");
+}
+
+function errorVideo(error) {
+    console.error("Error en video de Unity Ads:", error);
+    lanzarAlertaMictlan("Fallo en la transmisión astral.", "ERROR DE VIDEO");
+}
 // ==================================================================
 // EXTRAS Y MODALES SECUNDARIOS
 // ==================================================================
