@@ -1724,49 +1724,53 @@ main {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-/* ====================== ESTILO FUERTE PARA PERGAMINO ====================== */
+/* ====================== ESTILO ÉPICO PARA LEYES ====================== */
 
 #codice-titulo {
     color: #ff1a1a !important;
-    text-shadow: 0 0 22px #ff0000, 
-                 4px 4px 12px #000, 
+    text-shadow: 0 0 25px #ff0000,
+                 0 0 40px #ff0000,
+                 4px 4px 12px #000,
                  -4px -4px 12px #000 !important;
-    font-size: 1.4rem !important;
-    margin-bottom: 30px !important;
-    letter-spacing: 2px;
+    font-size: 1.3rem !important;
+    margin-bottom: 35px !important;
+    letter-spacing: 4px;
 }
 
-/* Texto dentro del pergamino (el más importante) */
+/* Texto principal del pergamino (igual que el título) */
 #codice-cuerpo,
+#codice-cuerpo *,
 .pergamino-quemado #codice-cuerpo,
 .pergamino-quemado #codice-cuerpo * {
-    color: #c80000 !important;           /* Rojo sangre fuerte */
+    color: #ff2222 !important;
     font-family: 'Nosifer', cursive !important;
-    text-shadow: 0 0 12px #ff0000, 
-                 3px 3px 8px #000000 !important;
-    line-height: 1.85 !important;
+    text-shadow: 0 0 18px #ff0000,
+                 0 0 30px #ff0000,
+                 3px 3px 10px #000,
+                 -2px -2px 8px #000 !important;
+    line-height: 1.9 !important;
     font-size: 0.7rem !important;
+    text-align: center;
 }
 
-/* Botones dentro del pergamino */
+/* Hover en botones con detalle blanco como pediste */
 .btn-subley {
-    background: #2c0000 !important;
-    color: #ff3333 !important;
+    background: #2a0000 !important;
+    color: #ff4444 !important;
     border: 3px solid #9f0000 !important;
     padding: 18px 25px !important;
-    font-family: 'Nosifer', cursive !important;
     font-size: 0.7rem !important;
     margin: 16px auto !important;
     width: 88% !important;
     max-width: 520px;
-    text-align: center;
-    text-shadow: 0 0 15px #ff0000, 3px 3px 8px #000 !important;
-    box-shadow: 0 6px 25px rgba(200, 0, 0, 0.6) !important;
+    text-shadow: 0 0 18px #ff0000, 3px 3px 8px #000 !important;
 }
 
 .btn-subley:hover {
     background: #5a0000 !important;
-    color: #ffdddd !important;
-    border-color: #ff1a1a !important;
-    transform: scale(1.04) !important;
+    color: #ffeeee !important;        /* Detalle blanco con glow */
+    border-color: #ff5555 !important;
+    transform: scale(1.05) !important;
+    text-shadow: 0 0 25px #ffffff, 
+                 0 0 35px #ff0000 !important;
 }
