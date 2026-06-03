@@ -21,25 +21,30 @@
     </div>
 </div>
 
+<!-- Busca el script de cierre en tu HTML y reemplázalo por este bloque exacto -->
 <script>
-    // Asignación de variables globales de entorno Monlix
-    window.monlixAppId = "TU_ID_REAL_DE_MONLIX"; // Reemplaza con el ID numérico cuando te aprueben
+    window.monlixAppId = "TU_ID_REAL_DE_MONLIX"; 
     
-    // Vinculación mística del botón de cierre al cargar la estructura de la página
     document.addEventListener("DOMContentLoaded", () => {
         const btnCerrar = document.getElementById('cerrar-portal-btn');
         if (btnCerrar) {
-            btnCerrar.onclick = () => {
+            // Transformamos el evento en una función ASYNC para poder usar AWAIT
+            btnCerrar.onclick = async () => {
+                console.log("🔮 Iniciando transmutación y absorción de energía...");
+
+                // 1. Ejecutamos la acumulación deteniendo el código hasta que el servidor responda
+                if (typeof videoCompletado === 'function') {
+                    await videoCompletado(); 
+                }
+                
+                // 2. UNA VEZ QUE TERMINA EL FETCH Y SALE LA ALERTA REAL, escondemos el modal de anuncios
                 document.getElementById('portal-monlix-modal').style.display = 'none';
                 document.getElementById('iframe-monlix-portal').src = "";
-                // Al cerrar el portal, forzamos la sincronización de saldos con Redis
-                if (typeof videoCompletado === 'function') {
-                    videoCompletado();
-                }
             };
         }
     });
 </script>
+
 
 </head>
 <body>
