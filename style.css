@@ -1838,6 +1838,20 @@ main {
     background: rgba(0, 0, 0, 0.75) !important;
     backdrop-filter: blur(2px) !important;
 }
+.contenedor-estado {
+    width: 100%;
+    margin-top: 10px;
+    padding-left: 20px; /* Alineado a la izquierda */
+    text-align: left;
+}
+
+.texto-estado {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: rgba(255, 69, 0, 0.5);
+    letter-spacing: 1px;
+}
+
 #tokensQuemados {
     transition: opacity 0.5s ease-in-out;
     opacity: 1;
