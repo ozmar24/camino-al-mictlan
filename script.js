@@ -1382,26 +1382,58 @@ async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pas
 
         const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
 
-        console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
+console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
 
-        const respuesta = await fetch('/api/reclamar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-    identidad: identidad,
-    wallet:    walletUsuario,
-    cripto:    criptoSeleccionada,
-    pasarela:  pasarela
-            })
-        });
+// === LLAMADA AL BACKEND MEJORADA ===
+console.log("📤 Enviando reclamo:", { 
+    identidad: identidad, 
+    wallet: walletUsuario, 
+    cripto: criptoSeleccionada, 
+    pasarela: pasarela 
+});
 
-        const resultado = await respuesta.json();
-        console.log("Respuesta del backend:", resultado);
+const respuesta = await fetch('/api/reclamar', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({
+        identidad: identidad,
+        wallet: walletUsuario,
+        cripto: criptoSeleccionada,
+        pasarela: pasarela
+    })
+});
 
-        if (!respuesta.ok) {
-            lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
-            return;
-        }
+console.log("Status del backend:", respuesta.status);
+
+let resultado;
+try {
+    resultado = await respuesta.json();
+} catch (e) {
+    console.error("Error al parsear JSON del backend:", e);
+    lanzarAlertaMictlan("Respuesta inválida del servidor", "ERROR INTERNO");
+    return;
+}
+
+console.log("Respuesta del backend:", resultado);
+
+if (!respuesta.ok) {
+    lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
+    return;
+}
+
+// Éxito
+if (resultado.success) {
+    balanceUsuarioSG = 0;
+    localStorage.setItem('soulgeist_balance', '0');
+    
+    const selector = document.querySelector('.alma-maestra .balance-actual');
+    if (selector) selector.innerText = `Poder: 0 SG`;
+
+    generarCementerio();
+    lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "ÉXITO");
+}
 
         // Éxito
         if (resultado.balanceAlmas !== undefined) {
