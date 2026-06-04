@@ -87,13 +87,16 @@ export default async function handler(req, res) {
 
         const cantidadAEnviar = balanceSG * infoCripta.tasa;
 
-// Para Ethereum y criptos pequeñas, bajamos el mínimo en pruebas
-const minimoReal = infoCripta.minimoNativo || 0.00000001;
-
-if (cantidadAEnviar < minimoReal) {
+// === BYPASS TEMPORAL PARA PRUEBAS ===
+if (cantidadAEnviar <= 0) {
     return res.status(400).json({ 
-        error: `Saldo insuficiente. Tienes ${cantidadAEnviar.toFixed(8)} ${infoCripta.simFP}. Mínimo requerido: ${minimoReal}` 
+        error: `No tienes balance suficiente. Tienes ${balanceSG} SG.` 
     });
+}
+
+// Solo mostramos advertencia pero permitimos el retiro
+if (cantidadAEnviar < infoCripta.minimoNativo) {
+    console.log(`⚠️ Advertencia: Monto bajo (${cantidadAEnviar}), pero permitimos en pruebas`);
 }
 
         let pagoExitoso = false;
