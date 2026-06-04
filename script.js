@@ -2249,8 +2249,9 @@ async function actualizarTransparencia() {
         if (!abiCargado) return;
 
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae".toLowerCase();
-        const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
+              const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae".toLowerCase();
+
+const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         
         // 1. Llamamos al contrato
         const resultados = await contrato.consultarBovedas();
