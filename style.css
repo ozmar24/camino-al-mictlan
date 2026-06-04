@@ -1839,10 +1839,12 @@ main {
     backdrop-filter: blur(2px) !important;
 }
 .contenedor-estado {
+    position: relative;
     width: 100%;
     margin-top: 205px;
     padding-left: 20px; /* Alineado a la izquierda */
     text-align: left;
+    z-index: 5;
 }
 
 .texto-estado {
@@ -1850,6 +1852,7 @@ main {
     font-size: 10px;
     color: #888888 !important;
     letter-spacing: 1px;
+    margin: 0;
 }
 
 #tokensQuemados {
