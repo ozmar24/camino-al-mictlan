@@ -2242,47 +2242,42 @@ async function cargarABI() {
 }
 
 async function actualizarTransparencia() {
-    if (typeof ethers === 'undefined') return;
+    if (typeof ethers === 'undefined') {
+        console.error("Ethers no está cargado");
+        return;
+    }
 
     try {
+        console.log("Iniciando actualización...");
         const abiCargado = await cargarABI();
-        if (!abiCargado) return;
+        if (!abiCargado) throw new Error("No se pudo cargar el ABI");
 
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-              const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae".toLowerCase();
-
-const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
+        const direccion = "0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae"; // Ya en minúsculas
+        const contrato = new ethers.Contract(direccion, abiCargado, provider);
         
-        // 1. Llamamos al contrato
+        console.log("Consultando contrato...");
         const resultados = await contrato.consultarBovedas();
         
-        // 2. Definimos el supply inicial (200,000,000,000 con 18 decimales)
-        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
-        
-        // 3. Obtenemos el supply actual del contrato (está en la posición 5 del array devuelto)
+        // Resultados[5] es el totalSupply según tu contrato
         const supplyActual = resultados[5]; 
-        
-        // 4. Calculamos los quemados: Inicial - Actual
+        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
         const tokensQuemados = supplyInicial.sub(supplyActual);
         
-        // 5. Formateamos para mostrar
         const valorLimpio = ethers.utils.formatUnits(tokensQuemados, 18).split('.')[0];
         const nuevoTexto = valorLimpio + " SOULGEIST QUEMADOS";
 
-        console.log("Tokens quemados calculados:", nuevoTexto);
+        console.log("Resultado final:", nuevoTexto);
         
         const elemento = document.getElementById("tokensQuemados");
-        if (elemento && elemento.innerText !== nuevoTexto) {
-            elemento.style.transition = "all 0.3s ease";
-            elemento.style.opacity = "0";
-            setTimeout(() => {
-                elemento.innerText = nuevoTexto;
-                elemento.style.opacity = "1";
-            }, 300);
+        if (elemento) {
+            elemento.innerText = nuevoTexto;
         }
+
     } catch (err) {
-        console.error("Error en la conexión:", err);
+        // ESTO ES LO QUE NECESITO QUE ME DIGAS
+        console.error("ERROR CRÍTICO EN ACTUALIZAR:", err);
         const elemento = document.getElementById("tokensQuemados");
-        if (elemento) elemento.innerText = "Sincronizando...";
+        if (elemento) elemento.innerText = "Error: Revisa consola F12";
     }
 }
