@@ -2210,7 +2210,7 @@ function cerrarAlerta() {
 // GUARDIÁN DE RED (CONFIGURADO PARA POLYGON MAINNET)
 // ==================================================================
 async function asegurarRedProduccion() {
-    const POLYGON_CHAIN_ID = '0x89'; // Hexadecimal para 137 (Polygon Mainnet)
+    const POLYGON_CHAIN_ID = '0x13882'; // Hexadecimal para 80002 (Polygon Amoy Testnet) // Hexadecimal para 137 (Polygon Mainnet)
 
     if (window.ethereum) {
         try {
@@ -2230,14 +2230,30 @@ async function asegurarRedProduccion() {
     }
 }
 window.entrarAlMictlan = entrarAlMictlan;
+
+async function cargarABI() {
+    try {
+        const response = await fetch('contractABI.json');
+        return await response.json();
+    } catch (error) {
+        console.error("No se pudo cargar el ABI:", error);
+        return null;
+    }
+}
+
 async function actualizarTransparencia() {
     if (typeof ethers === 'undefined') return;
 
     try {
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        const contrato = new ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, provider);
+        
+        // CORRECCIÓN: Se mantiene la dirección entre comillas como string
+        const contrato = new ethers.Contract("0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae", SOULGEIST_ABI, provider);
         
         const quemados = await contrato.consultarBovedas();
+        
+        // MANTENIENDO TU LÓGICA ORIGINAL:
+        // Asegúrate de que 'quemados.quemados' coincida con lo que devuelve tu contrato
         const nuevoTexto = ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
         const elemento = document.getElementById("tokensQuemados");
 
@@ -2252,7 +2268,8 @@ async function actualizarTransparencia() {
             }, 300);
         }
     } catch (err) {
-        // En lugar de ocultarlo, muestra "Sincronizando..." para que vean que sigue intentando
+        // MANTENIENDO TU LÓGICA DE ERROR:
+        console.error("Error en la conexión:", err); // Para que puedas ver qué pasa en consola (F12)
         document.getElementById("tokensQuemados").innerText = "Sincronizando...";
     }
 }
