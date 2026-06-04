@@ -2259,7 +2259,6 @@ async function actualizarTransparencia() {
         
         // 4. ACTUALIZACIÓN FORZADA AL DOM
        const elemento = document.getElementById("tokensQuemados");
-const elemento = document.getElementById("tokensQuemados");
         if (elemento) {
             console.log("¡Forzando actualización del DOM!");
             
@@ -2268,7 +2267,6 @@ const elemento = document.getElementById("tokensQuemados");
             
             elemento.textContent = nuevoTexto;
             console.log("Texto asignado:", nuevoTexto);
-        
         } else {
             console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
         }
