@@ -1848,7 +1848,7 @@ main {
 .texto-estado {
     font-family: 'Nosifer', monospace;
     font-size: 10px;
-    color: rgba(255, 69, 0, 0.5);
+    color: #888888 !important;
     letter-spacing: 1px;
 }
 
