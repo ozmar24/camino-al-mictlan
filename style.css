@@ -1856,8 +1856,8 @@ main {
 }
 
 #tokensQuemados {
-    transition: opacity 0.5s ease-in-out;
-    opacity: 1;
+    color: #a0d8ef !important; /* Un tono cian claro, como el de tu texto "Poder" */
+    text-shadow: 0 0 5px rgba(160, 216, 239, 0.5); /* Un brillo suave */
 }
 .punto-activo {
     color: #ff0000;
