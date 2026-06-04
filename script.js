@@ -2282,3 +2282,8 @@ async function actualizarTransparencia() {
         if (elemento) elemento.textContent = "Error al consultar";
     }
 }
+// 1. Ejecutar inmediatamente al cargar la página
+window.addEventListener('load', actualizarTransparencia);
+
+// 2. Ejecutar cada 30 segundos para mantener el dato fresco
+setInterval(actualizarTransparencia, 30000);
