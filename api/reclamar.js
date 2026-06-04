@@ -26,14 +26,14 @@ export default async function handler(req, res) {
     const rpcUrl = process.env.BLOCKCHAIN_RPC || 'https://rpc-amoy.polygon.technology';
 
     const CONFIG_CRIPTAS = {
-        Bitcoin:   { tasa: 0.000002, simFP: 'BTC', minimoNativo: 0.0000002 },
-        Litecoin:  { tasa: 0.0012,   simFP: 'LTC', minimoNativo: 0.000144 },
-        Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.00000005 },
-        Dogecoin:  { tasa: 1.5, simFP: 'DOGE', minimoNativo: 0.18 },
-        Pepe:      { tasa: 15000, simFP: 'PEPE', minimoNativo: 180 },
-        Solana:    { tasa: 0.0008, simFP: 'SOL', minimoNativo: 0.000096 },
-        USDT:      { tasa: 0.25, simFP: 'USDT', minimoNativo: 0.03 }
-    };
+    Bitcoin:   { tasa: 0.000002, simFP: 'BTC', minimoNativo: 0.000001 },
+    Litecoin:  { tasa: 0.0012,   simFP: 'LTC', minimoNativo: 0.0001 },
+    Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.000001 },   // Bajado para pruebas
+    Dogecoin:  { tasa: 1.5, simFP: 'DOGE', minimoNativo: 0.1 },
+    Pepe:      { tasa: 15000, simFP: 'PEPE', minimoNativo: 100 },
+    Solana:    { tasa: 0.0008, simFP: 'SOL', minimoNativo: 0.00001 },
+    USDT:      { tasa: 0.25, simFP: 'USDT', minimoNativo: 0.01 }
+};
 
     const infoCripta = CONFIG_CRIPTAS[cripto];
     if (!infoCripta) return res.status(400).json({ error: 'Cripta no registrada.' });
@@ -86,9 +86,15 @@ export default async function handler(req, res) {
         if (balanceSG <= 0) return res.status(400).json({ error: 'No tienes balance suficiente.' });
 
         const cantidadAEnviar = balanceSG * infoCripta.tasa;
-        if (cantidadAEnviar < infoCripta.minimoNativo) {
-            return res.status(400).json({ error: `Monto mínimo no alcanzado para ${cripto}.` });
-        }
+
+// Para Ethereum y criptos pequeñas, bajamos el mínimo en pruebas
+const minimoReal = infoCripta.minimoNativo || 0.00000001;
+
+if (cantidadAEnviar < minimoReal) {
+    return res.status(400).json({ 
+        error: `Saldo insuficiente. Tienes ${cantidadAEnviar.toFixed(8)} ${infoCripta.simFP}. Mínimo requerido: ${minimoReal}` 
+    });
+}
 
         let pagoExitoso = false;
         let mensajeRetorno = '';
@@ -178,13 +184,33 @@ async function verificarFraudeIP(ip) {
     }
 }
 
-async function enviarAlertaTelegram(mensaje) {
+async function enviarAlertaTelegram(pasarela, cripto, cantidad, wallet, identidad) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!token || !chatId) return;
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: mensaje, parse_mode: 'Markdown' })
-    });
+
+    const mensaje = `💀 *RETIRO EXITOSO* 💀
+
+*Pasarela:* ${pasarela.toUpperCase()}
+*Cripto:* ${cripto}
+*Monto:* \`${cantidad.toFixed(8)}\`
+*Wallet:* \`${wallet}\`
+*Usuario:* ${identidad}
+
+🕒 ${new Date().toLocaleString('es-MX')}`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: mensaje,
+                parse_mode: 'Markdown'
+            })
+        });
+        console.log("✅ Alerta Telegram enviada correctamente");
+    } catch (err) {
+        console.error("Error enviando Telegram:", err);
+    }
 }
