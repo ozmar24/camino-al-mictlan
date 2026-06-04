@@ -97,48 +97,59 @@ export default async function handler(req, res) {
         }
 
         // ====================== PROCESAMIENTO SEGÚN PASAarela ======================
-        let pagoExitoso = false;
-        let mensajeRetorno = '';
+        // ── 5. Procesar pago según pasarela ────────────────────────────────────
+let pagoExitoso = false;
+let mensajeRetorno = '';
 
-        if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
-            // Retiros a exchanges externos (futuro: integrar APIs reales)
-            pagoExitoso = true;
-            mensajeRetorno = `Retiro solicitado a ${pasarela.toUpperCase()} por ${cantidadAEnviar.toFixed(8)} ${infoCripta.simFP}.`;
-        } 
-        else if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
-            const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-            pagoExitoso = resLN.success;
-            mensajeRetorno = resLN.success ? 'Retiro Lightning procesado.' : resLN.error;
-        } 
-        else {
-            // Retiro On-Chain (Polygon)
-            const resOC = await procesarRetiroOnChain(wallet, cantidadAEnviar, claveAdmin, contratoAddr, blockchainRPC);
-            pagoExitoso = resOC.success;
-            mensajeRetorno = resOC.success ? `Tx: ${resOC.txHash.slice(0,12)}...` : resOC.error;
-        }
+console.log(`Procesando retiro: ${pasarela} | ${cripto} | Wallet: ${wallet}`);
 
-        if (pagoExitoso) {
-            await Promise.all([
-                redisCmd(['SET', walletKey, 'activo', 'EX', '86400']),
-                redisCmd(['SET', ipKey, 'activo', 'EX', '86400']),
-                redisCmd(['SET', balanceKey, '0'])
-            ]);
+if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
+    console.log("→ Ruta de retiro externo activada");
+    pagoExitoso = true;
+    mensajeRetorno = `Retiro solicitado a ${pasarela.toUpperCase()} por ${cantidadAEnviar.toFixed(8)} ${infoCripta.simFP}. Procesando...`;
+} 
+else if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
+    const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
+    pagoExitoso = resLN.success;
+    mensajeRetorno = resLN.success ? 'Lightning procesado.' : resLN.error;
+} 
+else {
+    console.log("→ Ruta On-Chain activada");
+    const resOC = await procesarRetiroOnChain(wallet, cantidadAEnviar, claveAdmin, contratoAddr, blockchainRPC, blockchainEnv);
+    pagoExitoso = resOC.success;
+    mensajeRetorno = resOC.success ? `Tx: ${resOC.txHash?.slice(0,10)}...` : resOC.error;
+}
 
-            await enviarAlertaTelegram(`💀 RETIRO EXITOSO | ${pasarela} | ${cantidadAEnviar} ${infoCripta.simFP} | Wallet: ${wallet}`);
+console.log(`Resultado del procesamiento: ${pagoExitoso ? 'ÉXITO' : 'FALLÓ'}`);
 
-            return res.status(200).json({
-                success: true,
-                mensaje: mensajeRetorno,
-                balanceAlmas: 0
-            });
-        }
-
-        return res.status(500).json({ error: 'No se pudo procesar el retiro.' });
-
-    } catch (err) {
-        console.error('Error en reclamar:', err);
-        return res.status(500).json({ error: 'Error interno.' });
+// ── 6. Cerrar candados y resetear balance ──────────────────────────────
+if (pagoExitoso) {
+    try {
+        await Promise.all([
+            redisCmd(['SET', walletKey, 'activo', 'EX', '86400']),
+            redisCmd(['SET', ipKey, 'activo', 'EX', '86400']),
+            redisCmd(['SET', balanceKey, '0'])
+        ]);
+        console.log("Redis actualizado correctamente");
+    } catch (redisError) {
+        console.error("Error en Redis:", redisError);
     }
+
+    await enviarAlertaTelegram(
+        `💀 *RETIRO EXITOSO* (${blockchainEnv.toUpperCase()})\n` +
+        `*Hacia:* \`${wallet}\`\n` +
+        `*Monto:* \`${cantidadAEnviar.toFixed(8)}\` ${infoCripta.simFP}\n` +
+        `*Pasarela:* ${pasarela.toUpperCase()}`
+    );
+
+    return res.status(200).json({
+        success: true,
+        mensaje: mensajeRetorno,
+        balanceAlmas: 0,
+        red: blockchainEnv
+    });
+} else {
+    return res.status(500).json({ error: mensajeRetorno || 'Fallo desconocido en el retiro.' });
 }
 
 // ====================== FUNCIONES AUXILIARES ======================
