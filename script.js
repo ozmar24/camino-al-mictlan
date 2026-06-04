@@ -2242,45 +2242,31 @@ async function cargarABI() {
 }
 
 async function actualizarTransparencia() {
-    console.log("--- 1. Iniciando actualización ---");
-    if (typeof ethers === 'undefined') {
-        console.error("Ethers no está definido");
-        return;
-    }
-
     try {
-        console.log("--- 2. Cargando ABI ---");
+        // 1. Obtener datos
         const abiCargado = await cargarABI();
-        if (!abiCargado) throw new Error("ABI nulo");
-
-        console.log("--- 3. Conectando al provider ---");
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        
-        console.log("--- 4. Instanciando contrato ---");
-        const direccionContrato = "0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae"; // Minúsculas
-        const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
-        
-        console.log("--- 5. Consultando contrato ---");
-        const quemados = await contrato.consultarBovedas();
-        console.log("Datos recibidos:", quemados);
-        
-        // Calculamos quemados: 200,000,000,000 - supplyActual
+        const contrato = new ethers.Contract("0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae", abiCargado, provider);
+        const res = await contrato.consultarBovedas();
+
+        // 2. Calcular
         const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
-        const supplyActual = quemados[5]; // Según tu contrato, el índice 5 es totalSupply
-        const totalQuemado = supplyInicial.sub(supplyActual);
+        const supplyActual = res[5]; 
+        const quemados = supplyInicial.sub(supplyActual);
         
-        const nuevoTexto = ethers.utils.formatUnits(totalQuemado, 18).split('.')[0] + " SOULGEIST QUEMADOS";
-        console.log("--- 6. Texto final generado:", nuevoTexto);
+        // 3. Formatear
+        const nuevoTexto = ethers.utils.formatUnits(quemados, 18).split('.')[0] + " SOULGEIST QUEMADOS";
         
+        // 4. ACTUALIZACIÓN FORZADA AL DOM
         const elemento = document.getElementById("tokensQuemados");
         if (elemento) {
-            elemento.innerText = nuevoTexto;
-            elemento.style.opacity = "1";
+            console.log("Intentando escribir en pantalla:", nuevoTexto);
+            elemento.innerText = nuevoTexto; // Cambio directo sin animaciones por ahora
+        } else {
+            console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
         }
 
     } catch (err) {
-        console.error("--- ERROR DETECTADO ---", err);
-        const elemento = document.getElementById("tokensQuemados");
-        if (elemento) elemento.innerText = "Error en carga";
+        console.error("Error en la actualización:", err);
     }
 }
