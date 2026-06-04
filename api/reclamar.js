@@ -143,49 +143,78 @@ export default async function handler(req, res) {
 
 // ====================== FUNCIONES AUXILIARES ======================
 function validarDireccion(wallet, pasarela, cripto) {
-    const regexEVM = /^0x[a-fA-F0-9]{40}$/;
-    const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
-    const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/;
+    const regexEVM = /^0x[a-fA-F0-9]{40}$/i;
+    
+    // Bitcoin (mainnet + testnet)
+    const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34}|t[b1][a-zA-Z0-9]{6,87}|[mn][a-zA-HJ-NP-Z1-9]{25,34})$/i;
+    
+    // Litecoin (mainnet + testnet)
+    const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^tltc1[a-z0-9]{6,87}$/i;
 
-    if (pasarela === 'binance' || pasarela === 'coinbase') return regexEVM.test(wallet);
+    if (pasarela === 'binance' || pasarela === 'coinbase') {
+        return regexEVM.test(wallet);
+    }
+
     if (pasarela === 'bitso') {
         if (cripto === 'Bitcoin') return regexBTC.test(wallet);
         if (cripto === 'Litecoin') return regexLTC.test(wallet);
-        return regexEVM.test(wallet);
+        return regexEVM.test(wallet); // Para otras criptos
     }
-    if (pasarela === 'bitso_lightning') return regexBTC.test(wallet);
+
+    if (pasarela === 'bitso_lightning') {
+        return regexBTC.test(wallet);
+    }
+
     return wallet.length > 5;
 }
 
-async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl) {
+async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl, entorno = 'testnet') {
     try {
+        console.log(`🔄 [${entorno}] Iniciando retiro on-chain...`);
+        console.log(`   → Wallet destino: ${walletUsuario}`);
+        console.log(`   → Monto: ${monto}`);
+
         const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const cleanKey = claveAdmin.startsWith('0x') ? claveAdmin : `0x${claveAdmin}`;
-        const walletAdmin = new ethers.Wallet(cleanKey, provider);
 
-        const abi = ["function transfer(address to, uint256 amount) returns (bool)"];
-        const contrato = new ethers.Contract(contratoAddr, abi, walletAdmin);
+        // Limpieza segura de clave privada
+        let privateKey = claveAdmin.trim();
+        if (!privateKey.startsWith('0x')) {
+            privateKey = '0x' + privateKey;
+        }
 
-        const amount = ethers.parseUnits(monto.toFixed(18), 18);
-        const tx = await contrato.transfer(ethers.getAddress(walletUsuario), amount);
+        const walletAdmin = new ethers.Wallet(privateKey, provider);
+
+        const MIN_ABI = [
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
+
+        const contrato = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
+
+        // Convertir monto
+        const amountParsed = ethers.parseUnits(monto.toFixed(18), 18);
+
+        // Validar dirección destino
+        const direccionDestino = ethers.getAddress(walletUsuario);
+
+        console.log(`   → Enviando ${ethers.formatUnits(amountParsed, 18)} tokens a ${direccionDestino}`);
+
+        // Enviar transacción
+        const tx = await contrato.transfer(direccionDestino, amountParsed);
+        console.log(`   → Tx enviada: ${tx.hash}`);
+
         const receipt = await tx.wait();
+        console.log(`   → Tx confirmada en bloque: ${receipt.blockNumber}`);
 
-        return { success: true, txHash: receipt.hash };
+        return { 
+            success: true, 
+            txHash: receipt.hash 
+        };
+
     } catch (error) {
-        console.error(error);
-        return { success: false, error: error.message };
+        console.error(`❌ Error en procesarRetiroOnChain:`, error);
+        return { 
+            success: false, 
+            error: error.reason || error.message || 'Error desconocido en blockchain' 
+        };
     }
-}
-
-async function ejecutarRetiroBitsoLightning(wallet, monto) {
-    console.warn('Bitso Lightning pendiente de implementación');
-    return { success: false, error: 'Funcionalidad en desarrollo' };
-}
-
-async function verificarFraudeIP(ip) {
-    // tu función actual...
-}
-
-async function enviarAlertaTelegram(mensaje) {
-    // tu función actual...
 }
