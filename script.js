@@ -2243,35 +2243,42 @@ async function cargarABI() {
 
 async function actualizarTransparencia() {
     try {
-        // 1. Obtener datos
-        const abiCargado = await cargarABI();
-        const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        const contrato = new ethers.Contract("0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae", abiCargado, provider);
-        const res = await contrato.consultarBovedas();
-
-        // 2. Calcular
-        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
-        const supplyActual = res[5]; 
-        const quemados = supplyInicial.sub(supplyActual);
-        
-        // 3. Formatear
-        const nuevoTexto = ethers.utils.formatUnits(quemados, 18).split('.')[0] + " SOULGEIST QUEMADOS";
-        
-        // 4. ACTUALIZACIÓN FORZADA AL DOM
-       const elemento = document.getElementById("tokensQuemados");
-        if (elemento) {
-            console.log("¡Forzando actualización del DOM!");
-            
-            // Esto sobrescribe cualquier estilo previo del CSS
-            elemento.style.cssText = "display: inline !important; opacity: 1 !important; color: white !important; font-size: 20px !important; background: black !important;";
-            
-            elemento.textContent = nuevoTexto;
-            console.log("Texto asignado:", nuevoTexto);
-        } else {
-            console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
+        const elemento = document.getElementById("tokensQuemados");
+        if (!elemento) {
+            console.error("No se encontró el elemento tokensQuemados");
+            return;
         }
 
+        elemento.textContent = "Consultando al Mictlán...";
+
+        // Usar BrowserProvider si estás en frontend
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const abiCargado = await cargarABI(); // Asegúrate que esta función funcione
+
+        const contrato = new ethers.Contract(
+            "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae", 
+            abiCargado, 
+            provider
+        );
+
+        const res = await contrato.consultarBovedas();
+        const supplyInicial = ethers.parseUnits("200000000000", 18);
+        const supplyActual = res[5]; // Asumiendo que el supply actual está en la posición 5
+        const quemados = supplyInicial - supplyActual;
+
+        const quemadosFormateado = ethers.formatUnits(quemados, 18).split('.')[0];
+
+        // Actualización fuerte del DOM
+        elemento.style.color = "#ff4444";
+        elemento.style.fontWeight = "bold";
+        elemento.style.textShadow = "0 0 10px #ff0000";
+        elemento.textContent = `${quemadosFormateado} SOULGEIST QUEMADOS`;
+
+        console.log("✅ Quemados actualizados:", quemadosFormateado);
+
     } catch (err) {
-        console.error("Error en la actualización:", err);
+        console.error("Error al actualizar quemados:", err);
+        const elemento = document.getElementById("tokensQuemados");
+        if (elemento) elemento.textContent = "Error al consultar";
     }
 }
