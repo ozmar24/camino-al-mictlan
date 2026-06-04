@@ -2230,29 +2230,31 @@ async function asegurarRedProduccion() {
     }
 }
 window.entrarAlMictlan = entrarAlMictlan;
-// 1. La función que hace el trabajo
-async function actualizarMarquee() {
+async function actualizarTransparencia() {
     try {
-        // Usamos el proveedor público (sin MetaMask)
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
         const contrato = new ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, provider);
-
-        // Llamamos a la función de tu contrato
-        const quemados = await contrato.consultarBovedas(); 
         
-        // Formateamos y ponemos en el HTML
-        // Nota: Asegúrate de que 'quemados' sea el índice correcto en tu objeto de respuesta
-        document.getElementById("tokensQuemados").innerText = 
-            ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
-            
-        console.log("✅ El marquee ha recibido datos del contrato con éxito.");
+        const quemados = await contrato.consultarBovedas(); 
+        const textoNuevo = ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
+        
+        const elemento = document.getElementById("tokensQuemados");
+        
+        // Efecto de "intermitencia" sutil
+        if (elemento.innerText !== textoNuevo) {
+            elemento.style.opacity = 0; // Desvanecer
+            setTimeout(() => {
+                elemento.innerText = textoNuevo;
+                elemento.style.opacity = 1; // Aparecer
+            }, 500);
+        }
     } catch (err) {
-        console.error("❌ El marquee no pudo conectar:", err);
+        console.log("Oráculo en pausa...");
     }
 }
 
-// 2. Ejecutar la primera vez al cargar
-actualizarMarquee();
-
-// 3. Programar la actualización cada 30 segundos
-setInterval(actualizarMarquee, 30000);
+// Actualizamos cada minuto (60000ms) para que sea un cambio sutil
+if (window.innerWidth > 768) {
+    setInterval(actualizarTransparencia, 60000);
+    actualizarTransparencia();
+}

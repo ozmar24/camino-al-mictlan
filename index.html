@@ -48,25 +48,7 @@
 
 </head>
 <body>
-<style>
-    .marquee-container {
-        display: block !important;
-        visibility: visible !important;
-        position: relative !important;
-        background: #000 !important;
-        color: #ff4500 !important;
-        border: 2px solid #550000 !important;
-        height: 40px !important;
-        line-height: 40px !important;
-        z-index: 10000 !important;
-    }
-</style>
-<div class="marquee-container" id="contenedorMarquee">
-    <marquee behavior="scroll" direction="left" scrollamount="5">
-        🔥 QUEMA DE TOKENS EN VIVO: <span id="tokensQuemados">Conectando al Mictlán...</span> | 
-        RED: POLYGON AMOY | ESTADO: TRANSPARENCIA TOTAL | ¡ÚNETE AL MICtlÁN!
-    </marquee>
-</div>
+
 
     <div id="aviso-rotar" style="display: none;">
         <h2>SABIDURÍA DEL INFRAMUNDO</h2>
@@ -145,6 +127,11 @@
     <div id="reproductor-ad" onclick="mostrarVideoUnityAds()" style="width: 160px; height: 90px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px;">
         <span style="font-size: 0.6rem; color: #666; font-family: 'MedievalSharp';">[ VER VIDEO ADS ]</span>
     </div>
+</div>
+<div id="contenedor-transparencia" style="margin-top: 10px; font-family: 'Courier New', monospace; text-align: center;">
+    <p style="font-size: 10px; color: rgba(255, 69, 0, 0.5);">
+        ESTADO DEL CONTRATO: <span id="tokensQuemados">Sincronizando...</span>
+    </p>
 </div>
 
 <div class="icono-billetera" onclick="abrirModalWallet()" style="position: absolute; top: 20px; right: 20px; z-index: 100; cursor: pointer;">

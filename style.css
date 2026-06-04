@@ -1838,15 +1838,7 @@ main {
     background: rgba(0, 0, 0, 0.75) !important;
     backdrop-filter: blur(2px) !important;
 }
-.marquee-container {
-    width: 100%;
-    background: #000;
-    color: #ff4500;
-    padding: 10px 0;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    border-bottom: 2px solid #550000;
-    position: fixed; /* O fixed si quieres que flote arriba */
-    top: 0;
-    z-index: 9999; /* Para que esté siempre al frente */
+#tokensQuemados {
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
 }
