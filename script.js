@@ -2242,42 +2242,45 @@ async function cargarABI() {
 }
 
 async function actualizarTransparencia() {
+    console.log("--- 1. Iniciando actualización ---");
     if (typeof ethers === 'undefined') {
-        console.error("Ethers no está cargado");
+        console.error("Ethers no está definido");
         return;
     }
 
     try {
-        console.log("Iniciando actualización...");
+        console.log("--- 2. Cargando ABI ---");
         const abiCargado = await cargarABI();
-        if (!abiCargado) throw new Error("No se pudo cargar el ABI");
+        if (!abiCargado) throw new Error("ABI nulo");
 
+        console.log("--- 3. Conectando al provider ---");
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        const direccion = "0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae"; // Ya en minúsculas
-        const contrato = new ethers.Contract(direccion, abiCargado, provider);
         
-        console.log("Consultando contrato...");
-        const resultados = await contrato.consultarBovedas();
+        console.log("--- 4. Instanciando contrato ---");
+        const direccionContrato = "0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae"; // Minúsculas
+        const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         
-        // Resultados[5] es el totalSupply según tu contrato
-        const supplyActual = resultados[5]; 
+        console.log("--- 5. Consultando contrato ---");
+        const quemados = await contrato.consultarBovedas();
+        console.log("Datos recibidos:", quemados);
+        
+        // Calculamos quemados: 200,000,000,000 - supplyActual
         const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
-        const tokensQuemados = supplyInicial.sub(supplyActual);
+        const supplyActual = quemados[5]; // Según tu contrato, el índice 5 es totalSupply
+        const totalQuemado = supplyInicial.sub(supplyActual);
         
-        const valorLimpio = ethers.utils.formatUnits(tokensQuemados, 18).split('.')[0];
-        const nuevoTexto = valorLimpio + " SOULGEIST QUEMADOS";
-
-        console.log("Resultado final:", nuevoTexto);
+        const nuevoTexto = ethers.utils.formatUnits(totalQuemado, 18).split('.')[0] + " SOULGEIST QUEMADOS";
+        console.log("--- 6. Texto final generado:", nuevoTexto);
         
         const elemento = document.getElementById("tokensQuemados");
         if (elemento) {
             elemento.innerText = nuevoTexto;
+            elemento.style.opacity = "1";
         }
 
     } catch (err) {
-        // ESTO ES LO QUE NECESITO QUE ME DIGAS
-        console.error("ERROR CRÍTICO EN ACTUALIZAR:", err);
+        console.error("--- ERROR DETECTADO ---", err);
         const elemento = document.getElementById("tokensQuemados");
-        if (elemento) elemento.innerText = "Error: Revisa consola F12";
+        if (elemento) elemento.innerText = "Error en carga";
     }
 }
