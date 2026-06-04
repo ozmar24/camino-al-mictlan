@@ -1841,7 +1841,7 @@ main {
 .contenedor-estado {
     position: relative;
     width: 100%;
-    margin-top: 205px;
+    margin-top: 15px;
     padding-left: 20px; /* Alineado a la izquierda */
     text-align: left;
     z-index: 5;
