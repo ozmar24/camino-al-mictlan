@@ -2259,11 +2259,16 @@ async function actualizarTransparencia() {
         
         // 4. ACTUALIZACIÓN FORZADA AL DOM
        const elemento = document.getElementById("tokensQuemados");
-if (elemento) {
-    console.log("¡Forzando actualización del DOM!");
-    elemento.style.display = "inline"; // Forzamos a que sea visible
-    elemento.style.opacity = "1";      // Forzamos visibilidad
-    elemento.textContent = nuevoTexto;
+const elemento = document.getElementById("tokensQuemados");
+        if (elemento) {
+            console.log("¡Forzando actualización del DOM!");
+            
+            // Esto sobrescribe cualquier estilo previo del CSS
+            elemento.style.cssText = "display: inline !important; opacity: 1 !important; color: white !important; font-size: 20px !important; background: black !important;";
+            
+            elemento.textContent = nuevoTexto;
+            console.log("Texto asignado:", nuevoTexto);
+        }
         } else {
             console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
         }
