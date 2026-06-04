@@ -1383,3 +1383,21 @@ async function asegurarRedProduccion() {
     }
 }
 window.entrarAlMictlan = entrarAlMictlan;
+async function conectarConContrato() {
+    // 1. Cargamos el ABI que ya guardaste
+    const respuesta = await fetch('./abi.json');
+    const abi = await respuesta.json();
+    
+    // 2. Tu dirección de contrato (la que tienes en Polygonscan)
+    const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae";
+
+    // 3. Inicializamos el proveedor de Ethereum (MetaMask)
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    // 4. Creamos el objeto del contrato
+    const contrato = new ethers.Contract(direccionContrato, abi, signer);
+    
+    console.log("✅ Contrato conectado. Ya puedes interactuar con él.");
+    return contrato;
+}
