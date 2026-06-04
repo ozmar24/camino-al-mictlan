@@ -1840,7 +1840,7 @@ main {
 }
 .contenedor-estado {
     position: absolute; /* Esto evita que empuje cualquier otro elemento */
-    top: 190px;         /* Ajusta este valor para bajarlo o subirlo exactamente bajo el video */
+    top: 210px;         /* Ajusta este valor para bajarlo o subirlo exactamente bajo el video */
     left: 20px;         /* Alineado a la izquierda */
     z-index: 10;        /* Asegura que esté por encima de la niebla pero debajo de botones críticos */
     pointer-events: none; /* Hace que el texto sea "fantasma" y no bloquee clics */
