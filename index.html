@@ -48,12 +48,23 @@
 
 </head>
 <body>
-<div class="marquee-container">
+<style>
+    .marquee-container {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        background: #000 !important;
+        color: #ff4500 !important;
+        border: 2px solid #550000 !important;
+        height: 40px !important;
+        line-height: 40px !important;
+        z-index: 10000 !important;
+    }
+</style>
+<div class="marquee-container" id="contenedorMarquee">
     <marquee behavior="scroll" direction="left" scrollamount="5">
-        🔥 QUEMA DE TOKENS EN VIVO: <span id="tokensQuemados">Cargando...</span> | 
-        RED: POLYGON AMOY | 
-        ESTADO: TRANSPARENCIA TOTAL | 
-        ¡ÚNETE AL MICtlÁN!
+        🔥 QUEMA DE TOKENS EN VIVO: <span id="tokensQuemados">Conectando al Mictlán...</span> | 
+        RED: POLYGON AMOY | ESTADO: TRANSPARENCIA TOTAL | ¡ÚNETE AL MICtlÁN!
     </marquee>
 </div>
 
@@ -225,7 +236,9 @@
 
 
 <div id="cursor-serpiente"></div>
+
 <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+
     <script src="script.js" defer></script>
 </body>
 </html>
