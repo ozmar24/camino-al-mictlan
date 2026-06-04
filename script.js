@@ -1139,15 +1139,16 @@ function generarCementerio() {
     }
 
     const configuracion = [
-        { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
-        { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.15 },
-        { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.15 },
-        { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.15 },
-        { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.15 },
-        { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.15 },
-        { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.15 },
-        { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.15 }
-    ];
+    { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
+
+    { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.01 },
+    { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.01 },
+    { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.01 },
+    { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.01 },
+    { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.01 },
+    { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.01 },
+    { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.01 }
+];
 
     configuracion.forEach(pos => {
         const div = document.createElement('div');
@@ -1353,118 +1354,95 @@ function adaptarPlaceholderPasarela(criptoId) {
 function procesarRetiro() {
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
-   
+  
     if (!inputWallet) return;
 
-    const walletDestino = inputWallet.value.trim();
-
-    if (walletDestino.length < 5) {
+    let walletDestino = inputWallet.value.trim();
+    if (walletDestino.length < 8) {
         lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
         return;
     }
 
-    // ELIMINAMOS CUALQUIER VERIFICACIÓN DE VIDEO AQUÍ
-    // Retiro directo a backend
-    const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
+    const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet || '';
+    if (!identidadUsuario) {
+        lanzarAlertaMictlan("Tu alma no está autenticada.", "ERROR DE IDENTIDAD");
+        return;
+    }
+
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "bitso";
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
-    
-    // Llamada directa a tu API de reclamos
+
+    // Llamada al backend
     procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
 }
 
-// === AGREGAMOS 'saldoEnSG' COMO QUINTO PARÁMETRO ===
 async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
-        console.log("🔄 Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
+        console.log("📤 Enviando reclamo:", { 
+            identidad, 
+            wallet: walletUsuario, 
+            cripto: criptoSeleccionada, 
+            pasarela 
+        });
 
         const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
+        console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
 
-console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
+        const respuesta = await fetch('/api/reclamar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                identidad: identidad,
+                wallet: walletUsuario,
+                cripto: criptoSeleccionada,
+                pasarela: pasarela
+            })
+        });
 
-// === LLAMADA AL BACKEND MEJORADA ===
-console.log("📤 Enviando reclamo:", { 
-    identidad: identidad, 
-    wallet: walletUsuario, 
-    cripto: criptoSeleccionada, 
-    pasarela: pasarela 
-});
+        console.log("Status del backend:", respuesta.status);
 
-const respuesta = await fetch('/api/reclamar', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify({
-        identidad: identidad,
-        wallet: walletUsuario,
-        cripto: criptoSeleccionada,
-        pasarela: pasarela
-    })
-});
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (e) {
+            console.error("Error al parsear JSON:", e);
+            lanzarAlertaMictlan("Respuesta inválida del servidor", "ERROR INTERNO");
+            return;
+        }
 
-console.log("Status del backend:", respuesta.status);
+        console.log("Respuesta del backend:", resultado);
 
-let resultado;
-try {
-    resultado = await respuesta.json();
-} catch (e) {
-    console.error("Error al parsear JSON del backend:", e);
-    lanzarAlertaMictlan("Respuesta inválida del servidor", "ERROR INTERNO");
-    return;
-}
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
+            return;
+        }
 
-console.log("Respuesta del backend:", resultado);
+        // === ÉXITO ===
+        if (resultado.success) {
+            // Resetear balance global
+            balanceUsuarioSG = 0;
+            localStorage.setItem('soulgeist_balance', '0');
 
-if (!respuesta.ok) {
-    lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
-    return;
-}
-
-// Éxito
-if (resultado.success) {
-    balanceUsuarioSG = 0;
-    localStorage.setItem('soulgeist_balance', '0');
-    
-    const selector = document.querySelector('.alma-maestra .balance-actual');
-    if (selector) selector.innerText = `Poder: 0 SG`;
-
-    generarCementerio();
-    lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "ÉXITO");
-}
-
-        // Éxito
-        if (resultado.balanceAlmas !== undefined) {
-            balanceUsuarioSG = resultado.balanceAlmas;
-            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            
             const selector = document.querySelector('.alma-maestra .balance-actual');
-            if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
-        }
+            if (selector) selector.innerText = `Poder: 0 SG`;
 
-        if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
-            window.tumbasConSaldo[criptoSeleccionada] = 0;
-            guardarSaldosCriptas();
-        }
+            // Resetear cripta específica
+            if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
+                window.tumbasConSaldo[criptoSeleccionada] = 0;
+                guardarSaldosCriptas();
+            }
 
-        generarCementerio();
-        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
+            generarCementerio();
+            lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "ÉXITO");
+        }
 
     } catch (error) {
         console.error("Error en procesarCosecha:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     }
 }
-
-function cerrarRitual() {
-    const modal = document.getElementById('modal-ritual'); 
-    const cementerio = document.getElementById('campo-santo'); 
-    if(modal) modal.style.display = 'none'; 
-    if(cementerio) cementerio.style.filter = "none"; 
-}
-
 // ==================================================================
 // UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
 // ==================================================================
