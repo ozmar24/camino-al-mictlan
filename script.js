@@ -1385,7 +1385,7 @@ async function asegurarRedProduccion() {
 window.entrarAlMictlan = entrarAlMictlan;
 async function conectarConContrato() {
     // 1. Cargamos el ABI que ya guardaste
-    const respuesta = await fetch('./abi.json');
+    const respuesta = await fetch('./contractABI.json');
     const abi = await respuesta.json();
     
     // 2. Tu dirección de contrato (la que tienes en Polygonscan)
