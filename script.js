@@ -2230,21 +2230,29 @@ async function asegurarRedProduccion() {
     }
 }
 window.entrarAlMictlan = entrarAlMictlan;
-async function conectarConContrato() {
-    // 1. Cargamos el ABI que ya guardaste
-    const respuesta = await fetch('./contractABI.json');
-    const abi = await respuesta.json();
-    
-    // 2. Tu dirección de contrato (la que tienes en Polygonscan)
-    const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae";
+// 1. La función que hace el trabajo
+async function actualizarMarquee() {
+    try {
+        // Usamos el proveedor público (sin MetaMask)
+        const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
+        const contrato = new ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, provider);
 
-    // 3. Inicializamos el proveedor de Ethereum (MetaMask)
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    // 4. Creamos el objeto del contrato
-    const contrato = new ethers.Contract(direccionContrato, abi, signer);
-    
-    console.log("✅ Contrato conectado. Ya puedes interactuar con él.");
-    return contrato;
+        // Llamamos a la función de tu contrato
+        const quemados = await contrato.consultarBovedas(); 
+        
+        // Formateamos y ponemos en el HTML
+        // Nota: Asegúrate de que 'quemados' sea el índice correcto en tu objeto de respuesta
+        document.getElementById("tokensQuemados").innerText = 
+            ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
+            
+        console.log("✅ El marquee ha recibido datos del contrato con éxito.");
+    } catch (err) {
+        console.error("❌ El marquee no pudo conectar:", err);
+    }
 }
+
+// 2. Ejecutar la primera vez al cargar
+actualizarMarquee();
+
+// 3. Programar la actualización cada 30 segundos
+setInterval(actualizarMarquee, 30000);

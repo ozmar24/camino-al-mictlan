@@ -1838,3 +1838,12 @@ main {
     background: rgba(0, 0, 0, 0.75) !important;
     backdrop-filter: blur(2px) !important;
 }
+.marquee-container {
+    background: #000;
+    color: #ff4500; /* Un naranja fuego o rojo sangre */
+    padding: 10px 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+}
