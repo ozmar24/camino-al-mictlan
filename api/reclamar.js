@@ -215,7 +215,7 @@ export default async function handler(req, res) {
 function validarDireccion(wallet, pasarela, cripto) {
     const regexEVM = /^0x[a-fA-F0-9]{40}$/;
     const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
-    const regexLTC = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/;
+    const regexLTC = /^[LMm3][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 
     if (pasarela === 'binance' || pasarela === 'coinbase') {
         return regexEVM.test(wallet);
