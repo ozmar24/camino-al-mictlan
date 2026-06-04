@@ -1402,7 +1402,8 @@ const respuesta = await fetch('/api/reclamar', {
         identidad: identidad,
         wallet: walletUsuario,
         cripto: criptoSeleccionada,
-        pasarela: pasarela
+        pasarela: pasarela,
+	saldoCripto: saldoCripto
     })
 });
 
