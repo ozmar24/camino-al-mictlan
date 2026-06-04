@@ -2262,7 +2262,8 @@ const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         
         // MANTENIENDO TU LÓGICA ORIGINAL:
         // Asegúrate de que 'quemados.quemados' coincida con lo que devuelve tu contrato
-        const nuevoTexto = ethers.utils.formatUnits(quemados.boveda, 18) + " SOULGEIST QUEMADOS";
+        const valorBoveda = ethers.utils.formatUnits(quemados[0], 18); 
+const nuevoTexto = valorBoveda + " SOULGEIST QUEMADOS";
 	console.log("Datos recibidos del contrato:", quemados);
         const elemento = document.getElementById("tokensQuemados");
 
@@ -2282,3 +2283,5 @@ const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         document.getElementById("tokensQuemados").innerText = "Sincronizando...";
     }
 }
+window.addEventListener('load', actualizarTransparencia);
+setInterval(actualizarTransparencia, 30000);
