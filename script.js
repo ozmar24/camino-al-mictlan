@@ -2268,7 +2268,7 @@ const elemento = document.getElementById("tokensQuemados");
             
             elemento.textContent = nuevoTexto;
             console.log("Texto asignado:", nuevoTexto);
-        }
+        
         } else {
             console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
         }
