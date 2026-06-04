@@ -2284,3 +2284,11 @@ window.addEventListener('load', actualizarTransparencia);
 
 // 2. Ejecutar cada 30 segundos para mantener el dato fresco
 setInterval(actualizarTransparencia, 30000);
+async function verificarSaludGas(walletAdmin, provider) {
+    const balanceGas = await provider.getBalance(walletAdmin.address);
+    // 0.01 MATIC es suficiente para varios retiros, si tiene menos, alerta!
+    if (balanceGas < ethers.parseEther("0.01")) {
+        await enviarAlertaTelegram("⚠️ *ALERTA:* La billetera de gas se está agotando.");
+        throw new Error("Fondos de gas insuficientes.");
+    }
+}

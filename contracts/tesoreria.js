@@ -14,7 +14,8 @@ const ABI = [
     "function porcEventos() view returns (uint256)",
     "function porcReserva() view returns (uint256)",
     "function porcQuema() view returns (uint256)",
-    "function tokenSoulgeist() view returns (address)"
+    "function tokenSoulgeist() view returns (address)",
+    "function balanceOf(address account) view returns (uint256)"
 ];
 
 let provider;
@@ -47,10 +48,12 @@ export async function conectarContrato() {
 export async function obtenerBalanceSG(direccion) {
     if (!contrato) await conectarContrato();
     try {
-        const balance = await contrato.tokenSoulgeist.balanceOf(direccion);
+        // Como el contrato ya sabe que es un contrato de tokens, 
+        // llamas a balanceOf directamente sobre 'contrato'
+        const balance = await contrato.balanceOf(direccion);
         return ethers.formatUnits(balance, 18);
     } catch (e) {
-        console.error(e);
+        console.error("Error al obtener balance:", e);
         return "0";
     }
 }
