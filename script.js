@@ -2245,16 +2245,24 @@ async function actualizarTransparencia() {
     if (typeof ethers === 'undefined') return;
 
     try {
+        // 1. CARGA EL ABI AQUÍ, DENTRO DE LA FUNCIÓN
+        const abiCargado = await cargarABI();
+        if (!abiCargado) {
+            console.error("El ABI no pudo cargarse");
+            return;
+        }
+
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
         
-        // CORRECCIÓN: Se mantiene la dirección entre comillas como string
-        const contrato = new ethers.Contract("0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae", SOULGEIST_ABI, provider);
+        // 2. USA abiCargado EN LUGAR DE SOULGEIST_ABI
+        const contrato = new ethers.Contract("0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae", abiCargado, provider);
         
         const quemados = await contrato.consultarBovedas();
         
         // MANTENIENDO TU LÓGICA ORIGINAL:
         // Asegúrate de que 'quemados.quemados' coincida con lo que devuelve tu contrato
-        const nuevoTexto = ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
+        const nuevoTexto = ethers.utils.formatUnits(quemados.boveda, 18) + " SOULGEIST QUEMADOS";
+	console.log("Datos recibidos del contrato:", quemados);
         const elemento = document.getElementById("tokensQuemados");
 
         // Si el valor cambia, hacemos un efecto visual de "recarga"
