@@ -2258,10 +2258,12 @@ async function actualizarTransparencia() {
         const nuevoTexto = ethers.utils.formatUnits(quemados, 18).split('.')[0] + " SOULGEIST QUEMADOS";
         
         // 4. ACTUALIZACIÓN FORZADA AL DOM
-        const elemento = document.getElementById("tokensQuemados");
-        if (elemento) {
-            console.log("Intentando escribir en pantalla:", nuevoTexto);
-            elemento.innerText = nuevoTexto; // Cambio directo sin animaciones por ahora
+       const elemento = document.getElementById("tokensQuemados");
+if (elemento) {
+    console.log("¡Forzando actualización del DOM!");
+    elemento.style.display = "inline"; // Forzamos a que sea visible
+    elemento.style.opacity = "1";      // Forzamos visibilidad
+    elemento.textContent = nuevoTexto;
         } else {
             console.error("NO SE ENCONTRÓ EL ELEMENTO 'tokensQuemados' EN EL HTML");
         }
