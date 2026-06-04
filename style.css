@@ -1852,7 +1852,7 @@ main {
     color: #888888 !important;
     letter-spacing: 1px;
     margin: 0; /* Importante: elimina cualquier margen que pueda estar empujando */
-    pointer-events: none;
+    user-select: none;
 }
 
 #tokensQuemados {
