@@ -1849,15 +1849,17 @@ main {
 .texto-estado {
     font-family: 'Nosifer', monospace;
     font-size: 10px;
-    color: #888888 !important;
+    color: #00f2ff !important;
     letter-spacing: 1px;
     margin: 0; /* Importante: elimina cualquier margen que pueda estar empujando */
     user-select: none;
 }
 
 #tokensQuemados {
-    color: #a0d8ef !important; /* Un tono cian claro, como el de tu texto "Poder" */
-    text-shadow: 0 0 5px rgba(160, 216, 239, 0.5); /* Un brillo suave */
+    color: #00f2ff !important; /* Sustituye este código por el HEX exacto de tu texto "PODER" */
+    text-shadow: 0 0 8px rgba(0, 242, 255, 0.6); /* Un resplandor suave que hace que destaque */
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 .punto-activo {
     color: #ff0000;
