@@ -2244,20 +2244,31 @@ async function cargarABI() {
 async function actualizarTransparencia() {
     try {
         const abiCargado = await cargarABI();
-        
-        // 1. Usar JsonRpcProvider (estándar para v5)
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        
         const contrato = new ethers.Contract("0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae", abiCargado, provider);
         const res = await contrato.consultarBovedas();
 
-        // 2. Cálculo (esto ya vimos que funciona bien)
+        // 2. Cálculo
         const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
         const supplyActual = res[5]; 
         const quemados = supplyInicial.sub(supplyActual);
         
-        // 3. Formateo y actualización
-        const nuevoTexto = ethers.utils.formatUnits(quemados, 18).split('.')[0] + " SOULGEIST QUEMADOS";
+        // --- AQUÍ VA EL NUEVO BLOQUE DE FORMATO ---
+        const valorNumerico = parseFloat(ethers.utils.formatUnits(quemados, 18));
+        let textoAbreviado;
+
+        if (valorNumerico >= 1000000000) {
+            textoAbreviado = (valorNumerico / 1000000000).toFixed(2) + "B"; 
+        } else if (valorNumerico >= 1000000) {
+            textoAbreviado = (valorNumerico / 1000000).toFixed(2) + "M"; 
+        } else if (valorNumerico >= 1000) {
+            textoAbreviado = (valorNumerico / 1000).toFixed(2) + "K";
+        } else {
+            textoAbreviado = valorNumerico.toFixed(0);
+        }
+        
+        const nuevoTexto = textoAbreviado + " SG QUEMADOS";
+        // ------------------------------------------
         
         const elemento = document.getElementById("tokensQuemados");
         if (elemento) {
