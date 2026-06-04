@@ -2255,7 +2255,8 @@ async function actualizarTransparencia() {
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
         
         // 2. USA abiCargado EN LUGAR DE SOULGEIST_ABI
-        const contrato = new ethers.Contract("0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae", abiCargado, provider);
+        const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae".toLowerCase();
+const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         
         const quemados = await contrato.consultarBovedas();
         
