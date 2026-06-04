@@ -2231,30 +2231,28 @@ async function asegurarRedProduccion() {
 }
 window.entrarAlMictlan = entrarAlMictlan;
 async function actualizarTransparencia() {
+    if (typeof ethers === 'undefined') return;
+
     try {
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
         const contrato = new ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, provider);
         
-        const quemados = await contrato.consultarBovedas(); 
-        const textoNuevo = ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
-        
+        const quemados = await contrato.consultarBovedas();
+        const nuevoTexto = ethers.utils.formatUnits(quemados.quemados, 18) + " SOULGEIST QUEMADOS";
         const elemento = document.getElementById("tokensQuemados");
-        
-        // Efecto de "intermitencia" sutil
-        if (elemento.innerText !== textoNuevo) {
-            elemento.style.opacity = 0; // Desvanecer
+
+        // Si el valor cambia, hacemos un efecto visual de "recarga"
+        if (elemento.innerText !== nuevoTexto) {
+            elemento.style.transition = "all 0.3s ease";
+            elemento.style.opacity = "0.2"; // El texto se atenúa
+            
             setTimeout(() => {
-                elemento.innerText = textoNuevo;
-                elemento.style.opacity = 1; // Aparecer
-            }, 500);
+                elemento.innerText = nuevoTexto;
+                elemento.style.opacity = "1"; // El texto vuelve a brillar
+            }, 300);
         }
     } catch (err) {
-        console.log("Oráculo en pausa...");
+        // En lugar de ocultarlo, muestra "Sincronizando..." para que vean que sigue intentando
+        document.getElementById("tokensQuemados").innerText = "Sincronizando...";
     }
-}
-
-// Actualizamos cada minuto (60000ms) para que sea un cambio sutil
-if (window.innerWidth > 768) {
-    setInterval(actualizarTransparencia, 60000);
-    actualizarTransparencia();
 }

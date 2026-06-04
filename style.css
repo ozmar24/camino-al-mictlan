@@ -1856,3 +1856,14 @@ main {
     transition: opacity 0.5s ease-in-out;
     opacity: 1;
 }
+.punto-activo {
+    color: #ff0000;
+    margin-right: 5px;
+    animation: palpitar 1.5s infinite;
+}
+
+@keyframes palpitar {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
