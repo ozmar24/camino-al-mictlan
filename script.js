@@ -2245,43 +2245,43 @@ async function actualizarTransparencia() {
     if (typeof ethers === 'undefined') return;
 
     try {
-        // 1. CARGA EL ABI AQUÍ, DENTRO DE LA FUNCIÓN
         const abiCargado = await cargarABI();
-        if (!abiCargado) {
-            console.error("El ABI no pudo cargarse");
-            return;
-        }
+        if (!abiCargado) return;
 
         const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        
-        // 2. USA abiCargado EN LUGAR DE SOULGEIST_ABI
         const direccionContrato = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae".toLowerCase();
-const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
+        const contrato = new ethers.Contract(direccionContrato, abiCargado, provider);
         
-        const quemados = await contrato.consultarBovedas();
+        // 1. Llamamos al contrato
+        const resultados = await contrato.consultarBovedas();
         
-        // MANTENIENDO TU LÓGICA ORIGINAL:
-        // Asegúrate de que 'quemados.quemados' coincida con lo que devuelve tu contrato
-        const valorBoveda = ethers.utils.formatUnits(quemados[0], 18); 
-const nuevoTexto = valorBoveda + " SOULGEIST QUEMADOS";
-	console.log("Datos recibidos del contrato:", quemados);
-        const elemento = document.getElementById("tokensQuemados");
+        // 2. Definimos el supply inicial (200,000,000,000 con 18 decimales)
+        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
+        
+        // 3. Obtenemos el supply actual del contrato (está en la posición 5 del array devuelto)
+        const supplyActual = resultados[5]; 
+        
+        // 4. Calculamos los quemados: Inicial - Actual
+        const tokensQuemados = supplyInicial.sub(supplyActual);
+        
+        // 5. Formateamos para mostrar
+        const valorLimpio = ethers.utils.formatUnits(tokensQuemados, 18).split('.')[0];
+        const nuevoTexto = valorLimpio + " SOULGEIST QUEMADOS";
 
-        // Si el valor cambia, hacemos un efecto visual de "recarga"
-        if (elemento.innerText !== nuevoTexto) {
+        console.log("Tokens quemados calculados:", nuevoTexto);
+        
+        const elemento = document.getElementById("tokensQuemados");
+        if (elemento && elemento.innerText !== nuevoTexto) {
             elemento.style.transition = "all 0.3s ease";
-            elemento.style.opacity = "0.2"; // El texto se atenúa
-            
+            elemento.style.opacity = "0";
             setTimeout(() => {
                 elemento.innerText = nuevoTexto;
-                elemento.style.opacity = "1"; // El texto vuelve a brillar
+                elemento.style.opacity = "1";
             }, 300);
         }
     } catch (err) {
-        // MANTENIENDO TU LÓGICA DE ERROR:
-        console.error("Error en la conexión:", err); // Para que puedas ver qué pasa en consola (F12)
-        document.getElementById("tokensQuemados").innerText = "Sincronizando...";
+        console.error("Error en la conexión:", err);
+        const elemento = document.getElementById("tokensQuemados");
+        if (elemento) elemento.innerText = "Sincronizando...";
     }
 }
-window.addEventListener('load', actualizarTransparencia);
-setInterval(actualizarTransparencia, 30000);
