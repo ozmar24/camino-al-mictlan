@@ -2312,36 +2312,52 @@ async function cargarABI() {
     }
 }
 
-async function actualizarTransparencia() {
-    const elemento = document.getElementById("tokensQuemados");
-    if (!elemento) return;
-
-    elemento.textContent = "Consultando al Mictlán...";
+async function conectarYRetirarMetaMask(pos) {
+    if (typeof window.ethers === 'undefined') {
+        console.log("Esperando ethers...");
+        setTimeout(() => conectarYRetirarMetaMask(pos), 100);
+        return;
+    }
 
     try {
-        const provider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
+        const direccion = await conectarMetaMask();
+        if (!direccion) return;
+
+        const btn = document.getElementById('btn-mostrar-retiro');
+        if (btn) {
+            btn.innerText = "FIRMANDO TRANSACCIÓN...";
+            btn.disabled = true;
+        }
+
+        const provider = new window.ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
         
-        const contratoAddress = "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae";
-        const abi = ["function totalSupply() view returns (uint256)"];
+        // ABI mínimo solo para transfer (no necesitas todo el ABI grande)
+        const MIN_ABI = [
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
 
-        const contrato = new ethers.Contract(contratoAddress, abi, provider);
+        const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, MIN_ABI, signer);
+        
+        const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar ? pos.montoAEnviar.toString() : "0", 18);
+        
+        console.log(`Enviando ${ethers.formatUnits(montoEnWei, 18)} ${pos.nombre} a ${direccion}`);
 
-        const supplyActual = await contrato.totalSupply();
-        const supplyInicial = ethers.parseUnits("200000000000", 18);
+        const tx = await contrato.transfer(direccion, montoEnWei);
+        await tx.wait();
 
-        const quemados = supplyInicial - supplyActual;
-        const valorNumerico = parseFloat(ethers.formatUnits(quemados, 18));
-
-        let texto = valorNumerico.toFixed(0);
-        if (valorNumerico >= 1000000000) texto = (valorNumerico / 1000000000).toFixed(2) + "B";
-        else if (valorNumerico >= 1000000) texto = (valorNumerico / 1000000).toFixed(2) + "M";
-
-        elemento.textContent = `${texto} SG QUEMADOS`;
-        console.log("✅ Quemados:", texto);
+        lanzarAlertaMictlan("Ritual Completado", "La energía ha sido transferida exitosamente.");
+        cerrarRitual();
 
     } catch (err) {
-        console.error("Error quemados:", err);
-        elemento.textContent = "Error al consultar";
+        console.error("Error en retiro MetaMask:", err);
+        lanzarAlertaMictlan("El ritual falló en la firma.", "ERROR EN EL VÍNCULO");
+    } finally {
+        const btn = document.getElementById('btn-mostrar-retiro');
+        if (btn) {
+            btn.innerText = "💰 RETIRAR A BILLETERA";
+            btn.disabled = false;
+        }
     }
 }
 
