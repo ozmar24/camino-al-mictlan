@@ -846,7 +846,7 @@ const SOULGEIST_ABI = [
 		"type": "function"
 	}
 ];
-import { ethers } from "ethers";
+
 const DIRECCION_CONTRATO = "0xAd479C0620E9C41F1ACCD8D9c4a81e9E7D4f76ae";
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
