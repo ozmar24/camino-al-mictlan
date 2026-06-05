@@ -2396,8 +2396,11 @@ async function conectarMetaMask() {
 }
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
-    const btn = document.getElementById('btn-mostrar-retiro');
-    
+    // 1. Verificación robusta de la librería
+    if (typeof window.ethers === 'undefined') {
+        lanzarAlertaMictlan("Ritual pausado", "La librería Web3 aún está cargando...");
+        return;
+    }    
     try {
         const direccion = await conectarMetaMask();
         if (!direccion) return;
@@ -2406,12 +2409,14 @@ async function conectarYRetirarMetaMask(pos) {
         btn.disabled = true;
 
         // 1. Ejecutar transacción con MetaMask y el contrato
-        const provider = new ethers.providers ? new ethers.providers.Web3Provider(window.ethereum) : new ethers.BrowserProvider(window.ethereum);
+        const provider = new window.ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
-        const contrato = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        
         
         // Asumiendo que el usuario retira sus propios tokens desde el contrato
-        const tx = await contrato.transfer(tuDireccionAdmin, monto); 
+        const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar.toString(), 18); 
+const contrato = new window.ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+const tx = await contrato.transfer(direccion, montoEnWei); 
         await tx.wait(); // Esto espera a que la blockchain confirme
 
         btn.innerText = "REGISTRANDO...";
