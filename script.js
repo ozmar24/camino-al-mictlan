@@ -2313,53 +2313,45 @@ async function cargarABI() {
 }
 
 async function actualizarTransparencia() {
-    const elemento = document.getElementById("tokensQuemados");
-    if (!elemento) return;
-
-    elemento.textContent = "Consultando al Mictlán...";
-
     try {
-        const provider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        
-        const contratoAddress = "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae";
-        
-        const abi = ["function totalSupply() view returns (uint256)"];
-        
-        const contrato = new ethers.Contract(contratoAddress, abi, provider);
+        const abiCargado = await cargarABI();
+        const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
+        const contrato = new ethers.Contract("0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae", abiCargado, provider);
+        const res = await contrato.consultarBovedas();
 
-        const supplyActual = await contrato.totalSupply();
-        const supplyInicial = ethers.parseUnits("200000000000", 18);
-
-        const quemados = supplyInicial - supplyActual;
-        const valorNumerico = parseFloat(ethers.formatUnits(quemados, 18));
-
-        // Formato abreviado (B, M, K)
+        // 2. Cálculo
+        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
+        const supplyActual = res[5]; 
+        const quemados = supplyInicial.sub(supplyActual);
+        
+        // --- AQUÍ VA EL NUEVO BLOQUE DE FORMATO ---
+        const valorNumerico = parseFloat(ethers.utils.formatUnits(quemados, 18));
         let textoAbreviado;
+
         if (valorNumerico >= 1000000000) {
-            textoAbreviado = (valorNumerico / 1000000000).toFixed(2) + "B";
+            textoAbreviado = (valorNumerico / 1000000000).toFixed(2) + "B"; 
         } else if (valorNumerico >= 1000000) {
-            textoAbreviado = (valorNumerico / 1000000).toFixed(2) + "M";
+            textoAbreviado = (valorNumerico / 1000000).toFixed(2) + "M"; 
         } else if (valorNumerico >= 1000) {
             textoAbreviado = (valorNumerico / 1000).toFixed(2) + "K";
         } else {
             textoAbreviado = valorNumerico.toFixed(0);
         }
-
-        const nuevoTexto = textoAbreviado + " SG QUEMADOS";
         
-        elemento.textContent = nuevoTexto;
-        console.log("✅ Quemados actualizados:", nuevoTexto);
+        const nuevoTexto = textoAbreviado + " SG QUEMADOS";
+        // ------------------------------------------
+        
+        const elemento = document.getElementById("tokensQuemados");
+        if (elemento) {
+            elemento.textContent = nuevoTexto;
+        }
 
     } catch (err) {
-        console.error("Error al actualizar quemados:", err);
-        elemento.textContent = "Error al consultar";
+        console.error("Error al actualizar:", err);
     }
 }
-
-// Ejecutar al cargar la página
-window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1500);
-});
+// 1. Ejecutar inmediatamente al cargar la página
+window.addEventListener('load', actualizarTransparencia);
 
 // 2. Ejecutar cada 30 segundos para mantener el dato fresco
 setInterval(actualizarTransparencia, 30000);
