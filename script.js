@@ -1,14 +1,4 @@
-// Agrega esto al puro inicio de tu script.js
-function esperarLibrerias(callback, maxIntentos = 20) {
-    if (typeof window.ethers !== 'undefined' && typeof google !== 'undefined') {
-        callback();
-    } else if (maxIntentos > 0) {
-        console.log("Esperando a los dioses del inframundo (librerías)...");
-        setTimeout(() => esperarLibrerias(callback, maxIntentos - 1), 500);
-    } else {
-        console.error("Las librerías no cargaron a tiempo.");
-    }
-}
+
 // ==================================================================
 // CONFIGURACIÓN DE BLOCKCHAIN (CONSTANTES FIJAS)
 // ==================================================================
