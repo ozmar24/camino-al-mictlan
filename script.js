@@ -2411,10 +2411,14 @@ async function conectarMetaMask() {
 }
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
+if (!pos || typeof pos.montoAEnviar === 'undefined') {
+        console.error("Error: La información de la tumba (pos) no está completa", pos);
+        lanzarAlertaMictlan("Ritual incompleto", "No se detectó el monto a retirar.");
+        return;
+    }
     // 1. ESPERA ACTIVA: Si ethers no ha cargado, reintenta en 100ms
     if (typeof window.ethers === 'undefined') {
-        console.log("Esperando a ethers...");
-        setTimeout(() => conectarYRetirarMetaMask(pos), 100);
+        setTimeout(() => conectarYRetirarMetaMask(pos), 1000);
         return;
     }
 
