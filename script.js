@@ -1,3 +1,14 @@
+// Agrega esto al puro inicio de tu script.js
+function esperarLibrerias(callback, maxIntentos = 20) {
+    if (typeof window.ethers !== 'undefined' && typeof google !== 'undefined') {
+        callback();
+    } else if (maxIntentos > 0) {
+        console.log("Esperando a los dioses del inframundo (librerías)...");
+        setTimeout(() => esperarLibrerias(callback, maxIntentos - 1), 500);
+    } else {
+        console.error("Las librerías no cargaron a tiempo.");
+    }
+}
 // ==================================================================
 // CONFIGURACIÓN DE BLOCKCHAIN (CONSTANTES FIJAS)
 // ==================================================================
@@ -2396,19 +2407,6 @@ async function conectarMetaMask() {
 }
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
-    // 1. Verificación robusta de la librería
-    if (typeof window.ethers === 'undefined') {
-        lanzarAlertaMictlan("Ritual pausado", "La librería Web3 aún está cargando...");
-        return;
-    }    
-    try {
-        const direccion = await conectarMetaMask();
-        if (!direccion) return;
-
-        btn.innerText = "FIRMANDO TRANSACCIÓN...";
-        btn.disabled = true;
-
-      async function conectarYRetirarMetaMask(pos) {
     // 1. ESPERA ACTIVA: Si ethers no ha cargado, reintenta en 100ms
     if (typeof window.ethers === 'undefined') {
         console.log("Esperando a ethers...");
@@ -2456,18 +2454,9 @@ async function conectarYRetirarMetaMask(pos) {
         lanzarAlertaMictlan("Error", "El ritual falló.");
     } finally {
         const btn = document.getElementById('btn-mostrar-retiro');
-        btn.innerText = "💰 RETIRAR A BILLETERA";
-        btn.disabled = false;
-    }
-}
-// Agrega esto al puro inicio de tu script.js
-function esperarLibrerias(callback, maxIntentos = 20) {
-    if (typeof window.ethers !== 'undefined' && typeof google !== 'undefined') {
-        callback();
-    } else if (maxIntentos > 0) {
-        console.log("Esperando a los dioses del inframundo (librerías)...");
-        setTimeout(() => esperarLibrerias(callback, maxIntentos - 1), 500);
-    } else {
-        console.error("Las librerías no cargaron a tiempo.");
+        if (btn) {
+            btn.innerText = "💰 RETIRAR A BILLETERA";
+            btn.disabled = false;
+        }
     }
 }
