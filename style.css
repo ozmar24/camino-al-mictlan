@@ -1874,8 +1874,8 @@ main {
 }
 /* Clase para los activos en Punto Rojo (BTC/LTC) */
 .tumba-sellada {
-    pointer-events: none; /* Evita que el usuario haga clic */
-    filter: grayscale(100%) brightness(0.7) !important; /* Estilo de tumba antigua/apagada */
+    pointer-events: auto; /* <--- CAMBIA 'none' POR 'auto' */
+    filter: grayscale(100%) brightness(0.7) !important; 
     cursor: not-allowed !important;
 }
 
@@ -1883,7 +1883,8 @@ main {
 .tumba-sellada .moneda-flotante, 
 .tumba-sellada .moneda-sustraer {
     animation: none !important;
-    opacity: 0.5 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Opcional: Cambiamos el texto para que el usuario sepa que está en mantenimiento */

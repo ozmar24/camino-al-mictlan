@@ -1171,7 +1171,7 @@ function generarCementerio() {
 
         // LEEMOS EL SALDO REAL YA FILTRADO
         const saldoGuardado = window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] ? window.tumbasConSaldo[pos.nombre] : 0;
-        const visibilidadOpacidad = saldoGuardado > 0 ? "1" : "0";
+        const visibilidadOpacidad = (saldoGuardado > 0 || esPuntoRojo) ? "1" : "0";
         const textoBalance = saldoGuardado.toFixed(6);
 
         if (pos.especial) {
