@@ -2313,48 +2313,45 @@ async function cargarABI() {
 }
 
 async function actualizarTransparencia() {
+    const elemento = document.getElementById("tokensQuemados");
+    if (!elemento) return;
+
+    elemento.textContent = "Consultando al Mictlán...";
+
     try {
-        const abiCargado = await cargarABI();
-        const provider = new ethers.providers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
-        const contrato = new ethers.Contract("0xad479c0620e9c41f1accd8d9c4a81e9e7d4f76ae", abiCargado, provider);
-        const res = await contrato.consultarBovedas();
+        const provider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
+        
+        const contratoAddress = "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae";
+        const abi = ["function totalSupply() view returns (uint256)"];
 
-        // 2. Cálculo
-        const supplyInicial = ethers.utils.parseUnits("200000000000", 18);
-        const supplyActual = res[5]; 
-        const quemados = supplyInicial.sub(supplyActual);
-        
-        // --- AQUÍ VA EL NUEVO BLOQUE DE FORMATO ---
-        const valorNumerico = parseFloat(ethers.utils.formatUnits(quemados, 18));
-        let textoAbreviado;
+        const contrato = new ethers.Contract(contratoAddress, abi, provider);
 
-        if (valorNumerico >= 1000000000) {
-            textoAbreviado = (valorNumerico / 1000000000).toFixed(2) + "B"; 
-        } else if (valorNumerico >= 1000000) {
-            textoAbreviado = (valorNumerico / 1000000).toFixed(2) + "M"; 
-        } else if (valorNumerico >= 1000) {
-            textoAbreviado = (valorNumerico / 1000).toFixed(2) + "K";
-        } else {
-            textoAbreviado = valorNumerico.toFixed(0);
-        }
-        
-        const nuevoTexto = textoAbreviado + " SG QUEMADOS";
-        // ------------------------------------------
-        
-        const elemento = document.getElementById("tokensQuemados");
-        if (elemento) {
-            elemento.textContent = nuevoTexto;
-        }
+        const supplyActual = await contrato.totalSupply();
+        const supplyInicial = ethers.parseUnits("200000000000", 18);
+
+        const quemados = supplyInicial - supplyActual;
+        const valorNumerico = parseFloat(ethers.formatUnits(quemados, 18));
+
+        let texto = valorNumerico.toFixed(0);
+        if (valorNumerico >= 1000000000) texto = (valorNumerico / 1000000000).toFixed(2) + "B";
+        else if (valorNumerico >= 1000000) texto = (valorNumerico / 1000000).toFixed(2) + "M";
+
+        elemento.textContent = `${texto} SG QUEMADOS`;
+        console.log("✅ Quemados:", texto);
 
     } catch (err) {
-        console.error("Error al actualizar:", err);
+        console.error("Error quemados:", err);
+        elemento.textContent = "Error al consultar";
     }
 }
-// 1. Ejecutar inmediatamente al cargar la página
-window.addEventListener('load', actualizarTransparencia);
 
-// 2. Ejecutar cada 30 segundos para mantener el dato fresco
-setInterval(actualizarTransparencia, 30000);
+// Ejecutar al cargar
+window.addEventListener('load', () => {
+    setTimeout(actualizarTransparencia, 1200);
+    // Actualizar cada 25 segundos
+    setInterval(actualizarTransparencia, 25000);
+});
+
 async function verificarSaludGas(walletAdmin, provider) {
     const balanceGas = await provider.getBalance(walletAdmin.address);
     // 0.01 MATIC es suficiente para varios retiros, si tiene menos, alerta!
