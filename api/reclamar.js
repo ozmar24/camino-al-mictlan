@@ -150,7 +150,7 @@ export default async function handler(req, res) {
                 mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
             }
 
-        } else if (['bitso', 'binance', 'coinbase'].includes(pasarela)) {
+        } else if (['metamask', 'binance', 'coinbase'].includes(pasarela)) {
             const resOC = await procesarRetiroOnChain(
                 wallet,
                 cantidadAEnviar,
@@ -217,19 +217,15 @@ function validarDireccion(wallet, pasarela, cripto) {
     const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
     const regexLTC = /^[LMm3][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 
-    if (pasarela === 'binance' || pasarela === 'coinbase') {
-        return regexEVM.test(wallet);
-    }
+    // MetaMask/Polygon — solo acepta direcciones EVM
+if (pasarela === 'metamask' || pasarela === 'binance' || pasarela === 'coinbase') {
+    return regexEVM.test(wallet);
+}
 
-    if (pasarela === 'bitso') {
-        if (cripto === 'Bitcoin')  return regexBTC.test(wallet);
-        if (cripto === 'Litecoin') return regexLTC.test(wallet);
-        return regexEVM.test(wallet);
-    }
-
-    if (pasarela === 'bitso_lightning') {
-        return regexBTC.test(wallet);
-    }
+// Bitso y Lightning — próximamente
+if (pasarela === 'bitso' || pasarela === 'bitso_lightning') {
+    return false; // bloqueado hasta integración Business
+}
 
     return wallet.length > 5;
 }

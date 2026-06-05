@@ -1291,18 +1291,29 @@ function abrirModalCosechaFinal(pos) {
             
             <!-- Campo para la wallet, solo se usa si decide retirar -->
             <div id="seccion-retiro" style="display:none; margin-top: 20px;">
-                <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                        style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
-                    <option value="bitso">BITSO (Recomendado)</option>
-                    <option value="binance">BINANCE</option>
-                    <option value="coinbase">COINBASE</option>
-                    ${pos.nombre === 'Bitcoin' ? '<option value="bitso_lightning">BITSO LIGHTNING (Instantáneo)</option>' : ''}
-                </select>
-                <input type="text" id="wallet-input" placeholder="Dirección de destino" 
-                       style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
-            </div>
-        </div>
-    `;
+                ${['Bitcoin', 'Litecoin'].includes(pos.nombre) ? `
+    <!-- BTC y LTC — próximamente con Bitso Business -->
+    <div style="background: rgba(139,0,0,0.2); border: 1px solid #8B0000; padding: 15px; border-radius: 5px; text-align:center;">
+        <p style="color:#ff4444; font-family:'MedievalSharp'; font-size:0.75rem; margin:0;">
+            🔒 RETIRO DIRECTO PRÓXIMAMENTE
+        </p>
+        <p style="color:#888; font-size:0.65rem; margin:5px 0 0 0;">
+            Integración con Bitso Business en proceso
+        </p>
+    </div>
+` : `
+    <!-- EVM compatible — MetaMask activo -->
+    <div style="margin-bottom:8px;">
+        <p style="color:#aaa; font-size:0.65rem; margin:0 0 5px 0;">Red: Polygon (MetaMask)</p>
+    </div>
+    <select id="pasarela-select" style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
+        <option value="metamask">METAMASK / POLYGON ✅</option>
+        <option value="binance" disabled>BINANCE (Próximamente 🔒)</option>
+        <option value="coinbase" disabled>COINBASE (Próximamente 🔒)</option>
+    </select>
+    <input type="text" id="wallet-input" placeholder="Tu dirección 0x... de MetaMask" 
+           style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
+`}
 
     botones.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
@@ -1339,17 +1350,7 @@ function abrirModalCosechaFinal(pos) {
 
 
 
-function adaptarPlaceholderPasarela(criptoId) {
-    const pasarela = document.getElementById('pasarela-select').value;
-    const input = document.getElementById('wallet-input');
-    if (!input) return;
 
-    if (pasarela === 'bitso') {
-        input.placeholder = "Dirección Bitso (BTC, USDT, etc.)";
-    } else {
-        input.placeholder = `Dirección de ${criptoId} en ${pasarela.toUpperCase()}`;
-    }
-}
 
 function procesarRetiro() {
     const inputWallet = document.getElementById('wallet-input');
@@ -1367,7 +1368,7 @@ function procesarRetiro() {
     // ELIMINAMOS CUALQUIER VERIFICACIÓN DE VIDEO AQUÍ
     // Retiro directo a backend
     const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
-    const pasarelaElegida = selectPasarela ? selectPasarela.value : "bitso";
+    const pasarelaElegida = selectPasarela ? selectPasarela.value : "metamask";
     const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
