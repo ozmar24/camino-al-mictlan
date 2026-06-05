@@ -1778,7 +1778,7 @@ main {
 #pantalla-codice .pergamino-titulo {
     color: #8b0000 !important; /* Rojo sangre oscuro base de tu contrato */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important; /* Sombra sutil casi invisible para dar profundidad */
-    font-size: 0.7rem !important;
+    font-size: 1.2rem !important;
     margin-bottom: 25px !important;
     font-weight: bold !important;
     opacity: 1 !important;
@@ -1807,6 +1807,9 @@ main {
     margin: 15px auto !important;
     line-height: 1.6 !important;
     word-wrap: break-word !important;
+    font-size: 0.60rem !important;
+    font-family: 'MedievalSharp', cursive !important;
+    font-weight: normal !important;
 }
 
 /* 4. ENLACES INTERACTIVOS EN REPOSO (MANTIENEN EL TONO OSCURO) */
