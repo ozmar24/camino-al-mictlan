@@ -1792,8 +1792,8 @@ main {
 #pantalla-codice #codice-cuerpo li,
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #000000 !important; /* Negro tinta sólido e imponente */
-    text-shadow: none !important; /* SE ELIMINA CUALQUIER HALO O BRILLO ROJO FEO */
+    color: #f5e6c8 !important; /* Pergamino envejecido */
+text-shadow: 1px 1px 3px rgba(0,0,0,0.8) !important;
     font-family: 'Nosifer', cursive !important;
     font-weight: bold !important;
     text-align: center !important; /* Mantiene la simetría central */
@@ -1820,7 +1820,7 @@ main {
     display: block !important;
     width: fit-content !important;
     margin: 8px auto !important;
-    color: #111111 !important; /* Negro ceniza oscuro para denotar interacción */
+    color: #f5e6c8 !important; /* Pergamino envejecido */
     text-shadow: none !important;
     letter-spacing: 2px !important;
     font-weight: bold !important;
