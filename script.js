@@ -2408,20 +2408,36 @@ async function conectarYRetirarMetaMask(pos) {
         btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-        // 1. Ejecutar transacción con MetaMask y el contrato
+      async function conectarYRetirarMetaMask(pos) {
+    // 1. ESPERA ACTIVA: Si ethers no ha cargado, reintenta en 100ms
+    if (typeof window.ethers === 'undefined') {
+        console.log("Esperando a ethers...");
+        setTimeout(() => conectarYRetirarMetaMask(pos), 100);
+        return;
+    }
+
+    // 2. Ahora que sabemos que ethers EXISTE, ejecutamos el ritual
+    try {
+        const direccion = await conectarMetaMask();
+        if (!direccion) return;
+
+        const btn = document.getElementById('btn-mostrar-retiro');
+        btn.innerText = "FIRMANDO TRANSACCIÓN...";
+        btn.disabled = true;
+
+        // 3. Usamos window.ethers (la versión global cargada por el CDN)
         const provider = new window.ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         
-        
-        // Asumiendo que el usuario retira sus propios tokens desde el contrato
+        // Usamos la constante que ya tienes en tu script
+        const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, ABI, signer);
         const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar.toString(), 18); 
-const contrato = new window.ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-const tx = await contrato.transfer(direccion, montoEnWei); 
-        await tx.wait(); // Esto espera a que la blockchain confirme
+        
+        const tx = await contrato.transfer(direccion, montoEnWei); 
+        await tx.wait(); 
 
         btn.innerText = "REGISTRANDO...";
 
-        // 2. Avisar a tu API que ya se pagó (para que actualice Redis)
         await fetch('/api/reclamar', {
             method: 'POST',
             body: JSON.stringify({ 
@@ -2439,7 +2455,19 @@ const tx = await contrato.transfer(direccion, montoEnWei);
         console.error(err);
         lanzarAlertaMictlan("Error", "El ritual falló.");
     } finally {
+        const btn = document.getElementById('btn-mostrar-retiro');
         btn.innerText = "💰 RETIRAR A BILLETERA";
         btn.disabled = false;
+    }
+}
+// Agrega esto al puro inicio de tu script.js
+function esperarLibrerias(callback, maxIntentos = 20) {
+    if (typeof window.ethers !== 'undefined' && typeof google !== 'undefined') {
+        callback();
+    } else if (maxIntentos > 0) {
+        console.log("Esperando a los dioses del inframundo (librerías)...");
+        setTimeout(() => esperarLibrerias(callback, maxIntentos - 1), 500);
+    } else {
+        console.error("Las librerías no cargaron a tiempo.");
     }
 }
