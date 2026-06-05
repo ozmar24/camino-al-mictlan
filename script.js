@@ -1141,13 +1141,18 @@ function generarCementerio() {
     const configuracion = [
     { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
 
-    { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%", tasa: 0.00000045, usdMinimo: 0.01 },
-    { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%", tasa: 0.0012, usdMinimo: 0.01 },
-    { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%", tasa: 15000, usdMinimo: 0.01 },
-    { nombre: "Solana", sim: "S", color: "#14f195", top: "64%", left: "46%", tasa: 0.0008, usdMinimo: 0.01 },
-    { nombre: "Dogecoin", sim: "Ð", color: "#ba9f33", top: "61%", left: "68%", tasa: 1.5, usdMinimo: 0.01 },
-    { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%", tasa: 0.25, usdMinimo: 0.01 },
-    { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%", tasa: 0.000002, usdMinimo: 0.01 }
+    { nombre: "Ethereum",  sim: "♦", color: "#627eea", top: "72%", left: "7.5%",   tasa: 0.00000045, usdMinimo: 0.01 },
+    { nombre: "Litecoin",  sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%",  tasa: 0.0012,    usdMinimo: 0.01 },
+    { nombre: "Pepe",      sim: "🐸", color: "#45ca5d", top: "68%", left: "38%",   tasa: 15000,     usdMinimo: 0.01 },
+    
+    // SOLANA → CAMBIADO A MATIC/POL
+    { nombre: "MATIC",     sim: "M", color: "#8247E5", top: "64%", left: "46%",   tasa: 0.015,      usdMinimo: 0.01 },
+    
+    // DOGE → CAMBIADO A BNB
+    { nombre: "BNB",       sim: "B", color: "#F0B90B", top: "61%", left: "68%",   tasa: 0.0018,     usdMinimo: 0.01 },
+    
+    { nombre: "USDT",      sim: "₮", color: "#26a17b", top: "73%", left: "77%",   tasa: 0.25,       usdMinimo: 0.01 },
+    { nombre: "Bitcoin",   sim: "₿", color: "#f7931a", top: "72%", left: "90%",   tasa: 0.000002,   usdMinimo: 0.01 }
 ];
 
     configuracion.forEach(pos => {

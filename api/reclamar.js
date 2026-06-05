@@ -51,14 +51,14 @@ export default async function handler(req, res) {
 
     // ── Configuración de tasas y mínimos por cripto ───────────────────────────
     const CONFIG_CRIPTAS = {
-        Ethereum: { tasa: 0.00000045, simFP: 'ETH',  minimoNativo: 0.00000005 },
-        Litecoin: { tasa: 0.0012,     simFP: 'LTC',  minimoNativo: 0.000144   },
-        Pepe:     { tasa: 15000,      simFP: 'PEPE', minimoNativo: 180         },
-        Solana:   { tasa: 0.0008,     simFP: 'SOL',  minimoNativo: 0.000096   },
-        Dogecoin: { tasa: 1.5,        simFP: 'DOGE', minimoNativo: 0.18        },
-        USDT:     { tasa: 0.25,       simFP: 'USDT', minimoNativo: 0.03        },
-        Bitcoin:  { tasa: 0.000002,   simFP: 'BTC',  minimoNativo: 0.0000002  }
-    };
+    Bitcoin:   { tasa: 0.000002, simFP: 'BTC',   minimoNativo: 0.000001 },
+    Litecoin:  { tasa: 0.0012,   simFP: 'LTC',   minimoNativo: 0.0001 },
+    Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.000001 },
+    Pepe:      { tasa: 15000,    simFP: 'PEPE',  minimoNativo: 100 },
+    MATIC:     { tasa: 0.015,    simFP: 'MATIC', minimoNativo: 0.001 },
+    BNB:       { tasa: 0.0018,   simFP: 'BNB',   minimoNativo: 0.001 },
+    USDT:      { tasa: 0.25,     simFP: 'USDT',  minimoNativo: 0.01 }
+};
 
     const infoCripta = CONFIG_CRIPTAS[cripto];
     if (!infoCripta) return res.status(400).json({ error: 'Cripta no registrada.' });
