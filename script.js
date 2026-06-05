@@ -2406,7 +2406,7 @@ async function conectarYRetirarMetaMask(pos) {
         btn.disabled = true;
 
         // 1. Ejecutar transacción con MetaMask y el contrato
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.providers ? new ethers.providers.Web3Provider(window.ethereum) : new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const contrato = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
         
