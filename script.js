@@ -1157,7 +1157,13 @@ function generarCementerio() {
 
     configuracion.forEach(pos => {
         const div = document.createElement('div');
-        div.className = pos.especial ? 'zona-tumba alma-maestra' : 'zona-tumba';
+        
+        // 1. Detectar si es Punto Rojo
+        const esPuntoRojo = (pos.nombre === "Bitcoin" || pos.nombre === "Litecoin");
+        
+        // 2. Aplicar clases: añadimos 'tumba-sellada' si es Punto Rojo
+        div.className = pos.especial ? 'zona-tumba alma-maestra' : (esPuntoRojo ? 'zona-tumba tumba-sellada' : 'zona-tumba');
+        
         div.style.top = pos.top;
         div.style.left = pos.left;
         div.style.setProperty('--color-cripto', pos.color);
@@ -1194,6 +1200,11 @@ function generarCementerio() {
 
         div.onclick = (e) => {
             e.stopPropagation();
+	
+	    if (esPuntoRojo) {
+                lanzarAlertaMictlan("ESTA BÓVEDA ESTÁ EN EL ABISMO", "El portal hacia esta cripta está sellado por los guardianes. Regresa pronto.");
+                return;
+            }
 
             if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
                 abrirModalCosechaFinal(pos);
