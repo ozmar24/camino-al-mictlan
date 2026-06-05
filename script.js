@@ -2432,7 +2432,7 @@ async function conectarYRetirarMetaMask(pos) {
         const signer = await provider.getSigner();
         
         // Usamos la constante que ya tienes en tu script
-        const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, ABI, signer);
+        const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, signer);
         const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar.toString(), 18); 
         
         const tx = await contrato.transfer(direccion, montoEnWei); 
