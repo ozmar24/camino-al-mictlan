@@ -2424,32 +2424,36 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-        // 3. Usamos window.ethers (la versión global cargada por el CDN)
-        const provider = new window.ethers.BrowserProvider(window.ethereum);
-	provider.resolveName = async (name) => name;        
-	const signer = await provider.getSigner();
-        
-        // Usamos la constante que ya tienes en tu script
-        const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, signer);
-        const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar.toString(), 18); 
-        
-        const direccionLimpia = direccion.toLowerCase();
-	const tx = await contrato.transfer(direccionLimpia, montoEnWei); 
-        await tx.wait(); 
+       // 3. El backend firma y envía — el frontend solo obtiene la dirección
+        const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
 
-        btn.innerText = "REGISTRANDO...";
+        btn.innerText = "PROCESANDO...";
 
-        await fetch('/api/reclamar', {
+        const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
-            body: JSON.stringify({ 
-                pasarela: 'metamask', 
-                cripto: pos.nombre,
-                wallet: direccion,
-                identidad: window.userWallet 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                identidad:   window.userWallet,
+                wallet:      direccion,
+                cripto:      pos.nombre,
+                pasarela:    'metamask',
+                saldoCripto: saldoActual
             })
         });
 
-        lanzarAlertaMictlan("Ritual Completado", "La energía ha sido transferida.");
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            lanzarAlertaMictlan(resultado.error || "Error del servidor", "RITUAL FALLIDO");
+            return;
+        }
+
+        // Limpiar saldo de la tumba tras retiro exitoso
+        window.tumbasConSaldo[pos.nombre] = 0;
+        guardarSaldosCriptas();
+        generarCementerio();
+
+        lanzarAlertaMictlan(resultado.mensaje || "Tokens enviados a tu wallet.", "RITUAL COMPLETADO");
         cerrarRitual();
 
     } catch (err) {
