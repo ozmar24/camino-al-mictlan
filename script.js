@@ -2425,13 +2425,15 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
 
         // 3. Usamos window.ethers (la versión global cargada por el CDN)
         const provider = new window.ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
+	provider.resolveName = async (name) => name;        
+	const signer = await provider.getSigner();
         
         // Usamos la constante que ya tienes en tu script
         const contrato = new window.ethers.Contract(DIRECCION_CONTRATO, SOULGEIST_ABI, signer);
         const montoEnWei = window.ethers.parseUnits(pos.montoAEnviar.toString(), 18); 
         
-        const tx = await contrato.transfer(direccion, montoEnWei); 
+        const direccionLimpia = direccion.toLowerCase();
+	const tx = await contrato.transfer(direccionLimpia, montoEnWei); 
         await tx.wait(); 
 
         btn.innerText = "REGISTRANDO...";
