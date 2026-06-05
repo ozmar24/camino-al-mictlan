@@ -1792,7 +1792,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 #pantalla-codice #codice-cuerpo li,
 #pantalla-codice .pergamino-quemado #codice-cuerpo *,
 #pantalla-codice .pergamino-quemado #codice-cuerpo {
-    color: #000000 !important; /* Negro tinta sólido e imponente */
+    color: #2c1a00 !important;
     text-shadow: none !important; /* SE ELIMINA CUALQUIER HALO O BRILLO ROJO FEO */
     font-family: 'Nosifer', cursive !important;
     font-weight: bold !important;
