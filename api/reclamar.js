@@ -217,15 +217,19 @@ function validarDireccion(wallet, pasarela, cripto) {
     const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
     const regexLTC = /^[LMm3][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
 
-    // MetaMask/Polygon — solo acepta direcciones EVM
-if (pasarela === 'metamask' || pasarela === 'binance' || pasarela === 'coinbase') {
-    return regexEVM.test(wallet);
-}
+    if (pasarela === 'binance' || pasarela === 'coinbase') {
+        return regexEVM.test(wallet);
+    }
 
-// Bitso y Lightning — próximamente
-if (pasarela === 'bitso' || pasarela === 'bitso_lightning') {
-    return false; // bloqueado hasta integración Business
-}
+    if (pasarela === 'bitso') {
+        if (cripto === 'Bitcoin')  return regexBTC.test(wallet);
+        if (cripto === 'Litecoin') return regexLTC.test(wallet);
+        return regexEVM.test(wallet);
+    }
+
+    if (pasarela === 'bitso_lightning') {
+        return regexBTC.test(wallet);
+    }
 
     return wallet.length > 5;
 }
