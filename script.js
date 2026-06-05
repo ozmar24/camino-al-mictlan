@@ -1740,7 +1740,6 @@ function mostrarSubLey(seccion) {
     const cuerpo = document.getElementById('codice-cuerpo');
     const boton  = document.querySelector('.boton-cerrar-codice');
 
-    // ✅ Botón cambia a "REGRESAR A LEYES"
     if (boton) {
         boton.innerHTML = '[ REGRESAR A LEYES ]';
         boton.onclick = () => mostrarPergamino('leyes');
@@ -1749,25 +1748,51 @@ function mostrarSubLey(seccion) {
     const contenidos = {
         privacidad: {
             titulo: "VELO DE PRIVACIDAD",
-            texto: `No recopilamos datos sensibles como nombre completo, dirección física, 
-                    teléfono o información bancaria.<br><br>
-                    Únicamente almacenamos wallet y correo para el funcionamiento del portal.`
+            texto: `Las sombras del Mictlán guardan tus secretos con celo ancestral.<br><br>
+                    Solo preservamos tu dirección de wallet y correo electrónico — 
+                    los sellos necesarios para que el portal reconozca tu alma.<br><br>
+                    Jamás reclamaremos tu nombre mortal, domicilio físico, 
+                    número de invocación ni datos bancarios del mundo de los vivos.<br><br>
+                    Tu esencia digital pertenece únicamente a ti.`
         },
         reglas: {
             titulo: "REGLAS ETERNAS",
-            texto: `Queda prohibido el uso de VPN, proxies o múltiples cuentas.<br><br>
-                    Todo intento de manipulación será considerado traición.`
+            texto: `Desde los tiempos de Mictlantecuhtli, el inframundo opera bajo 
+                    leyes inmutables que todo viajero debe respetar:<br><br>
+                    — Una sola alma por caminante. Las identidades múltiples 
+                    serán reconocidas y eliminadas sin misericordia.<br><br>
+                    — El uso de VPN, proxies o cualquier velo artificial para 
+                    ocultar tu origen está estrictamente prohibido.<br><br>
+                    — Las recompensas son sagradas y solo se otorgan a quienes 
+                    las merecen por mérito propio.<br><br>
+                    — SOULGEIST es una criptomoneda con valor real. 
+                    Su uso implica conocimiento y aceptación del riesgo financiero.`
         },
         prohibiciones: {
             titulo: "PROHIBICIONES DEL INFRAMUNDO",
-            texto: `Actividades fraudulentas o distribución de información falsa 
-                    serán castigadas con severidad.`
+            texto: `Los siguientes actos son considerados profanación en el Mictlán 
+                    y serán juzgados con severidad:<br><br>
+                    — Manipulación de transacciones o intentos de engaño al sistema.<br><br>
+                    — Difusión de información falsa sobre SOULGEIST o Camino al Mictlán.<br><br>
+                    — Uso de bots, scripts automatizados o cualquier herramienta 
+                    que simule actividad humana.<br><br>
+                    — Actividades que violen las leyes de México o del país 
+                    desde donde se accede al portal.<br><br>
+                    — Intentos de hackeo, inyección de código o cualquier ataque 
+                    contra la infraestructura del Mictlán.`
         },
         consecuencias: {
             titulo: "CONSECUENCIAS",
-            texto: `La violación de estas leyes puede resultar en la suspensión permanente 
-                    de la cuenta y la quema de recompensas.<br><br>
-                    El Mictlán no olvida.`
+            texto: `El Mictlán no perdona ni olvida. Quienes profanen estas leyes 
+                    enfrentarán el juicio eterno:<br><br>
+                    — Suspensión permanente e irrevocable de la cuenta. 
+                    Recuerda: del más allá no hay regreso.<br><br>
+                    — Quema inmediata de todas las recompensas acumuladas.<br><br>
+                    — Bloqueo definitivo de wallet y dirección IP.<br><br>
+                    — En casos graves que impliquen fraude o actividad ilegal, 
+                    la información será compartida con las autoridades competentes 
+                    conforme a la legislación mexicana vigente.<br><br>
+                    <em>El Mictlán observa. El Mictlán recuerda. El Mictlán actúa.</em>`
         }
     };
 
@@ -1777,7 +1802,6 @@ function mostrarSubLey(seccion) {
         cuerpo.innerHTML = `<p>${data.texto}</p>`;
     }
 }
-
 function cerrarCodice() {
     const pantalla = document.getElementById('pantalla-codice');
     if (pantalla) {
@@ -2051,7 +2075,7 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
 
 
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
-// Reemplaza tu función actual por esta versión para depurar:
+
 async function sincronizarBalanceConRedis() {
     if (!window.userWallet) return 0;
 
@@ -2126,7 +2150,7 @@ async function descontarBalanceEnRedis(costoRitual) {
 }
 function cargarSaldosCriptas() {
     if (!window.userWallet) {
-        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0 };
+        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Matic": 0, "Bnn": 0, "USDT": 0, "Bitcoin": 0 };
         console.log("Nuevo usuario: criptas en cero");
         return;
     }
@@ -2138,7 +2162,7 @@ function cargarSaldosCriptas() {
         window.tumbasConSaldo = JSON.parse(guardados);
         console.log(`✅ Criptas cargadas para ${window.userWallet}`);
     } else {
-        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0 };
+        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Matic": 0, "Bnb": 0, "USDT": 0, "Bitcoin": 0 };
         console.log(`Nuevo usuario: criptas en cero`);
     }
 }
