@@ -847,8 +847,7 @@ const SOULGEIST_ABI = [
 	}
 ];
 
-const DIRECCION_CONTRATO = window.ethers.getAddress("0xad479c0620e9c41f1acd8d9c4a81e9e7d4f76ae");
-
+const DIRECCION_CONTRATO = "0xad479c0620e9c41f1acd8d9c4a81e9e7d4f76ae";
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
