@@ -2396,16 +2396,45 @@ async function conectarMetaMask() {
 }
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
-    const direccion = await conectarMetaMask();
+    const btn = document.getElementById('btn-mostrar-retiro');
     
-    if (direccion) {
-        // Si logramos obtener la dirección, procedemos al retiro on-chain
-        const btn = document.getElementById('btn-mostrar-retiro');
-        btn.innerText = "PROCESANDO...";
+    try {
+        const direccion = await conectarMetaMask();
+        if (!direccion) return;
+
+        btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-        // Aquí llamas a tu función de contrato inteligente
-        // ejecutarRetiroOnChain(direccion, pos); 
-        console.log(`Enviando energía de ${pos.nombre} a: ${direccion}`);
+        // 1. Ejecutar transacción con MetaMask y el contrato
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contrato = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        
+        // Asumiendo que el usuario retira sus propios tokens desde el contrato
+        const tx = await contrato.transfer(tuDireccionAdmin, monto); 
+        await tx.wait(); // Esto espera a que la blockchain confirme
+
+        btn.innerText = "REGISTRANDO...";
+
+        // 2. Avisar a tu API que ya se pagó (para que actualice Redis)
+        await fetch('/api/reclamar', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                pasarela: 'metamask', 
+                cripto: pos.nombre,
+                wallet: direccion,
+                identidad: window.userWallet 
+            })
+        });
+
+        lanzarAlertaMictlan("Ritual Completado", "La energía ha sido transferida.");
+        cerrarRitual();
+
+    } catch (err) {
+        console.error(err);
+        lanzarAlertaMictlan("Error", "El ritual falló.");
+    } finally {
+        btn.innerText = "💰 RETIRAR A BILLETERA";
+        btn.disabled = false;
     }
 }

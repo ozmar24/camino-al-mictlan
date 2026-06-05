@@ -140,36 +140,44 @@ export default async function handler(req, res) {
         }
 
         // ── 5. Procesar pago según pasarela ────────────────────────────────────
-        let pagoExitoso    = false;
-        let mensajeRetorno = '';
+       let pagoExitoso = false;
+let mensajeRetorno = '';
 
-        if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
-            const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-            if (resLN.success) {
-                pagoExitoso    = true;
-                mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
-            }
+// AQUÍ ES DONDE REEMPLAZAS LO QUE TENÍAS POR ESTO:
 
-        } else if (['metamask', 'binance', 'coinbase'].includes(pasarela)) {
-            const resOC = await procesarRetiroOnChain(
-                wallet,
-                cantidadAEnviar,
-                claveAdmin,
-                contratoAddr,
-                blockchainRPC,
-                blockchainEnv
-            );
+if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
+    const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
+    if (resLN.success) {
+        pagoExitoso = true;
+        mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
+    }
 
-            if (resOC.success) {
-                pagoExitoso    = true;
-                mensajeRetorno = `Cosecha autorizada${blockchainEnv === 'testnet' ? ' en Amoy (testnet)' : ''}. Tx: ${resOC.txHash.slice(0, 10)}...`;
-            } else {
-                return res.status(500).json({ error: resOC.error || 'La blockchain rechazó la transferencia.' });
-            }
+} else if (pasarela === 'metamask') {
+    // ESTA ES LA NUEVA PARTE: Solo registramos, no ejecutamos OnChain aquí
+    pagoExitoso = true;
+    mensajeRetorno = "Cosecha registrada en el libro del inframundo.";
 
-        } else {
-            return res.status(400).json({ error: 'Pasarela no reconocida.' });
-        }
+} else if (['binance', 'coinbase'].includes(pasarela)) {
+    // Las pasarelas centrales siguen usando tu lógica original de servidor
+    const resOC = await procesarRetiroOnChain(
+        wallet,
+        cantidadAEnviar,
+        claveAdmin,
+        contratoAddr,
+        blockchainRPC,
+        blockchainEnv
+    );
+
+    if (resOC.success) {
+        pagoExitoso = true;
+        mensajeRetorno = `Cosecha autorizada. Tx: ${resOC.txHash.slice(0, 10)}...`;
+    } else {
+        return res.status(500).json({ error: resOC.error || 'La blockchain rechazó la transferencia.' });
+    }
+
+} else {
+    return res.status(400).json({ error: 'Pasarela no reconocida.' });
+}
 
         // ── 6. Cerrar candados y resetear balance si aplica ───────────────────
         if (pagoExitoso) {
