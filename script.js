@@ -2378,6 +2378,29 @@ async function verificarSaludGas(walletAdmin, provider) {
  * Si falla o el usuario cancela, lanza una alerta temática.
  */
 
+async function conectarMetaMask() {
+    if (!window.ethereum) {
+        lanzarAlertaMictlan("Billetera no detectada", "Necesitas instalar MetaMask para continuar con el ritual.");
+        return null;
+    }
+    try {
+        const cuentas = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (cuentas.length > 0) {
+            const cuentaPrincipal = cuentas[0];
+            console.log("Alma conectada:", cuentaPrincipal);
+            return cuentaPrincipal;
+        }
+    } catch (error) {
+        if (error.code === 4001) {
+            lanzarAlertaMictlan("Conexión rechazada", "El guardián necesita acceso a tu billetera para el ritual.");
+        } else {
+            lanzarAlertaMictlan("Error místico", "No se pudo establecer el vínculo con MetaMask.");
+            console.error(error);
+        }
+        return null;
+    }
+}
+
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
 if (!pos || typeof pos.montoAEnviar === 'undefined') {
