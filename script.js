@@ -1353,7 +1353,9 @@ document.getElementById('btn-mostrar-retiro').onclick = function() {
 
     if (esEVM) {
         // --- FLUJO METAMASK ---
-        conectarYRetirarMetaMask(pos);
+        const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
+pos.montoAEnviar = saldoActual;
+conectarYRetirarMetaMask(pos);
     } else {
         // --- FLUJO TRADICIONAL (BTC/LTC/ETC) ---
         if (seccion.style.display === 'none') {
@@ -2361,12 +2363,6 @@ async function conectarYRetirarMetaMask(pos) {
     }
 }
 
-// Ejecutar al cargar
-window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1200);
-    // Actualizar cada 25 segundos
-    setInterval(actualizarTransparencia, 25000);
-});
 
 async function verificarSaludGas(walletAdmin, provider) {
     const balanceGas = await provider.getBalance(walletAdmin.address);
@@ -2381,34 +2377,7 @@ async function verificarSaludGas(walletAdmin, provider) {
  * Si tiene éxito, devuelve la dirección de la billetera.
  * Si falla o el usuario cancela, lanza una alerta temática.
  */
-async function conectarMetaMask() {
-    // 1. Verificar si el navegador tiene MetaMask (ethereum provider)
-    if (!window.ethereum) {
-        lanzarAlertaMictlan("Billetera no detectada", "Necesitas instalar MetaMask para continuar con el ritual.");
-        return null;
-    }
 
-    try {
-        // 2. Solicitar acceso a las cuentas
-        // Esto abrirá la ventana emergente de MetaMask automáticamente
-        const cuentas = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        if (cuentas.length > 0) {
-            const cuentaPrincipal = cuentas[0];
-            console.log("Alma conectada:", cuentaPrincipal);
-            return cuentaPrincipal; // Retornamos la dirección para usarla en el retiro
-        }
-    } catch (error) {
-        // 3. Manejo de errores (ej. usuario canceló la conexión)
-        if (error.code === 4001) {
-            lanzarAlertaMictlan("Conexión rechazada", "El guardián necesita acceso a tu billetera para el ritual.");
-        } else {
-            lanzarAlertaMictlan("Error místico", "No se pudo establecer el vínculo con MetaMask.");
-            console.error(error);
-        }
-        return null;
-    }
-}
 // Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
 async function conectarYRetirarMetaMask(pos) {
 if (!pos || typeof pos.montoAEnviar === 'undefined') {
