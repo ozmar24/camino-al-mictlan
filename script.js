@@ -1341,14 +1341,27 @@ function abrirModalCosechaFinal(pos) {
     `;
 
     // Lógica para mostrar los campos de retiro solo si pulsa el botón
-    document.getElementById('btn-mostrar-retiro').onclick = function() {
-        const seccion = document.getElementById('seccion-retiro');
+   // --- Modificación en abrirModalCosechaFinal ---
+document.getElementById('btn-mostrar-retiro').onclick = function() {
+    const seccion = document.getElementById('seccion-retiro');
+    const pos = window.currentCripto;
+
+    // Detectamos si es un activo EVM (Polygon/BNB Chain)
+    const esEVM = (pos.nombre === "MATIC" || pos.nombre === "BNB" || pos.nombre === "Ethereum" || pos.nombre === "USDT" || pos.nombre === "Pepe");
+
+    if (esEVM) {
+        // --- FLUJO METAMASK ---
+        conectarYRetirarMetaMask(pos);
+    } else {
+        // --- FLUJO TRADICIONAL (BTC/LTC/ETC) ---
         if (seccion.style.display === 'none') {
             seccion.style.display = 'block';
             this.innerText = "CONFIRMAR RETIRO";
-            this.onclick = procesarRetiro; // Al segundo click, procesa el retiro
+        } else {
+            procesarRetiro(); // Tu función existente
         }
-    };
+    }
+};
 
     modal.style.display = 'block';
 }
@@ -1356,6 +1369,10 @@ function abrirModalCosechaFinal(pos) {
 
 
 function adaptarPlaceholderPasarela(criptoId) {
+    // Si la cripto es de red (EVM), no hacemos nada porque no usamos pasarelas
+    const esEVM = ['MATIC', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(criptoId.toUpperCase());
+    if (esEVM) return;
+
     const pasarela = document.getElementById('pasarela-select').value;
     const input = document.getElementById('wallet-input');
     if (!input) return;
@@ -1367,29 +1384,31 @@ function adaptarPlaceholderPasarela(criptoId) {
     }
 }
 
-function procesarRetiro() {
+async function procesarRetiro() {
+    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
+    
+    // --- NUEVO PUENTE DELEGADOR ---
+    // Si es un activo de red, lo enviamos a su propio ritual y salimos de esta función
+    if (['MATIC', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(nombreCripto.toUpperCase())) {
+        await conectarYRetirarMetaMask(window.currentCripto);
+        return; 
+    }
+    // -------------------------------
+
+    // Si llega aquí, es porque es BTC o LTC (el código original sigue intacto)
     const inputWallet = document.getElementById('wallet-input');
     const selectPasarela = document.getElementById('pasarela-select');
-   
-    if (!inputWallet) return;
-
-    const walletDestino = inputWallet.value.trim();
-
-    if (walletDestino.length < 5) {
-        lanzarAlertaMictlan("Falta la dirección o correo de destino.", "RITUAL INCOMPLETO");
+    
+    if (!inputWallet || inputWallet.value.trim().length < 5) {
+        lanzarAlertaMictlan("Falta la dirección de destino.", "RITUAL INCOMPLETO");
         return;
     }
 
-    // ELIMINAMOS CUALQUIER VERIFICACIÓN DE VIDEO AQUÍ
-    // Retiro directo a backend
     const identidadUsuario = localStorage.getItem('soulgeist_user_email') || window.userWallet;
     const pasarelaElegida = selectPasarela ? selectPasarela.value : "bitso";
-    const nombreCripto = window.currentCripto ? window.currentCripto.nombre : "Bitcoin";
 
     cerrarRitual();
-    
-    // Llamada directa a tu API de reclamos
-    procesarCosecha(identidadUsuario, walletDestino, nombreCripto, pasarelaElegida);
+    procesarCosecha(identidadUsuario, inputWallet.value.trim(), nombreCripto, pasarelaElegida);
 }
 
 
@@ -2340,5 +2359,38 @@ async function verificarSaludGas(walletAdmin, provider) {
     if (balanceGas < ethers.parseEther("0.01")) {
         await enviarAlertaTelegram("⚠️ *ALERTA:* La billetera de gas se está agotando.");
         throw new Error("Fondos de gas insuficientes.");
+    }
+}
+/**
+ * Solicita la conexión con MetaMask.
+ * Si tiene éxito, devuelve la dirección de la billetera.
+ * Si falla o el usuario cancela, lanza una alerta temática.
+ */
+async function conectarMetaMask() {
+    // 1. Verificar si el navegador tiene MetaMask (ethereum provider)
+    if (!window.ethereum) {
+        lanzarAlertaMictlan("Billetera no detectada", "Necesitas instalar MetaMask para continuar con el ritual.");
+        return null;
+    }
+
+    try {
+        // 2. Solicitar acceso a las cuentas
+        // Esto abrirá la ventana emergente de MetaMask automáticamente
+        const cuentas = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        if (cuentas.length > 0) {
+            const cuentaPrincipal = cuentas[0];
+            console.log("Alma conectada:", cuentaPrincipal);
+            return cuentaPrincipal; // Retornamos la dirección para usarla en el retiro
+        }
+    } catch (error) {
+        // 3. Manejo de errores (ej. usuario canceló la conexión)
+        if (error.code === 4001) {
+            lanzarAlertaMictlan("Conexión rechazada", "El guardián necesita acceso a tu billetera para el ritual.");
+        } else {
+            lanzarAlertaMictlan("Error místico", "No se pudo establecer el vínculo con MetaMask.");
+            console.error(error);
+        }
+        return null;
     }
 }
