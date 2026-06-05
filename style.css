@@ -677,7 +677,9 @@ button,
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px;
+    padding: 120px 80px 100px 80px;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 #codice-titulo { font-family: 'Nosifer', cursive; color: #4a0000; font-size: 09rem; margin-bottom: 20px; }
