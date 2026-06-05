@@ -2394,3 +2394,18 @@ async function conectarMetaMask() {
         return null;
     }
 }
+// Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
+async function conectarYRetirarMetaMask(pos) {
+    const direccion = await conectarMetaMask();
+    
+    if (direccion) {
+        // Si logramos obtener la dirección, procedemos al retiro on-chain
+        const btn = document.getElementById('btn-mostrar-retiro');
+        btn.innerText = "PROCESANDO...";
+        btn.disabled = true;
+
+        // Aquí llamas a tu función de contrato inteligente
+        // ejecutarRetiroOnChain(direccion, pos); 
+        console.log(`Enviando energía de ${pos.nombre} a: ${direccion}`);
+    }
+}
