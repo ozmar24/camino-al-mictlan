@@ -1675,7 +1675,9 @@ function abrirConfirmacionFinal() {
     document.body.appendChild(overlayFinal); 
     document.body.appendChild(modalFinal); 
 
-    document.getElementById('final-si').onclick = () => { window.location.href = "https://void-onyx-web.vercel.app"; }; 
+    document.getElementById('final-si').onclick = () => { // window.location.href = "https://void-onyx-web.vercel.app";
+lanzarAlertaMictlan("Portal Sellado", "El Abismo aún no está listo para recibir tu alma. Vuelve pronto.");
+ }; 
     document.getElementById('final-no').onclick = () => { modalFinal.remove(); overlayFinal.remove(); }; 
 }
 
