@@ -1940,7 +1940,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         width: 90vw !important;
         height: auto !important;
         min-height: 70vh !important;
-        padding: 70px 20px 50px 20px !important;
+        padding: 100px 25px 80px 25px !important;
         transform: translate(-50%, -50%) scale(0.95) !important;
     }
 
