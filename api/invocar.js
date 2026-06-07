@@ -71,14 +71,7 @@ Reglas de respuesta:
             parts: [{
                 text: `${instruccionSistema}\n\nPregunta del viajero: ${promptLimpio}`
             }]
-        }],
-        // Esto le da permiso a la IA de hablar de valor real sin bloquearse
-        safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-        ]
+        }]
     });
 
     const URL_API = `/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
