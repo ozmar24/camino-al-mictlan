@@ -973,7 +973,7 @@ async function manejarAuth() {
     btnAuth.disabled = true;
 
     try {
-        const respuesta = await fetch(`${DOMINIO_VERCEL}/api/pacto`, {
+        const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, accion })
@@ -1007,7 +1007,6 @@ async function manejarAuth() {
         btnAuth.disabled = false;
     }
 }
-
 
 async function manejarLoginGoogle(response) {
     try {
