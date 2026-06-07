@@ -1918,63 +1918,30 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil pergamino de leyes ─────────────────────── */
 @media (max-width: 1024px) {
     #pantalla-codice .pergamino-quemado {
-        width: 90vw !important;
-        max-width: 450px !important; /* Evita que en tablets se estire demasiado hacia los lados */
+        width: 95vw !important;
         height: auto !important;
-        min-height: auto !important; /* Eliminamos el 80vh para que el alto lo dicte el contenido */
-        padding: 80px 35px 60px 35px !important; /* Ajusta los márgenes internos para que el texto caiga dentro del dibujo */
-        transform: translate(-50%, -50%) scale(1) !important; /* Evitamos escalas que distorsionen fuentes */
-        box-sizing: border-box !important;
-        overflow-y: auto !important; /* Si el texto es muy largo, crea un scroll interno limpio */
-        max-height: 85vh !important; /* No permite que el pergamino se salga de la pantalla del móvil */
+        min-height: 80vh !important;
+        padding: 70px 20px 50px 20px !important;
+        transform: translate(-50%, -50%) scale(0.9) !important;
     }
 
-    #codice-cuerpo {
-        font-size: 0.65rem !important; /* Un poco más legible que 0.50rem */
-        line-height: 1.4 !important;
-        width: 100% !important;
-        overflow-wrap: break-word !important; /* Rompe palabras largas automáticamente */
-        word-break: break-word !important;
-    }
-
-    #pantalla-codice #codice-cuerpo p {
-        font-size: 0.60rem !important;
-        width: 100% !important;
+    #codice-cuerpo p {
+        font-size: 0.50rem !important;
+        width: 90% !important;
         max-width: 100% !important;
-        margin: 8px auto !important;
-        text-align: center !important;
     }
 
-    #codice-titulo,
-    #pantalla-codice h2 {
-        font-size: 0.85rem !important;
-        margin-bottom: 12px !important;
-        text-align: center !important;
-    }
-
-    #pantalla-codice #codice-cuerpo span,
-    #pantalla-codice #codice-cuerpo span.link-ley {
-        font-size: 0.60rem !important;
-        letter-spacing: 0.5px !important;
-        display: block !important; /* Asegura que no se encimen los links */
-        margin: 6px auto !important;
-    }
-
-    .btn-subley {
-        font-size: 0.60rem !important;
-        padding: 6px 10px !important;
+    #codice-titulo {
+        font-size: 0.75rem !important;
     }
 
     /* ── Bóveda separada ── */
     #modal-boveda .pergamino-quemado {
         width: 90vw !important;
-        max-width: 420px !important;
         height: auto !important;
-        max-height: 85vh !important;
-        overflow-y: auto !important;
-        padding: 90px 30px 70px 30px !important;
-        transform: translate(-50%, -50%) scale(1) !important;
-        box-sizing: border-box !important;
+        min-height: 70vh !important;
+        padding: 100px 25px 80px 25px !important;
+        transform: translate(-50%, -50%) scale(0.95) !important;
     }
 
     #modal-boveda #boveda-cuerpo {
@@ -1986,22 +1953,51 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     }
 
     #modal-boveda .btn-ritual-grimorio {
-        width: 90% !important;
-        font-size: 0.65rem !important;
+        width: 80% !important;
+        font-size: 0.55rem !important;
         padding: 8px 10px !important;
         text-align: center !important;
         white-space: normal !important;
     }
 
     #modal-boveda h2 {
-        font-size: 0.9rem !important;
+        font-size: 0.8rem !important;
     }
 
     #modal-boveda p {
-        font-size: 0.65rem !important;
+        font-size: 0.55rem !important;
+    }
+
+#codice-titulo,
+    #pantalla-codice h2 {
+        font-size: 0.75rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    #codice-cuerpo {
+        font-size: 0.55rem !important;
+        line-height: 1.4 !important;
+    }
+
+    #pantalla-codice #codice-cuerpo p {
+        font-size: 0.45rem !important;
+        width: 95% !important;
+        margin: 8px auto !important;
+        line-height: 1.4 !important;
+    }
+
+    #pantalla-codice #codice-cuerpo span,
+    #pantalla-codice #codice-cuerpo span.link-ley {
+        font-size: 0.45rem !important;
+        letter-spacing: 1px !important;
+        margin: 4px auto !important;
+    }
+
+    .btn-subley {
+        font-size: 0.55rem !important;
+        padding: 8px 10px !important;
     }
 }
-
 
 
 
