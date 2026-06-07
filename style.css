@@ -1336,20 +1336,20 @@ button,
 /* ====================== MÓVIL ====================== */
 @media (max-width: 1024px) {
     .grimorio-container {
-        /* Mantenemos tu escala actual */
-        transform: scale(0.7) !important;
-        transform-origin: top center !important; 
+        /* Mantenemos tu escala que ya funciona bien */
+        transform: scale(0.7);
+        transform-origin: top center; 
         
-        /* Ajuste de posición: 'top' controla qué tan arriba está el elemento */
-        position: fixed !important;
-        top: 10% !important;   /* <--- SUBE O BAJA ESTE VALOR (ej: 5% es más arriba, 20% más abajo) */
+        /* Centrado absoluto */
+        position: obsolute !important;
+        top: 30% !important;   /* Ajusta este % (10% a 20%) para subir o bajar el libro */
         left: 50% !important;
-        transform: translate(-50%, 0) scale(0.7) !important; 
+        transform: translate(-50%, 0) scale(0.7); /* El translate(-50%) lo centra horizontalmente */
         
+        /* Aseguramos que no ocupe espacio extra */
         width: 90% !important;
         margin: 0 !important;
     }
-}
 
     .pagina-izquierda,
     .pagina-derecha {
@@ -1898,12 +1898,4 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     color: #ff0000;
     font-size: 0.7rem;
     display: block;
-}
-@media (max-width: 1024px) {
-    /* Identifica la clase de tu contenedor de quema de tokens */
-    .contenedor-quema-tokens { 
-        position: fixed !important;
-        top: 15% !important; /* Ajusta este valor para subirlo o bajarlo a tu gusto */
-        z-index: 999 !important;
-    }
 }
