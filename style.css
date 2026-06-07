@@ -1917,7 +1917,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 }
 /* ── Ajuste móvil pergamino de leyes ─────────────────────── */
 @media (max-width: 1024px) {
-    .pergamino-quemado {
+    #pantalla-codice .pergamino-quemado {
         width: 95vw !important;
         height: auto !important;
         min-height: 80vh !important;
@@ -1926,24 +1926,62 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     }
 
     #codice-cuerpo p {
-        font-size: 0.55rem !important;
+        font-size: 0.50rem !important;
         width: 90% !important;
         max-width: 100% !important;
     }
 
     #codice-titulo {
-        font-size: 1rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* ── Bóveda separada ── */
+    #modal-boveda .pergamino-quemado {
+        width: 90vw !important;
+        height: auto !important;
+        min-height: 70vh !important;
+        padding: 100px 25px 80px 25px !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    #modal-boveda #boveda-cuerpo {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    #modal-boveda .btn-ritual-grimorio {
+        width: 80% !important;
+        font-size: 0.55rem !important;
+        padding: 8px 10px !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
+
+    #modal-boveda h2 {
+        font-size: 0.9rem !important;
+    }
+
+    #modal-boveda p {
+        font-size: 0.55rem !important;
     }
 }
 
 @media (max-width: 480px) {
-    .pergamino-quemado {
+    #pantalla-codice .pergamino-quemado {
         width: 98vw !important;
         padding: 70px 20px 50px 20px !important;
         transform: translate(-50%, -50%) scale(0.9) !important;
     }
 
     #codice-cuerpo p {
+        font-size: 0.45rem !important;
+    }
+
+    #modal-boveda .btn-ritual-grimorio {
+        width: 85% !important;
         font-size: 0.50rem !important;
     }
 }
