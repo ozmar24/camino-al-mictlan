@@ -1919,14 +1919,10 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil pergamino de leyes (Unificado para Modo Horizontal / Landscape) ─────────────────────── */
 @media (max-width: 1024px) and (orientation: landscape), (max-height: 500px) {
     #pantalla-codice .pergamino-quemado {
-        /* Llevamos el alto al 98% de la pantalla y aumentamos el ancho multiplicando por 0.85 */
         height: 98vh !important; 
         width: calc(98vh * 0.85) !important; 
         max-height: 480px !important;
-        max-width: 410px !important; /* Más ancho para que el lienzo se vea imponente */
-
-        /* Reducimos ligeramente el padding lateral para que el texto tenga más área útil */
-        padding: 45px 20px 30px 20px !important; 
+        max-width: 410px !important; 
         
         position: absolute !important;
         top: 50% !important;
@@ -1934,25 +1930,32 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         transform: translate(-50%, -50%) scale(1) !important; 
         box-sizing: border-box !important;
         overflow: hidden !important; 
+
+        /* Dejamos el padding del contenedor base estándar */
+        padding: 45px 15px 30px 15px !important; 
     }
 
-    /* FORZAMOS EL COLOR ROJO EN TODOS LOS TEXTOS INTERNOS DEL CÓDICE */
+    /* FORZAMOS ROJO FUERTE EN EL TÍTULO */
     #pantalla-codice .pergamino-quemado h2,
     #pantalla-codice .pergamino-quemado #codice-titulo,
     #codice-titulo {
         font-size: 0.65rem !important;
         margin-bottom: 6px !important;
         text-align: center !important;
-        color: #ff3333 !important; /* Rojo brillante */
-        text-shadow: 1px 1px 2px #000000 !important;
+        color: #ff0000 !important; /* Rojo puro */
+        font-weight: 900 !important;
+        text-shadow: none !important; /* Quitamos la sombra para evitar el tono rosa */
     }
 
+    /* EL TRUCO PARA QUE EL TEXTO NO SE SALGA HACIA LOS LADOS */
     #codice-cuerpo {
-        width: 100% !important;
+        width: 72% !important; /* Forzamos a que el texto ocupe solo el centro limpio del pergamino */
+        max-width: 72% !important;
+        margin: 0 auto !important; /* Lo centramos perfectamente */
         height: auto !important;
     }
 
-    /* Apuntamos de forma ultra-específica para ganarle a cualquier otra regla de tu CSS */
+    /* ROJO SANGRE ULTRA-ESPECÍFICO Y CONTROL DE LÍNEAS */
     #pantalla-codice .pergamino-quemado #codice-cuerpo p,
     #pantalla-codice #codice-cuerpo p,
     #codice-cuerpo p {
@@ -1963,10 +1966,10 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         line-height: 1.2 !important;
         text-align: center !important;
         
-        /* Forzamos el color rojo místico y la sombra negra */
-        color: #ff4d4d !important; 
-        font-weight: bold !important;
-        text-shadow: 1px 1px 1px #000000 !important;
+        /* Forzamos un rojo vivo y grueso para que no se vea rosa ni pálido */
+        color: #ff0000 !important; 
+        font-weight: 900 !important; 
+        text-shadow: none !important; 
     }
 
     #pantalla-codice .pergamino-quemado #codice-cuerpo span,
@@ -1976,8 +1979,9 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         letter-spacing: 0.5px !important;
         margin: 3px auto !important;
         display: block !important;
-        color: #ff4d4d !important;
-        text-shadow: 1px 1px 1px #000000 !important;
+        color: #ff3333 !important;
+        font-weight: 900 !important;
+        text-shadow: none !important;
     }
 
     .btn-subley {
@@ -1985,13 +1989,13 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         padding: 4px 8px !important;
     }
 
-    /* ── Bóveda separada (Mismo aumento máximo y color super-forzado) ── */
+    /* ── Bóveda separada (Mismo control estricto de ancho de texto y rojo puro) ── */
     #modal-boveda .pergamino-quemado {
         height: 98vh !important;
         width: calc(98vh * 0.85) !important;
         max-height: 480px !important;
         max-width: 410px !important;
-        padding: 50px 20px 35px 20px !important;
+        padding: 50px 15px 35px 15px !important;
         position: absolute !important;
         top: 50% !important;
         left: 50% !important;
@@ -2004,12 +2008,14 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        width: 100% !important;
+        width: 72% !important; /* Encapsulado central */
+        max-width: 72% !important;
+        margin: 0 auto !important;
         gap: 4px !important;
     }
 
     #modal-boveda .btn-ritual-grimorio {
-        width: 85% !important;
+        width: 95% !important;
         font-size: 0.45rem !important;
         padding: 4px 6px !important;
         text-align: center !important;
@@ -2018,16 +2024,16 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 
     #modal-boveda h2 {
         font-size: 0.65rem !important;
-        color: #ff3333 !important;
-        text-shadow: 1px 1px 2px #000000 !important;
+        color: #ff0000 !important;
+        font-weight: 900 !important;
+        text-shadow: none !important;
     }
 
     #modal-boveda p,
     #modal-boveda #boveda-cuerpo p {
         font-size: 0.45rem !important;
-        color: #ff4d4d !important;
-        font-weight: bold !important;
-        text-shadow: 1px 1px 1px #000000 !important;
+        color: #ff0000 !important;
+        font-weight: 900 !important;
+        text-shadow: none !important;
     }
 }
-
