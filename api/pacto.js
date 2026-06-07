@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     const cleanUrl = UPSTASH_REDIS_REST_URL.replace(/\/$/, '');
 
     // ── Helpers Redis Corregidos para la API REST de Upstash ───────────────────
+        // ── Helpers Redis Adaptados Correctamente a la API REST de Upstash ──
     const redisGet = async (key) => {
         const r = await fetch(`${cleanUrl}/get/${key}`, {
             headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
@@ -44,6 +45,7 @@ export default async function handler(req, res) {
         if (!data || data.result === null || data.result === undefined) return null;
         
         try {
+            // Si el dato viene de un set estructurado, lo parseamos a Objeto JS
             return JSON.parse(data.result);
         } catch (e) {
             return data.result; 
@@ -53,37 +55,19 @@ export default async function handler(req, res) {
     const redisSet = async (key, value, exSeconds = null) => {
         const stringValue = typeof value === 'object' ? JSON.stringify(value) : value;
 
+        // Validamos la sintaxis correcta de Upstash: Todo viaja codificado en la URL del endpoint
         const url = exSeconds
             ? `${cleanUrl}/set/${key}/${encodeURIComponent(stringValue)}/EX/${exSeconds}`
-            : `${cleanUrl}/set/${key}`;
+            : `${cleanUrl}/set/${key}/${encodeURIComponent(stringValue)}`; // <── ¡Corrección Clave!
 
-        const options = exSeconds
-            ? { method: 'POST', headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` } }
-            : {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(stringValue)
-              };
+        const options = {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+        };
 
         return fetch(url, options).then(r => r.json());
     };
 
-    const redisIncr = async (key) => {
-        return fetch(`${cleanUrl}/incr/${key}`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
-        }).then(r => r.json());
-    };
-
-    const redisExpire = async (key, seconds) => {
-        return fetch(`${cleanUrl}/expire/${key}/${seconds}`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
-        }).then(r => r.json());
-    };
 
     // ── Validar body ───────────────────────────────────────────────────────────
     const { email, password, accion, action } = req.body || {};
