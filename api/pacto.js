@@ -8,9 +8,9 @@ export default async function handler(req, res) {
 
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
-        'https://vercel.app',
-        'http://localhost:3000'
-    ];
+    'https://camino-al-mictlan.vercel.app',
+    'http://localhost:3000'
+];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -70,6 +70,19 @@ export default async function handler(req, res) {
         // El endpoint raíz de Upstash procesa arreglos de comandos JSON nativos
         return fetch(cleanUrl, options).then(r => r.json());
     };
+const redisIncr = async (key) => {
+    return fetch(`${cleanUrl}/incr/${key}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+    }).then(r => r.json());
+};
+
+const redisExpire = async (key, seconds) => {
+    return fetch(`${cleanUrl}/expire/${key}/${seconds}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
+    }).then(r => r.json());
+};
 
 
 
