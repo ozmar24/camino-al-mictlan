@@ -973,11 +973,14 @@ async function manejarAuth() {
     btnAuth.disabled = true;
 
     try {
+                
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, accion })
+            /* Cambiamos 'email' por 'correo: email' para que el backend lo reciba correctamente */
+            body: JSON.stringify({ correo: email, password, accion })
         });
+
 
         const resultado = await respuesta.json();
 
@@ -1814,7 +1817,7 @@ function cerrarCodice() {
     document.getElementById('pantalla-codice').style.display = 'none'; 
 } 
 
-// ❌ BUSCA ESTO:
+
 function abrirSoporte() {
     const pantalla = document.getElementById('pantalla-oraculo'); 
     if (pantalla) {
