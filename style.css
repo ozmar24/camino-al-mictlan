@@ -1915,33 +1915,74 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     font-size: 0.7rem;
     display: block;
 }
-/* ── Ajuste móvil pergamino de leyes ─────────────────────── */
-@media (max-width: 1024px) {
+
+/* ── Ajuste móvil pergamino de leyes (Unificado para Modo Horizontal / Landscape) ─────────────────────── */
+@media (max-width: 1024px) and (orientation: landscape), (max-height: 500px) {
     #pantalla-codice .pergamino-quemado {
-        width: 95vw !important;
-        height: auto !important;
-        min-height: 80vh !important;
-        padding: 70px 20px 50px 20px !important;
-        transform: translate(-50%, -50%) scale(0.9) !important;
+        /* Controlamos el tamaño basándose en el ALTO de la pantalla, no en el ancho */
+        height: 90vh !important; 
+        width: calc(90vh * 0.75) !important; /* Mantiene la proporción del pergamino para que no se deforme */
+        max-height: 400px !important;
+        max-width: 300px !important;
+
+        /* Reducimos drásticamente los paddings superiores e inferiores para ganar espacio de texto */
+        padding: 40px 20px 30px 20px !important; 
+        
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) scale(1) !important; 
+        box-sizing: border-box !important;
+        overflow: hidden !important; /* Garantiza que nada se salga del lienzo */
     }
 
-    #codice-cuerpo p {
-        font-size: 0.50rem !important;
-        width: 90% !important;
+    #codice-titulo,
+    #pantalla-codice h2 {
+        font-size: 0.65rem !important; /* Un poco más pequeño para dejarle espacio al cuerpo */
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+
+    #codice-cuerpo {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    #pantalla-codice #codice-cuerpo p {
+        font-size: 0.45rem !important; /* Tamaño ultra-compacto ideal para pantallas horizontales bajas */
+        width: 100% !important;
         max-width: 100% !important;
+        margin: 4px auto !important;
+        line-height: 1.2 !important; /* Espaciado entre líneas más cerrado */
+        text-align: center !important;
     }
 
-    #codice-titulo {
-        font-size: 0.75rem !important;
+    #pantalla-codice #codice-cuerpo span,
+    #pantalla-codice #codice-cuerpo span.link-ley {
+        font-size: 0.45rem !important;
+        letter-spacing: 0.5px !important;
+        margin: 3px auto !important;
+        display: block !important;
     }
 
-    /* ── Bóveda separada ── */
+    .btn-subley {
+        font-size: 0.45rem !important;
+        padding: 4px 8px !important;
+    }
+
+    /* ── Bóveda separada (Adaptada a Horizontal) ── */
     #modal-boveda .pergamino-quemado {
-        width: 90vw !important;
-        height: auto !important;
-        min-height: 70vh !important;
-        padding: 100px 25px 80px 25px !important;
-        transform: translate(-50%, -50%) scale(0.95) !important;
+        height: 90vh !important;
+        width: calc(90vh * 0.75) !important;
+        max-height: 400px !important;
+        max-width: 300px !important;
+        padding: 45px 20px 35px 20px !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
     }
 
     #modal-boveda #boveda-cuerpo {
@@ -1949,71 +1990,22 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         flex-direction: column !important;
         align-items: center !important;
         width: 100% !important;
-        gap: 8px !important;
+        gap: 4px !important;
     }
 
     #modal-boveda .btn-ritual-grimorio {
-        width: 80% !important;
-        font-size: 0.55rem !important;
-        padding: 8px 10px !important;
+        width: 85% !important;
+        font-size: 0.45rem !important;
+        padding: 4px 6px !important;
         text-align: center !important;
         white-space: normal !important;
     }
 
     #modal-boveda h2 {
-        font-size: 0.8rem !important;
+        font-size: 0.65rem !important;
     }
 
     #modal-boveda p {
-        font-size: 0.55rem !important;
-    }
-
-#codice-titulo,
-    #pantalla-codice h2 {
-        font-size: 0.75rem !important;
-        margin-bottom: 10px !important;
-    }
-
-    #codice-cuerpo {
-        font-size: 0.55rem !important;
-        line-height: 1.4 !important;
-    }
-
-    #pantalla-codice #codice-cuerpo p {
         font-size: 0.45rem !important;
-        width: 95% !important;
-        margin: 8px auto !important;
-        line-height: 1.4 !important;
-    }
-
-    #pantalla-codice #codice-cuerpo span,
-    #pantalla-codice #codice-cuerpo span.link-ley {
-        font-size: 0.45rem !important;
-        letter-spacing: 1px !important;
-        margin: 4px auto !important;
-    }
-
-    .btn-subley {
-        font-size: 0.55rem !important;
-        padding: 8px 10px !important;
-    }
-}
-
-
-
-@media (max-width: 480px) {
-    #pantalla-codice .pergamino-quemado {
-        width: 98vw !important;
-        padding: 70px 20px 50px 20px !important;
-        transform: translate(-50%, -50%) scale(0.9) !important;
-    }
-
-    #codice-cuerpo p {
-        font-size: 0.45rem !important;
-    }
-
-    #modal-boveda .btn-ritual-grimorio {
-        width: 85% !important;
-        font-size: 0.50rem !important;
     }
 }
