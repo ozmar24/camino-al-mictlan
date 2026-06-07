@@ -158,18 +158,25 @@ export default async function handler(req, res) {
         // ══════════════════════════════════════════════════════════════════════
         // LOGIN
         // ══════════════════════════════════════════════════════════════════════
-        if (accionReal === 'login') {
+              if (accionReal === 'login') {
             const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
-            // Mismo mensaje para usuario inexistente o contraseña incorrecta
-            // (evita enumeración de usuarios)
             if (!existeUsuario) {
                 await redisIncr(intentosKey);
-                await redisExpire(intentosKey, 900); // 15 minutos
+                await redisExpire(intentosKey, 900);
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
 
-            // ✅ Comparación segura con bcrypt
+            // ── PROTECCIÓN ANTES DE BCRYPT ──
+            // Si el usuario se registró con Google y no tiene contraseña en la BD
+            if (!usuario.password) {
+                return res.status(401).json({ 
+                    success: false, 
+                    error: 'Este espíritu se vinculó a través de Google. Usa el botón de Vinculación Rápida.' 
+                });
+            }
+
+            // ✅ Comparación segura con bcrypt (Ya no se romperá porque garantizamos que 'usuario.password' existe)
             const passwordValida = await bcrypt.compare(password, usuario.password);
 
             if (!passwordValida) {
@@ -177,6 +184,7 @@ export default async function handler(req, res) {
                 await redisExpire(intentosKey, 900);
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
+
 
             // Login exitoso — limpiar contador de intentos
             await fetch(`${cleanUrl}/del/${intentosKey}`, {
