@@ -1915,33 +1915,76 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     font-size: 0.7rem;
     display: block;
 }
-/* ── Ajuste móvil pergamino de leyes ─────────────────────── */
+/* ── Ajuste móvil pergamino ─────────────────────────────── */
 @media (max-width: 1024px) {
+
+    /* Contenedor principal — permite scroll */
+    #pantalla-codice {
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+        padding: 20px 10px !important;
+    }
+
+    /* Pergamino de leyes */
     #pantalla-codice .pergamino-quemado {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
         width: 95vw !important;
         height: auto !important;
-        min-height: 80vh !important;
-        padding: 80px 30px 60px 30px !important;
-        transform: translate(-50%, -50%) scale(0.95) !important;
+        min-height: auto !important;
+        margin: 10px auto !important;
+        padding: 80px 25px 60px 25px !important;
+        overflow: visible !important;
     }
 
-    #codice-cuerpo p {
-        font-size: 0.50rem !important;
-        width: 90% !important;
-        max-width: 100% !important;
-    }
-
-    #codice-titulo {
+    /* Títulos */
+    #codice-titulo,
+    #pantalla-codice h2 {
         font-size: 0.75rem !important;
+        margin-bottom: 10px !important;
     }
 
-    /* ── Bóveda separada ── */
+    /* Cuerpo general */
+    #codice-cuerpo {
+        font-size: 0.55rem !important;
+        line-height: 1.4 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Párrafos */
+    #pantalla-codice #codice-cuerpo p {
+        font-size: 0.45rem !important;
+        width: 95% !important;
+        max-width: 100% !important;
+        margin: 8px auto !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Links de leyes */
+    #pantalla-codice #codice-cuerpo span,
+    #pantalla-codice #codice-cuerpo span.link-ley {
+        font-size: 0.45rem !important;
+        letter-spacing: 1px !important;
+        margin: 4px auto !important;
+    }
+
+    /* Botones sub-ley */
+    .btn-subley {
+        font-size: 0.55rem !important;
+        padding: 8px 10px !important;
+    }
+
+    /* ── Bóveda ── */
     #modal-boveda .pergamino-quemado {
         width: 90vw !important;
         height: auto !important;
         min-height: 70vh !important;
         padding: 100px 25px 80px 25px !important;
         transform: translate(-50%, -50%) !important;
+        position: fixed !important;
     }
 
     #modal-boveda #boveda-cuerpo {
@@ -1967,62 +2010,31 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     #modal-boveda p {
         font-size: 0.55rem !important;
     }
-}
-#codice-titulo,
-    #pantalla-codice h2 {
-        font-size: 0.75rem !important;
-        margin-bottom: 10px !important;
+
+    /* ── Texto quema de tokens ── */
+    .contenedor-estado {
+        top: auto !important;
+        bottom: 10px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        text-align: center !important;
+        width: 90% !important;
+        z-index: 100 !important;
     }
 
-    #codice-cuerpo {
-        font-size: 0.55rem !important;
-        line-height: 1.4 !important;
-    }
-
-    #pantalla-codice #codice-cuerpo p {
-        font-size: 0.45rem !important;
-        width: 95% !important;
-        margin: 8px auto !important;
-        line-height: 1.4 !important;
-    }
-
-    #pantalla-codice #codice-cuerpo span,
-    #pantalla-codice #codice-cuerpo span.link-ley {
-        font-size: 0.45rem !important;
-        letter-spacing: 1px !important;
-        margin: 4px auto !important;
-    }
-
-    .btn-subley {
-        font-size: 0.55rem !important;
-        padding: 8px 10px !important;
-    }
-}
-@media (max-width: 1024px) {
-    /* ... lo que ya tienes ... */
-
-    #pantalla-codice .pergamino-quemado {
-        overflow-y: auto !important;
-        justify-content: flex-start !important;
-        padding-top: 60px !important;
-    }
-
-    #pantalla-codice #codice-cuerpo {
-        overflow-y: auto !important;
-        max-height: 55vh !important;
-        padding: 0 10px !important;
+    .texto-estado {
+        font-size: 8px !important;
     }
 }
 
 @media (max-width: 480px) {
     #pantalla-codice .pergamino-quemado {
         width: 98vw !important;
-        padding: 70px 20px 50px 20px !important;
-        transform: translate(-50%, -50%) scale(0.9) !important;
+        padding: 70px 15px 50px 15px !important;
     }
 
-    #codice-cuerpo p {
-        font-size: 0.45rem !important;
+    #pantalla-codice #codice-cuerpo p {
+        font-size: 0.40rem !important;
     }
 
     #modal-boveda .btn-ritual-grimorio {
