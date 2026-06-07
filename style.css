@@ -1916,7 +1916,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     display: block;
 }
 /* ── Ajuste móvil pergamino de leyes ─────────────────────── */
-@media (max-width: 620px) {
+@media (max-width: 864px) {
     #pantalla-codice .pergamino-quemado {
         width: 95vw !important;
         height: auto !important;
