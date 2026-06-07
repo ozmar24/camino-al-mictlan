@@ -945,31 +945,28 @@ async function manejarAuth() {
     const passwordEl = document.getElementById('password');
     const btnAuth = document.getElementById('btn-auth');
 
-    if (!emailEl || !passwordEl) {
-        lanzarAlertaMictlan("Los portales de texto no se manifestaron.", "ERROR CRÍTICO");
-        return;
-    }
+    if (!emailEl || !passwordEl || !btnAuth) return;
 
     const email = emailEl.value.trim();
     const password = passwordEl.value.trim();
 
     if (!email || !password) {
-        lanzarAlertaMictlan("Debes completar ambos campos del pacto.", "CAMPOS INCOMPLETOS");
+        lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
         return;
     }
 
     const accion = esModoRegistro ? 'registro' : 'login';
 
     if (accion === 'registro') {
-        const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
-        if (!regexPassword.test(password)) {
-            lanzarAlertaMictlan("La llave secreta es débil. Debe contener al menos 8 caracteres, mayúscula, minúscula y un símbolo.", "LLAVE INSEGURA");
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+        if (!regex.test(password)) {
+            lanzarAlertaMictlan("La contraseña debe tener 8+ caracteres, mayúscula, minúscula y símbolo.", "LLAVE DÉBIL");
             return;
         }
     }
 
     const textoOriginal = btnAuth.innerText;
-    btnAuth.innerText = "PROCESANDO PACTO...";
+    btnAuth.innerText = "PROCESANDO...";
     btnAuth.disabled = true;
 
     try {
@@ -979,37 +976,29 @@ async function manejarAuth() {
             body: JSON.stringify({ email, password, accion })
         });
 
-        let resultado;
-        try {
-            resultado = await respuesta.json();
-        } catch (e) {
-            // Si no es JSON, mostramos el error crudo
-            const textoError = await respuesta.text().catch(() => "Error desconocido del servidor");
-            console.error("Respuesta no JSON:", textoError);
-            throw new Error("El inframundo devolvió una respuesta inválida");
-        }
+        const resultado = await respuesta.json();
 
         if (!respuesta.ok || resultado.success === false) {
-            lanzarAlertaMictlan(resultado.error || "Pacto rechazado por el abismo.", "RITUAL RECHAZADO");
+            lanzarAlertaMictlan(resultado.error || "Pacto rechazado.", "RITUAL RECHAZADO");
             return;
         }
 
         if (accion === 'registro') {
-            lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
-            cambiarModoAuth();
+            lanzarAlertaMictlan("¡Pacto sellado! Ahora inicia sesión.", "ALMA REGISTRADA");
+            cambiarModoAuth();   // Cambia automáticamente a login
         } else {
+            // Login exitoso
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
 
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
-           
             await sincronizarBalanceConRedis();
             entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
         }
     } catch (error) {
         console.error("Error en manejarAuth:", error);
-        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu conexión.", "FALLO DE CONEXIÓN");
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE CONEXIÓN");
     } finally {
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;
