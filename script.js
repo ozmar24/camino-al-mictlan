@@ -972,31 +972,45 @@ async function manejarAuth() {
     btnAuth.innerText = "PROCESANDO PACTO...";
     btnAuth.disabled = true;
 
-  try {
-    const respuesta = await fetch('/api/pacto', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, accion })
-    });
-
-    let resultado;
     try {
-        resultado = await respuesta.json();
-    } catch (e) {
-        console.error("Respuesta no es JSON:", await respuesta.text());
-        throw new Error("El inframundo devolvió respuesta inválida");
-    }
+        const respuesta = await fetch('/api/pacto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, accion })
+        });
 
-    if (!respuesta.ok || resultado.success === false) {
-        lanzarAlertaMictlan(resultado.error || "Pacto rechazado por el abismo.", "RITUAL RECHAZADO");
-        return;
-    }
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (e) {
+            // Si no es JSON, mostramos el error crudo
+            const textoError = await respuesta.text().catch(() => "Error desconocido del servidor");
+            console.error("Respuesta no JSON:", textoError);
+            throw new Error("El inframundo devolvió una respuesta inválida");
+        }
 
-    // ... resto de tu código (registro / login exitoso)
-} catch (error) {
-    console.error("Error en manejarAuth:", error);
-    lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu conexión.", "FALLO DE CONEXIÓN");
-} finally {
+        if (!respuesta.ok || resultado.success === false) {
+            lanzarAlertaMictlan(resultado.error || "Pacto rechazado por el abismo.", "RITUAL RECHAZADO");
+            return;
+        }
+
+        if (accion === 'registro') {
+            lanzarAlertaMictlan("Pacto sellado con éxito. Ahora inicia sesión.", "ALMA REGISTRADA");
+            cambiarModoAuth();
+        } else {
+            window.userWallet = resultado.usuario.email;
+            localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
+            localStorage.setItem('usuario_email', resultado.usuario.email);
+
+            lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
+           
+            await sincronizarBalanceConRedis();
+            entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
+        }
+    } catch (error) {
+        console.error("Error en manejarAuth:", error);
+        lanzarAlertaMictlan("No se pudo conectar con el inframundo. Revisa tu conexión.", "FALLO DE CONEXIÓN");
+    } finally {
         btnAuth.innerText = textoOriginal;
         btnAuth.disabled = false;
     }
