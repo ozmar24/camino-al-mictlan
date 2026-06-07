@@ -138,8 +138,8 @@ export default async function handler(req, res) {
             });
         }
 
-        // ══════════════════════════════════════════════════════════════════════
-        // LOGIN
+                // ══════════════════════════════════════════════════════════════════════
+        // LOGIN DEFINITIVO SIN BLOQUEOS
         // ══════════════════════════════════════════════════════════════════════
         if (accionReal === 'login') {
             const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -150,12 +150,18 @@ export default async function handler(req, res) {
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
 
-            // ── PROTECCIÓN DEFINITIVA ANTES DE BCRYPT ──
-            if (!usuario.password && usuario.metodo !== 'manual') {
+            // ── NUEVA VALIDACIÓN COMPLETA PARA GOOGLE ──
+            // Solo rebota si explícitamente la base de datos dice que la cuenta fue creada con Google
+            if (usuario.metodo === 'google' || usuario.authProvider === 'google') {
                 return res.status(401).json({ 
                     success: false, 
                     error: 'Este espíritu se vinculó a través de Google. Usa el botón de Vinculación Rápida.' 
                 });
+            }
+
+            // Si por alguna razón extraña la contraseña sigue vacía en un usuario manual, lanzamos un error seguro
+            if (!usuario.password) {
+                return res.status(401).json({ success: false, error: 'Credenciales incorrectas o corruptas.' });
             }
 
             // ✅ Comparación mística segura con bcrypt
@@ -182,13 +188,3 @@ export default async function handler(req, res) {
             });
         }
 
-        return res.status(400).json({ success: false, error: 'Acción no válida.' });
-
-    } catch (error) {
-        console.error('Error crítico en pacto.js:', error);
-        return res.status(500).json({
-            success: false,
-            error: 'Error interno. Intenta de nuevo.'
-        });
-    }
-}
