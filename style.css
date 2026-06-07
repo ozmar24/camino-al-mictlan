@@ -1998,6 +1998,21 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         padding: 8px 10px !important;
     }
 }
+@media (max-width: 1024px) {
+    /* ... lo que ya tienes ... */
+
+    #pantalla-codice .pergamino-quemado {
+        overflow-y: auto !important;
+        justify-content: flex-start !important;
+        padding-top: 60px !important;
+    }
+
+    #pantalla-codice #codice-cuerpo {
+        overflow-y: auto !important;
+        max-height: 55vh !important;
+        padding: 0 10px !important;
+    }
+}
 
 @media (max-width: 480px) {
     #pantalla-codice .pergamino-quemado {
