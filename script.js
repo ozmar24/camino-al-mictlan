@@ -975,11 +975,11 @@ async function manejarAuth() {
     try {
                 
         const respuesta = await fetch('/api/pacto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            /* Cambiamos 'email' por 'correo: email' para que el backend lo reciba correctamente */
-            body: JSON.stringify({ correo: email, password, accion })
-        });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, accion }) // <── Enviamos 'email'
+});
+
 
 
         const resultado = await respuesta.json();
