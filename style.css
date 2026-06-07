@@ -1866,6 +1866,22 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     font-weight: bold;
     transition: all 0.3s ease;
 }
+/* ── Ajuste móvil texto quema de tokens ─────────────────────── */
+@media (max-width: 1024px) {
+    .contenedor-estado {
+        top: auto !important;
+        bottom: 10px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        text-align: center !important;
+        width: 90% !important;
+        z-index: 100 !important;
+    }
+
+    .texto-estado {
+        font-size: 8px !important;
+    }
+}
 .punto-activo {
     color: #ff0000;
     margin-right: 5px;
