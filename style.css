@@ -1922,7 +1922,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         height: auto !important;
         min-height: 80vh !important;
         padding: 70px 20px 50px 20px !important;
-        transform: translate(-50%, -50%) scale(0.85) !important;
+        transform: translate(-50%, -50%) scale(0.9) !important;
     }
 
     #codice-cuerpo p {
