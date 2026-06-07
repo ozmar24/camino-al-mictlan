@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
+        'https://vercel.app',
         'http://localhost:3000'
     ];
     const origin = req.headers.origin;
@@ -34,17 +34,27 @@ export default async function handler(req, res) {
 
     const cleanUrl = UPSTASH_REDIS_REST_URL.replace(/\/$/, '');
 
-    // ── Helpers Redis ──────────────────────────────────────────────────────────
+    // ── Helpers Redis Corregidos para la API REST de Upstash ───────────────────
     const redisGet = async (key) => {
         const r = await fetch(`${cleanUrl}/get/${key}`, {
             headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` }
         });
-        return r.json();
+        const data = await r.json();
+        
+        if (!data || data.result === null || data.result === undefined) return null;
+        
+        try {
+            return JSON.parse(data.result);
+        } catch (e) {
+            return data.result; 
+        }
     };
 
     const redisSet = async (key, value, exSeconds = null) => {
+        const stringValue = typeof value === 'object' ? JSON.stringify(value) : value;
+
         const url = exSeconds
-            ? `${cleanUrl}/set/${key}/${encodeURIComponent(value)}/EX/${exSeconds}`
+            ? `${cleanUrl}/set/${key}/${encodeURIComponent(stringValue)}/EX/${exSeconds}`
             : `${cleanUrl}/set/${key}`;
 
         const options = exSeconds
@@ -55,7 +65,7 @@ export default async function handler(req, res) {
                     Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(value)
+                body: JSON.stringify(stringValue)
               };
 
         return fetch(url, options).then(r => r.json());
@@ -101,7 +111,7 @@ export default async function handler(req, res) {
     if (accionReal === 'login') {
         const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
         const intentosRes = await redisGet(intentosKey);
-        const intentos = parseInt(intentosRes?.result || 0);
+        const intentos = parseInt(intentosRes || 0);
 
         if (intentos >= 5) {
             return res.status(429).json({
@@ -112,20 +122,8 @@ export default async function handler(req, res) {
     }
 
     try {
-        // ── Leer usuario existente ─────────────────────────────────────────────
-        const checkUser = await redisGet(userKey);
-        let usuario = null;
-
-        if (checkUser?.result) {
-            try {
-                usuario = typeof checkUser.result === 'string'
-                    ? JSON.parse(checkUser.result)
-                    : checkUser.result;
-            } catch (e) {
-                console.error('Error al parsear usuario:', e);
-            }
-        }
-
+        // ── Leer usuario existente (El helper ya lo parsea automáticamente) ────
+        const usuario = await redisGet(userKey);
         const existeUsuario = usuario !== null;
 
         // ══════════════════════════════════════════════════════════════════════
@@ -141,13 +139,14 @@ export default async function handler(req, res) {
 
             const nuevoUsuario = {
                 email: emailNormalizado,
-                password: passwordHash,               // hash, no texto plano
+                password: passwordHash,               
                 wallet: `wallet-temp-${Date.now()}`,
                 balance_soulgeist: '0',
-                creado_en: new Date().toISOString()
+                creado_en: new Date().toISOString(),
+                metodo: 'manual'                      
             };
 
-            await redisSet(userKey, JSON.stringify(nuevoUsuario));
+            await redisSet(userKey, nuevoUsuario);
 
             return res.status(200).json({
                 success: true,
@@ -158,7 +157,7 @@ export default async function handler(req, res) {
         // ══════════════════════════════════════════════════════════════════════
         // LOGIN
         // ══════════════════════════════════════════════════════════════════════
-              if (accionReal === 'login') {
+        if (accionReal === 'login') {
             const intentosKey = `login:intentos:${emailNormalizado.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
             if (!existeUsuario) {
@@ -167,16 +166,15 @@ export default async function handler(req, res) {
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
 
-            // ── PROTECCIÓN ANTES DE BCRYPT ──
-            // Si el usuario se registró con Google y no tiene contraseña en la BD
-            if (!usuario.password) {
+            // ── PROTECCIÓN DEFINITIVA ANTES DE BCRYPT ──
+            if (!usuario.password && usuario.metodo !== 'manual') {
                 return res.status(401).json({ 
                     success: false, 
                     error: 'Este espíritu se vinculó a través de Google. Usa el botón de Vinculación Rápida.' 
                 });
             }
 
-            // ✅ Comparación segura con bcrypt (Ya no se romperá porque garantizamos que 'usuario.password' existe)
+            // ✅ Comparación mística segura con bcrypt
             const passwordValida = await bcrypt.compare(password, usuario.password);
 
             if (!passwordValida) {
@@ -184,7 +182,6 @@ export default async function handler(req, res) {
                 await redisExpire(intentosKey, 900);
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
-
 
             // Login exitoso — limpiar contador de intentos
             await fetch(`${cleanUrl}/del/${intentosKey}`, {
