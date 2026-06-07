@@ -1916,13 +1916,13 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     display: block;
 }
 /* ── Ajuste móvil pergamino de leyes ─────────────────────── */
-@media (max-width: 864px) {
+@media (max-width: 720px) {
     #pantalla-codice .pergamino-quemado {
         width: 95vw !important;
         height: auto !important;
         min-height: 80vh !important;
         padding: 70px 20px 50px 20px !important;
-        transform: translate(-50%, -50%) scale(0.9) !important;
+        transform: translate(-50%, -50%) scale(0.95) !important;
     }
 
     #codice-cuerpo p {
