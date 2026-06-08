@@ -5,12 +5,10 @@ export default async function handler(req, res) {
     const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, "");
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
     
-    // 1. La LLAVE debe ser la misma que usas en pacto.js y obtener-balance.js
     const emailLimpio = wallet.toLowerCase().trim();
     const userKey = `usuario:${emailLimpio.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
     try {
-        // 2. OBTENER EL OBJETO DEL USUARIO
         const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
             headers: { Authorization: `Bearer ${redisToken}` }
         });
@@ -19,23 +17,28 @@ export default async function handler(req, res) {
 
         if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-        // 3. LÓGICA DE SUMA (Vídeo)
-	console.log("Recibido - Acción:", accion, "Wallet/Email:", wallet);
+        console.log("Procesando acción:", accion);
+
+        // LÓGICA DE SUMA
         if (accion === 'sumar_ritual') {
-            const balanceActual = parseFloat(usuario.balance_soulgeist || 0);
-            usuario.balance_soulgeist = balanceActual + 10; // Sumamos 10 al total real
-
-            // 4. GUARDAR EL OBJETO COMPLETO ACTUALIZADO
-            await fetch(`${redisUrl}/set/${userKey}`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(usuario)
-            });
-
-            return res.status(200).json({ success: true, nuevoBalance: usuario.balance_soulgeist });
+            usuario.balance_soulgeist = parseFloat(usuario.balance_soulgeist || 0) + 10;
+        } 
+        // LÓGICA DE DESCUENTO
+        else if (accion === 'descontar_ritual') {
+            usuario.balance_soulgeist = parseFloat(usuario.balance_soulgeist || 0) - 10;
+        } 
+        else {
+            return res.status(400).json({ error: 'Acción no reconocida' });
         }
 
-        return res.status(400).json({ error: 'Acción no reconocida' });
+        // GUARDAR EL OBJETO COMPLETO ACTUALIZADO (se hace una sola vez para ambas acciones)
+        await fetch(`${redisUrl}/set/${userKey}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(usuario)
+        });
+
+        return res.status(200).json({ success: true, nuevoBalance: usuario.balance_soulgeist });
 
     } catch (e) {
         console.error("Error en acumular-sg:", e);
