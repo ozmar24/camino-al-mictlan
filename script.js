@@ -991,7 +991,6 @@ async function manejarAuth() {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
-	    console.log("Balance recibido del servidor:", resultado.usuario.balance);
 
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
@@ -1022,13 +1021,6 @@ async function manejarLoginGoogle(response) {
         if (res.ok && datos.success) {
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
-	
-	    // 1. Actualizamos nuestra variable global de balance con lo que devolvió el servidor
-            balanceUsuarioSG = datos.perfil.balanceSG; 
-
-            // 2. Refrescamos la barra de progreso inmediatamente 
-            // para que si el contador subió, el usuario vea el cambio
-            await syncContador();
 
             await sincronizarBalanceConRedis();
             entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
@@ -1915,16 +1907,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Persistencia del usuario en el Inframundo
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
-if (usuarioGuardado) {
-    window.userWallet = usuarioGuardado;
-    
-    // Primero sincroniza con el servidor
-    sincronizarBalanceConRedis().then((balanceReal) => {
-        // Ahora sí, entra al Campo Santo con el dato real traído de Redis
+    if (usuarioGuardado) {
+        window.userWallet = usuarioGuardado;
+        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: balanceReal }); 
+            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
         }
-    });
+    }
+});
 
 // Aceptamos 'pos' como parámetro
 // ÚNICA VERSIÓN DE lanzarAlma
@@ -2106,7 +2096,6 @@ async function sincronizarBalanceConRedis() {
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance) || 0;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-	    actualizarBalanceSoulgeist(balanceUsuarioSG);
             return balanceUsuarioSG;
         }
     } catch (e) {
@@ -2392,8 +2381,8 @@ async function actualizarTransparencia() {
 
 // Ejecutar automáticamente
 window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1880);
-    syncContador();
+    setTimeout(actualizarTransparencia, 1800);
+syncContador();
 });
 
 
@@ -2499,28 +2488,44 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         }
     }
 }
-async function syncContador() {
+async function actualizarBarraProgreso() {
     try {
-        // Hacemos el POST a tu archivo pacto.js con la acción correcta
-        const response = await fetch('/api/pacto', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accion: 'estado_pacto' })
-        });
-        
-        const data = await response.json();
+        const res = await fetch('/api/estado-pacto');
+        const data = await res.json();
         
         const barra = document.getElementById('barra-progreso');
-        // Usamos un selector más específico si es necesario, o document.querySelector('p')
-        const texto = document.querySelector('p[style*="font-family"]') || document.querySelector('p'); 
+        const texto = document.querySelector('p[style*="font-family"]'); // Selecciona tu párrafo
         
-        // Calcular porcentaje con límite de 100%
-        const porcentaje = Math.min((data.actual / data.limite) * 100, 100);
+        // Calcular porcentaje
+        const porcentaje = (data.actual / data.limite) * 100;
         barra.style.width = porcentaje + "%";
         
         if (data.actual >= 50) {
             texto.innerText = "PACTO FUNDADOR CERRADO";
-            barra.style.background = "#4a0000"; // Tu toque de diseño
+            barra.style.background = "#4a0000"; // Cambia el color a un rojo más oscuro o gris
+        } else {
+            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+        }
+    } catch (e) {
+        console.error("Error al sincronizar con el inframundo");
+    }
+}
+
+// Ejecutar al cargar la página
+actualizarBarraProgreso();
+
+async function syncContador() {
+    try {
+        const response = await fetch('/api/estado-pacto');
+        const data = await response.json();
+        
+        // data.actual viene de tu nuevo endpoint
+        const porcentaje = Math.min((data.actual / data.limite) * 100, 100);
+        document.getElementById('barra-progreso').style.width = porcentaje + "%";
+        
+        const texto = document.querySelector('p'); // Ajusta el selector si tienes varios <p>
+        if (data.actual >= 50) {
+            texto.innerText = "PACTO FUNDADOR CERRADO";
         } else {
             texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
         }
