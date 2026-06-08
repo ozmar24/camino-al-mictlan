@@ -1,59 +1,145 @@
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-let balanceSG = 0;
+// api/auth-google.js
+// REQUIERE: npm install google-auth-library
+import { OAuth2Client } from 'google-auth-library';
 
-if (redisUrl && redisToken) {
+export default async function handler(req, res) {
+
+    // ── CORS dinámico ──────────────────────────────────────────────────────────
+    const ORIGENES_PERMITIDOS = [
+        'https://camino-al-mictlan.vercel.app',
+        'http://localhost:3000'
+    ];
+    const origin = req.headers.origin;
+    if (ORIGENES_PERMITIDOS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Método no permitido.' });
+    }
+
+    // ── Validar variable de entorno ────────────────────────────────────────────
+    // ✅ Client ID en variable de entorno, nunca hardcodeado en el código
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    if (!GOOGLE_CLIENT_ID) {
+        console.error('Falta GOOGLE_CLIENT_ID en las variables de entorno de Vercel.');
+        return res.status(500).json({ success: false, error: 'Configuración del servidor incompleta.' });
+    }
+
+    // ── Extraer y validar token ────────────────────────────────────────────────
+    let token;
     try {
-        // ✅ Misma llave que pacto.js y obtener-balance.js
-        const userKey = `usuario:${emailUsuario.toLowerCase().trim().replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
-        
-        const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        token = body?.token;
+    } catch {
+        return res.status(400).json({ success: false, error: 'Cuerpo de la petición inválido.' });
+    }
+
+    if (!token || typeof token !== 'string' || token.trim().length === 0) {
+        return res.status(400).json({ success: false, error: 'El token místico está ausente.' });
+    }
+
+    // ── Verificar token con Google ─────────────────────────────────────────────
+    try {
+        const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+        const ticket = await client.verifyIdToken({
+            idToken:  token,
+            audience: GOOGLE_CLIENT_ID,
         });
-        const getData = await getRes.json();
+
+        const payload = ticket.getPayload();
+
+        // Verificar que el token no esté expirado (Google lo verifica,
+        // pero lo validamos explícitamente como capa extra)
+        const ahora = Math.floor(Date.now() / 1000);
+        if (payload.exp < ahora) {
+            return res.status(401).json({ success: false, error: 'El token ha expirado. Vuelve a iniciar sesión.' });
+        }
+
+        // ✅ Datos garantizados por Google — no vienen del cliente
+        const emailUsuario  = payload.email;
+        const nombreUsuario = payload.name;
+        const emailVerified = payload.email_verified;
+
+        // Solo aceptar emails verificados por Google
+        if (!emailVerified) {
+            return res.status(401).json({ success: false, error: 'El email de Google no está verificado.' });
+        }
+
+        // ── Consultar balance en Redis ─────────────────────────────────────────
+        const redisUrl   = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
+        const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+        let balanceSG = 0;
+
+        if (redisUrl && redisToken) {
+            try {
+                const balanceKey = `user:balance:${emailUsuario.toLowerCase().trim()}`;
+                const balanceRes = await fetch(`${redisUrl}`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${redisToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(['GET', balanceKey])
+                }).then(r => r.json());
+
+                balanceSG = parseInt(balanceRes?.result || 0);
+if (balanceSG === 0) {
+    const resContador = await fetch(`${redisUrl}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(['GET', 'contador_almas'])
+    }).then(r => r.json());
+    
+    const cuentaActual = parseInt(resContador?.result || 0);
+
+    if (cuentaActual < 50) {
+        // Le damos el bono
+        balanceSG = 1000;
         
-        let usuario = null;
-        if (getData.result) {
-            usuario = typeof getData.result === 'string' ? JSON.parse(getData.result) : getData.result;
+        // Guardamos el nuevo balance en Redis
+        await fetch(`${redisUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(['SET', balanceKey, balanceSG])
+        });
+
+        // Incrementamos el contador
+        await fetch(`${redisUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(['INCR', 'contador_almas'])
+        });
+    }
+}
+            } catch (redisError) {
+                // Si Redis falla, no bloqueamos el login — solo el balance queda en 0
+                console.error('Error consultando balance en Redis:', redisError);
+            }
         }
 
-        if (!usuario) {
-            // Usuario nuevo — verificar bono de fundador
-            const resContador = await fetch(`${redisUrl}/get/contador_almas`, {
-                headers: { Authorization: `Bearer ${redisToken}` }
-            });
-            const dataContador = await resContador.json();
-            const cuentaActual = parseInt(dataContador?.result || 0);
-            balanceSG = cuentaActual < 50 ? 1000 : 0;
+        return res.status(200).json({
+            success: true,
+            perfil: {
+                email:      emailUsuario,
+                nombre:     nombreUsuario,
+                balanceSG
+            }
+        });
 
-            // Crear usuario en Redis con la misma estructura que pacto.js
-            const nuevoUsuario = {
-                email: emailUsuario.toLowerCase(),
-                password: null,
-                balance_soulgeist: balanceSG,
-                creado_en: new Date().toISOString(),
-                metodo: 'google',
-                nombre: nombreUsuario
-            };
-
-            await fetch(`${redisUrl}/set/${userKey}`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevoUsuario)
-            });
-
-            // Incrementar contador
-            await fetch(`${redisUrl}/incr/contador_almas`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${redisToken}` }
-            });
-
-        } else {
-            // Usuario existente — leer su balance
-            balanceSG = parseFloat(usuario.balance_soulgeist || 0);
-        }
-
-    } catch (redisError) {
-        console.error('Error en Redis:', redisError);
+    } catch (error) {
+        // Google lanza error si el token es inválido, manipulado o de otro proyecto
+        console.error('Error validando token de Google:', error.message);
+        return res.status(401).json({
+            success: false,
+            error: 'El inframundo rechazó la validación del token.'
+        });
     }
 }
