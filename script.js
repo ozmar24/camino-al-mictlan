@@ -2487,3 +2487,28 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         }
     }
 }
+async function actualizarBarraProgreso() {
+    try {
+        const res = await fetch('/api/estado-pacto');
+        const data = await res.json();
+        
+        const barra = document.getElementById('barra-progreso');
+        const texto = document.querySelector('p[style*="font-family"]'); // Selecciona tu párrafo
+        
+        // Calcular porcentaje
+        const porcentaje = (data.actual / data.limite) * 100;
+        barra.style.width = porcentaje + "%";
+        
+        if (data.actual >= 50) {
+            texto.innerText = "PACTO FUNDADOR CERRADO";
+            barra.style.background = "#4a0000"; // Cambia el color a un rojo más oscuro o gris
+        } else {
+            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+        }
+    } catch (e) {
+        console.error("Error al sincronizar con el inframundo");
+    }
+}
+
+// Ejecutar al cargar la página
+actualizarBarraProgreso();
