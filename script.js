@@ -1914,6 +1914,10 @@ document.addEventListener("DOMContentLoaded", () => {
             entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
         }
     }
+// Añade esto al final de tu bloque document.addEventListener("DOMContentLoaded", () => { ... });
+	if (document.getElementById('barra-progreso')) {
+        actualizarBarraProgreso();
+    }
 });
 
 // Aceptamos 'pos' como parámetro
@@ -2489,7 +2493,7 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
 }
 async function actualizarBarraProgreso() {
     try {
-        const res = await fetch('/api/estado-pacto');
+        const res = await fetch('/api/pacto');
         const data = await res.json();
         
         const barra = document.getElementById('barra-progreso');
@@ -2509,6 +2513,3 @@ async function actualizarBarraProgreso() {
         console.error("Error al sincronizar con el inframundo");
     }
 }
-
-// Ejecutar al cargar la página
-actualizarBarraProgreso();
