@@ -105,12 +105,17 @@ if (redisUrl && redisToken) {
                 fecha_registro: new Date().toISOString()
             };
 
-            // Guardamos el objeto
-            await fetch(`${redisUrl}/set/${userKey}`, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(usuario)
-            });
+            
+            // Cambia tu bloque de "Guardar el objeto" por este:
+await fetch(`${redisUrl}`, {
+    method: 'POST',
+    headers: { 
+        Authorization: `Bearer ${redisToken}`, 
+        'Content-Type': 'application/json' 
+    },
+    // Esto es lo que la API REST de Upstash espera: ["COMANDO", "LLAVE", "VALOR"]
+    body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
+});
 
             // Incrementamos el contador si es usuario nuevo
             if (cuentaActual < 50) {
