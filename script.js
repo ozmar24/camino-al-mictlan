@@ -2527,6 +2527,6 @@ async function syncContador() {
 
 // Ejecutar automáticamente
 window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1800);
-syncContador();
+    setTimeout(actualizarTransparencia, 1880);
+    syncContador();
 });
