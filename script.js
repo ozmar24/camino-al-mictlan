@@ -2528,4 +2528,3 @@ async function syncContador() {
         console.error("Error al sincronizar con el inframundo:", err);
     }
 }
-
