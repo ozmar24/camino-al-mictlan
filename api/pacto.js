@@ -12,6 +12,17 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Método no permitido' });
 
     const { email, password, accion } = req.body || {};
+if (accion === 'estado_pacto') {
+        const respuesta = await fetch(`${cleanUrl}/get/contador_almas`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const total = await respuesta.json();
+        return res.status(200).json({ 
+            actual: parseInt(total?.result || 0), 
+            limite: 50 
+        });
+    }
     if (!email || !password || !accion) {
         return res.status(400).json({ success: false, error: 'Faltan email, password o acción' });
     }
