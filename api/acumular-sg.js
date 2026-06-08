@@ -20,6 +20,7 @@ export default async function handler(req, res) {
         if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
 
         // 3. LÓGICA DE SUMA (Vídeo)
+	console.log("Recibido - Acción:", accion, "Wallet/Email:", wallet);
         if (accion === 'sumar_ritual') {
             const balanceActual = parseFloat(usuario.balance_soulgeist || 0);
             usuario.balance_soulgeist = balanceActual + 10; // Sumamos 10 al total real
