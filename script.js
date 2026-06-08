@@ -1047,19 +1047,14 @@ function entrarAlCampoSanto(perfil = {}) {
 
     // Carga fuerte
     if (perfil && perfil.balanceSG !== undefined) {
-        window.balanceUsuarioSG = parseFloat(perfil.balanceSG);
-    } else {
-        // Fallback: solo si no hay perfil, intenta usar localStorage
-        window.balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
     }
 
-    // Guardamos la versión "verdadera" en localStorage
-    localStorage.setItem('soulgeist_balance', window.balanceUsuarioSG);
-    
-    console.log("=== BALANCE FINAL AL ENTRAR (VERIFICADO) ===", window.balanceUsuarioSG);
+    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+    console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
 
-    actualizarBalanceSoulgeist(window.balanceUsuarioSG);
-    cargarSaldosCriptas();
+    actualizarBalanceSoulgeist(balanceUsuarioSG);
+cargarSaldosCriptas();
     generarCementerio();
 }
 
@@ -1914,13 +1909,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        sincronizarBalanceConRedis().then((balanceReal) => {
-        // Solo ahora entramos al juego con el balance correcto
+        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: balanceReal }); 
+            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
         }
-    });
-}
+    }
+});
 
 // Aceptamos 'pos' como parámetro
 // ÚNICA VERSIÓN DE lanzarAlma
@@ -2177,7 +2171,6 @@ function guardarSaldosCriptas() {
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
     console.log(`💾 Guardado criptas para ${window.userWallet}`);
 }
-
 function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)
     localStorage.removeItem('soulgeist_user_email');
@@ -2389,7 +2382,6 @@ async function actualizarTransparencia() {
 // Ejecutar automáticamente
 window.addEventListener('load', () => {
     setTimeout(actualizarTransparencia, 1800);
-syncContador();
 });
 
 
@@ -2493,50 +2485,5 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
             btn.innerText = "💰 RETIRAR A BILLETERA";
             btn.disabled = false;
         }
-    }
-}
-async function actualizarBarraProgreso() {
-    try {
-        const res = await fetch('/api/estado-pacto');
-        const data = await res.json();
-        
-        const barra = document.getElementById('barra-progreso');
-        const texto = document.querySelector('p[style*="font-family"]'); // Selecciona tu párrafo
-        
-        // Calcular porcentaje
-        const porcentaje = (data.actual / data.limite) * 100;
-        barra.style.width = porcentaje + "%";
-        
-        if (data.actual >= 50) {
-            texto.innerText = "PACTO FUNDADOR CERRADO";
-            barra.style.background = "#4a0000"; // Cambia el color a un rojo más oscuro o gris
-        } else {
-            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
-        }
-    } catch (e) {
-        console.error("Error al sincronizar con el inframundo");
-    }
-}
-
-// Ejecutar al cargar la página
-actualizarBarraProgreso();
-
-async function syncContador() {
-    try {
-        const response = await fetch('/api/pacto');
-        const data = await response.json();
-        
-        // data.actual viene de tu nuevo endpoint
-        const porcentaje = Math.min((data.actual / data.limite) * 100, 100);
-        document.getElementById('barra-progreso').style.width = porcentaje + "%";
-        
-        const texto = document.querySelector('p'); // Ajusta el selector si tienes varios <p>
-        if (data.actual >= 50) {
-            texto.innerText = "PACTO FUNDADOR CERRADO";
-        } else {
-            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
-        }
-    } catch (err) {
-        console.error("Error al sincronizar con el inframundo:", err);
     }
 }
