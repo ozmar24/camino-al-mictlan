@@ -1924,8 +1924,7 @@ if (usuarioGuardado) {
         if (typeof entrarAlCampoSanto === 'function') {
             entrarAlCampoSanto({ balanceSG: balanceReal }); 
         }
-    }
-});
+    });
 
 // Aceptamos 'pos' como parámetro
 // ÚNICA VERSIÓN DE lanzarAlma
