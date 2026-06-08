@@ -1047,14 +1047,19 @@ function entrarAlCampoSanto(perfil = {}) {
 
     // Carga fuerte
     if (perfil && perfil.balanceSG !== undefined) {
-        balanceUsuarioSG = parseFloat(perfil.balanceSG) || 0;
+        window.balanceUsuarioSG = parseFloat(perfil.balanceSG);
+    } else {
+        // Fallback: solo si no hay perfil, intenta usar localStorage
+        window.balanceUsuarioSG = parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
     }
 
-    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-    console.log("=== BALANCE FINAL AL ENTRAR ===", balanceUsuarioSG);
+    // Guardamos la versión "verdadera" en localStorage
+    localStorage.setItem('soulgeist_balance', window.balanceUsuarioSG);
+    
+    console.log("=== BALANCE FINAL AL ENTRAR (VERIFICADO) ===", window.balanceUsuarioSG);
 
-    actualizarBalanceSoulgeist(balanceUsuarioSG);
-cargarSaldosCriptas();
+    actualizarBalanceSoulgeist(window.balanceUsuarioSG);
+    cargarSaldosCriptas();
     generarCementerio();
 }
 
@@ -1909,12 +1914,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
+        sincronizarBalanceConRedis().then((balanceReal) => {
+        // Solo ahora entramos al juego con el balance correcto
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
+            entrarAlCampoSanto({ balanceSG: balanceReal }); 
         }
-    }
-});
+    });
+}
 
 // Aceptamos 'pos' como parámetro
 // ÚNICA VERSIÓN DE lanzarAlma
@@ -2171,6 +2177,7 @@ function guardarSaldosCriptas() {
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
     console.log(`💾 Guardado criptas para ${window.userWallet}`);
 }
+
 function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)
     localStorage.removeItem('soulgeist_user_email');
@@ -2516,7 +2523,7 @@ actualizarBarraProgreso();
 
 async function syncContador() {
     try {
-        const response = await fetch('/api/estado-pacto');
+        const response = await fetch('/api/pacto');
         const data = await response.json();
         
         // data.actual viene de tu nuevo endpoint

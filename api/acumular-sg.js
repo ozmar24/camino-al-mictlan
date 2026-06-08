@@ -1,95 +1,43 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método no permitido' });
-    }
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-    const { wallet, nuevoBalance, accion } = req.body;
-   
-    const rawIp = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
-    const ipLimpia = rawIp.split(',')[0].trim() || req.socket.remoteAddress || '127.0.0.1';
-
-    if (!wallet) {
-        return res.status(400).json({ error: 'Falta la credencial del alma (wallet).' });
-    }
-
-    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const { wallet, accion } = req.body;
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, "");
     const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-    const cleanUrl = redisUrl?.replace(/\/$/, "");
-    const balanceKey = `user:balance:${wallet}`;
-
-    // ====================== DESCONTAR RITUAL (FORMA DIRECTA A URL) ======================
-    if (accion === 'descontar_ritual') {
-        if (typeof nuevoBalance === 'undefined') {
-            return res.status(400).json({ error: 'Falta el nuevo balance.' });
-        }
-        try {
-            // CONSTRUIMOS EL COMANDO EN LA URL: /set/llave/valor
-            // Esto evita enviar cualquier JSON que esté causando el 400
-            const urlRedis = `${cleanUrl}/set/${balanceKey}/${nuevoBalance}`;
-            
-            const response = await fetch(urlRedis, {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${redisToken}`
-                }
-            });
-
-            const data = await response.json();
-
-            // Si Upstash devuelve un error, lo veremos en el log
-            if (data.error) {
-                console.error("Upstash rechazó el comando:", data.error);
-                return res.status(500).json({ error: "Redis rechazó el cambio: " + data.error });
-            }
-
-            return res.status(200).json({ success: true, nuevoBalance: nuevoBalance });
-            
-        } catch (error) {
-            console.error("Error crítico en la comunicación con Redis:", error);
-            return res.status(500).json({ error: "No se pudo contactar con el Inframundo." });
-        }
-    }
-
-    // ====================== ACUMULAR VIDEO ======================
-    const cooldownKey = `user:cooldown:video:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    const TIEMPO_ESPERA_VIDEO = 60;
-    const RECOMPENSA_SG = 10;
+    
+    // 1. La LLAVE debe ser la misma que usas en pacto.js y obtener-balance.js
+    const emailLimpio = wallet.toLowerCase().trim();
+    const userKey = `usuario:${emailLimpio.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
     try {
-        const checkCooldown = await fetch(`${cleanUrl}/get/${cooldownKey}`, {
+        // 2. OBTENER EL OBJETO DEL USUARIO
+        const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
             headers: { Authorization: `Bearer ${redisToken}` }
-        }).then(r => r.json());
+        });
+        const data = await getRes.json();
+        let usuario = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
 
-        if (checkCooldown && checkCooldown.result) {
-            const ttlRes = await fetch(`${cleanUrl}/ttl/${cooldownKey}`, {
-                headers: { Authorization: `Bearer ${redisToken}` }
-            }).then(r => r.json());
-           
-            return res.status(429).json({ 
-                error: `Los ancestros exigen paciencia. Podrás absorber más en ${ttlRes.result} segundos.` 
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        // 3. LÓGICA DE SUMA (Vídeo)
+        if (!accion || accion === 'sumar_ritual' || accion === 'acumular_video') {
+            const balanceActual = parseFloat(usuario.balance_soulgeist || 0);
+            usuario.balance_soulgeist = balanceActual + 10; // Sumamos 10 al total real
+
+            // 4. GUARDAR EL OBJETO COMPLETO ACTUALIZADO
+            await fetch(`${redisUrl}/set/${userKey}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(usuario)
             });
+
+            return res.status(200).json({ success: true, nuevoBalance: usuario.balance_soulgeist });
         }
 
-        await fetch(`${cleanUrl}/incrby/${balanceKey}/${RECOMPENSA_SG}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
-
-        await fetch(`${cleanUrl}/set/${cooldownKey}/bloqueado/EX/${TIEMPO_ESPERA_VIDEO}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        });
-
-        const resNuevoBalance = await fetch(`${cleanUrl}/get/${balanceKey}`, { 
-            headers: { Authorization: `Bearer ${redisToken}` } 
-        }).then(r => r.json());
-
-        return res.status(200).json({
-            success: true,
-            mensaje: `Has absorbido +${RECOMPENSA_SG} SG.`,
-            nuevoBalance: parseInt(resNuevoBalance.result || 0, 10)
-        });
+        return res.status(400).json({ error: 'Acción no reconocida' });
 
     } catch (e) {
-        console.error("Error acumulando SG:", e);
-        return res.status(500).json({ error: "Error en las criptas de Upstash." });
+        console.error("Error en acumular-sg:", e);
+        return res.status(500).json({ error: "Error en las criptas." });
     }
 }
