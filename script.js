@@ -1915,11 +1915,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Persistencia del usuario en el Inframundo
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
-    if (usuarioGuardado) {
-        window.userWallet = usuarioGuardado;
-        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
+if (usuarioGuardado) {
+    window.userWallet = usuarioGuardado;
+    
+    // Primero sincroniza con el servidor
+    sincronizarBalanceConRedis().then((balanceReal) => {
+        // Ahora sí, entra al Campo Santo con el dato real traído de Redis
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
+            entrarAlCampoSanto({ balanceSG: balanceReal }); 
         }
     }
 });
@@ -2104,6 +2107,7 @@ async function sincronizarBalanceConRedis() {
         if (data.balance !== undefined) {
             balanceUsuarioSG = parseFloat(data.balance) || 0;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+	    actualizarBalanceSoulgeist(balanceUsuarioSG);
             return balanceUsuarioSG;
         }
     } catch (e) {
