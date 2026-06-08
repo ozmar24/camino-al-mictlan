@@ -1585,7 +1585,7 @@ async function videoCompletado() {
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wallet: window.userWallet })
+            body: JSON.stringify({ wallet: window.userWallet, accion: 'sumar_ritual' })
         });
 
         const resultado = await respuesta.json();
@@ -2492,33 +2492,34 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
     }
 }
 async function actualizarBarraProgreso() {
-    // 1. Escudo de seguridad (para evitar el error de "Cannot read properties of null")
     const barra = document.getElementById('barra-progreso');
     const texto = document.querySelector('p[style*="font-family"]');
-    
     if (!barra || !texto) return;
 
     try {
-        // 2. CAMBIO CRÍTICO: Usamos POST y enviamos la acción que espera tu pacto.js
         const res = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accion: 'estado_pacto' }) 
+            body: JSON.stringify({ accion: 'estado_pacto' })
         });
         
+        // Si el servidor responde con error, salimos suavemente
+        if (!res.ok) {
+            console.warn("El inframundo no responde correctamente:", res.status);
+            return;
+        }
+
         const data = await res.json();
         
-        // 3. Lógica de visualización
-        const porcentaje = (data.actual / data.limite) * 100;
-        barra.style.width = porcentaje + "%";
-        
-        if (data.actual >= 50) {
-            texto.innerText = "PACTO FUNDADOR CERRADO";
-            barra.style.background = "#4a0000";
-        } else {
-            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+        // Verificamos que 'data' tenga lo necesario
+        if (data && typeof data.actual !== 'undefined') {
+            const porcentaje = (data.actual / data.limite) * 100;
+            barra.style.width = porcentaje + "%";
+            texto.innerText = data.actual >= 50 
+                ? "PACTO FUNDADOR CERRADO" 
+                : `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
         }
     } catch (e) {
-        console.error("Error al sincronizar con el inframundo", e);
+        console.error("Fallo de conexión:", e);
     }
 }
