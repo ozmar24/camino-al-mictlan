@@ -77,7 +77,13 @@ export default async function handler(req, res) {
         }
 
         return res.status(400).json({ success: false, error: 'Acción inválida' });
-    } catch (error) {
-        return res.status(500).json({ success: false, error: 'Error interno del inframundo.' });
+    // ... dentro de pacto.js, al final del catch
+} catch (error) {
+        console.error("Error crítico:", error);
+        // CAMBIO: Asegúrate de devolver un objeto, no un string
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Error interno del inframundo.' 
+        });
     }
 }

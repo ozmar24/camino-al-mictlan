@@ -2492,24 +2492,33 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
     }
 }
 async function actualizarBarraProgreso() {
+    // 1. Escudo de seguridad (para evitar el error de "Cannot read properties of null")
+    const barra = document.getElementById('barra-progreso');
+    const texto = document.querySelector('p[style*="font-family"]');
+    
+    if (!barra || !texto) return;
+
     try {
-        const res = await fetch('/api/pacto');
+        // 2. CAMBIO CRÍTICO: Usamos POST y enviamos la acción que espera tu pacto.js
+        const res = await fetch('/api/pacto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: 'estado_pacto' }) 
+        });
+        
         const data = await res.json();
         
-        const barra = document.getElementById('barra-progreso');
-        const texto = document.querySelector('p[style*="font-family"]'); // Selecciona tu párrafo
-        
-        // Calcular porcentaje
+        // 3. Lógica de visualización
         const porcentaje = (data.actual / data.limite) * 100;
         barra.style.width = porcentaje + "%";
         
         if (data.actual >= 50) {
             texto.innerText = "PACTO FUNDADOR CERRADO";
-            barra.style.background = "#4a0000"; // Cambia el color a un rojo más oscuro o gris
+            barra.style.background = "#4a0000";
         } else {
             texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
         }
     } catch (e) {
-        console.error("Error al sincronizar con el inframundo");
+        console.error("Error al sincronizar con el inframundo", e);
     }
 }
