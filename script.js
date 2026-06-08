@@ -991,6 +991,7 @@ async function manejarAuth() {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             localStorage.setItem('usuario_email', resultado.usuario.email);
+	    console.log("Balance recibido del servidor:", resultado.usuario.balance);
 
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
