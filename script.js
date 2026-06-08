@@ -2390,7 +2390,11 @@ async function actualizarTransparencia() {
     }
 }
 
-
+// Ejecutar automáticamente
+window.addEventListener('load', () => {
+    setTimeout(actualizarTransparencia, 1880);
+    syncContador();
+});
 
 
 async function verificarSaludGas(walletAdmin, provider) {
@@ -2525,8 +2529,3 @@ async function syncContador() {
     }
 }
 
-// Ejecutar automáticamente
-window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1880);
-    syncContador();
-});
