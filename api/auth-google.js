@@ -72,74 +72,65 @@ export default async function handler(req, res) {
             return res.status(401).json({ success: false, error: 'El email de Google no está verificado.' });
         }
 
-        // ── Consultar balance en Redis ─────────────────────────────────────────
-        const redisUrl   = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
-        const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+        // ── Consultar y unificar balance en Redis ────────────────────────────────────
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-        let balanceSG = 0;
+let balanceSG = 0;
 
-        if (redisUrl && redisToken) {
-            try {
-                const balanceKey = `user:balance:${emailUsuario.toLowerCase().trim()}`;
-                const balanceRes = await fetch(`${redisUrl}`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${redisToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(['GET', balanceKey])
-                }).then(r => r.json());
+if (redisUrl && redisToken) {
+    try {
+        // 1. Usamos la llave unificada "usuario:email"
+        const emailLimpio = emailUsuario.toLowerCase().trim();
+        const userKey = `usuario:${emailLimpio.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
-                balanceSG = parseInt(balanceRes?.result || 0);
-if (balanceSG === 0) {
-    const resContador = await fetch(`${redisUrl}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(['GET', 'contador_almas'])
-    }).then(r => r.json());
-    
-    const cuentaActual = parseInt(resContador?.result || 0);
+        // 2. Obtenemos el objeto completo
+        const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
+            headers: { Authorization: `Bearer ${redisToken}` }
+        }).then(r => r.json());
 
-    if (cuentaActual < 50) {
-        // Le damos el bono
-        balanceSG = 1000;
-        
-        // Guardamos el nuevo balance en Redis
-        await fetch(`${redisUrl}`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(['SET', balanceKey, balanceSG])
-        });
+        let usuario = getRes.result ? JSON.parse(getRes.result) : null;
 
-        // Incrementamos el contador
-        await fetch(`${redisUrl}`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(['INCR', 'contador_almas'])
-        });
-    }
-}
-            } catch (redisError) {
-                // Si Redis falla, no bloqueamos el login — solo el balance queda en 0
-                console.error('Error consultando balance en Redis:', redisError);
+        // 3. Si el usuario no existe, lo inicializamos
+        if (!usuario) {
+            const resContador = await fetch(`${redisUrl}/get/contador_almas`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            }).then(r => r.json());
+
+            const cuentaActual = parseInt(resContador?.result || 0);
+
+            usuario = {
+                email: emailUsuario,
+                balance_soulgeist: (cuentaActual < 50) ? 1000 : 0,
+                fecha_registro: new Date().toISOString()
+            };
+
+            // Guardamos el objeto
+            await fetch(`${redisUrl}/set/${userKey}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(usuario)
+            });
+
+            // Incrementamos el contador si es usuario nuevo
+            if (cuentaActual < 50) {
+                await fetch(`${redisUrl}/incr/contador_almas`, {
+                    headers: { Authorization: `Bearer ${redisToken}` }
+                });
             }
         }
-
-        return res.status(200).json({
-            success: true,
-            perfil: {
-                email:      emailUsuario,
-                nombre:     nombreUsuario,
-                balanceSG
-            }
-        });
-
-    } catch (error) {
-        // Google lanza error si el token es inválido, manipulado o de otro proyecto
-        console.error('Error validando token de Google:', error.message);
-        return res.status(401).json({
-            success: false,
-            error: 'El inframundo rechazó la validación del token.'
-        });
+        
+        balanceSG = usuario.balance_soulgeist;
+    } catch (redisError) {
+        console.error('Error en Redis:', redisError);
     }
 }
+
+return res.status(200).json({
+    success: true,
+    perfil: {
+        email: emailUsuario,
+        nombre: nombreUsuario,
+        balanceSG
+    }
+});
