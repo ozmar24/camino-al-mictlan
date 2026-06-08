@@ -91,6 +91,34 @@ export default async function handler(req, res) {
                 }).then(r => r.json());
 
                 balanceSG = parseInt(balanceRes?.result || 0);
+if (balanceSG === 0) {
+    const resContador = await fetch(`${redisUrl}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(['GET', 'contador_almas'])
+    }).then(r => r.json());
+    
+    const cuentaActual = parseInt(resContador?.result || 0);
+
+    if (cuentaActual < 50) {
+        // Le damos el bono
+        balanceSG = 1000;
+        
+        // Guardamos el nuevo balance en Redis
+        await fetch(`${redisUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(['SET', balanceKey, balanceSG])
+        });
+
+        // Incrementamos el contador
+        await fetch(`${redisUrl}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(['INCR', 'contador_almas'])
+        });
+    }
+}
             } catch (redisError) {
                 // Si Redis falla, no bloqueamos el login — solo el balance queda en 0
                 console.error('Error consultando balance en Redis:', redisError);

@@ -37,31 +37,51 @@ export default async function handler(req, res) {
             usuario = typeof getData.result === 'string' ? JSON.parse(getData.result) : getData.result;
         }
 
-        // REGISTRO
+        // REGISTRO Y ASIGNACIÓN DE TOKENS
         if (accion === 'registro') {
             if (usuario) {
                 return res.status(409).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
             }
 
+            // 1. Consultar contador para saber si aún hay cupo de fundador
+            const resContador = await fetch(`${cleanUrl}/get/contador_almas`, { headers: { Authorization: `Bearer ${token}` }});
+            const dataContador = await resContador.json();
+            const cuentaActual = parseInt(dataContador?.result || 0);
+
+            // 2. Si hay menos de 50, se lleva 1000 tokens
+            const premio = cuentaActual < 50 ? 1000 : 0;
+
             const hash = await bcrypt.hash(password, 12);
             const nuevoUsuario = {
                 email: emailNormalizado,
                 password: hash,
-                balance_soulgeist: 0,
+                balance_soulgeist: premio, // <--- Aquí se asignan instantáneamente
                 creado_en: new Date().toISOString(),
                 metodo: 'manual'
             };
 
             await fetch(`${cleanUrl}/set/${userKey}`, {
                 method: 'POST',
-                headers: { 
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(nuevoUsuario)
             });
 
-            return res.status(200).json({ success: true, message: 'Pacto sellado con éxito.' });
+            await fetch(`${cleanUrl}/incr/contador_almas`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            return res.status(200).json({ success: true, message: 'Pacto sellado. ' + (premio > 0 ? 'Has recibido 1,000 $SG.' : '') });
+        }
+
+        // 3. CONSULTA DE ESTADO (Para la barrita)
+        if (accion === 'estado_pacto') {
+            const respuesta = await fetch(`${cleanUrl}/get/contador_almas`, {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const total = await respuesta.json();
+            return res.status(200).json({ actual: parseInt(total?.result || 0), limite: 50 });
         }
 
         // LOGIN

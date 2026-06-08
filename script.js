@@ -1021,6 +1021,13 @@ async function manejarLoginGoogle(response) {
         if (res.ok && datos.success) {
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
+	
+	    // 1. Actualizamos nuestra variable global de balance con lo que devolvió el servidor
+            balanceUsuarioSG = datos.perfil.balanceSG; 
+
+            // 2. Refrescamos la barra de progreso inmediatamente 
+            // para que si el contador subió, el usuario vea el cambio
+            await syncContador();
 
             await sincronizarBalanceConRedis();
             entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
@@ -2379,10 +2386,7 @@ async function actualizarTransparencia() {
     }
 }
 
-// Ejecutar automáticamente
-window.addEventListener('load', () => {
-    setTimeout(actualizarTransparencia, 1800);
-});
+
 
 
 async function verificarSaludGas(walletAdmin, provider) {
@@ -2487,3 +2491,38 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         }
     }
 }
+async function syncContador() {
+    try {
+        // Hacemos el POST a tu archivo pacto.js con la acción correcta
+        const response = await fetch('/api/pacto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: 'estado_pacto' })
+        });
+        
+        const data = await response.json();
+        
+        const barra = document.getElementById('barra-progreso');
+        // Usamos un selector más específico si es necesario, o document.querySelector('p')
+        const texto = document.querySelector('p[style*="font-family"]') || document.querySelector('p'); 
+        
+        // Calcular porcentaje con límite de 100%
+        const porcentaje = Math.min((data.actual / data.limite) * 100, 100);
+        barra.style.width = porcentaje + "%";
+        
+        if (data.actual >= 50) {
+            texto.innerText = "PACTO FUNDADOR CERRADO";
+            barra.style.background = "#4a0000"; // Tu toque de diseño
+        } else {
+            texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+        }
+    } catch (err) {
+        console.error("Error al sincronizar con el inframundo:", err);
+    }
+}
+
+// Ejecutar automáticamente
+window.addEventListener('load', () => {
+    setTimeout(actualizarTransparencia, 1800);
+syncContador();
+});
