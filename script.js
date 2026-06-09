@@ -1574,6 +1574,8 @@ function mostrarVideoUnityAds() { // Mantenemos tu enlace visual izquierdo
 
 
 // 2. AQUÍ ESTÁ TU BLOQUE TOTALMENTE INTACTO (Se ejecuta al cerrar el portal de Monlix)
+const ENLACE_MISTICO_KEY = "TuPalabraSecretaDelInframundo";
+
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
@@ -1581,6 +1583,18 @@ async function videoCompletado() {
     }
 
     try {
+        const walletLimpia = window.userWallet.toLowerCase().trim();
+        const accion = 'sumar_ritual';
+        
+        // --- RITUAL DE FIRMA CRIPTOGRÁFICA ---
+        // Creamos un mensaje único combinando los datos
+        const mensaje = `${walletLimpia}:${accion}:${ENLACE_MISTICO_KEY}`;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(mensaje);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const firmaSegura = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
         // Envia el POST real a tu API para acumular los 10 SG en Redis
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
