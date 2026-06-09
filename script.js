@@ -1007,10 +1007,7 @@ async function manejarAuth() {
 
 async function manejarLoginGoogle(response) {
     try {
-        // Reemplaza 'tu-dominio-en-vercel.vercel.app' por tu dirección real de Vercel
-        const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app'; 
-
-        const res = await fetch(`${DOMINIO_VERCEL}/api/auth-google`, {
+        const res = await fetch('/api/auth-google', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: response.credential })
@@ -1032,7 +1029,6 @@ async function manejarLoginGoogle(response) {
         lanzarAlertaMictlan("Fallo en la autenticación.", "FALLO DE RED");
     }
 }
-
 function entrarAlCampoSanto(perfil = {}) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
