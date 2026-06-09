@@ -2034,42 +2034,46 @@ function abrirModalSeleccionCantidad(pos) {
 async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
-    
-    // 1. Descontamos localmente UNA SOLA VEZ
-    balanceUsuarioSG = balanceUsuarioSG - cantidad; 
-    if (balanceUsuarioSG < 0) balanceUsuarioSG = 0;
+   
+    if (!tumbaOrigen || !tumbaDestino) return;
 
+    // 1. Descontar localmente
+    balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidad);
     actualizarBalanceSoulgeist(balanceUsuarioSG);
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
     const ganancia = cantidad * (pos.tasa || 0);
-    cerrarRitual(); 
+    cerrarRitual();
 
-   if (window.userWallet) {
+    // 2. Enviar descuento a Redis
+    if (window.userWallet) {
         try {
-            // AQUÍ ES DONDE ESTABA EL ERROR: 
-            // Ya no restamos de nuevo, simplemente enviamos el balanceUsuarioSG que ya restamos arriba.
-            
-            console.log(`[RITUAL] Notificando descuento a Redis. Quedan: ${balanceUsuarioSG}`);
-            
-            await fetch('/api/acumular-sg', {
+            console.log(`[DESCUENTO] Enviando a Redis: ${balanceUsuarioSG} SG restantes`);
+
+            const response = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    wallet: window.userWallet, 
-                    nuevoBalance: balanceUsuarioSG, 
-                    accion: 'descontar_ritual'
+                body: JSON.stringify({
+                    wallet: window.userWallet,
+                    accion: 'descontar_ritual',
+                    nuevoBalance: balanceUsuarioSG   // ← Este es el parámetro que usa el backend
                 })
             });
+
+            const result = await response.json();
+            console.log("✅ Respuesta Redis:", result);
         } catch (error) {
-            console.error("Fallo de conexión al restar saldo en Redis:", error);
+            console.error("❌ Error al actualizar Redis:", error);
         }
     }
 
+    // 3. Animación y suma a la cripta
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-        const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
+        
+        const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
         localStorage.setItem(keyCriptas, JSON.stringify(window.tumbasConSaldo));
+
         generarCementerio();
         mostrarModalFusionExitosa(pos, ganancia);
     });
