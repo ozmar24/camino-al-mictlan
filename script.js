@@ -1032,6 +1032,7 @@ async function manejarLoginGoogle(response) {
         lanzarAlertaMictlan("Fallo en la autenticación.", "FALLO DE RED");
     }
 }
+
 function entrarAlCampoSanto(perfil = {}) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
