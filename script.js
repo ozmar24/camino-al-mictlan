@@ -2045,29 +2045,29 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     const ganancia = cantidad * (pos.tasa || 0);
     cerrarRitual();
 
-    // 2. Enviar descuento a Redis
+    // 2. Enviar a Redis (DEBUG)
     if (window.userWallet) {
-        try {
-            console.log(`[DESCUENTO] Enviando a Redis: ${balanceUsuarioSG} SG restantes`);
+        console.log(`[DEBUG DESCuento] Enviando nuevoBalance = ${balanceUsuarioSG}`);
 
+        try {
             const response = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     wallet: window.userWallet,
                     accion: 'descontar_ritual',
-                    nuevoBalance: balanceUsuarioSG   // ← Este es el parámetro que usa el backend
+                    nuevoBalance: balanceUsuarioSG   // ← Este valor debe ser 990
                 })
             });
 
             const result = await response.json();
             console.log("✅ Respuesta Redis:", result);
         } catch (error) {
-            console.error("❌ Error al actualizar Redis:", error);
+            console.error("❌ Error Redis:", error);
         }
     }
 
-    // 3. Animación y suma a la cripta
+    // 3. Animación
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
         
