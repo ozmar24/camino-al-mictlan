@@ -137,6 +137,6 @@ return res.status(200).json({
     perfil: {
         email: emailUsuario,
         nombre: nombreUsuario,
-        balanceSG
+        balanceSG: balanceSG
     }
 });
