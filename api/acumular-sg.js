@@ -42,6 +42,50 @@ export default async function handler(req, res) {
         let usuario = JSON.parse(getData.result);
 
         if (accion === 'sumar_ritual') {
+	const llaveCooldown = `cooldown_video:${emailLimpio}`;
+            const llaveLimiteDiario = `limite_diario_video:${emailLimpio}`;
+
+            // CANDADO A: Verificar si el usuario está en tiempo de espera (30 segundos)
+            const checkCooldownRes = await fetch(`${redisUrl}/get/${llaveCooldown}`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            });
+            const checkCooldownData = await checkCooldownRes.json();
+            if (checkCooldownData.result) {
+                return res.status(429).json({ success: false, error: 'La energía visual aún se está canalizando. Espera 30 segundos.' });
+            }
+
+            // CANDADO B: Verificar el límite diario de 10 videos
+            const checkLimiteRes = await fetch(`${redisUrl}/get/${llaveLimiteDiario}`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            });
+            const checkLimiteData = await checkLimiteRes.json();
+            const videosVistosHoy = parseInt(checkLimiteData.result || "0");
+
+            if (videosVistosHoy >= 10) {
+                return res.status(403).json({ success: false, error: 'Has alcanzado el límite diario de 10 ofrendas visuales.' });
+            }
+
+           
+            
+            // 1. Activar Cooldown de 30 segundos
+            await fetch(`${redisUrl}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(['SET', llaveCooldown, 'activo', 'EX', 30])
+            });
+
+            // 2. Incrementar el contador diario (expira en 24 horas)
+            if (videosVistosHoy === 0) {
+                await fetch(`${redisUrl}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(['SET', llaveLimiteDiario, '1', 'EX', 86400])
+                });
+            } else {
+                await fetch(`${redisUrl}/incr/${llaveLimiteDiario}`, {
+                    headers: { Authorization: `Bearer ${redisToken}` }
+                });
+            }
             usuario.balance_soulgeist = parseFloat(usuario.balance_soulgeist || 0) + 10;
         
         } else if (accion === 'descontar_ritual') {
