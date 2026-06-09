@@ -3,6 +3,7 @@
 import { OAuth2Client } from 'google-auth-library';
 
 export default async function handler(req, res) {
+console.log("¡El servidor recibió la petición!");
 
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
