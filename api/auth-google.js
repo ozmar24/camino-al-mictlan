@@ -48,7 +48,7 @@ console.log("¡El servidor recibió la petición!");
     // ── Verificar token con Google ─────────────────────────────────────────────
     try {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-
+	console.log("Token recibido:", token.substring(0, 20) + "...");
         const ticket = await client.verifyIdToken({
             idToken:  token,
             audience: GOOGLE_CLIENT_ID,
