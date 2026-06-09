@@ -2063,7 +2063,7 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
                 body: JSON.stringify({
                     wallet: window.userWallet,
                     accion: 'descontar_ritual',
-                    nuevoBalance: balanceUsuarioSG   // ← Este debe ser 990
+                    nuevoBalance: cantidad   // ← Este debe ser 990
                 })
             });
 
