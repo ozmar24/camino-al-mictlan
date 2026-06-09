@@ -2031,43 +2031,50 @@ function abrirModalSeleccionCantidad(pos) {
     
     modal.style.display = 'block';
 }
+
 async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
    
     if (!tumbaOrigen || !tumbaDestino) return;
 
-    // 1. Descontar localmente
+    // 1. Guardamos el balance ANTES de descontar (para debug)
+    const balanceAntes = balanceUsuarioSG;
+    console.log(`[DEBUG] Balance antes: ${balanceAntes} | Cantidad a enviar: ${cantidad}`);
+
+    // 2. Descontar localmente
     balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidad);
     actualizarBalanceSoulgeist(balanceUsuarioSG);
     localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 
+    console.log(`[DEBUG] Balance después de descuento: ${balanceUsuarioSG}`);
+
     const ganancia = cantidad * (pos.tasa || 0);
     cerrarRitual();
 
-    // 2. Enviar a Redis (DEBUG)
+    // 3. Enviar a Redis (CORREGIDO)
     if (window.userWallet) {
-        console.log(`[DEBUG DESCuento] Enviando nuevoBalance = ${balanceUsuarioSG}`);
-
         try {
+            console.log(`[DESCUENTO] Enviando nuevoBalance = ${balanceUsuarioSG} a Redis`);
+
             const response = await fetch('/api/acumular-sg', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     wallet: window.userWallet,
                     accion: 'descontar_ritual',
-                    nuevoBalance: balanceUsuarioSG   // ← Este valor debe ser 990
+                    nuevoBalance: balanceUsuarioSG   // ← Este debe ser 990
                 })
             });
 
             const result = await response.json();
-            console.log("✅ Respuesta Redis:", result);
+            console.log("✅ Respuesta de Redis:", result);
         } catch (error) {
-            console.error("❌ Error Redis:", error);
+            console.error("❌ Error al actualizar Redis:", error);
         }
     }
 
-    // 3. Animación
+    // 4. Animación + sumar a cripta
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
         
