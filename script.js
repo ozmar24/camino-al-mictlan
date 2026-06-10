@@ -1547,7 +1547,7 @@ function mostrarVideoHilltop() {
                 
                 // NOTA: Aquí es donde debes disparar la lógica para entregar los SG
                 // ¡Asegúrate de llamar a tu API y no solo a una función local!
-                reclamarSGPorVideo(); 
+                videoCompletado(); 
             }
         }, 1000);
     }
