@@ -1145,7 +1145,7 @@ function generarCementerio() {
     { nombre: "Pepe",      sim: "🐸", color: "#45ca5d", top: "68%", left: "38%",   tasa: 15000,     usdMinimo: 0.01 },
     
     // SOLANA → CAMBIADO A MATIC/POL
-    { nombre: "MATIC",     sim: "M", color: "#8247E5", top: "64%", left: "46%",   tasa: 0.015,      usdMinimo: 0.01 },
+    { nombre: "MATIC/POL",     sim: "M", color: "#8247E5", top: "64%", left: "46%",   tasa: 0.015,      usdMinimo: 0.01 },
     
     // DOGE → CAMBIADO A BNB
     { nombre: "BNB",       sim: "B", color: "#F0B90B", top: "61%", left: "68%",   tasa: 0.0018,     usdMinimo: 0.01 },

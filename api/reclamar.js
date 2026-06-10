@@ -7,11 +7,14 @@ export default async function handler(req, res) {
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
         'https://camino-al-mictlan.vercel.app',
+	'http://localhost:3000'
         
     ];
     const origin = req.headers.origin;
-    if (ORIGENES_PERMITIDOS.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
+    return res.status(403).json({ error: 'Origen no autorizado.' });
+}
+res.setHeader('Access-Control-Allow-Origin', origin);
     }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -55,7 +58,7 @@ export default async function handler(req, res) {
     Litecoin:  { tasa: 0.0012,   simFP: 'LTC',   minimoNativo: 0.0001 },
     Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.000001 },
     Pepe:      { tasa: 15000,    simFP: 'PEPE',  minimoNativo: 100 },
-    MATIC:     { tasa: 0.015,    simFP: 'MATIC', minimoNativo: 0.001 },
+    MATIC:     { tasa: 0.015,    simFP: 'MATIC/POL', minimoNativo: 0.001 },
     BNB:       { tasa: 0.0018,   simFP: 'BNB',   minimoNativo: 0.001 },
     USDT:      { tasa: 0.25,     simFP: 'USDT',  minimoNativo: 0.01 }
 };
