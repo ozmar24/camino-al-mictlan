@@ -1,6 +1,22 @@
 // api/auth-google.js
 import { OAuth2Client } from 'google-auth-library';
 
+async function enviarAlertaTelegram(mensaje) {
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: mensaje, parse_mode: 'HTML' })
+        });
+    } catch (error) {
+        console.error("Error enviando alerta a Telegram:", error);
+    }
+}
+
 export default async function handler(req, res) {
     const ORIGENES_PERMITIDOS = [
         'https://camino-al-mictlan.vercel.app',
@@ -85,6 +101,8 @@ export default async function handler(req, res) {
                     },
                     body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
                 });
+		
+		await enviarAlertaTelegram(`<b>🚀 Nuevo Registro en el Mictlán</b>\n👤 Email: ${emailUsuario}`);
 
                 // Incrementar contador si es de los primeros 50
                 if (contadorActual < 50) {

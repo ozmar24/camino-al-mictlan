@@ -1,6 +1,22 @@
 // api/pacto.js
 import bcrypt from 'bcryptjs';
 
+async function enviarAlertaTelegram(mensaje) {
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: mensaje, parse_mode: 'HTML' })
+        });
+    } catch (error) {
+        console.error("Error enviando alerta a Telegram:", error);
+    }
+}
+
 export default async function handler(req, res) {
     // 1. Definición de orígenes permitidos
     const ORIGENES_PERMITIDOS = [
@@ -98,6 +114,8 @@ export default async function handler(req, res) {
                 },
                 body: JSON.stringify(['SET', userKey, JSON.stringify(nuevoUsuario)])
             });
+		
+	    await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (Manual):</b> ${emailNormalizado}`);
 
             // Incrementar contador
             if (cuentaActual < 50) {
