@@ -29,6 +29,13 @@ export default async function handler(req, res) {
     if (!cleanUrl || !token) {
         return res.status(500).json({ success: false, error: 'Configuración Redis incompleta' });
     }
+    
+    const origenPeticion = req.headers.origin || req.headers.referer;
+    const MI_DOMINIO_OFICIAL = "https://camino-al-mictlan.vercel.app"; 
+
+    if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO_OFICIAL) && !origenPeticion.includes("localhost"))) {
+        return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
+    }
 
     const { email, password, accion } = req.body || {};
 
