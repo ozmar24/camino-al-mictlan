@@ -1518,14 +1518,12 @@ function mostrarVideoHilltop() {
 
     const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
 
-    // Usamos un reproductor VAST público confiable
-    const playerUrl = `https://vast-player.netlify.app/?vast=${encodeURIComponent(vastUrl)}`;
+    // Abrir directamente el VAST
+    window.open(vastUrl, '_blank');
 
-    window.open(playerUrl, '_blank');
+    lanzarAlertaMictlan("Abriendo grimorio de video de HilltopAds...", "VIDEO ABIERTO");
 
-    lanzarAlertaMictlan("Abriendo el grimorio de video...", "VIDEO CARGANDO");
-
-    // Timer de recompensa
+    // Timer de recompensa (el usuario debe ver el video y volver)
     let tiempoRestante = 20;
     const btnCerrar = document.getElementById('cerrar-portal-btn');
     if (btnCerrar) {
@@ -1543,7 +1541,7 @@ function mostrarVideoHilltop() {
                 btnCerrar.disabled = false;
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
             }
-            // Dar los 10 SG automáticamente
+            // Dar recompensa automáticamente
             videoCompletado();
         }
     }, 1000);
