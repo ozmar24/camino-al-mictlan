@@ -1,25 +1,9 @@
-// api/obtener-balance.js
 export default async function handler(req, res) {
-    // 1. Definición de orígenes permitidos
-    const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
-        'http://localhost:3000'
-    ];
-
-    const origin = req.headers.origin;
-
-    // 2. Bloqueo estricto de origen
-    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
-        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
+    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
+    // Permitimos tanto GET como POST según la lógica de tu aplicación.
+    if (req.method !== 'GET' && req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
-
-    // 3. CORS seguro (sin asterisco)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
 
     let wallet = req.query.wallet || (req.body && req.body.wallet);
     if (!wallet) {

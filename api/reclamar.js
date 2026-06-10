@@ -1,27 +1,12 @@
-// api/reclamar.js
 // REQUIERE: npm install ethers
 import { ethers } from 'ethers';
 
 export default async function handler(req, res) {
-
-    // ── CORS dinámico ──────────────────────────────────────────────────────────
-    const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
-	'http://localhost:3000'
-        
-    ];
-    const origin = req.headers.origin;
-if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
-    return res.status(403).json({ error: 'Origen no autorizado.' });
-}
-res.setHeader('Access-Control-Allow-Origin', origin);
+    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js globalmente.
+    // Solo aseguramos que el método entrante sea estrictamente POST.
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido.' });
     }
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido.' });
 
     // ── Variables de entorno ───────────────────────────────────────────────────
     const redisUrl     = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
@@ -50,9 +35,7 @@ res.setHeader('Access-Control-Allow-Origin', origin);
     // ── IP y país ──────────────────────────────────────────────────────────────
     const rawIp    = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
-    const country  = req.headers['x-vercel-ip-country'] || 'XX';
-
-    // ── Configuración de tasas y mínimos por cripto ───────────────────────────
+    const country  = req.headers['x-vercel-ip-country'] || 'XX';    // ── Configuración de tasas y mínimos por cripto ───────────────────────────
     const CONFIG_CRIPTAS = {
     Bitcoin:   { tasa: 0.000002, simFP: 'BTC',   minimoNativo: 0.000001 },
     Litecoin:  { tasa: 0.0012,   simFP: 'LTC',   minimoNativo: 0.0001 },

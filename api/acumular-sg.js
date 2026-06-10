@@ -1,31 +1,13 @@
-// api/acumular-sg.js
 import crypto from 'crypto';
 
 export default async function handler(req, res) {
-    // 1. Definición de orígenes y validación inicial de CORS
-    const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
-        'http://localhost:3000'
-    ];
-    
-    const origin = req.headers.origin;
-    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
-        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
-    }
-
-    // 2. Configuración de cabeceras de respuesta
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // 3. Manejo de preflight (OPTIONS) y método permitido
-    if (req.method === 'OPTIONS') return res.status(200).end();
+    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
+    // Solo aseguramos que el método entrante sea estrictamente POST.
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
 
-        const { wallet, accion } = req.body || {}; 
+    const { wallet, accion } = req.body || {}; 
     if (!wallet) {
         return res.status(400).json({ success: false, error: 'Falta wallet' });
     }
@@ -41,16 +23,17 @@ export default async function handler(req, res) {
     const userKey = `usuario:${emailLimpio.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
     try {
-      
+        // Validación de Referer para seguridad extra en la acumulación de puntos (Candado de backend)
         const origenPeticion = req.headers.origin || req.headers.referer;
         const MI_DOMINIO_OFICIAL = "https://camino-al-mictlan.vercel.app"; 
         
-        if (!origenPeticion || !origenPeticion.includes(MI_DOMINIO_OFICIAL)) {
+        // En desarrollo local puedes agregar: || origenPeticion?.includes("localhost")
+        if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO_OFICIAL) && !origenPeticion.includes("localhost"))) {
             return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
         }
 
         const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
-        headers: { Authorization: `Bearer ${redisToken}` }
+            headers: { Authorization: `Bearer ${redisToken}` }
         });
         const getData = await getRes.json();
 
@@ -61,7 +44,7 @@ export default async function handler(req, res) {
         let usuario = JSON.parse(getData.result);
 
         if (accion === 'sumar_ritual') {
-	const llaveCooldown = `cooldown_video:${emailLimpio}`;
+            const llaveCooldown = `cooldown_video:${emailLimpio}`;
             const llaveLimiteDiario = `limite_diario_video:${emailLimpio}`;
 
             // CANDADO A: Verificar si el usuario está en tiempo de espera (30 segundos)
@@ -84,8 +67,6 @@ export default async function handler(req, res) {
                 return res.status(403).json({ success: false, error: 'Has alcanzado el límite diario de 10 ofrendas visuales.' });
             }
 
-           
-            
             // 1. Activar Cooldown de 30 segundos
             await fetch(`${redisUrl}`, {
                 method: 'POST',
@@ -121,7 +102,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Acción no reconocida' });
         }
 
-        
         await fetch(`${redisUrl}`, {
             method: 'POST',
             headers: {

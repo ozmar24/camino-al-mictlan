@@ -1,4 +1,3 @@
-// api/pacto.js
 import bcrypt from 'bcryptjs';
 
 async function enviarAlertaTelegram(mensaje) {
@@ -18,27 +17,11 @@ async function enviarAlertaTelegram(mensaje) {
 }
 
 export default async function handler(req, res) {
-    // 1. Definición de orígenes permitidos
-    const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
-        'http://localhost:3000'
-    ];
-
-    const origin = req.headers.origin;
-
-    // 2. Bloqueo estricto de origen
-    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
-        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
+    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
+    // Solo validamos que el método HTTP que entra a esta API sea estrictamente POST.
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
-
-    // 3. CORS seguro
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Método no permitido' });
 
     const cleanUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
     const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -115,7 +98,7 @@ export default async function handler(req, res) {
                 body: JSON.stringify(['SET', userKey, JSON.stringify(nuevoUsuario)])
             });
 		
-	    await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (Manual):</b> ${emailNormalizado}`);
+            await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (Manual):</b> ${emailNormalizado}`);
 
             // Incrementar contador
             if (cuentaActual < 50) {
