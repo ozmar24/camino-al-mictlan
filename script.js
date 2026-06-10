@@ -1516,36 +1516,35 @@ function mostrarVideoHilltop() {
         return;
     }
 
-    const modalPortal = document.getElementById('portal-monlix-modal');
-    const iframePortal = document.getElementById('iframe-monlix-portal');
+    const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
+
+    // Abre el VAST en una nueva pestaña (funciona mejor)
+    window.open(vastUrl, '_blank');
+
+    lanzarAlertaMictlan("El grimorio de ofrendas se abrió en una nueva ventana...", "VIDEO ABIERTO");
+
+    // Timer de seguridad (el usuario debe ver el video y volver)
+    let tiempoRestante = 25;
     const btnCerrar = document.getElementById('cerrar-portal-btn');
-
-    if (modalPortal && iframePortal && btnCerrar) {
-        // Usamos un reproductor que pueda manejar VAST
-        const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
-        
-        // Intentamos cargar con un reproductor VAST simple
-        iframePortal.src = `https://player.vdo.ai/?vast=${encodeURIComponent(vastUrl)}`;
-        
-        modalPortal.style.display = 'flex';
-
-        lanzarAlertaMictlan("Canalizando energía del grimorio...", "VIDEO CARGANDO");
-
-        // Timer de seguridad
-        let tiempoRestante = 25;
+    if (btnCerrar) {
         btnCerrar.disabled = true;
-        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
+        btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
+    }
 
-        const reloj = setInterval(() => {
-            tiempoRestante--;
-            btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
-            if (tiempoRestante <= 0) {
-                clearInterval(reloj);
+    const reloj = setInterval(() => {
+        tiempoRestante--;
+        if (btnCerrar) btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
+
+        if (tiempoRestante <= 0) {
+            clearInterval(reloj);
+            if (btnCerrar) {
                 btnCerrar.disabled = false;
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
             }
-        }, 1000);
-    }
+            // Aquí puedes llamar a videoCompletado() automáticamente o dejar que el usuario cierre
+            // videoCompletado(); // Descomenta si quieres dar SG automáticamente
+        }
+    }, 1000);
 }
 
 
