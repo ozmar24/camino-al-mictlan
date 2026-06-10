@@ -1,7 +1,26 @@
 // api/acumular-sg.js
-import crypto from 'crypto'; // Se mantiene listo para integraciones futuras
+import crypto from 'crypto';
 
 export default async function handler(req, res) {
+    // 1. Definición de orígenes y validación inicial de CORS
+    const ORIGENES_PERMITIDOS = [
+        'https://camino-al-mictlan.vercel.app',
+        'http://localhost:3000'
+    ];
+    
+    const origin = req.headers.origin;
+    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
+        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
+    }
+
+    // 2. Configuración de cabeceras de respuesta
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // 3. Manejo de preflight (OPTIONS) y método permitido
+    if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Método no permitido' });
     }

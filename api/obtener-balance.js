@@ -1,8 +1,21 @@
 // api/obtener-balance.js
 export default async function handler(req, res) {
-    // CORS
+    // 1. Definición de orígenes permitidos
+    const ORIGENES_PERMITIDOS = [
+        'https://camino-al-mictlan.vercel.app',
+        'http://localhost:3000'
+    ];
+
     const origin = req.headers.origin;
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+
+    // 2. Bloqueo estricto de origen
+    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
+        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
+    }
+
+    // 3. CORS seguro (sin asterisco)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 

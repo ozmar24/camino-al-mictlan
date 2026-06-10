@@ -2,14 +2,24 @@
 import { OAuth2Client } from 'google-auth-library';
 
 export default async function handler(req, res) {
+    const ORIGENES_PERMITIDOS = [
+        'https://camino-al-mictlan.vercel.app',
+        'http://localhost:3000'
+    ];
+    
+    // AÑADE ESTO: Validar que el origen exista antes de comprobar el array
+    const origin = req.headers.origin;
+    if (!origin || !ORIGENES_PERMITIDOS.includes(origin)) {
+        return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
+    }
+
     res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Método no permitido' });
-
     const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
     if (!GOOGLE_CLIENT_ID) {
         return res.status(500).json({ success: false, error: 'Configuración de Google incompleta' });
