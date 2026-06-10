@@ -1516,20 +1516,21 @@ function mostrarVideoHilltop() {
         return;
     }
 
-    const modalPortal = document.getElementById('portal-monlix-modal');
+    const modalPortal = document.getElementById('portal-monlix-modal'); // Reutilizamos el modal que ya tienes
     const iframePortal = document.getElementById('iframe-monlix-portal');
     const btnCerrar = document.getElementById('cerrar-portal-btn');
 
     if (modalPortal && iframePortal && btnCerrar) {
-        // CORRECCIÓN: Usamos el reproductor VAST para interpretar el XML de Hilltop
+        // Aquí ponemos el VAST de HilltopAds
         const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
-        const playerUrl = `https://vast-player.netlify.app/?vast=${encodeURIComponent(vastUrl)}`;
 
-        iframePortal.src = playerUrl;
+        // Cargamos el video VAST en el iframe
+        iframePortal.src = vastUrl;
         modalPortal.style.display = 'flex';
 
         lanzarAlertaMictlan("El grimorio de ofrendas de HilltopAds se ha abierto...", "VIDEO ABIERTO");
 
+        // Timer de seguridad (30 segundos)
         let tiempoRestante = 30;
         btnCerrar.disabled = true;
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
@@ -1544,10 +1545,6 @@ function mostrarVideoHilltop() {
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
                 btnCerrar.style.background = "#3a0000";
                 btnCerrar.style.color = "#ffcccc";
-                
-                // NOTA: Aquí es donde debes disparar la lógica para entregar los SG
-                // ¡Asegúrate de llamar a tu API y no solo a una función local!
-                videoCompletado(); 
             }
         }, 1000);
     }
