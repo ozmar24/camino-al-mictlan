@@ -1516,37 +1516,41 @@ function mostrarVideoHilltop() {
         return;
     }
 
-    const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
-
-    // Usamos un reproductor VAST público confiable
-    const playerUrl = `https://vast-player.netlify.app/?vast=${encodeURIComponent(vastUrl)}`;
-
-    window.open(playerUrl, '_blank');
-
-    lanzarAlertaMictlan("Abriendo el grimorio de video...", "VIDEO CARGANDO");
-
-    // Timer de recompensa
-    let tiempoRestante = 20;
+    const modalPortal = document.getElementById('portal-monlix-modal');
+    const iframePortal = document.getElementById('iframe-monlix-portal');
     const btnCerrar = document.getElementById('cerrar-portal-btn');
-    if (btnCerrar) {
+
+    if (modalPortal && iframePortal && btnCerrar) {
+        // CORRECCIÓN: Usamos el reproductor VAST para interpretar el XML de Hilltop
+        const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
+        const playerUrl = `https://vast-player.netlify.app/?vast=${encodeURIComponent(vastUrl)}`;
+
+        iframePortal.src = playerUrl;
+        modalPortal.style.display = 'flex';
+
+        lanzarAlertaMictlan("El grimorio de ofrendas de HilltopAds se ha abierto...", "VIDEO ABIERTO");
+
+        let tiempoRestante = 30;
         btnCerrar.disabled = true;
-        btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
-    }
+        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
-    const reloj = setInterval(() => {
-        tiempoRestante--;
-        if (btnCerrar) btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
+        const reloj = setInterval(() => {
+            tiempoRestante--;
+            btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
-        if (tiempoRestante <= 0) {
-            clearInterval(reloj);
-            if (btnCerrar) {
+            if (tiempoRestante <= 0) {
+                clearInterval(reloj);
                 btnCerrar.disabled = false;
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
+                btnCerrar.style.background = "#3a0000";
+                btnCerrar.style.color = "#ffcccc";
+                
+                // NOTA: Aquí es donde debes disparar la lógica para entregar los SG
+                // ¡Asegúrate de llamar a tu API y no solo a una función local!
+                reclamarSGPorVideo(); 
             }
-            // Dar los 10 SG automáticamente
-            videoCompletado();
-        }
-    }, 1000);
+        }, 1000);
+    }
 }
 
 
