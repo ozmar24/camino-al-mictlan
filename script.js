@@ -1518,12 +1518,14 @@ function mostrarVideoHilltop() {
 
     const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
 
-    // Abre el VAST en una nueva pestaña (funciona mejor)
-    window.open(vastUrl, '_blank');
+    // Usamos un reproductor VAST público simple
+    const playerUrl = `https://player.vdo.ai/?vast=${encodeURIComponent(vastUrl)}`;
 
-    lanzarAlertaMictlan("El grimorio de ofrendas se abrió en una nueva ventana...", "VIDEO ABIERTO");
+    window.open(playerUrl, '_blank');
 
-    // Timer de seguridad (el usuario debe ver el video y volver)
+    lanzarAlertaMictlan("El grimorio de ofrendas se abrió en nueva ventana...", "VIDEO CARGANDO");
+
+    // Timer de seguridad (el usuario debe ver el video)
     let tiempoRestante = 25;
     const btnCerrar = document.getElementById('cerrar-portal-btn');
     if (btnCerrar) {
@@ -1541,8 +1543,8 @@ function mostrarVideoHilltop() {
                 btnCerrar.disabled = false;
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
             }
-            // Aquí puedes llamar a videoCompletado() automáticamente o dejar que el usuario cierre
-            // videoCompletado(); // Descomenta si quieres dar SG automáticamente
+            // Opcional: Dar SG automáticamente
+            // videoCompletado();
         }
     }, 1000);
 }
