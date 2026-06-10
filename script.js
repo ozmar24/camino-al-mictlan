@@ -1518,22 +1518,24 @@ function mostrarVideoHilltop() {
 
     const vastUrl = "https://faithfuloccasion.com/dcm.F-zzdNGUNbvzZ/GxUR/Gedmg9BusZfUTlQkRPKTxcZxzMljvUi5VMtD/EdtZNMzOE/yMNCTJkNwXNSQy";
 
-    // Abrir directamente el VAST (algunos navegadores lo interpretan)
-    window.open(vastUrl, '_blank');
+    // Usamos un reproductor VAST público confiable
+    const playerUrl = `https://vast-player.netlify.app/?vast=${encodeURIComponent(vastUrl)}`;
 
-    lanzarAlertaMictlan("Abriendo grimorio de HilltopAds...", "VIDEO ABIERTO");
+    window.open(playerUrl, '_blank');
+
+    lanzarAlertaMictlan("Abriendo el grimorio de video...", "VIDEO CARGANDO");
 
     // Timer de recompensa
     let tiempoRestante = 20;
     const btnCerrar = document.getElementById('cerrar-portal-btn');
     if (btnCerrar) {
         btnCerrar.disabled = true;
-        btnCerrar.innerText = `ESPERANDO (${tiempoRestante}s)...`;
+        btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
     }
 
     const reloj = setInterval(() => {
         tiempoRestante--;
-        if (btnCerrar) btnCerrar.innerText = `ESPERANDO (${tiempoRestante}s)...`;
+        if (btnCerrar) btnCerrar.innerText = `ESPERANDO ENERGÍA (${tiempoRestante}s)...`;
 
         if (tiempoRestante <= 0) {
             clearInterval(reloj);
@@ -1541,7 +1543,7 @@ function mostrarVideoHilltop() {
                 btnCerrar.disabled = false;
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
             }
-            // Dar recompensa automáticamente
+            // Dar los 10 SG automáticamente
             videoCompletado();
         }
     }, 1000);
