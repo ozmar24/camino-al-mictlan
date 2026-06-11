@@ -36,6 +36,13 @@ export default async function handler(req, res) {
     if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO_OFICIAL) && !origenPeticion.includes("localhost"))) {
         return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
     }
+    
+    const tokenMisticoCliente = req.headers['x-enlace-mistico'];
+    const tokenMisticoServidor = process.env.ENLACE_MISTICO_KEY;
+
+    if (!tokenMisticoCliente || tokenMisticoCliente !== tokenMisticoServidor) {
+        return res.status(401).json({ success: false, error: 'Firma mística inválida o ausente.' });
+    }
 
     const { email, password, accion } = req.body || {};
 

@@ -973,6 +973,8 @@ async function manejarAuth() {
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+	    'x-enlace-mistico': process.env.NEXT_PUBLIC_ENLACE_MISTICO
+            },
             body: JSON.stringify({ email, password, accion })
         });
 
