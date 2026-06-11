@@ -880,8 +880,8 @@ const GOOGLE_CLIENT_ID = "25093626964-mep6ihpq1gamn8hm59q2cf15rm8gd0ao.apps.goog
 // ==================================================================
 // FASE 1 -> FASE 2: APERTURA DEL GRIMORIO ABIERTO (CORREGIDO)
 // ==================================================================
-function entrarAlMictlan() {
-    console.log("Intentando entrar al Mictlán..."); // Para depurar en consola
+window.entrarAlMictlan = function() {
+    console.log("Intentando entrar al Mictlán...") // Para depurar en consola
     
     const portal = document.getElementById('escena-portal');
     const modalContrato = document.getElementById('modal-contrato');
