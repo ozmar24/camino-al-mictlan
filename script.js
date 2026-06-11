@@ -969,14 +969,11 @@ async function manejarAuth() {
     btnAuth.innerText = "PROCESANDO...";
     btnAuth.disabled = true;
 
-     try {
-        const res = await fetch('/api/pacto', {
+    try {
+        const respuesta = await fetch('/api/pacto', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-enlace-mistico': process.env.NEXT_PUBLIC_ENLACE_MISTICO
-            },
-            body: JSON.stringify({ accion: 'estado_pacto' })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, accion })
         });
 
         const resultado = await respuesta.json();
