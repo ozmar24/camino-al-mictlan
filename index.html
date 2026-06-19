@@ -23,29 +23,22 @@
         <button id="cerrar-portal-btn" style="background: #3a0000; color: #ffcccc; border: 1px solid #ff0000; padding: 10px 25px; cursor: pointer; font-family: 'MedievalSharp', cursive; font-size: 0.85rem; margin-bottom: 15px; align-self: flex-start; text-shadow: 1px 1px 2px #000; letter-spacing: 1px; transition: all 0.3s ease;" onmouseover="this.style.background='#ff0000'; this.style.color='#fff';" onmouseout="this.style.background='#3a0000'; this.style.color='#ffcccc';">
             RETROCEDER AL CEMENTERIO
         </button>
-        <iframe id="iframe-monlix-portal" src="" width="100%" height="100%" frameborder="0" style="border: 1px solid #2a0000; background: #050505; box-shadow: 0 0 15px #000;"></iframe>
+        <iframe data-aa='2444906' src='//acceptable.a-ads.com/2444906/?size=Adaptive'
+        style='border:0; padding:0; width:100%; height:250px; overflow:hidden; display:block; margin:auto;'></iframe>
     </div>
 </div>
 
-<!-- Busca el script de cierre en tu HTML y reemplázalo por este bloque exacto -->
 <script>
     window.monlixAppId = "TU_ID_REAL_DE_MONLIX"; 
     
     document.addEventListener("DOMContentLoaded", () => {
         const btnCerrar = document.getElementById('cerrar-portal-btn');
         if (btnCerrar) {
-            // Transformamos el evento en una función ASYNC para poder usar AWAIT
             btnCerrar.onclick = async () => {
-                console.log("🔮 Iniciando transmutación y absorción de energía...");
-
-                // 1. Ejecutamos la acumulación deteniendo el código hasta que el servidor responda
-                if (typeof videoCompletado === 'function') {
-                    await videoCompletado(); 
-                }
+                // Solo ejecutar si el botón ya está habilitado (countdown terminó)
+                if (btnCerrar.disabled) return;
                 
-                // 2. UNA VEZ QUE TERMINA EL FETCH Y SALE LA ALERTA REAL, escondemos el modal de anuncios
                 document.getElementById('portal-monlix-modal').style.display = 'none';
-                document.getElementById('iframe-monlix-portal').src = "";
             };
         }
     });

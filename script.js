@@ -1510,66 +1510,51 @@ function cerrarRitual() {
 // ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA DE MONLIX)
 // ==================================================================
 
-function mostrarVideoUnityAds() { // Mantenemos tu enlace visual izquierdo
+function mostrarVideoUnityAds() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    console.log("🎬 Abriendo el pergamino de ofertas de Monlix...");
-    
-    const appId = window.monlixAppId || "TU_ID_REAL_DE_MONLIX";
-    const userIdSafe = encodeURIComponent(window.userWallet.toLowerCase().trim());
-    const urlMuro = `https://monlix.com{appId}&user_id=${userIdSafe}`;
-
     const modalPortal = document.getElementById('portal-monlix-modal');
-    const iframePortal = document.getElementById('iframe-monlix-portal');
-    const btnCerrar = document.getElementById('cerrar-portal-btn');
+    const btnCerrar   = document.getElementById('cerrar-portal-btn');
 
-    if (modalPortal && iframePortal && btnCerrar) {
-        iframePortal.src = urlMuro;
-        modalPortal.style.display = 'flex';
-        lanzarAlertaMictlan("El grimorio de ofrendas se ha manifestado. La energía visual se está canalizando.", "PORTAL ABIERTO");
-
-        // ── RITUAL DE TEMPORIZADOR DE SEGURIDAD ─────────────────────────────
-        let tiempoRestante = 30; // Tiempo obligatorio en segundos (puedes cambiarlo a 20s o 15s)
-        
-        // 1. Bloqueamos el botón y removemos temporalmente tus efectos inline del HTML
-        btnCerrar.disabled = true;
-        btnCerrar.style.background = "#222";
-        btnCerrar.style.color = "#666";
-        btnCerrar.style.border = "1px solid #444";
-        btnCerrar.style.cursor = "not-allowed";
-        btnCerrar.onmouseover = null; // Apaga el hover del HTML
-        btnCerrar.onmouseout = null;  // Apaga el hover del HTML
-        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
-
-        // 2. Iniciamos el reloj regresivo del inframundo
-        const relojMictlan = setInterval(() => {
-            tiempoRestante--;
-            btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
-
-            if (tiempoRestante <= 0) {
-                clearInterval(relojMictlan); // Detenemos el reloj definitivo
-                
-                // 3. RESTAURAMOS EXPANSIÓN COMPLETA DE TU DISEÑO ORIGINAL DEL HTML
-                btnCerrar.disabled = false;
-                btnCerrar.style.background = "#3a0000";
-                btnCerrar.style.color = "#ffcccc";
-                btnCerrar.style.border = "1px solid #ff0000";
-                btnCerrar.style.cursor = "pointer";
-                btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
-
-                // Re-inyectamos tus funciones inline exactas de hover desde JavaScript
-                btnCerrar.onmouseover = function() { this.style.background = '#ff0000'; this.style.color = '#fff'; };
-                btnCerrar.onmouseout = function() { this.style.background = '#3a0000'; this.style.color = '#ffcccc'; };
-            }
-        }, 1000); // Se ejecuta en ciclos de 1 segundo
-
-    } else {
-        console.error("❌ Los elementos del DOM de Monlix no fueron hallados.");
-        lanzarAlertaMictlan("Fallo en la invocación del portal publicitario.", "ERROR MÍSTICO");
+    if (!modalPortal || !btnCerrar) {
+        lanzarAlertaMictlan("El portal no se manifestó.", "ERROR MÍSTICO");
+        return;
     }
+
+    // Mostrar modal
+    modalPortal.style.display = 'flex';
+
+    // Countdown
+    let segundos = 30;
+    btnCerrar.disabled = true;
+    btnCerrar.style.background = "#222";
+    btnCerrar.style.color = "#666";
+    btnCerrar.style.border = "1px solid #444";
+    btnCerrar.style.cursor = "not-allowed";
+    btnCerrar.innerText = `CANALIZANDO ENERGÍA (${segundos}s)...`;
+
+    const reloj = setInterval(() => {
+        segundos--;
+        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${segundos}s)...`;
+
+        if (segundos <= 0) {
+            clearInterval(reloj);
+            btnCerrar.disabled = false;
+            btnCerrar.style.background = "#3a0000";
+            btnCerrar.style.color = "#ffcccc";
+            btnCerrar.style.border = "1px solid #ff0000";
+            btnCerrar.style.cursor = "pointer";
+            btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
+            btnCerrar.onmouseover = function() { this.style.background = '#ff0000'; this.style.color = '#fff'; };
+            btnCerrar.onmouseout  = function() { this.style.background = '#3a0000'; this.style.color = '#ffcccc'; };
+
+            // Al activarse el botón — dar recompensa automáticamente
+            videoCompletado();
+        }
+    }, 1000);
 }
 
 
