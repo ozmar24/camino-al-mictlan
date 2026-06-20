@@ -2037,3 +2037,41 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         text-shadow: none !important;
     }
 }
+/* Contenedor para que el botón esté a la derecha */
+.contenedor-boton-meta {
+    display: flex;
+    justify-content: flex-end; /* Lo alinea a la derecha */
+    margin-top: 10px;
+    margin-right: 20px;       /* Ajusta según el margen de tu diseño */
+}
+
+/* Estilo para el botón */
+.btn-meta {
+    background: rgba(0, 0, 0, 0.7); /* Fondo oscuro semitransparente */
+    border: 1px solid #440000;      /* Borde rojizo oscuro */
+    color: #ff0000;                 /* Texto rojo */
+    padding: 8px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;                      /* Espacio entre imagen y texto */
+    font-family: 'TuFuente', serif; /* Mantén tu tipografía */
+    transition: 0.3s;
+}
+
+.btn-meta:hover {
+    background: rgba(40, 0, 0, 0.9);
+    border-color: #ff0000;
+}
+
+/* Tamaño de tu emblema Meta1.png */
+.img-meta {
+    width: 35px; 
+    height: auto;
+}
+
+.texto-btn {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
