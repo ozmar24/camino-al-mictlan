@@ -1508,33 +1508,27 @@ function cerrarRitual() {
 // ==================================================================
 
 function mostrarVideoUnityAds() { 
-    // Mantenemos la seguridad de la wallet
+    // 1. Seguridad
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    // 1. Abrimos el Direct Link de Monetag en pestaña nueva
+    // 2. Abrir Monetag
     const MONETAG_LINK = "https://omg10.com/4/11178661";
     window.open(MONETAG_LINK, '_blank', 'noopener,noreferrer');
-    console.log("🎬 Abriendo portal de Monetag...");
 
-    // 2. Mantenemos el modal activo pero sin iframe para que el usuario 
-    // tenga un lugar donde dar clic a "Cerrar" y recibir sus +10 SG
+    // 3. Referencias del DOM
     const modalPortal = document.getElementById('portal-monlix-modal');
-    const iframePortal = document.getElementById('iframe-monlix-portal');
     const btnCerrar = document.getElementById('cerrar-portal-btn');
 
-    if (modalPortal && iframePortal && btnCerrar) {
-        // Limpiamos el src del iframe para que no cargue nada de Monlix
-        iframePortal.src = "about:blank"; 
+    // 4. Lógica de despliegue (Sin depender del iframe)
+    if (modalPortal && btnCerrar) {
         modalPortal.style.display = 'flex';
-        
-        lanzarAlertaMictlan("El portal se ha abierto. Asegúrate de interactuar con el anuncio y regresa para reclamar tu ofrenda.", "PORTAL ABIERTO");
+        lanzarAlertaMictlan("Interactúa con el anuncio y regresa para reclamar.", "PORTAL ABIERTO");
 
-        // --- RITUAL DE TEMPORIZADOR (SE MANTIENE IGUAL) ---
-        // Esto asegura que el usuario pase el tiempo necesario antes de reclamar
-        let tiempoRestante = 30; 
+        // 5. Temporizador de seguridad (30 segundos)
+        let tiempoRestante = 30;
         btnCerrar.disabled = true;
         btnCerrar.style.background = "#222";
         btnCerrar.style.color = "#666";
@@ -1550,14 +1544,13 @@ function mostrarVideoUnityAds() {
                 btnCerrar.disabled = false;
                 btnCerrar.style.background = "#3a0000";
                 btnCerrar.style.color = "#ffcccc";
+                btnCerrar.style.border = "1px solid #ff0000";
                 btnCerrar.style.cursor = "pointer";
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
             }
-        }, 1000); // Se ejecuta en ciclos de 1 segundo
-
+        }, 1000);
     } else {
-        console.error("❌ Los elementos del DOM de Monlix no fueron hallados.");
-        lanzarAlertaMictlan("Fallo en la invocación del portal publicitario.", "ERROR MÍSTICO");
+        console.error("No se encontraron los elementos del modal.");
     }
 }
 
