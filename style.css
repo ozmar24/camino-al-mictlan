@@ -2055,7 +2055,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     display: flex;
     align-items: center;
     gap: 10px;                      /* Espacio entre imagen y texto */
-    font-family: 'TuFuente', serif; /* Mantén tu tipografía */
+    font-family: 'Nosifer', serif; /* Mantén tu tipografía */
     transition: 0.3s;
 }
 
