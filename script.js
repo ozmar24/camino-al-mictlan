@@ -1,8 +1,3 @@
-const { Web3Modal } = window.web3modal;
-const web3modal = new Web3Modal({
-  projectId: 'be592ab676c5be3e09ba2b18b72e30d8',
-  chains: [80002],
-});
 
 // ==================================================================
 // CONFIGURACIÓN DE BLOCKCHAIN (CONSTANTES FIJAS)
