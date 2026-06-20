@@ -129,8 +129,22 @@ export default async function handler(req, res) {
        let pagoExitoso = false;
 let mensajeRetorno = '';
 
-if (pasarela === 'metamask') {
-    // Ejecutamos el pago OnChain usando tu función administrativa
+// AQUÍ ES DONDE REEMPLAZAS LO QUE TENÍAS POR ESTO:
+
+if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
+    const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
+    if (resLN.success) {
+        pagoExitoso = true;
+        mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
+    }
+
+} else if (pasarela === 'metamask') {
+    // ESTA ES LA NUEVA PARTE: Solo registramos, no ejecutamos OnChain aquí
+    pagoExitoso = true;
+    mensajeRetorno = "Cosecha registrada en el libro del inframundo.";
+
+} else if (['binance', 'coinbase'].includes(pasarela)) {
+    // Las pasarelas centrales siguen usando tu lógica original de servidor
     const resOC = await procesarRetiroOnChain(
         wallet,
         cantidadAEnviar,
@@ -148,8 +162,7 @@ if (pasarela === 'metamask') {
     }
 
 } else {
-    // Si llega cualquier otra cosa, bloqueamos
-    return res.status(400).json({ error: 'Pasarela no reconocida o deshabilitada.' });
+    return res.status(400).json({ error: 'Pasarela no reconocida.' });
 }
 
         // ── 6. Cerrar candados y resetear balance si aplica ───────────────────
@@ -192,15 +205,27 @@ if (pasarela === 'metamask') {
 // FUNCIONES AUXILIARES
 // ══════════════════════════════════════════════════════════════════════════════
 
+// ── Validar formato de wallet según pasarela Y cripto ────────────────────────
 function validarDireccion(wallet, pasarela, cripto) {
     const regexEVM = /^0x[a-fA-F0-9]{40}$/;
-    
-    // Como solo usamos metamask, solo validamos formato EVM
-    if (pasarela === 'metamask') {
+    const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
+    const regexLTC = /^[LMm3][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
+
+    if (pasarela === 'binance' || pasarela === 'coinbase') {
         return regexEVM.test(wallet);
     }
 
-    return false; // Si no es metamask, no permitimos nada más
+    if (pasarela === 'bitso') {
+        if (cripto === 'Bitcoin')  return regexBTC.test(wallet);
+        if (cripto === 'Litecoin') return regexLTC.test(wallet);
+        return regexEVM.test(wallet);
+    }
+
+    if (pasarela === 'bitso_lightning') {
+        return regexBTC.test(wallet);
+    }
+
+    return wallet.length > 5;
 }
 
 // ── Retiro on-chain ───────────────────────────────────────────────────────────
