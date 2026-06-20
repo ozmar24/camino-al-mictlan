@@ -1504,57 +1504,61 @@ function cerrarRitual() {
 }
 
 // ==================================================================
-// UNITY ADS - MOSTRAR VIDEO Y PROCESAR RECOMPENSA
-// ==================================================================
-// ==================================================================
-// ABSORCIÓN DE VIDEOS MONETIZADOS (RECLAMOS DE ENERGÍA DE MONLIX)
+// ABSORCIÓN DE MONETIZADOS (RECLAMOS DE ENERGÍA DE MONETAG)
 // ==================================================================
 
-function mostrarVideoUnityAds() {
+function mostrarVideoUnityAds() { 
+    // Mantenemos la seguridad de la wallet
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
+    // 1. Abrimos el Direct Link de Monetag en pestaña nueva
+    const MONETAG_LINK = "https://omg10.com/4/11178661";
+    window.open(MONETAG_LINK, '_blank', 'noopener,noreferrer');
+    console.log("🎬 Abriendo portal de Monetag...");
+
+    // 2. Mantenemos el modal activo pero sin iframe para que el usuario 
+    // tenga un lugar donde dar clic a "Cerrar" y recibir sus +10 SG
     const modalPortal = document.getElementById('portal-monlix-modal');
-    const btnCerrar   = document.getElementById('cerrar-portal-btn');
+    const iframePortal = document.getElementById('iframe-monlix-portal');
+    const btnCerrar = document.getElementById('cerrar-portal-btn');
 
-    if (!modalPortal || !btnCerrar) {
-        lanzarAlertaMictlan("El portal no se manifestó.", "ERROR MÍSTICO");
-        return;
+    if (modalPortal && iframePortal && btnCerrar) {
+        // Limpiamos el src del iframe para que no cargue nada de Monlix
+        iframePortal.src = "about:blank"; 
+        modalPortal.style.display = 'flex';
+        
+        lanzarAlertaMictlan("El portal se ha abierto. Asegúrate de interactuar con el anuncio y regresa para reclamar tu ofrenda.", "PORTAL ABIERTO");
+
+        // --- RITUAL DE TEMPORIZADOR (SE MANTIENE IGUAL) ---
+        // Esto asegura que el usuario pase el tiempo necesario antes de reclamar
+        let tiempoRestante = 30; 
+        btnCerrar.disabled = true;
+        btnCerrar.style.background = "#222";
+        btnCerrar.style.color = "#666";
+        btnCerrar.style.cursor = "not-allowed";
+        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
+
+        const relojMictlan = setInterval(() => {
+            tiempoRestante--;
+            btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
+
+            if (tiempoRestante <= 0) {
+                clearInterval(relojMictlan);
+                btnCerrar.disabled = false;
+                btnCerrar.style.background = "#3a0000";
+                btnCerrar.style.color = "#ffcccc";
+                btnCerrar.style.cursor = "pointer";
+                btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
+            }
+        }, 1000); // Se ejecuta en ciclos de 1 segundo
+
+    } else {
+        console.error("❌ Los elementos del DOM de Monlix no fueron hallados.");
+        lanzarAlertaMictlan("Fallo en la invocación del portal publicitario.", "ERROR MÍSTICO");
     }
-
-    // Mostrar modal
-    modalPortal.style.display = 'flex';
-
-    // Countdown
-    let segundos = 30;
-    btnCerrar.disabled = true;
-    btnCerrar.style.background = "#222";
-    btnCerrar.style.color = "#666";
-    btnCerrar.style.border = "1px solid #444";
-    btnCerrar.style.cursor = "not-allowed";
-    btnCerrar.innerText = `CANALIZANDO ENERGÍA (${segundos}s)...`;
-
-    const reloj = setInterval(() => {
-        segundos--;
-        btnCerrar.innerText = `CANALIZANDO ENERGÍA (${segundos}s)...`;
-
-        if (segundos <= 0) {
-            clearInterval(reloj);
-            btnCerrar.disabled = false;
-            btnCerrar.style.background = "#3a0000";
-            btnCerrar.style.color = "#ffcccc";
-            btnCerrar.style.border = "1px solid #ff0000";
-            btnCerrar.style.cursor = "pointer";
-            btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
-            btnCerrar.onmouseover = function() { this.style.background = '#ff0000'; this.style.color = '#fff'; };
-            btnCerrar.onmouseout  = function() { this.style.background = '#3a0000'; this.style.color = '#ffcccc'; };
-
-            // Al activarse el botón — dar recompensa automáticamente
-            videoCompletado();
-        }
-    }, 1000);
 }
 
 
