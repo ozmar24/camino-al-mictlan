@@ -2039,10 +2039,12 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 }
 /* Contenedor para que el botón esté a la derecha */
 .contenedor-boton-meta {
+    position: absolute; /* Esto lo vuelve independiente y flotante */
+    top: 150px;         /* Ajusta esto para colocarlo verticalmente */
+    right: 30px;        /* Ajusta esto para colocarlo horizontalmente */
+    z-index: 9999;      /* Asegura que esté encima de todo */
     display: flex;
-    justify-content: flex-end; /* Lo alinea a la derecha */
-    margin-top: 10px;
-    margin-right: 20px;       /* Ajusta según el margen de tu diseño */
+    justify-content: flex-end;
 }
 
 /* Estilo para el botón */
