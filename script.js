@@ -1506,6 +1506,7 @@ function cerrarRitual() {
 // ==================================================================
 // ABSORCIÓN DE MONETIZADOS (RECLAMOS DE ENERGÍA DE MONETAG)
 // ==================================================================
+let anuncioEnCurso = false; // Variable global fuera de la función
 
 function mostrarVideoUnityAds() { 
     // 1. Seguridad
@@ -1513,6 +1514,14 @@ function mostrarVideoUnityAds() {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
+
+    // --- PROTECCIÓN ANTICLIC ---
+    if (anuncioEnCurso) {
+        lanzarAlertaMictlan("El portal ya está activo. Termina tu absorción primero.", "ENERGÍA EN CANAL");
+        return; 
+    }
+    anuncioEnCurso = true; // Bloqueamos los clics hasta que termine el proceso
+    // ---------------------------
 
     // 2. Abrir Monetag
     const MONETAG_LINK = "https://omg10.com/4/11178661";
@@ -1522,7 +1531,7 @@ function mostrarVideoUnityAds() {
     const modalPortal = document.getElementById('portal-monlix-modal');
     const btnCerrar = document.getElementById('cerrar-portal-btn');
 
-    // 4. Lógica de despliegue (Sin depender del iframe)
+    // 4. Lógica de despliegue
     if (modalPortal && btnCerrar) {
         modalPortal.style.display = 'flex';
         lanzarAlertaMictlan("Interactúa con el anuncio y regresa para reclamar.", "PORTAL ABIERTO");
@@ -1547,13 +1556,16 @@ function mostrarVideoUnityAds() {
                 btnCerrar.style.border = "1px solid #ff0000";
                 btnCerrar.style.cursor = "pointer";
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
+                
+                // DESBLOQUEAMOS PARA EL SIGUIENTE CLIC
+                anuncioEnCurso = false; 
             }
         }, 1000);
     } else {
+        anuncioEnCurso = false; // Si falla el modal, desbloqueamos para intentar de nuevo
         console.error("No se encontraron los elementos del modal.");
     }
 }
-
 
 // 2. AQUÍ ESTÁ TU BLOQUE TOTALMENTE INTACTO (Se ejecuta al cerrar el portal de Monlix)
 const ENLACE_MISTICO_KEY = "TuPalabraSecretaDelInframundo";
