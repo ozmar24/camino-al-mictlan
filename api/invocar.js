@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
-        'https://camino-al-mictlan.vercel.app',
+        'https://caminoamictlan.com',
         'http://localhost:3000'
     ];
     const origin = req.headers.origin;

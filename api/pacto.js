@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     }
     
     const origenPeticion = req.headers.origin || req.headers.referer;
-    const MI_DOMINIO_OFICIAL = "https://camino-al-mictlan.vercel.app"; 
+    const MI_DOMINIO_OFICIAL = "https://caminoamictlan.com"; 
 
     if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO_OFICIAL) && !origenPeticion.includes("localhost"))) {
         return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });

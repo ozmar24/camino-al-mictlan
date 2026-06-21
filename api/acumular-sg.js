@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     try {
         // Validación de Referer para seguridad extra en la acumulación de puntos (Candado de backend)
         const origenPeticion = req.headers.origin || req.headers.referer;
-        const MI_DOMINIO_OFICIAL = "https://camino-al-mictlan.vercel.app"; 
+        const MI_DOMINIO_OFICIAL = "https://caminoamictlan.com"; 
         
         // En desarrollo local puedes agregar: || origenPeticion?.includes("localhost")
         if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO_OFICIAL) && !origenPeticion.includes("localhost"))) {

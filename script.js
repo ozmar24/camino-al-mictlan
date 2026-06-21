@@ -860,7 +860,7 @@ let esModoRegistro = false;
 window.estaCargandoAnuncio = false;
 
 // UNIFICACIÓN DEL DOMINIO ABSOLUTO DE VERCEL
-const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app';
+const DOMINIO_VERCEL = 'https://caminoamictlan.com';
 
 if (typeof window.tumbasConSaldo === 'undefined') {
     window.tumbasConSaldo = {};
