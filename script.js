@@ -1328,33 +1328,25 @@ function abrirModalCosechaFinal(pos) {
 
     // Lógica para mostrar los campos de retiro solo si pulsa el botón
    // --- Modificación en abrirModalCosechaFinal ---
-document.getElementById('btn-mostrar-retiro').onclick = async function() {
+document.getElementById('btn-mostrar-retiro').onclick = function() {
+    const seccion = document.getElementById('seccion-retiro');
     const pos = window.currentCripto;
 
-    // 1. BARRERA DE SEGURIDAD: Verificar conexión
-    if (!window.userWallet) {
-        lanzarAlertaMictlan(
-            "Billetera no vinculada", 
-            "Debes conectar tu alma (MetaMask) antes de intentar retirar la energía."
-        );
-        // Intentamos conectar automáticamente al intentar retirar
-        await conectarWallet(); 
-        return; 
-    }
-
-    // 2. Lógica de retiro si ya está conectado
-    const esEVM = ['MATIC', 'BNB', 'ETHEREUM', 'USDT', 'PEPE'].includes(pos.nombre.toUpperCase());
+    // Detectamos si es un activo EVM (Polygon/BNB Chain)
+    const esEVM = (pos.nombre === "MATIC" || pos.nombre === "BNB" || pos.nombre === "Ethereum" || pos.nombre === "USDT" || pos.nombre === "Pepe");
 
     if (esEVM) {
         // --- FLUJO METAMASK ---
         const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
-        pos.montoAEnviar = saldoActual;
-        await conectarYRetirarMetaMask(pos);
-    } else {
-        // --- FLUJO TRADICIONAL (BTC/LTC) ---
-        procesarRetiro(); 
-    }
-};
+pos.montoAEnviar = saldoActual;
+conectarYRetirarMetaMask(pos);
+        } else {
+            procesarRetiro(); // Tu función existente
+        }
+   };
+
+    modal.style.display = 'block';
+}
 
 
 
