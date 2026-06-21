@@ -6,7 +6,8 @@ export default async function handler(req, res) {
     // ── CORS dinámico ──────────────────────────────────────────────────────────
     const ORIGENES_PERMITIDOS = [
         'https://caminoamictlan.com',
-        'http://localhost:3000'
+    'https://www.caminoamictlan.com', // Añade esto
+    'http://localhost:3000'
     ];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {

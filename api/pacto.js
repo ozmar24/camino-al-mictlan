@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     }
     
     const origenPeticion = req.headers.origin || req.headers.referer;
-    const MI_DOMINIO = "https://caminoamictlan.com"; 
+    const MI_DOMINIO = "caminoamictlan.com"; 
 
     if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO) && !origenPeticion.includes("localhost"))) {
         return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
