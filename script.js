@@ -1303,19 +1303,6 @@ function abrirModalCosechaFinal(pos) {
             <p style="color: #666; font-size: 12px; margin-top: 10px;">
                 ¿Qué deseas hacer con esta energía acumulada?
             </p>
-            
-            <!-- Campo para la wallet, solo se usa si decide retirar -->
-            <div id="seccion-retiro" style="display:none; margin-top: 20px;">
-                <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                        style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
-                    <option value="bitso">BITSO (Recomendado)</option>
-                    <option value="binance">BINANCE</option>
-                    <option value="coinbase">COINBASE</option>
-                    ${pos.nombre === 'Bitcoin' ? '<option value="bitso_lightning">BITSO LIGHTNING (Instantáneo)</option>' : ''}
-                </select>
-                <input type="text" id="wallet-input" placeholder="Dirección de destino" 
-                       style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
-            </div>
         </div>
     `;
 
