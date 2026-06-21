@@ -30,25 +30,23 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // --- APERTURA DE MONETAG (DIRECT LINK) ---
-        const btnAbrir = document.getElementById('btn-abrir-portal');
-        if (btnAbrir) {
-            btnAbrir.addEventListener('click', () => {
-                // Se abre el enlace de Monetag en pestaña nueva
-                window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
-                console.log("Anuncio de Monetag iniciado...");
-            });
-        }
-
-        // --- LÓGICA DE CIERRE DEL PORTAL (AÚN ÚTIL SI QUIERES MANTENER EL MODAL) ---
+        // --- LÓGICA DE CIERRE DEL PORTAL ---
         const btnCerrar = document.getElementById('cerrar-portal-btn');
         if (btnCerrar) {
             btnCerrar.onclick = async () => {
                 console.log("🔮 Iniciando transmutación...");
+                
+                // 1. Ejecutar la lógica de recompensa
                 if (typeof videoCompletado === 'function') {
                     await videoCompletado(); 
                 }
+                
+                // 2. LIMPIEZA DE ESTADOS (Crucial para el siguiente ritual)
                 document.getElementById('portal-monlix-modal').style.display = 'none';
+                document.title = "Camino al Mictlán"; // Resetear el título de la pestaña
+                window.anuncioEnCurso = false;        // Permitir que el usuario vuelva a abrir el portal después
+                
+                console.log("Portal cerrado, ritual completado y sistema liberado.");
             };
         }
     });

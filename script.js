@@ -1523,31 +1523,41 @@ function mostrarVideoUnityAds() {
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
         const relojMictlan = setInterval(() => {
-            // SI EL USUARIO SE FUE, CANCELAMOS TODO
-            if (focoPerdido) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", checkFocus);
-                anuncioEnCurso = false;
-                modalPortal.style.display = 'none'; // Cerramos el modal si hace trampa
-                lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
-                return;
-            }
+    // 1. Verificación de seguridad (Foco perdido)
+    if (focoPerdido) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        anuncioEnCurso = false;
+        document.title = "Ritual Interrumpido | Camino al Mictlán"; // Aviso de falla
+        modalPortal.style.display = 'none';
+        lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
+        return;
+    }
 
-            tiempoRestante--;
-            btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
+    tiempoRestante--;
 
-            if (tiempoRestante <= 0) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", checkFocus);
-                
-                btnCerrar.disabled = false;
-                btnCerrar.style.background = "#3a0000";
-                btnCerrar.style.color = "#ffcccc";
-                btnCerrar.style.cursor = "pointer";
-                btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
-                // NO desbloqueamos anuncioEnCurso aquí, eso se hará en el cierre final
-            }
-        }, 1000);
+    // 2. ACTUALIZACIÓN EN BARRA DE TÍTULO
+    // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
+    document.title = tiempoRestante > 0 
+        ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
+        : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+
+    // 3. Actualización en el botón
+    btnCerrar.innerText = tiempoRestante > 0 
+        ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
+        : "RETROCEDER AL CEMENTERIO";
+
+    // 4. Finalización del tiempo
+    if (tiempoRestante <= 0) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        
+        btnCerrar.disabled = false;
+        btnCerrar.style.background = "#3a0000";
+        btnCerrar.style.color = "#ffcccc";
+        btnCerrar.style.cursor = "pointer";
+    }
+}, 1000);
     } else {
         anuncioEnCurso = false;
     }
