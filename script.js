@@ -1008,7 +1008,7 @@ async function manejarAuth() {
 async function manejarLoginGoogle(response) {
     try {
         // Reemplaza 'tu-dominio-en-vercel.vercel.app' por tu dirección real de Vercel
-        const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app'; 
+        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com/'; 
 
         const res = await fetch(`${DOMINIO_VERCEL}/api/auth-google`, {
             method: 'POST',
