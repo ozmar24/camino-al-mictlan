@@ -1487,6 +1487,9 @@ function cerrarRitual() {
 // ==================================================================
 // ABSORCIÓN DE MONETIZADOS (RECLAMOS DE ENERGÍA DE MONETAG)
 // ==================================================================
+let anuncioEnCurso = false;
+let focoPerdido = false;
+
 function mostrarVideoUnityAds() { 
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
