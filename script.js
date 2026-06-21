@@ -1295,6 +1295,7 @@ function abrirModalCosechaFinal(pos) {
     const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
 
     info.innerHTML = `
+        info.innerHTML = `
         <div style="text-align: center; margin: 20px 0;">
             <p style="color: #aaa;">Saldo acumulado en esta tumba:</p>
             <h2 style="color: ${pos.color}; font-size: 28px; text-shadow: 0 0 10px ${pos.color};">
@@ -1303,6 +1304,8 @@ function abrirModalCosechaFinal(pos) {
             <p style="color: #666; font-size: 12px; margin-top: 10px;">
                 ¿Qué deseas hacer con esta energía acumulada?
             </p>
+        </div>
+    `;
             
          
 
@@ -1347,8 +1350,7 @@ conectarYRetirarMetaMask(pos);
     }
 };
 
-const modal = document.getElementById('modal-ritual');
-if (modal) {
+
     modal.style.display = 'block';
 }
 
