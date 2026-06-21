@@ -1333,7 +1333,7 @@ document.getElementById('btn-mostrar-retiro').onclick = function() {
     const pos = window.currentCripto;
 
     // Detectamos si es un activo EVM (Polygon/BNB Chain)
-    const esEVM = (pos.nombre === "MATIC" || pos.nombre === "BNB" || pos.nombre === "Ethereum" || pos.nombre === "USDT" || pos.nombre === "Pepe");
+    const esEVM = (pos.nombre === "MATIC/POL" || pos.nombre === "BNB" || pos.nombre === "Ethereum" || pos.nombre === "USDT" || pos.nombre === "Pepe");
 
     if (esEVM) {
         // --- FLUJO METAMASK ---
@@ -1352,7 +1352,7 @@ conectarYRetirarMetaMask(pos);
 
 function adaptarPlaceholderPasarela(criptoId) {
     // Si la cripto es de red (EVM), no hacemos nada porque no usamos pasarelas
-    const esEVM = ['MATIC', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(criptoId.toUpperCase());
+    const esEVM = ['MATIC/POL', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(criptoId.toUpperCase());
     if (esEVM) return;
 
     const pasarela = document.getElementById('pasarela-select').value;
@@ -1371,7 +1371,7 @@ async function procesarRetiro() {
     
     // --- NUEVO PUENTE DELEGADOR ---
     // Si es un activo de red, lo enviamos a su propio ritual y salimos de esta función
-    if (['MATIC', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(nombreCripto.toUpperCase())) {
+    if (['MATIC/POL', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(nombreCripto.toUpperCase())) {
         await conectarYRetirarMetaMask(window.currentCripto);
         return; 
     }
