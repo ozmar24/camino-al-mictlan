@@ -1489,14 +1489,9 @@ function cerrarRitual() {
 // ==================================================================
 let anuncioEnCurso = false;
 let focoPerdido = false;
-const checkFocus = () => {
-    if (document.hidden) {
-        focoPerdido = true;
-        console.log("Trampa detectada: El usuario abandonó el ritual.");
-    }
-};
 
-function mostrarVideoUnityAds() {  
+
+function mostrarVideoUnityAds() { 
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
@@ -1504,18 +1499,24 @@ function mostrarVideoUnityAds() {
 
     if (anuncioEnCurso) return;
 
-    anuncioEnCurso = true;
-    focoPerdido = false; 
-    let esMomentoDeVigilar = false; 
+   anuncioEnCurso = true;
+focoPerdido = false; 
+let esMomentoDeVigilar = false; // Nueva variable de control
 
-    // Activamos la vigilancia después de 3 segundos
-    setTimeout(() => {
-        esMomentoDeVigilar = true;
-    }, 3000);
+// Activamos la vigilancia después de 3 segundos para dejar que el anuncio cargue
+setTimeout(() => {
+    esMomentoDeVigilar = true;
+}, 3000);
 
-    // Mueve esta lógica dentro de una función o asegúrate de que esté bien colocada
-    // Lo ideal es que checkFocus sea la función global que ya definiste
-    document.addEventListener("visibilitychange", checkFocus);
+const checkFocus = () => {
+    // Solo marcamos como perdido si ya pasaron los 3 segundos
+    if (document.hidden && esMomentoDeVigilar) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
+
+document.addEventListener("visibilitychange", checkFocus);
 
     // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
@@ -1533,35 +1534,41 @@ function mostrarVideoUnityAds() {
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
         const relojMictlan = setInterval(() => {
-            if (focoPerdido) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", checkFocus);
-                anuncioEnCurso = false;
-                document.title = "Ritual Interrumpido | Camino al Mictlán";
-                modalPortal.style.display = 'none';
-                lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
-                return;
-            }
+    // 1. Verificación de seguridad (Foco perdido)
+    if (focoPerdido) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        anuncioEnCurso = false;
+        document.title = "Ritual Interrumpido | Camino al Mictlán"; // Aviso de falla
+        modalPortal.style.display = 'none';
+        lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
+        return;
+    }
 
-            tiempoRestante--;
+    tiempoRestante--;
 
-            document.title = tiempoRestante > 0 
-                ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
-                : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+    // 2. ACTUALIZACIÓN EN BARRA DE TÍTULO
+    // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
+    document.title = tiempoRestante > 0 
+        ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
+        : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
 
-            btnCerrar.innerText = tiempoRestante > 0 
-                ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
-                : "RETROCEDER AL CEMENTERIO";
+    // 3. Actualización en el botón
+    btnCerrar.innerText = tiempoRestante > 0 
+        ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
+        : "RETROCEDER AL CEMENTERIO";
 
-            if (tiempoRestante <= 0) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", checkFocus);
-                btnCerrar.disabled = false;
-                btnCerrar.style.background = "#3a0000";
-                btnCerrar.style.color = "#ffcccc";
-                btnCerrar.style.cursor = "pointer";
-            }
-        }, 1000);
+    // 4. Finalización del tiempo
+    if (tiempoRestante <= 0) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        
+        btnCerrar.disabled = false;
+        btnCerrar.style.background = "#3a0000";
+        btnCerrar.style.color = "#ffcccc";
+        btnCerrar.style.cursor = "pointer";
+    }
+}, 1000);
     } else {
         anuncioEnCurso = false;
     }
