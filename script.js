@@ -1326,7 +1326,8 @@ function abrirModalCosechaFinal(pos) {
         </div>
     `;
 
-   
+    // Lógica para mostrar los campos de retiro solo si pulsa el botón
+   // --- Modificación en abrirModalCosechaFinal ---
 document.getElementById('btn-mostrar-retiro').onclick = async function() {
     const pos = window.currentCripto;
 
@@ -1337,10 +1338,7 @@ document.getElementById('btn-mostrar-retiro').onclick = async function() {
             "Debes conectar tu alma (MetaMask) antes de intentar retirar la energía."
         );
         // Intentamos conectar automáticamente al intentar retirar
-        await conectarWallet();
-	if (window.userWallet) {
-            document.getElementById('btn-mostrar-retiro').click();
-        }
+        await conectarWallet(); 
         return; 
     }
 
@@ -1353,7 +1351,7 @@ document.getElementById('btn-mostrar-retiro').onclick = async function() {
         pos.montoAEnviar = saldoActual;
         await conectarYRetirarMetaMask(pos);
     } else {
-       
+        // --- FLUJO TRADICIONAL (BTC/LTC) ---
         procesarRetiro(); 
     }
 };
