@@ -1498,18 +1498,24 @@ function mostrarVideoUnityAds() {
 
     if (anuncioEnCurso) return;
 
-    anuncioEnCurso = true;
-    focoPerdido = false;
-    
-    setTimeout(() => {
-    document.addEventListener("visibilitychange", checkFocus);
-}, 1000); 
+   anuncioEnCurso = true;
+focoPerdido = false; 
+let esMomentoDeVigilar = false; // Nueva variable de control
 
-    // Guardián de enfoque
-    const checkFocus = () => {
-        if (document.hidden) focoPerdido = true;
-    };
-    document.addEventListener("visibilitychange", checkFocus);
+// Activamos la vigilancia después de 3 segundos para dejar que el anuncio cargue
+setTimeout(() => {
+    esMomentoDeVigilar = true;
+}, 3000);
+
+const checkFocus = () => {
+    // Solo marcamos como perdido si ya pasaron los 3 segundos
+    if (document.hidden && esMomentoDeVigilar) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
+
+document.addEventListener("visibilitychange", checkFocus);
 
     // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
