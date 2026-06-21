@@ -1489,8 +1489,14 @@ function cerrarRitual() {
 // ==================================================================
 let anuncioEnCurso = false;
 let focoPerdido = false;
+const checkFocus = () => {
+    if (document.hidden) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
 
-function mostrarVideoUnityAds() { 
+function mostrarVideoUnityAds() {  
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
@@ -1498,24 +1504,18 @@ function mostrarVideoUnityAds() {
 
     if (anuncioEnCurso) return;
 
-   anuncioEnCurso = true;
-focoPerdido = false; 
-let esMomentoDeVigilar = false; // Nueva variable de control
+    anuncioEnCurso = true;
+    focoPerdido = false; 
+    let esMomentoDeVigilar = false; 
 
-// Activamos la vigilancia después de 3 segundos para dejar que el anuncio cargue
-setTimeout(() => {
-    esMomentoDeVigilar = true;
-}, 3000);
+    // Activamos la vigilancia después de 3 segundos
+    setTimeout(() => {
+        esMomentoDeVigilar = true;
+    }, 3000);
 
-const checkFocus = () => {
-    // Solo marcamos como perdido si ya pasaron los 3 segundos
-    if (document.hidden && esMomentoDeVigilar) {
-        focoPerdido = true;
-        console.log("Trampa detectada: El usuario abandonó el ritual.");
-    }
-};
-
-document.addEventListener("visibilitychange", checkFocus);
+    // Mueve esta lógica dentro de una función o asegúrate de que esté bien colocada
+    // Lo ideal es que checkFocus sea la función global que ya definiste
+    document.addEventListener("visibilitychange", checkFocus);
 
     // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
@@ -1533,41 +1533,35 @@ document.addEventListener("visibilitychange", checkFocus);
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
         const relojMictlan = setInterval(() => {
-    // 1. Verificación de seguridad (Foco perdido)
-    if (focoPerdido) {
-        clearInterval(relojMictlan);
-        document.removeEventListener("visibilitychange", checkFocus);
-        anuncioEnCurso = false;
-        document.title = "Ritual Interrumpido | Camino al Mictlán"; // Aviso de falla
-        modalPortal.style.display = 'none';
-        lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
-        return;
-    }
+            if (focoPerdido) {
+                clearInterval(relojMictlan);
+                document.removeEventListener("visibilitychange", checkFocus);
+                anuncioEnCurso = false;
+                document.title = "Ritual Interrumpido | Camino al Mictlán";
+                modalPortal.style.display = 'none';
+                lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
+                return;
+            }
 
-    tiempoRestante--;
+            tiempoRestante--;
 
-    // 2. ACTUALIZACIÓN EN BARRA DE TÍTULO
-    // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
-    document.title = tiempoRestante > 0 
-        ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
-        : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+            document.title = tiempoRestante > 0 
+                ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
+                : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
 
-    // 3. Actualización en el botón
-    btnCerrar.innerText = tiempoRestante > 0 
-        ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
-        : "RETROCEDER AL CEMENTERIO";
+            btnCerrar.innerText = tiempoRestante > 0 
+                ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
+                : "RETROCEDER AL CEMENTERIO";
 
-    // 4. Finalización del tiempo
-    if (tiempoRestante <= 0) {
-        clearInterval(relojMictlan);
-        document.removeEventListener("visibilitychange", checkFocus);
-        
-        btnCerrar.disabled = false;
-        btnCerrar.style.background = "#3a0000";
-        btnCerrar.style.color = "#ffcccc";
-        btnCerrar.style.cursor = "pointer";
-    }
-}, 1000);
+            if (tiempoRestante <= 0) {
+                clearInterval(relojMictlan);
+                document.removeEventListener("visibilitychange", checkFocus);
+                btnCerrar.disabled = false;
+                btnCerrar.style.background = "#3a0000";
+                btnCerrar.style.color = "#ffcccc";
+                btnCerrar.style.cursor = "pointer";
+            }
+        }, 1000);
     } else {
         anuncioEnCurso = false;
     }
@@ -1613,6 +1607,9 @@ async function videoCompletado() {
             lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
             return;
         }
+ 
+	anuncioEnCurso = false;
+	document.removeEventListener("visibilitychange", checkFocus);
 
         // Actualiza las variables globales y el localStorage con el nuevo balance del servidor
         balanceUsuarioSG = parseFloat(resultado.nuevoBalance) || balanceUsuarioSG;
@@ -1626,6 +1623,8 @@ async function videoCompletado() {
         lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
 
     } catch (error) {
+	anuncioEnCurso = false;
+	document.removeEventListener("visibilitychange", checkFocus);
         console.error("Error en video:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
     }
