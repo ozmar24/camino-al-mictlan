@@ -1304,20 +1304,7 @@ function abrirModalCosechaFinal(pos) {
                 ¿Qué deseas hacer con esta energía acumulada?
             </p>
             
-            <!-- Campo para la wallet, solo se usa si decide retirar -->
-            <div id="seccion-retiro" style="display:none; margin-top: 20px;">
-                <select id="pasarela-select" onchange="adaptarPlaceholderPasarela('${pos.nombre}')" 
-                        style="width: 80%; padding: 10px; background: #111; border: 1px solid ${pos.color}; color: #fff; margin-bottom: 10px;">
-                    <option value="bitso">BITSO (Recomendado)</option>
-                    <option value="binance">BINANCE</option>
-                    <option value="coinbase">COINBASE</option>
-                    ${pos.nombre === 'Bitcoin' ? '<option value="bitso_lightning">BITSO LIGHTNING (Instantáneo)</option>' : ''}
-                </select>
-                <input type="text" id="wallet-input" placeholder="Dirección de destino" 
-                       style="width: 80%; padding: 10px; background: #000; border: 1px solid ${pos.color}; color: #fff; text-align: center;">
-            </div>
-        </div>
-    `;
+         
 
     botones.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
@@ -1342,7 +1329,7 @@ function abrirModalCosechaFinal(pos) {
     // Lógica para mostrar los campos de retiro solo si pulsa el botón
    // --- Modificación en abrirModalCosechaFinal ---
 document.getElementById('btn-mostrar-retiro').onclick = function() {
-    const seccion = document.getElementById('seccion-retiro');
+   
     const pos = window.currentCripto;
 
     // Detectamos si es un activo EVM (Polygon/BNB Chain)
@@ -1354,19 +1341,16 @@ document.getElementById('btn-mostrar-retiro').onclick = function() {
 pos.montoAEnviar = saldoActual;
 conectarYRetirarMetaMask(pos);
     } else {
-        // --- FLUJO TRADICIONAL (BTC/LTC/ETC) ---
-        if (seccion.style.display === 'none') {
-            seccion.style.display = 'block';
-            this.innerText = "CONFIRMAR RETIRO";
-        } else {
+        
             procesarRetiro(); // Tu función existente
-        }
+        
     }
 };
 
+const modal = document.getElementById('modal-ritual');
+if (modal) {
     modal.style.display = 'block';
 }
-
 
 
 function adaptarPlaceholderPasarela(criptoId) {
