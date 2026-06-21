@@ -1489,9 +1489,15 @@ function cerrarRitual() {
 // ==================================================================
 let anuncioEnCurso = false;
 let focoPerdido = false;
+const checkFocus = () => {
+    // Nota: Usamos una variable de estado que revisaremos dentro de mostrarVideoUnityAds
+    if (document.hidden && window.vigilanciaActiva) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
 
-
-function mostrarVideoUnityAds() { 
+function mostrarVideoUnityAds() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
@@ -1499,26 +1505,17 @@ function mostrarVideoUnityAds() {
 
     if (anuncioEnCurso) return;
 
-   anuncioEnCurso = true;
-focoPerdido = false; 
-let esMomentoDeVigilar = false; // Nueva variable de control
+    anuncioEnCurso = true;
+    focoPerdido = false;
+    window.vigilanciaActiva = false; 
 
-// Activamos la vigilancia después de 3 segundos para dejar que el anuncio cargue
-setTimeout(() => {
-    esMomentoDeVigilar = true;
-}, 3000);
+    setTimeout(() => {
+        window.vigilanciaActiva = true;
+    }, 3000);
 
-const checkFocus = () => {
-    // Solo marcamos como perdido si ya pasaron los 3 segundos
-    if (document.hidden && esMomentoDeVigilar) {
-        focoPerdido = true;
-        console.log("Trampa detectada: El usuario abandonó el ritual.");
-    }
-};
+    // Registramos la función GLOBAL
+    document.addEventListener("visibilitychange", checkFocus);
 
-document.addEventListener("visibilitychange", checkFocus);
-
-    // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
 
     const modalPortal = document.getElementById('portal-monlix-modal');
