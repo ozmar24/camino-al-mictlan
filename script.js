@@ -1499,7 +1499,11 @@ function mostrarVideoUnityAds() {
     if (anuncioEnCurso) return;
 
     anuncioEnCurso = true;
-    focoPerdido = false; 
+    focoPerdido = false;
+    
+    setTimeout(() => {
+    document.addEventListener("visibilitychange", checkFocus);
+}, 1000); 
 
     // Guardián de enfoque
     const checkFocus = () => {
