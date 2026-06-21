@@ -1487,64 +1487,66 @@ function cerrarRitual() {
 // ==================================================================
 // ABSORCIÓN DE MONETIZADOS (RECLAMOS DE ENERGÍA DE MONETAG)
 // ==================================================================
-let anuncioEnCurso = false; // Variable global fuera de la función
-
 function mostrarVideoUnityAds() { 
-    // 1. Seguridad
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
     }
 
-    // --- PROTECCIÓN ANTICLIC ---
-    if (anuncioEnCurso) {
-        lanzarAlertaMictlan("El portal ya está activo. Termina tu absorción primero.", "ENERGÍA EN CANAL");
-        return; 
-    }
-    anuncioEnCurso = true; // Bloqueamos los clics hasta que termine el proceso
-    // ---------------------------
+    if (anuncioEnCurso) return;
 
-    // 2. Abrir Monetag
-    const MONETAG_LINK = "https://omg10.com/4/11178661";
-    window.open(MONETAG_LINK, '_blank', 'noopener,noreferrer');
+    anuncioEnCurso = true;
+    focoPerdido = false; 
 
-    // 3. Referencias del DOM
+    // Guardián de enfoque
+    const checkFocus = () => {
+        if (document.hidden) focoPerdido = true;
+    };
+    document.addEventListener("visibilitychange", checkFocus);
+
+    // Abrir ventana una sola vez
+    window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
+
     const modalPortal = document.getElementById('portal-monlix-modal');
     const btnCerrar = document.getElementById('cerrar-portal-btn');
 
-    // 4. Lógica de despliegue
     if (modalPortal && btnCerrar) {
         modalPortal.style.display = 'flex';
         lanzarAlertaMictlan("Interactúa con el anuncio y regresa para reclamar.", "PORTAL ABIERTO");
 
-        // 5. Temporizador de seguridad (30 segundos)
         let tiempoRestante = 30;
         btnCerrar.disabled = true;
         btnCerrar.style.background = "#222";
-        btnCerrar.style.color = "#666";
-        btnCerrar.style.cursor = "not-allowed";
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
         const relojMictlan = setInterval(() => {
+            // SI EL USUARIO SE FUE, CANCELAMOS TODO
+            if (focoPerdido) {
+                clearInterval(relojMictlan);
+                document.removeEventListener("visibilitychange", checkFocus);
+                anuncioEnCurso = false;
+                modalPortal.style.display = 'none'; // Cerramos el modal si hace trampa
+                lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
+                return;
+            }
+
             tiempoRestante--;
             btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
             if (tiempoRestante <= 0) {
                 clearInterval(relojMictlan);
+                document.removeEventListener("visibilitychange", checkFocus);
+                
                 btnCerrar.disabled = false;
                 btnCerrar.style.background = "#3a0000";
                 btnCerrar.style.color = "#ffcccc";
-                btnCerrar.style.border = "1px solid #ff0000";
                 btnCerrar.style.cursor = "pointer";
                 btnCerrar.innerText = "RETROCEDER AL CEMENTERIO";
-                
-                // DESBLOQUEAMOS PARA EL SIGUIENTE CLIC
-                anuncioEnCurso = false; 
+                // NO desbloqueamos anuncioEnCurso aquí, eso se hará en el cierre final
             }
         }, 1000);
     } else {
-        anuncioEnCurso = false; // Si falla el modal, desbloqueamos para intentar de nuevo
-        console.error("No se encontraron los elementos del modal.");
+        anuncioEnCurso = false;
     }
 }
 
@@ -1554,6 +1556,11 @@ const ENLACE_MISTICO_KEY = "TuPalabraSecretaDelInframundo";
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
+        return;
+    }
+
+    if (focoPerdido) {
+        lanzarAlertaMictlan("No puedes reclamar: el portal se cerró porque abandonaste la publicidad.", "RITUAL INVÁLIDO");
         return;
     }
 
