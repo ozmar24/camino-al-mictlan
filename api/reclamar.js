@@ -45,9 +45,17 @@ export default async function handler(req, res) {
     BNB:       { tasa: 0.0018,   simFP: 'BNB',   minimoNativo: 0.001 },
     USDT:      { tasa: 0.25,     simFP: 'USDT',  minimoNativo: 0.01 }
 };
+    let nombreNormalizado = cripto;
+if (nombreNormalizado === "MATIC/POL") {
+    nombreNormalizado = "MATIC";
+}
 
-    const infoCripta = CONFIG_CRIPTAS[cripto];
-    if (!infoCripta) return res.status(400).json({ error: 'Cripta no registrada.' });
+    const infoCripta = CONFIG_CRIPTAS[nombreNormalizado]; 
+
+if (!infoCripta) {
+    console.error("Cripta no encontrada en configuración:", nombreNormalizado); // Muy útil para los logs
+    return res.status(400).json({ error: 'Cripta no registrada.' });
+}
 
     // ── Filtro geográfico ──────────────────────────────────────────────────────
     const PAISES_BLOQUEADOS = ['BD', 'PK', 'IN', 'VN', 'NG', 'ID', 'SI'];
