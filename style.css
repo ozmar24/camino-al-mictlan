@@ -2077,8 +2077,12 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-@media (max-width: 768px) {
-    .contenedor-boton-meta {
+/* Forzar la ocultación del contenedor del botón en pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    body .contenedor-boton-meta {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
