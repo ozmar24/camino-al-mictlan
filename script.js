@@ -1754,8 +1754,13 @@ function mostrarPergamino(tipo) {
         }
 
     } else if (tipo === 'alianzas') {
-        titulo.innerText = "ALIANZAS OSCURAS"; 
-        cuerpo.innerHTML = "<br><br>• BITSO<br>• COINBASE<br>• BINANCE";
+    titulo.innerText = "ALIANZAS OSCURAS"; 
+    
+    cuerpo.innerHTML = `
+        <br> 
+        <img src="img/Meta1.png" alt="MetaMask" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;">
+        METAMASK
+    `;
     }
 
     if (pantalla) {
