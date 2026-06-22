@@ -1967,10 +1967,10 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         line-height: 1.2 !important;
         text-align: center !important;
         
-        /* Forzamos un rojo vivo y grueso para que no se vea rosa ni pálido */
+        
         color: #000000 !important; 
         font-weight: 900 !important; 
-        text-shadow: none !important; 
+        text-shadow: 1px 1px 1px #ffffff !important; 
     }
 
     #pantalla-codice .pergamino-quemado #codice-cuerpo span,
