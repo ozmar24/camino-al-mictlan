@@ -1835,7 +1835,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 #pantalla-codice #codice-cuerpo span.link-ley:hover,
 #pantalla-codice #codice-cuerpo a:hover {
     color: #8b0000 !important; /* Cambia al mismo rojo místico del título */
-    text-shadow: none !important; /* Sin resplandores molestos */
+    
     cursor: pointer;
 }
 
