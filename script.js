@@ -1756,10 +1756,10 @@ function mostrarPergamino(tipo) {
     } else if (tipo === 'alianzas') {
     titulo.innerText = "ALIANZAS OSCURAS"; 
     
-    cuerpo.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+   cuerpo.innerHTML = `
+    <div class="bloque-metamask" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
         <img src="img/Meta1.png" alt="MetaMask" style="width: 50px; height: 50px;">
-        <span style="font-weight: 900; color: #000000;">METAMASK</span>
+        <span style="font-weight: 900;">METAMASK</span>
     </div>
 `;
     }

@@ -2095,3 +2095,6 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         font-size: 0.6rem !important;
     }
 }
+.bloque-metamask span {
+    color: #000000 !important; 
+}
