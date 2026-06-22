@@ -1812,6 +1812,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     font-size: 0.60rem !important;
     font-family: 'MedievalSharp', cursive !important;
     font-weight: normal !important;
+    text-shadow: 1px 1px 1px #ffffff !important;
 }
 
 /* 4. ENLACES INTERACTIVOS EN REPOSO (MANTIENEN EL TONO OSCURO) */
@@ -1956,7 +1957,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         height: auto !important;
     }
 
-    /* ROJO SANGRE ULTRA-ESPECÍFICO Y CONTROL DE LÍNEAS */
+   
     #pantalla-codice .pergamino-quemado #codice-cuerpo p,
     #pantalla-codice #codice-cuerpo p,
     #codice-cuerpo p {
