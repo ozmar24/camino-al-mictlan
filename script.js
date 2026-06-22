@@ -1757,10 +1757,11 @@ function mostrarPergamino(tipo) {
     titulo.innerText = "ALIANZAS OSCURAS"; 
     
     cuerpo.innerHTML = `
-        <br> 
-        <img src="img/Meta1.png" alt="MetaMask" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;">
-        METAMASK
-    `;
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+        <img src="img/Meta1.png" alt="MetaMask" style="width: 50px; height: 50px;">
+        <span style="font-weight: 900; color: #000000;">METAMASK</span>
+    </div>
+`;
     }
 
     if (pantalla) {
