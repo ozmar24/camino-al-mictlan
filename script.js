@@ -1507,15 +1507,25 @@ function mostrarVideoUnityAds() {
 
     anuncioEnCurso = true;
     focoPerdido = false;
-    window.vigilanciaActiva = false; 
+    window.vigilanciaActiva = false; // Activamos vigilancia mediante una variable global
 
     setTimeout(() => {
         window.vigilanciaActiva = true;
     }, 3000);
 
-    // Registramos la función GLOBAL
     document.addEventListener("visibilitychange", checkFocus);
 
+const checkFocus = () => {
+    // Solo marcamos como perdido si ya pasaron los 3 segundos
+    if (document.hidden && esMomentoDeVigilar) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
+
+document.addEventListener("visibilitychange", checkFocus);
+
+    // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
 
     const modalPortal = document.getElementById('portal-monlix-modal');
@@ -2459,20 +2469,37 @@ async function conectarMetaMask() {
     }
 }
 
-// Dentro de tu lógica de clic en el modal (la que ya habíamos modificado)
+// --- DETECCIÓN GLOBAL DE DISPOSITIVO ---
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// 1. Ocultar botón de conexión al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    const btnConectar = document.getElementById('btn-conectar-metamask');
+    if (isMobile && btnConectar) {
+        btnConectar.style.display = 'none';
+    }
+});
+
+// 2. Restringir retiros a PC
 async function conectarYRetirarMetaMask(pos) {
-if (!pos || typeof pos.montoAEnviar === 'undefined') {
-        console.error("Error: La información de la tumba (pos) no está completa", pos);
+    if (isMobile) {
+        lanzarAlertaMictlan(
+            "Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).", 
+            "SANTUARIO PC REQUERIDO"
+        );
+        return;
+    }
+
+    if (!pos || typeof pos.montoAEnviar === 'undefined') {
         lanzarAlertaMictlan("Ritual incompleto", "No se detectó el monto a retirar.");
         return;
     }
-    // 1. ESPERA ACTIVA: Si ethers no ha cargado, reintenta en 100ms
+
     if (typeof window.ethers === 'undefined') {
         setTimeout(() => conectarYRetirarMetaMask(pos), 1000);
         return;
     }
 
-    // 2. Ahora que sabemos que ethers EXISTE, ejecutamos el ritual
     try {
         const direccion = await conectarMetaMask();
         if (!direccion) return;
@@ -2481,31 +2508,27 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-       // 3. El backend firma y envía — el frontend solo obtiene la dirección
         const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
-
         btn.innerText = "PROCESANDO...";
 
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                identidad:   window.userWallet,
-                wallet:      direccion,
-                cripto:      pos.nombre,
-                pasarela:    'metamask',
+                identidad: window.userWallet,
+                wallet: direccion,
+                cripto: pos.nombre,
+                pasarela: 'metamask',
                 saldoCripto: saldoActual
             })
         });
 
         const resultado = await respuesta.json();
-
         if (!respuesta.ok) {
             lanzarAlertaMictlan(resultado.error || "Error del servidor", "RITUAL FALLIDO");
             return;
         }
 
-        // Limpiar saldo de la tumba tras retiro exitoso
         window.tumbasConSaldo[pos.nombre] = 0;
         guardarSaldosCriptas();
         generarCementerio();
@@ -2524,6 +2547,7 @@ if (!pos || typeof pos.montoAEnviar === 'undefined') {
         }
     }
 }
+
 async function actualizarBarraProgreso() {
     const barra = document.getElementById('barra-progreso');
     const texto = document.querySelector('p[style*="font-family"]');

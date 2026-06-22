@@ -2077,3 +2077,8 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+@media (max-width: 768px) {
+    #btn-conectar-metamask {
+        display: none !important;
+    }
+}
