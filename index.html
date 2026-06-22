@@ -60,13 +60,17 @@
     (function() {
         // Detectamos si es móvil
         var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
+        // Solo si es móvil, inyectamos el CSS. Si es PC, el script no hace absolutamente nada.
         if (isMobile) {
-            // Creamos un estilo que se inyecta al vuelo
-            var css = '.contenedor-boton-meta { display: none !important; visibility: hidden !important; opacity: 0 !important; }';
+            var css = '.contenedor-boton-meta { display: none !important; }';
             var style = document.createElement('style');
             style.type = 'text/css';
             style.appendChild(document.createTextNode(css));
             document.head.appendChild(style);
+            console.log("Modo móvil: Botón oculto.");
+        } else {
+            console.log("Modo escritorio: Botón visible.");
         }
     })();
 </script>

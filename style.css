@@ -2077,16 +2077,3 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-@media only screen and (max-width: 768px) {
-    .contenedor-boton-meta {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-    }
-}
