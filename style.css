@@ -1967,7 +1967,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         text-align: center !important;
         
         /* Forzamos un rojo vivo y grueso para que no se vea rosa ni pálido */
-        color: #000000 !important; 
+        color: #ff0000 !important; 
         font-weight: 900 !important; 
         text-shadow: none !important; 
     }
@@ -1979,7 +1979,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         letter-spacing: 0.5px !important;
         margin: 3px auto !important;
         display: block !important;
-        color: #ff3333 !important;
+        color: #ff0000 !important;
         font-weight: 900 !important;
         text-shadow: none !important;
     }
