@@ -2081,19 +2081,16 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     .contenedor-boton-meta {
         display: none !important;
     }
-}
-@media screen and (max-width: 768px) {
-    #contenedor-progreso-airdrop {
-        /* Sacamos el elemento de la posición central absoluta */
+}@media screen and (max-width: 1024px) {
+    .mobile-responsive {
         position: fixed !important;
-        top: 10px !important;      /* Lo movemos arriba */
-        left: 10px !important;     /* Lo pegamos a la izquierda */
-        transform: none !important; /* Quitamos el centrado */
-        width: 150px !important;    /* Reducimos el ancho */
+        top: 10px !important;
+        left: 10px !important;
+        transform: none !important;
+        width: 150px !important;
     }
 
-    #contenedor-progreso-airdrop p {
-        font-size: 0.6rem !important; /* Hacemos el texto más pequeño */
-        margin-bottom: 2px !important;
+    .mobile-responsive p {
+        font-size: 0.6rem !important;
     }
 }
