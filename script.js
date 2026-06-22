@@ -1489,7 +1489,13 @@ function cerrarRitual() {
 // ==================================================================
 let anuncioEnCurso = false;
 let focoPerdido = false;
-let esMomentoDeVigilar = false; // Nueva bandera de control
+const checkFocus = () => {
+    // Nota: Usamos una variable de estado que revisaremos dentro de mostrarVideoUnityAds
+    if (document.hidden && window.vigilanciaActiva) {
+        focoPerdido = true;
+        console.log("Trampa detectada: El usuario abandonó el ritual.");
+    }
+};
 
 function mostrarVideoUnityAds() {
     if (!window.userWallet) {
@@ -1501,24 +1507,17 @@ function mostrarVideoUnityAds() {
 
     anuncioEnCurso = true;
     focoPerdido = false;
-    esMomentoDeVigilar = false;
+    window.vigilanciaActiva = false; // Activamos vigilancia mediante una variable global
 
-    // Activamos vigilancia después de 3 segundos
     setTimeout(() => {
-        esMomentoDeVigilar = true;
+        window.vigilanciaActiva = true;
     }, 3000);
 
-    // Definición única de la función de vigilancia
-    const handlerCheckFocus = () => {
-        if (document.hidden && esMomentoDeVigilar) {
-            focoPerdido = true;
-            console.log("Trampa detectada: El usuario abandonó el ritual.");
-        }
-    };
+    document.addEventListener("visibilitychange", checkFocus);
 
-    document.addEventListener("visibilitychange", handlerCheckFocus);
 
-    // Abrir ventana
+
+    // Abrir ventana una sola vez
     window.open("https://omg10.com/4/11178661", '_blank', 'noopener,noreferrer');
 
     const modalPortal = document.getElementById('portal-monlix-modal');
@@ -1534,40 +1533,46 @@ function mostrarVideoUnityAds() {
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
 
         const relojMictlan = setInterval(() => {
-            if (focoPerdido) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", handlerCheckFocus);
-                anuncioEnCurso = false;
-                document.title = "Ritual Interrumpido | Camino al Mictlán";
-                modalPortal.style.display = 'none';
-                lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
-                return;
-            }
+    // 1. Verificación de seguridad (Foco perdido)
+    if (focoPerdido) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        anuncioEnCurso = false;
+        document.title = "Ritual Interrumpido | Camino al Mictlán"; // Aviso de falla
+        modalPortal.style.display = 'none';
+        lanzarAlertaMictlan("¡RITUAL ROTO! Debes mantener la publicidad activa.", "FALLO DE CONCENTRACIÓN");
+        return;
+    }
 
-            tiempoRestante--;
+    tiempoRestante--;
 
-            document.title = tiempoRestante > 0 
-                ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
-                : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+    // 2. ACTUALIZACIÓN EN BARRA DE TÍTULO
+    // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
+    document.title = tiempoRestante > 0 
+        ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
+        : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
 
-            btnCerrar.innerText = tiempoRestante > 0 
-                ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
-                : "RETROCEDER AL CEMENTERIO";
+    // 3. Actualización en el botón
+    btnCerrar.innerText = tiempoRestante > 0 
+        ? `CANALIZANDO ENERGÍA (${tiempoRestante}s)...` 
+        : "RETROCEDER AL CEMENTERIO";
 
-            if (tiempoRestante <= 0) {
-                clearInterval(relojMictlan);
-                document.removeEventListener("visibilitychange", handlerCheckFocus);
-                btnCerrar.disabled = false;
-                btnCerrar.style.background = "#3a0000";
-                btnCerrar.style.color = "#ffcccc";
-                btnCerrar.style.cursor = "pointer";
-            }
-        }, 1000);
+    // 4. Finalización del tiempo
+    if (tiempoRestante <= 0) {
+        clearInterval(relojMictlan);
+        document.removeEventListener("visibilitychange", checkFocus);
+        
+        btnCerrar.disabled = false;
+        btnCerrar.style.background = "#3a0000";
+        btnCerrar.style.color = "#ffcccc";
+        btnCerrar.style.cursor = "pointer";
+    }
+}, 1000);
     } else {
         anuncioEnCurso = false;
-        document.removeEventListener("visibilitychange", handlerCheckFocus);
     }
 }
+
 // 2. AQUÍ ESTÁ TU BLOQUE TOTALMENTE INTACTO (Se ejecuta al cerrar el portal de Monlix)
 const ENLACE_MISTICO_KEY = "TuPalabraSecretaDelInframundo";
 
