@@ -1938,7 +1938,8 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     /* FORZAMOS ROJO FUERTE EN EL TÍTULO */
     #pantalla-codice .pergamino-quemado h2,
     #pantalla-codice .pergamino-quemado #codice-titulo,
-    #codice-titulo {
+    #codice-titulo
+    #modal-boveda h2 {
         font-size: 0.65rem !important;
         margin-bottom: 6px !important;
         text-align: center !important;
@@ -1967,7 +1968,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         text-align: center !important;
         
         /* Forzamos un rojo vivo y grueso para que no se vea rosa ni pálido */
-        color: #ff0000 !important; 
+        color: #000000 !important; 
         font-weight: 900 !important; 
         text-shadow: none !important; 
     }
