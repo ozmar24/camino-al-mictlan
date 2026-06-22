@@ -2077,7 +2077,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .contenedor-boton-meta {
         display: none !important;
     }
