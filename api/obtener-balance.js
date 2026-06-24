@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import contractABI from '../contractABI.json';
+import contractABI from './contractABI.json';
 
 export default async function handler(req, res) {
     // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
