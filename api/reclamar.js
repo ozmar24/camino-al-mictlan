@@ -149,7 +149,7 @@ if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
 } else if (pasarela === 'metamask') {
     // ESTA ES LA NUEVA PARTE: Solo registramos, no ejecutamos OnChain aquí
     pagoExitoso = true;
-    mensajeRetorno = "Cosecha registrada en el libro del inframundo.";
+    mensajeRetorno = "Solicitud validada. Por favor, confirma la transacción en tu MetaMask.";
 
 } else if (['binance', 'coinbase'].includes(pasarela)) {
     // Las pasarelas centrales siguen usando tu lógica original de servidor

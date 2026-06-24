@@ -1,3 +1,6 @@
+import { ethers } from 'ethers';
+import contractABI from '../contractABI.json';
+
 export default async function handler(req, res) {
     // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
     // Permitimos tanto GET como POST según la lógica de tu aplicación.
@@ -37,16 +40,37 @@ export default async function handler(req, res) {
 
         console.log(`✅ Balance consultado para ${userKey}: ${balance}`);
 
+const esWalletValida = /^0x[a-fA-F0-9]{40}$/.test(wallet);
+        
+        let balanceFinal = balance; // Por defecto usamos Redis
+        let fuente = 'redis';
+
+        // Solo si la wallet es un formato EVM correcto, consultamos la blockchain
+        if (esWalletValida) {
+            try {
+                const provider = new ethers.JsonRpcProvider(process.env.BLOCKCHAIN_RPC);
+                const contrato = new ethers.Contract(process.env.SOULGEIST_CONTRACT_ADDRESS, contractABI, provider);
+                
+                const balanceOnChain = await contrato.balanceOf(wallet);
+                const balanceFormateado = ethers.formatUnits(balanceOnChain, 18);
+                
+                balanceFinal = parseFloat(balanceFormateado);
+                fuente = 'blockchain';
+            } catch (error) {
+                console.error("❌ Error en consulta blockchain, usando Redis:", error);
+                // Si falla la blockchain, mantenemos balanceFinal = balance (de Redis)
+            }
+        }
+
         return res.status(200).json({
             success: true,
-            balance: balance
+            balance: balanceFinal,
+            fuente: fuente
         });
+        // ──────────────────────────────────────────────────────────────────────────
 
     } catch (error) {
         console.error("❌ Error en obtener-balance:", error);
-        return res.status(500).json({ 
-            success: false, 
-            error: "Error de conexión con el Inframundo" 
-        });
+        return res.status(500).json({ success: false, error: "Error de conexión" });
     }
 }
