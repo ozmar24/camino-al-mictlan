@@ -1870,19 +1870,20 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil texto quema de tokens ─────────────────────── */
 @media (max-width: 1024px) {
     .contenedor-estado {
-        top: auto !important;
-        bottom: 10px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        text-align: center !important;
-        width: 90% !important;
-        z-index: 100 !important;
+        position: static !important; /* Ya no flota, vive dentro del padre */
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
+        margin-top: 10px;
     }
 
     .texto-estado {
-        font-size: 8px !important;
+        font-size: 10px !important; /* Un poquito más legible que 8px */
     }
 }
+
+/* Mantén esto tal cual, está perfecto */
 .punto-activo {
     color: #ff0000;
     margin-right: 5px;
