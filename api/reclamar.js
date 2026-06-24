@@ -13,8 +13,8 @@ export default async function handler(req, res) {
     const redisToken   = process.env.UPSTASH_REDIS_REST_TOKEN;
     const claveAdmin   = process.env.ADMIN_PRIVATE_KEY;
     const contratoAddr = process.env.SOULGEIST_CONTRACT_ADDRESS;
-    const blockchainRPC = process.env.BLOCKCHAIN_RPC || 'https://rpc-amoy.polygon.technology';
-    const blockchainEnv = process.env.BLOCKCHAIN_ENV || 'testnet';
+    const blockchainRPC = process.env.BLOCKCHAIN_RPC || 'https://polygon-mainnet.infura.io';
+    const blockchainEnv = process.env.BLOCKCHAIN_ENV || 'mainnet';
 
     if (!redisUrl || !redisToken) {
         return res.status(500).json({ error: 'Redis no configurado.' });
@@ -236,28 +236,36 @@ function validarDireccion(wallet, pasarela, cripto) {
     return wallet.length > 5;
 }
 
-// ── Retiro on-chain ───────────────────────────────────────────────────────────
+import contractABI from '../contractABI.json'; 
+
 async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl, entorno) {
     try {
-        const provider    = new ethers.JsonRpcProvider(rpcUrl);
+        // 1. Inicializar el proveedor con tu URL de Alchemy (Mainnet)
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        
+        // 2. Inicializar la billetera del administrador
         const walletAdmin = new ethers.Wallet(claveAdmin, provider);
 
-        const MIN_ABI = [
-            'function transfer(address to, uint256 amount) returns (bool)'
-        ];
-
-        const contrato             = new ethers.Contract(contratoAddr, MIN_ABI, walletAdmin);
+        // 3. Crear instancia del contrato usando el ABI completo
+        const contrato = new ethers.Contract(contratoAddr, contractABI, walletAdmin);
+        
+        // 4. Convertir el monto a unidades (asumiendo 18 decimales como en tu tesoreria.js)
         const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
 
         console.log(`🤖 [${entorno}] Enviando ${monto} tokens a: ${walletUsuario}`);
 
-        const tx      = await contrato.transfer(walletUsuario, cantidadConDecimales);
-        const receipt = await tx.wait();
+        // 5. Ejecutar la transferencia
+        // Nota: Asegúrate de que tu contrato tenga una función 'transfer' 
+        // o la función que corresponda para mover los tokens desde el admin/contrato
+        const tx = await contrato.transfer(walletUsuario, cantidadConDecimales);
+        
+        // 6. Esperar confirmación en la red (clave para Mainnet)
+        const receipt = await tx.wait(1); 
 
         return { success: true, txHash: receipt.hash };
 
     } catch (error) {
-        console.error(`Fallo en blockchain [${entorno}]:`, error);
+        console.error(`❌ Fallo en blockchain [${entorno}]:`, error);
         return { success: false, error: error.message };
     }
 }

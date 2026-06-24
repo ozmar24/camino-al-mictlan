@@ -210,6 +210,25 @@ const SOULGEIST_ABI = [
 			{
 				"indexed": true,
 				"internalType": "address",
+				"name": "cuenta",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "excluida",
+				"type": "bool"
+			}
+		],
+		"name": "ExclusionActualizada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
 			},
@@ -260,7 +279,7 @@ const SOULGEIST_ABI = [
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "quemados",
+				"name": "quema",
 				"type": "uint256"
 			}
 		],
@@ -392,6 +411,32 @@ const SOULGEIST_ABI = [
 	{
 		"inputs": [],
 		"name": "TOKEN_LOGO_URI",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN_NOMBRE",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN_SIMBOLO",
 		"outputs": [
 			{
 				"internalType": "string",
@@ -656,6 +701,25 @@ const SOULGEIST_ABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "isExcludedFromBurn",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "name",
 		"outputs": [
@@ -697,6 +761,24 @@ const SOULGEIST_ABI = [
 			}
 		],
 		"name": "rescatarTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_cuenta",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "_excluida",
+				"type": "bool"
+			}
+		],
+		"name": "setExcludedFromBurn",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -845,9 +927,9 @@ const SOULGEIST_ABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-];
+]
 
-const DIRECCION_CONTRATO = "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae";
+const DIRECCION_CONTRATO = "0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB";
 
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
