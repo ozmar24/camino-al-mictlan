@@ -2482,7 +2482,7 @@ async function actualizarTransparencia() {
     elemento.textContent = "Consultando al Mictlán...";
 
     try {
-        const provider = new ethers.JsonRpcProvider("https://polygon.llamarpc.com");
+        const provider = new ethers.JsonRpcProvider("https://rpc-mainnet.matic.quiknode.pro");
         
         const contratoAddress = "0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB";
         
