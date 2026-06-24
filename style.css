@@ -1870,12 +1870,15 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil texto quema de tokens ─────────────────────── */
 @media (max-width: 1024px) {
     .contenedor-estado {
-        position: static !important; /* Ya no flota, vive dentro del padre */
-        bottom: auto !important;
-        left: auto !important;
-        transform: none !important;
-        width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
-        margin-top: 110px;
+        position: absolute !important; /* Volvemos a absolute para que no empuje el contenido */
+        top: auto !important;
+        bottom: 80px !important;       /* Ajusta este valor hasta que no tape el correo */
+        left: 20px !important;         /* Alineado a la izquierda */
+        right: 20px !important;        /* Opcional: autoajuste de ancho */
+        width: auto !important;
+        margin: 0 !important;
+        z-index: 99 !important;
+        background: rgba(0,0,0,0.8) !important;
     }
 
     .texto-estado {
