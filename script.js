@@ -1550,6 +1550,14 @@ if (resultado.success) {
             guardarSaldosCriptas();
         }
 
+	if (['MATIC/POL', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(criptoSeleccionada.toUpperCase())) {
+            fetch('/api/limpiar-balance-tras-retiro', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wallet: walletUsuario, cripto: criptoSeleccionada }) 
+            }).then(() => console.log("Sincronización con Redis completada.")).catch(console.error);
+        }
+
         generarCementerio();
         lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
 
@@ -2208,7 +2216,7 @@ async function sincronizarBalanceConRedis() {
         const emailLimpio = window.userWallet.toLowerCase().trim();
         
         // Pon aquí tu dominio real de Vercel
-        const DOMINIO_VERCEL = 'https://camino-al-mictlan.vercel.app'; 
+        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com/'; 
         
         // Modificado a URL absoluta:
         const res = await fetch(`${DOMINIO_VERCEL}/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
@@ -2474,9 +2482,9 @@ async function actualizarTransparencia() {
     elemento.textContent = "Consultando al Mictlán...";
 
     try {
-        const provider = new ethers.JsonRpcProvider("https://rpc-amoy.polygon.technology");
+        const provider = new ethers.JsonRpcProvider("https://polygon-rpc.com");
         
-        const contratoAddress = "0xAd479C0620E9C41F1ACCd8D9c4a81e9E7D4f76ae";
+        const contratoAddress = "0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB";
         
         const abi = ["function totalSupply() view returns (uint256)"];
         
