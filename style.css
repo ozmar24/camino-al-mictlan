@@ -1870,7 +1870,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil texto quema de tokens ─────────────────────── */
 @media (max-width: 1024px) {
     .contenedor-estado {
-        position: absolute !important; /* Volvemos a absolute para que no empuje el contenido */
+        position: fixed !important; 
         top: auto !important;
         bottom: 80px !important;       /* Ajusta este valor hasta que no tape el correo */
         left: 20px !important;         /* Alineado a la izquierda */
