@@ -1871,10 +1871,13 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 @media (max-width: 1024px) {
     .contenedor-estado {
         position: fixed !important; 
-        top: auto !important;
-        bottom: 80px !important;       /* Ajusta este valor hasta que no tape el correo */
+        top: 110 important;
+        bottom: auto !important;       /* Ajusta este valor hasta que no tape el correo */
         left: 20px !important;         /* Alineado a la izquierda */
         right: 20px !important;        /* Opcional: autoajuste de ancho */
+	border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
         width: auto !important;
         margin: 0 !important;
         z-index: 99 !important;
