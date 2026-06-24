@@ -1875,11 +1875,11 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         left: auto !important;
         transform: none !important;
         width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
-        margin-top: 10px;
+        margin-top: 50px;
     }
 
     .texto-estado {
-        font-size: 10px !important; /* Un poquito más legible que 8px */
+        font-size: 7px !important; /* Un poquito más legible que 8px */
     }
 }
 
