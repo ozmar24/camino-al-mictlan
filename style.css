@@ -1870,8 +1870,8 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil texto quema de tokens ─────────────────────── */
 @media (max-width: 1024px) {
     .contenedor-estado {
-        position: static !important; /* Ya no flota, vive dentro del padre */
-        bottom: auto !important;
+        position: fixed !important; 
+	bottom: auto !important;
         left: auto !important;
         transform: none !important;
         width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
