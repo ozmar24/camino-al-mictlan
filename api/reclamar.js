@@ -67,7 +67,8 @@ if (!infoCripta) {
 
     // ── Claves Redis ───────────────────────────────────────────────────────────
     const identidadNorm = identidad.toLowerCase().trim();
-    const balanceKey    = `user:balance:${identidadNorm}`;
+    // ⚠️ IMPORTANTE: debe coincidir con el formato de auth-google y obtener-balance
+    const balanceKey    = `usuario:${identidadNorm.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
     const walletKey     = `user:wallet:${wallet}:${cripto}`;
     const ipKey         = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`;
 
@@ -113,7 +114,8 @@ if (!infoCripta) {
         } else {
             // Retiro basado en balance SG de Redis
             const balanceRes = await redisCmd(['GET', balanceKey]);
-            const balanceSG  = parseInt(balanceRes?.result || 0);
+            const usuarioData = balanceRes?.result ? JSON.parse(balanceRes.result) : null;
+            const balanceSG  = parseFloat(usuarioData?.balance_soulgeist || 0);
 
             if (balanceSG <= 0) {
                 return res.status(400).json({ error: 'No tienes almas suficientes para retirar.' });
@@ -179,7 +181,11 @@ if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
 
             // Solo resetear balance SG si el retiro fue por SG (no por tumba)
             if (!saldoCripto || parseFloat(saldoCripto) <= 0) {
-                operaciones.push(redisCmd(['SET', balanceKey, '0']));
+                // Leer el objeto completo, poner balance en 0, y guardar de vuelta
+                const usuarioActualRes = await redisCmd(['GET', balanceKey]);
+                const usuarioActual = usuarioActualRes?.result ? JSON.parse(usuarioActualRes.result) : {};
+                usuarioActual.balance_soulgeist = 0;
+                operaciones.push(redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)]));
             }
 
             await Promise.all(operaciones);

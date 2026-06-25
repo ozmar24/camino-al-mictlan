@@ -1,4 +1,3 @@
-
 // ==================================================================
 // CONFIGURACIÓN DE BLOCKCHAIN (CONSTANTES FIJAS)
 // ==================================================================
@@ -1198,7 +1197,8 @@ function dispararInicioRitualGlobal() {
 // ==================================================================
 // PASO 2 Y 3: CLICK EN CRIPTA -> ANIMACIÓN EN VIVO -> MODAL RITUAL INICIADO
 // ==================================================================
-window.TASAS_ACTUALES = window.TASAS_ACTUALES || {
+// Tasas de respaldo mientras carga la API
+window.TASAS_ACTUALES = {
     "Ethereum": { tasa: 0.00000045 },
     "Litecoin": { tasa: 0.0012 },
     "Pepe": { tasa: 15000 },
@@ -1207,6 +1207,25 @@ window.TASAS_ACTUALES = window.TASAS_ACTUALES || {
     "USDT": { tasa: 0.25 },
     "Bitcoin": { tasa: 0.000002 }
 };
+
+// Actualiza las tasas desde el Oráculo (QuickSwap) cada 60 segundos
+async function actualizarTasasEnVivo() {
+    try {
+        const res = await fetch('/api/tasas');
+        if (!res.ok) throw new Error('Respuesta no ok');
+        const tasasNuevas = await res.json();
+        if (tasasNuevas && !tasasNuevas.error) {
+            window.TASAS_ACTUALES = tasasNuevas;
+            console.log('✅ Tasas actualizadas desde QuickSwap:', tasasNuevas);
+        }
+    } catch (e) {
+        console.warn('⚠️ Usando tasas de respaldo:', e.message);
+    }
+}
+
+// Llamar al cargar y luego cada 60 segundos
+actualizarTasasEnVivo();
+setInterval(actualizarTasasEnVivo, 60000);
 
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
@@ -2218,9 +2237,7 @@ async function sincronizarBalanceConRedis() {
         const emailLimpio = window.userWallet.toLowerCase().trim();
         
         // Pon aquí tu dominio real de Vercel
-        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com/'; 
-        
-        // Modificado a URL absoluta:
+        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com';
         const res = await fetch(`${DOMINIO_VERCEL}/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
         
         if (!res.ok) {
@@ -2443,7 +2460,7 @@ function cerrarAlerta() {
 // GUARDIÁN DE RED (CONFIGURADO PARA POLYGON MAINNET)
 // ==================================================================
 async function asegurarRedProduccion() {
-    const POLYGON_CHAIN_ID = '0x13882'; // Hexadecimal para 80002 (Polygon Amoy Testnet) // Hexadecimal para 137 (Polygon Mainnet)
+    const POLYGON_CHAIN_ID = '0x89'; // Polygon Mainnet (137)
 
     if (window.ethereum) {
         try {
