@@ -1198,6 +1198,16 @@ function dispararInicioRitualGlobal() {
 // ==================================================================
 // PASO 2 Y 3: CLICK EN CRIPTA -> ANIMACIÓN EN VIVO -> MODAL RITUAL INICIADO
 // ==================================================================
+window.TASAS_ACTUALES = window.TASAS_ACTUALES || {
+    "Ethereum": { tasa: 0.00000045 },
+    "Litecoin": { tasa: 0.0012 },
+    "Pepe": { tasa: 15000 },
+    "MATIC/POL": { tasa: 0.015 },
+    "BNB": { tasa: 0.0018 },
+    "USDT": { tasa: 0.25 },
+    "Bitcoin": { tasa: 0.000002 }
+};
+
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
     if (!contenedor) return;
@@ -1221,28 +1231,27 @@ function generarCementerio() {
 
     const configuracion = [
     { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
-
-    { nombre: "Ethereum",  sim: "♦", color: "#627eea", top: "72%", left: "7.5%",   tasa: 0.00000045, usdMinimo: 0.01 },
-    { nombre: "Litecoin",  sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%",  tasa: 0.0012,    usdMinimo: 0.01 },
-    { nombre: "Pepe",      sim: "🐸", color: "#45ca5d", top: "68%", left: "38%",   tasa: 15000,     usdMinimo: 0.01 },
-    
-    // SOLANA → CAMBIADO A MATIC/POL
-    { nombre: "MATIC/POL",     sim: "M", color: "#8247E5", top: "64%", left: "46%",   tasa: 0.015,      usdMinimo: 0.01 },
-    
-    // DOGE → CAMBIADO A BNB
-    { nombre: "BNB",       sim: "B", color: "#F0B90B", top: "61%", left: "68%",   tasa: 0.0018,     usdMinimo: 0.01 },
-    
-    { nombre: "USDT",      sim: "₮", color: "#26a17b", top: "73%", left: "77%",   tasa: 0.25,       usdMinimo: 0.01 },
-    { nombre: "Bitcoin",   sim: "₿", color: "#f7931a", top: "72%", left: "90%",   tasa: 0.000002,   usdMinimo: 0.01 }
+    { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%" },
+    { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%" },
+    { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%" },
+    { nombre: "MATIC/POL", sim: "M", color: "#8247E5", top: "64%", left: "46%" },
+    { nombre: "BNB", sim: "B", color: "#F0B90B", top: "61%", left: "68%" },
+    { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%" },
+    { nombre: "Bitcoin", sim: "₿", color: "#f7931a", top: "72%", left: "90%" }
 ];
 
     configuracion.forEach(pos => {
-        const div = document.createElement('div');
-        
-        // 1. Detectar si es Punto Rojo
+	
+	const infoTasa = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0, minimoNativo: 0 }; 
         const esPuntoRojo = (pos.nombre === "Bitcoin" || pos.nombre === "Litecoin");
+        const saldoGuardado = (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre]) ? window.tumbasConSaldo[pos.nombre] : 0;
         
-        // 2. Aplicar clases: añadimos 'tumba-sellada' si es Punto Rojo
+        // 2. Ahora sí podemos usar esPuntoRojo y saldoGuardado sin error
+        const textoBalance = saldoGuardado.toFixed(6);
+        const visibilidadOpacidad = (saldoGuardado > 0 || esPuntoRojo) ? "1" : "0";
+
+        // 3. Creamos el div UNA sola vez
+        const div = document.createElement('div');
         div.className = pos.especial ? 'zona-tumba alma-maestra' : (esPuntoRojo ? 'zona-tumba tumba-sellada' : 'zona-tumba');
         
         div.style.top = pos.top;
@@ -1250,11 +1259,7 @@ function generarCementerio() {
         div.style.setProperty('--color-cripto', pos.color);
         div.setAttribute('data-nombre', pos.nombre);
 
-        // LEEMOS EL SALDO REAL YA FILTRADO
-        const saldoGuardado = window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] ? window.tumbasConSaldo[pos.nombre] : 0;
-        const visibilidadOpacidad = (saldoGuardado > 0 || esPuntoRojo) ? "1" : "0";
-        const textoBalance = saldoGuardado.toFixed(6);
-
+        
         if (pos.especial) {
             div.innerHTML = `
                 <div class="sigilo-soulgeist"></div>
@@ -1320,18 +1325,15 @@ function generarCementerio() {
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
-                lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadEnviada * (pos.tasa || 0), pos, async () => {
-    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + (cantidadEnviada * (pos.tasa || 0));
-    
-guardarSaldosCriptas();
+    const infoTasa = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
+const cantidadConvertida = cantidadEnviada * infoTasa.tasa;
 
-    // === ACTUALIZACIÓN CRÍTICA EN REDIS ===
+lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadConvertida, pos, async () => {
+    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + cantidadConvertida;
+    guardarSaldosCriptas();
     await descontarBalanceEnRedis(cantidadEnviada);
-
-
-
     generarCementerio();
-    mostrarModalFusionExitosa(pos, cantidadEnviada * (pos.tasa || 0));
+    mostrarModalFusionExitosa(pos, cantidadConvertida);
 });
             } else {
                 lanzarAlertaMictlan("Toca el Soulgeist para iniciar la canalización.", "RITUAL REQUERIDO");

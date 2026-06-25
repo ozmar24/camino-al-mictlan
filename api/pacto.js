@@ -126,6 +126,10 @@ export default async function handler(req, res) {
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
             }
 
+	    if (usuario.metodo === 'google') {
+            return res.status(401).json({ success: false, error: 'Usa el acceso con Google.' });
+    	    }
+
             const valida = await bcrypt.compare(password, usuario.password || '');
             if (!valida) {
                 return res.status(401).json({ success: false, error: 'Credenciales incorrectas.' });
@@ -135,7 +139,7 @@ export default async function handler(req, res) {
                 success: true,
                 usuario: {
                     email: usuario.email,
-                    balance: parseFloat(usuario.balance_soulgeist || 0)
+                    balance: parseFloat(usuario.balance_soulgeist ?? 0)
                 }
             });
         }

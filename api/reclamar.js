@@ -36,7 +36,8 @@ export default async function handler(req, res) {
     const rawIp    = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
     const ipLimpia = rawIp.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
     const country  = req.headers['x-vercel-ip-country'] || 'XX';    // ── Configuración de tasas y mínimos por cripto ───────────────────────────
-    const CONFIG_CRIPTAS = {
+    const tasasConfig = await redisCmd(['GET', 'tasas_config']);
+const CONFIG_CRIPTAS = tasasConfig?.result ? JSON.parse(tasasConfig.result) : {
     Bitcoin:   { tasa: 0.000002, simFP: 'BTC',   minimoNativo: 0.000001 },
     Litecoin:  { tasa: 0.0012,   simFP: 'LTC',   minimoNativo: 0.0001 },
     Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.000001 },
@@ -45,12 +46,8 @@ export default async function handler(req, res) {
     BNB:       { tasa: 0.0018,   simFP: 'BNB',   minimoNativo: 0.001 },
     USDT:      { tasa: 0.25,     simFP: 'USDT',  minimoNativo: 0.01 }
 };
-    let nombreNormalizado = cripto;
-if (nombreNormalizado === "MATIC/POL") {
-    nombreNormalizado = "MATIC";
-}
-
-    const infoCripta = CONFIG_CRIPTAS[nombreNormalizado]; 
+   let nombreNormalizado = cripto === "MATIC/POL" ? "MATIC" : cripto;
+const infoCripta = CONFIG_CRIPTAS[nombreNormalizado]; 
 
 if (!infoCripta) {
     console.error("Cripta no encontrada en configuración:", nombreNormalizado); // Muy útil para los logs
