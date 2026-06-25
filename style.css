@@ -1870,32 +1870,16 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 /* ── Ajuste móvil texto quema de tokens ─────────────────────── */
 @media (max-width: 1024px) {
     .contenedor-estado {
-        position: fixed !important;
-        /* Lo movemos a la parte superior izquierda, justo debajo del botón de absorción */
-        top: 110px !important; 
+        position: static !important; /* Ya no flota, vive dentro del padre */
         bottom: auto !important;
-        left: 20px !important;
-        
-        /* Limpieza total de bordes y líneas */
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-        
-        /* Ajustes de tamaño y fondo */
-        width: 160px !important;
-        background: rgba(0, 0, 0, 0.6) !important;
-        padding: 5px !important;
-        border-radius: 4px !important;
-        z-index: 9999 !important;
+        left: auto !important;
+        transform: none !important;
+        width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
+        margin-top: 110px;
     }
 
     .texto-estado {
-        font-size: 6px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-        text-align: left !important;
-        color: #ffcccc !important;
+        font-size: 6px !important; /* Un poquito más legible que 8px */
     }
 }
 
