@@ -1875,7 +1875,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
         left: auto !important;
         transform: none !important;
         width: 100% !important; /* Toma el ancho de la zona-patrocinadores */
-        margin-top: 50px;
+        top: 110px;
     }
 
     .texto-estado {
