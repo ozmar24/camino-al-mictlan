@@ -1397,13 +1397,29 @@ function abrirModalCosechaFinal(pos) {
     
     const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
 
+    // SG equivalentes al saldo visual
+    const infoTasaModal = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
+    const sgEquivalentes = infoTasaModal.tasa > 0 ? (saldoActual / infoTasaModal.tasa) : 0;
+
     info.innerHTML = `
         <div style="text-align: center; margin: 20px 0;">
             <p style="color: #aaa;">Saldo acumulado en esta tumba:</p>
             <h2 style="color: ${pos.color}; font-size: 28px; text-shadow: 0 0 10px ${pos.color};">
                 ${saldoActual.toFixed(8)} ${pos.sim}
             </h2>
-            <p style="color: #666; font-size: 12px; margin-top: 10px;">
+            <p style="color: #888; font-size: 13px; margin-top: 6px;">
+                ≈ <b style="color:#c8a951;">${sgEquivalentes.toFixed(2)} SG</b> a retirar
+            </p>
+            <div style="margin:14px auto; max-width:320px; padding:10px 14px; background:rgba(200,169,81,0.08); border-left:3px solid #c8a951; border-radius:4px; text-align:left;">
+                <p style="color:#c8a951; font-size:11px; margin:0; line-height:1.6;">
+                    ⚠️ <b>Nota:</b> Los saldos mostrados son valores de referencia.
+                    Al retirar recibirás <b>SG tokens</b> equivalentes en tu MetaMask,
+                    que puedes convertir a ${pos.nombre} en
+                    <a href="https://quickswap.exchange/#/swap?inputCurrency=0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB"
+                       target="_blank" style="color:#ff6b35; text-decoration:underline;">QuickSwap ↗</a>.
+                </p>
+            </div>
+            <p style="color:#666; font-size:12px; margin-top:6px;">
                 ¿Qué deseas hacer con esta energía acumulada?
             </p>
         </div>
@@ -2615,7 +2631,19 @@ async function conectarYRetirarMetaMask(pos) {
         btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-        const saldoActual = window.tumbasConSaldo[pos.nombre] || 0;
+        // SG equivalentes al saldo visual (compensando el 2% de quema del contrato)
+        const infoTasaRetiro = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
+        const saldoVisual = window.tumbasConSaldo[pos.nombre] || 0;
+        // Cuántos SG son equivalentes al saldo visual
+        const sgBrutos = infoTasaRetiro.tasa > 0 ? (saldoVisual / infoTasaRetiro.tasa) : 0;
+        // Compensar el 2% que el contrato quema automáticamente
+        const sgAEnviar = sgBrutos / 0.98;
+
+        if (sgAEnviar <= 0) {
+            lanzarAlertaMictlan("No tienes saldo suficiente para retirar.", "RITUAL INCOMPLETO");
+            return;
+        }
+
         btn.innerText = "PROCESANDO...";
 
         const respuesta = await fetch('/api/reclamar', {
@@ -2626,7 +2654,8 @@ async function conectarYRetirarMetaMask(pos) {
                 wallet: direccion,
                 cripto: pos.nombre,
                 pasarela: 'metamask',
-                saldoCripto: saldoActual
+                sgAEnviar: sgAEnviar,
+                saldoVisual: saldoVisual
             })
         });
 
@@ -2640,7 +2669,7 @@ async function conectarYRetirarMetaMask(pos) {
         guardarSaldosCriptas();
         generarCementerio();
 
-        lanzarAlertaMictlan(resultado.mensaje || "Tokens enviados a tu wallet.", "RITUAL COMPLETADO");
+        lanzarAlertaMictlan(resultado.mensaje || "SG enviados a tu wallet.", "RITUAL COMPLETADO");
         cerrarRitual();
 
     } catch (err) {

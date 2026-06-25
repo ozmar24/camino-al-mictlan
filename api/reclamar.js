@@ -1,58 +1,64 @@
-// REQUIERE: npm install ethers
 import { ethers } from 'ethers';
 
+// ABI mínimo ERC-20 para transferir SG
+const ERC20_ABI = [
+    "function transfer(address to, uint256 value) returns (bool)",
+    "function balanceOf(address account) view returns (uint256)",
+    "function decimals() view returns (uint8)"
+];
+
 export default async function handler(req, res) {
-    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js globalmente.
-    // Solo aseguramos que el método entrante sea estrictamente POST.
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método no permitido.' });
     }
 
     // ── Variables de entorno ───────────────────────────────────────────────────
-    const redisUrl     = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
-    const redisToken   = process.env.UPSTASH_REDIS_REST_TOKEN;
-    const claveAdmin   = process.env.ADMIN_PRIVATE_KEY;
-    const contratoAddr = process.env.SOULGEIST_CONTRACT_ADDRESS;
-    const blockchainRPC = process.env.BLOCKCHAIN_RPC || 'https://polygon-mainnet.infura.io';
-    const blockchainEnv = process.env.BLOCKCHAIN_ENV || 'mainnet';
+    const redisUrl      = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
+    const redisToken    = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const claveAdmin    = process.env.ADMIN_PRIVATE_KEY;       // wallet bóveda usuarios
+    const contratoAddr  = process.env.SOULGEIST_CONTRACT_ADDRESS;
+    const blockchainRPC = process.env.BLOCKCHAIN_RPC || 'https://rpc.ankr.com/polygon';
 
     if (!redisUrl || !redisToken) {
         return res.status(500).json({ error: 'Redis no configurado.' });
     }
     if (!claveAdmin || !contratoAddr) {
-        return res.status(500).json({ error: 'Servidor Web3 no configurado completamente.' });
+        return res.status(500).json({ error: 'Bóveda Web3 no configurada.' });
     }
 
-    // ── Extraer datos del body ─────────────────────────────────────────────────
-    const { identidad, cripto, pasarela, saldoCripto } = req.body || {};
-    const wallet = req.body?.wallet?.toLowerCase().trim() || '';
+    // ── Helper Redis ───────────────────────────────────────────────────────────
+    const redisCmd = async (comando) => {
+        const r = await fetch(redisUrl, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(comando)
+        });
+        return r.json();
+    };
 
-    if (!identidad) return res.status(400).json({ error: 'Falta la identidad del alma.' });
+    // ── Extraer body ───────────────────────────────────────────────────────────
+    const { identidad, cripto, pasarela, sgAEnviar, saldoVisual } = req.body || {};
+    const wallet = req.body?.wallet?.trim() || '';
+
+    if (!identidad)  return res.status(400).json({ error: 'Falta la identidad del alma.' });
     if (!wallet || wallet.length < 8) return res.status(400).json({ error: 'Wallet inválida.' });
-    if (!cripto) return res.status(400).json({ error: 'Falta la cripto seleccionada.' });
-    if (!pasarela) return res.status(400).json({ error: 'Falta la pasarela de retiro.' });
+    if (!cripto)     return res.status(400).json({ error: 'Falta la cripto.' });
+    if (!pasarela)   return res.status(400).json({ error: 'Falta la pasarela.' });
+
+    const cantidadSG = parseFloat(sgAEnviar || 0);
+    if (cantidadSG <= 0) {
+        return res.status(400).json({ error: 'Cantidad de SG inválida.' });
+    }
+
+    // Validar wallet EVM
+    if (!/^0x[a-fA-F0-9]{40}$/.test(wallet)) {
+        return res.status(400).json({ error: 'Dirección de wallet inválida. Debe ser una dirección Ethereum/Polygon.' });
+    }
 
     // ── IP y país ──────────────────────────────────────────────────────────────
     const rawIp    = req.headers['x-vercel-forwarded-for'] || req.headers['x-forwarded-for'] || '';
-    const ipLimpia = rawIp.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
-    const country  = req.headers['x-vercel-ip-country'] || 'XX';    // ── Configuración de tasas y mínimos por cripto ───────────────────────────
-    const tasasConfig = await redisCmd(['GET', 'tasas_config']);
-const CONFIG_CRIPTAS = tasasConfig?.result ? JSON.parse(tasasConfig.result) : {
-    Bitcoin:   { tasa: 0.000002, simFP: 'BTC',   minimoNativo: 0.000001 },
-    Litecoin:  { tasa: 0.0012,   simFP: 'LTC',   minimoNativo: 0.0001 },
-    Ethereum:  { tasa: 0.00000045, simFP: 'ETH', minimoNativo: 0.000001 },
-    Pepe:      { tasa: 15000,    simFP: 'PEPE',  minimoNativo: 100 },
-    MATIC:     { tasa: 0.015,    simFP: 'MATIC/POL', minimoNativo: 0.001 },
-    BNB:       { tasa: 0.0018,   simFP: 'BNB',   minimoNativo: 0.001 },
-    USDT:      { tasa: 0.25,     simFP: 'USDT',  minimoNativo: 0.01 }
-};
-   let nombreNormalizado = cripto === "MATIC/POL" ? "MATIC" : cripto;
-const infoCripta = CONFIG_CRIPTAS[nombreNormalizado]; 
-
-if (!infoCripta) {
-    console.error("Cripta no encontrada en configuración:", nombreNormalizado); // Muy útil para los logs
-    return res.status(400).json({ error: 'Cripta no registrada.' });
-}
+    const ipLimpia = rawIp.split(',')[0].trim() || '127.0.0.1';
+    const country  = req.headers['x-vercel-ip-country'] || 'XX';
 
     // ── Filtro geográfico ──────────────────────────────────────────────────────
     const PAISES_BLOQUEADOS = ['BD', 'PK', 'IN', 'VN', 'NG', 'ID', 'SI'];
@@ -60,257 +66,148 @@ if (!infoCripta) {
         return res.status(403).json({ error: 'Región no disponible.' });
     }
 
-    // ── Validar formato de wallet según pasarela Y cripto ─────────────────────
-    if (!validarDireccion(wallet, pasarela, cripto)) {
-        return res.status(400).json({ error: 'El formato de la billetera no coincide con la pasarela seleccionada.' });
+    // ── Mínimo de retiro: equivalente a 0.0000002 BTC en SG ──────────────────
+    // Con precio actual ~$107,000 BTC y SG ~$0.0001868
+    // 0.0000002 BTC = $0.0214 USD = ~114 SG
+    const MINIMO_SG = 100; // 100 SG mínimo de retiro
+    if (cantidadSG < MINIMO_SG) {
+        return res.status(400).json({
+            error: `Mínimo de retiro: ${MINIMO_SG} SG. Tienes ${cantidadSG.toFixed(2)} SG equivalentes.`
+        });
     }
 
     // ── Claves Redis ───────────────────────────────────────────────────────────
     const identidadNorm = identidad.toLowerCase().trim();
-    // ⚠️ IMPORTANTE: debe coincidir con el formato de auth-google y obtener-balance
     const balanceKey    = `usuario:${identidadNorm.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
-    const walletKey     = `user:wallet:${wallet}:${cripto}`;
-    const ipKey         = `user:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`;
-
-    // ── Helper Redis ───────────────────────────────────────────────────────────
-    const redisCmd = async (comando) => {
-        const r = await fetch(redisUrl, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${redisToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(comando)
-        });
-        return r.json();
-    };
+    const walletKey     = `retiro:wallet:${wallet.toLowerCase()}:${cripto}`;
+    const ipKey         = `retiro:ip:${ipLimpia.replace(/[^a-zA-Z0-9]/g, '_')}:${cripto}`;
 
     try {
-        // ── 1. Verificar cooldowns (24h por wallet y por IP) ───────────────────
+        // ── 1. Verificar cooldown 24h ──────────────────────────────────────────
         const [resWallet, resIp] = await Promise.all([
             redisCmd(['GET', walletKey]),
             redisCmd(['GET', ipKey])
         ]);
 
         if (resWallet?.result || resIp?.result) {
-            return res.status(429).json({ error: 'Debes esperar 24 horas para otro retiro de esta cripto.' });
+            return res.status(429).json({ error: 'Debes esperar 24 horas para otro retiro.' });
         }
 
-        // ── 2. Escudo Anti-VPN ─────────────────────────────────────────────────
+        // ── 2. Anti-VPN ────────────────────────────────────────────────────────
         const auditoriaIP = await verificarFraudeIP(ipLimpia);
         if (auditoriaIP.bloquear) {
             return res.status(403).json({ error: 'VPN/Proxy detectado. Retiro no permitido.' });
         }
 
-        // ── 3. Determinar cantidad a enviar ────────────────────────────────────
-        // ✅ NUEVO: Si viene saldoCripto del frontend (retiro de tumba),
-        // lo usamos directamente. Si no, calculamos desde el balance SG de Redis.
-        let cantidadAEnviar = 0;
+        // ── 3. Verificar balance real en Redis ─────────────────────────────────
+        const balanceRes  = await redisCmd(['GET', balanceKey]);
+        const usuarioData = balanceRes?.result ? JSON.parse(balanceRes.result) : null;
+        const balanceSG   = parseFloat(usuarioData?.balance_soulgeist || 0);
 
-        if (saldoCripto && parseFloat(saldoCripto) > 0) {
-            // Retiro de cripta acumulada en tumba (Bitso, Binance, Coinbase)
-            cantidadAEnviar = parseFloat(saldoCripto);
-            console.log(`💎 Retiro de tumba: ${cantidadAEnviar} ${infoCripta.simFP}`);
-        } else {
-            // Retiro basado en balance SG de Redis
-            const balanceRes = await redisCmd(['GET', balanceKey]);
-            const usuarioData = balanceRes?.result ? JSON.parse(balanceRes.result) : null;
-            const balanceSG  = parseFloat(usuarioData?.balance_soulgeist || 0);
-
-            if (balanceSG <= 0) {
-                return res.status(400).json({ error: 'No tienes almas suficientes para retirar.' });
-            }
-
-            cantidadAEnviar = balanceSG * infoCripta.tasa;
-            console.log(`⚗️ Retiro por SG: ${balanceSG} SG → ${cantidadAEnviar} ${infoCripta.simFP}`);
+        if (balanceSG <= 0) {
+            return res.status(400).json({ error: 'No tienes SG suficientes para retirar.' });
         }
 
-        // ── 4. Validar mínimo de retiro ────────────────────────────────────────
-        if (cantidadAEnviar < infoCripta.minimoNativo) {
-            return res.status(400).json({
-                error: `Mínimo no alcanzado. Necesitas al menos ${infoCripta.minimoNativo} ${infoCripta.simFP} para retirar.`
-            });
+        // ── 4. Transferir SG desde la bóveda al usuario ───────────────────────
+        const resultado = await transferirSG(wallet, cantidadSG, claveAdmin, contratoAddr, blockchainRPC);
+
+        if (!resultado.success) {
+            return res.status(500).json({ error: resultado.error });
         }
 
-        // ── 5. Procesar pago según pasarela ────────────────────────────────────
-       let pagoExitoso = false;
-let mensajeRetorno = '';
+        // ── 5. Cerrar candados y resetear balance ──────────────────────────────
+        const usuarioActual = usuarioData || {};
+        usuarioActual.balance_soulgeist = 0;
 
-// AQUÍ ES DONDE REEMPLAZAS LO QUE TENÍAS POR ESTO:
+        await Promise.all([
+            redisCmd(['SET', walletKey, 'activo', 'EX', 86400]),
+            redisCmd(['SET', ipKey,     'activo', 'EX', 86400]),
+            redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)])
+        ]);
 
-if (pasarela === 'bitso_lightning' && cripto === 'Bitcoin') {
-    const resLN = await ejecutarRetiroBitsoLightning(wallet, cantidadAEnviar);
-    if (resLN.success) {
-        pagoExitoso = true;
-        mensajeRetorno = `¡Energía canalizada! Enviados ${cantidadAEnviar.toFixed(7)} BTC via Lightning.`;
-    }
+        // ── 6. Alerta Telegram ─────────────────────────────────────────────────
+        await enviarAlertaTelegram(
+            `💀 *RETIRO EXITOSO*\n` +
+            `👤 *Usuario:* \`${identidadNorm}\`\n` +
+            `📬 *Wallet:* \`${wallet}\`\n` +
+            `💎 *SG enviados:* \`${cantidadSG.toFixed(4)}\`\n` +
+            `🪙 *Cripto elegida:* ${cripto}\n` +
+            `📊 *Saldo visual:* ${parseFloat(saldoVisual || 0).toFixed(8)}\n` +
+            `🔗 *Tx:* \`${resultado.txHash}\``
+        );
 
-} else if (pasarela === 'metamask') {
-    // ESTA ES LA NUEVA PARTE: Solo registramos, no ejecutamos OnChain aquí
-    pagoExitoso = true;
-    mensajeRetorno = "Solicitud validada. Por favor, confirma la transacción en tu MetaMask.";
-
-} else if (['binance', 'coinbase'].includes(pasarela)) {
-    // Las pasarelas centrales siguen usando tu lógica original de servidor
-    const resOC = await procesarRetiroOnChain(
-        wallet,
-        cantidadAEnviar,
-        claveAdmin,
-        contratoAddr,
-        blockchainRPC,
-        blockchainEnv
-    );
-
-    if (resOC.success) {
-        pagoExitoso = true;
-        mensajeRetorno = `Cosecha autorizada. Tx: ${resOC.txHash.slice(0, 10)}...`;
-    } else {
-        return res.status(500).json({ error: resOC.error || 'La blockchain rechazó la transferencia.' });
-    }
-
-} else {
-    return res.status(400).json({ error: 'Pasarela no reconocida.' });
-}
-
-        // ── 6. Cerrar candados y resetear balance si aplica ───────────────────
-        if (pagoExitoso) {
-            const operaciones = [
-                redisCmd(['SET', walletKey, 'activo', 'EX', '86400']),
-                redisCmd(['SET', ipKey,     'activo', 'EX', '86400'])
-            ];
-
-            // Solo resetear balance SG si el retiro fue por SG (no por tumba)
-            if (!saldoCripto || parseFloat(saldoCripto) <= 0) {
-                // Leer el objeto completo, poner balance en 0, y guardar de vuelta
-                const usuarioActualRes = await redisCmd(['GET', balanceKey]);
-                const usuarioActual = usuarioActualRes?.result ? JSON.parse(usuarioActualRes.result) : {};
-                usuarioActual.balance_soulgeist = 0;
-                operaciones.push(redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)]));
-            }
-
-            await Promise.all(operaciones);
-
-            await enviarAlertaTelegram(
-                `💀 *RETIRO EXITOSO* (${blockchainEnv.toUpperCase()})\n` +
-                `*Hacia:* \`${wallet}\`\n` +
-                `*Monto:* \`${cantidadAEnviar.toFixed(8)}\` ${infoCripta.simFP}\n` +
-                `*Pasarela:* ${pasarela.toUpperCase()}\n` +
-                `*Tipo:* ${saldoCripto ? 'Tumba acumulada' : 'Balance SG'}`
-            );
-
-            return res.status(200).json({
-                success: true,
-                mensaje: mensajeRetorno,
-                balanceAlmas: (!saldoCripto || parseFloat(saldoCripto) <= 0) ? 0 : undefined,
-                red: blockchainEnv
-            });
-        }
+        return res.status(200).json({
+            success: true,
+            txHash: resultado.txHash,
+            balanceAlmas: 0,
+            mensaje: `✅ ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.\n` +
+                     `Puedes convertirlos a ${cripto} en QuickSwap.\n` +
+                     `Tx: ${resultado.txHash.slice(0, 14)}...`
+        });
 
     } catch (err) {
-        console.error('Error global en reclamar.js:', err);
+        console.error('Error en reclamar:', err);
         return res.status(500).json({ error: 'Error de conexión con el inframundo.' });
     }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// FUNCIONES AUXILIARES
-// ══════════════════════════════════════════════════════════════════════════════
-
-// ── Validar formato de wallet según pasarela Y cripto ────────────────────────
-function validarDireccion(wallet, pasarela, cripto) {
-    const regexEVM = /^0x[a-fA-F0-9]{40}$/;
-    const regexBTC = /^(bc1[a-z0-9]{6,87}|[13][a-zA-HJ-NP-Z1-9]{25,34})$/;
-    const regexLTC = /^[LMm3][a-km-zA-HJ-NP-Z1-9]{25,34}$/;
-
-    if (pasarela === 'binance' || pasarela === 'coinbase') {
-        return regexEVM.test(wallet);
-    }
-
-    if (pasarela === 'bitso') {
-        if (cripto === 'Bitcoin')  return regexBTC.test(wallet);
-        if (cripto === 'Litecoin') return regexLTC.test(wallet);
-        return regexEVM.test(wallet);
-    }
-
-    if (pasarela === 'bitso_lightning') {
-        return regexBTC.test(wallet);
-    }
-
-    return wallet.length > 5;
-}
-
-import contractABI from '../contractABI.json'; 
-
-async function procesarRetiroOnChain(walletUsuario, monto, claveAdmin, contratoAddr, rpcUrl, entorno) {
+// ── Transferir SG desde la bóveda al usuario ─────────────────────────────────
+async function transferirSG(walletUsuario, cantidadSG, claveAdmin, contratoAddr, rpcUrl) {
     try {
-        // 1. Inicializar el proveedor con tu URL de Alchemy (Mainnet)
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        
-        // 2. Inicializar la billetera del administrador
+        const provider    = new ethers.JsonRpcProvider(rpcUrl);
         const walletAdmin = new ethers.Wallet(claveAdmin, provider);
+        const contrato    = new ethers.Contract(contratoAddr, ERC20_ABI, walletAdmin);
 
-        // 3. Crear instancia del contrato usando el ABI completo
-        const contrato = new ethers.Contract(contratoAddr, contractABI, walletAdmin);
-        
-        // 4. Convertir el monto a unidades (asumiendo 18 decimales como en tu tesoreria.js)
-        const cantidadConDecimales = ethers.parseUnits(monto.toString(), 18);
+        const decimals = await contrato.decimals();
+        const cantidad = ethers.parseUnits(cantidadSG.toFixed(18).slice(0, cantidadSG.toFixed(18).indexOf('.') + 19), decimals);
 
-        console.log(`🤖 [${entorno}] Enviando ${monto} tokens a: ${walletUsuario}`);
+        // Verificar saldo de la bóveda
+        const saldoBoveda = await contrato.balanceOf(walletAdmin.address);
+        if (saldoBoveda < cantidad) {
+            return { success: false, error: 'La bóveda no tiene suficientes SG. Contacta al administrador.' };
+        }
 
-        // 5. Ejecutar la transferencia
-        // Nota: Asegúrate de que tu contrato tenga una función 'transfer' 
-        // o la función que corresponda para mover los tokens desde el admin/contrato
-        const tx = await contrato.transfer(walletUsuario, cantidadConDecimales);
-        
-        // 6. Esperar confirmación en la red (clave para Mainnet)
-        const receipt = await tx.wait(1); 
+        console.log(`🤖 Enviando ${cantidadSG} SG a ${walletUsuario}`);
 
+        const tx      = await contrato.transfer(walletUsuario, cantidad);
+        const receipt = await tx.wait(1);
+
+        console.log(`✅ Tx confirmada: ${receipt.hash}`);
         return { success: true, txHash: receipt.hash };
 
     } catch (error) {
-        console.error(`❌ Fallo en blockchain [${entorno}]:`, error);
-        return { success: false, error: error.message };
+        console.error('❌ Error blockchain:', error.message);
+        if (error.message?.includes('insufficient funds')) {
+            return { success: false, error: 'La bóveda no tiene MATIC para el gas. Contacta al administrador.' };
+        }
+        return { success: false, error: 'Error en la transferencia. Intenta de nuevo.' };
     }
 }
 
-// ── Bitso Lightning (⚠️ pendiente de implementación real) ────────────────────
-async function ejecutarRetiroBitsoLightning(invoice, monto) {
-    console.warn('⚠️ ejecutarRetiroBitsoLightning: implementación pendiente.');
-    return { success: false, error: 'Bitso Lightning aún no implementado.' };
-}
-
-// ── Anti-VPN con proxycheck.io ────────────────────────────────────────────────
+// ── Anti-VPN ──────────────────────────────────────────────────────────────────
 async function verificarFraudeIP(ip) {
     try {
         const apiKey = process.env.PROXYCHECK_API_KEY;
         if (!apiKey) return { bloquear: false };
-
         const res  = await fetch(`https://proxycheck.io/v2/${ip}?key=${apiKey}&vpn=1`);
         const data = await res.json();
-
         if (data?.[ip]?.proxy === 'yes' || data?.[ip]?.is_hosting === 'yes') {
             return { bloquear: true };
         }
         return { bloquear: false };
-
     } catch {
         return { bloquear: false };
     }
 }
 
-// ── Alerta Telegram ────────────────────────────────────────────────────────────
+// ── Alerta Telegram ───────────────────────────────────────────────────────────
 async function enviarAlertaTelegram(mensaje) {
     const token  = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!token || !chatId) return;
-
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id:    chatId,
-            text:       mensaje,
-            parse_mode: 'Markdown'
-        })
+        body: JSON.stringify({ chat_id: chatId, text: mensaje, parse_mode: 'Markdown' })
     });
 }
