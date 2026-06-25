@@ -1872,7 +1872,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     .contenedor-estado {
         position: fixed !important;
         /* Lo movemos a la parte superior izquierda, justo debajo del botón de absorción */
-        top: 160px !important; 
+        top: 110px !important; 
         bottom: auto !important;
         left: 20px !important;
         
