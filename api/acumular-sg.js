@@ -98,6 +98,24 @@ export default async function handler(req, res) {
                 return res.status(400).json({ success: false, error: 'SG insuficientes' });
             }
             usuario.balance_soulgeist = balanceActual - costo;
+        } else if (accion === 'guardar_tumbas') {
+            // Guardar saldos de tumbas en el objeto del usuario
+            const tumbas = req.body.tumbas || {};
+            usuario.tumbas = tumbas;
+            await fetch(`${redisUrl}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
+            });
+            return res.status(200).json({ success: true });
+
+        } else if (accion === 'cargar_tumbas') {
+            // Devolver saldos de tumbas guardados en Redis
+            return res.status(200).json({ 
+                success: true, 
+                tumbas: usuario.tumbas || null 
+            });
+
         } else {
             return res.status(400).json({ success: false, error: 'Acción no reconocida' });
         }

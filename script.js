@@ -1546,73 +1546,57 @@ console.log("📤 Enviando reclamo:", {
 });
 
 const respuesta = await fetch('/api/reclamar', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify({
-        identidad: identidad,
-        wallet: walletUsuario,
-        cripto: criptoSeleccionada,
-        pasarela: pasarela,
-	saldoCripto: saldoCripto
-    })
-});
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                identidad: identidad,
+                wallet: walletUsuario,
+                cripto: criptoSeleccionada,
+                pasarela: pasarela,
+                saldoCripto: saldoCripto
+            })
+        });
 
-console.log("Status del backend:", respuesta.status);
+        console.log("Status del backend:", respuesta.status);
 
-let resultado;
-try {
-    resultado = await respuesta.json();
-} catch (e) {
-    console.error("Error al parsear JSON del backend:", e);
-    lanzarAlertaMictlan("Respuesta inválida del servidor", "ERROR INTERNO");
-    return;
-}
+        // --- AQUÍ ESTABA LA PARTE QUE FALTABA ---
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (e) {
+            console.error("Error al parsear JSON del backend:", e);
+            lanzarAlertaMictlan("Respuesta inválida del servidor", "ERROR INTERNO");
+            return;
+        }
 
-console.log("Respuesta del backend:", resultado);
+        console.log("Respuesta del backend:", resultado);
 
-if (!respuesta.ok) {
-    lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
-    return;
-}
+        if (!respuesta.ok || !resultado.success) {
+            lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
+            return;
+        }
 
-// Éxito
-if (resultado.success) {
-    balanceUsuarioSG = 0;
-    localStorage.setItem('soulgeist_balance', '0');
-    
-    const selector = document.querySelector('.alma-maestra .balance-actual');
-    if (selector) selector.innerText = `Poder: 0 SG`;
+        // === ÉXITO: PROCESAR AHORA ===
+        console.log("✅ Cosecha confirmada por el servidor:", resultado);
 
-    generarCementerio();
-    lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "ÉXITO");
-}
-
-        // Éxito
+        // 1. Resetear localmente solo la cripta retirada
+        window.tumbasConSaldo[criptoSeleccionada] = 0;
+        guardarSaldosCriptas();
+        
+        // 2. Actualizar balance global si el servidor lo devolvió
         if (resultado.balanceAlmas !== undefined) {
             balanceUsuarioSG = resultado.balanceAlmas;
             localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            
             const selector = document.querySelector('.alma-maestra .balance-actual');
             if (selector) selector.innerText = `Poder: ${balanceUsuarioSG} SG`;
         }
 
-        if (window.tumbasConSaldo[criptoSeleccionada] !== undefined) {
-            window.tumbasConSaldo[criptoSeleccionada] = 0;
-            guardarSaldosCriptas();
+        // 3. El balance ya se resetea en reclamar.js — no se necesita llamada extra
         }
 
-	if (['MATIC/POL', 'BNB', 'ETHEREUM', 'USDT', 'PEPE', 'SOULGEIST'].includes(criptoSeleccionada.toUpperCase())) {
-            fetch('/api/limpiar-balance-tras-retiro', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wallet: walletUsuario, cripto: criptoSeleccionada }) 
-            }).then(() => console.log("Sincronización con Redis completada.")).catch(console.error);
-        }
-
+        // 4. Actualización final visual
         generarCementerio();
-        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada", "ÉXITO");
+        lanzarAlertaMictlan(resultado.mensaje || "Cosecha realizada con éxito", "ÉXITO");
 
     } catch (error) {
         console.error("Error en procesarCosecha:", error);
@@ -2082,9 +2066,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        // Si hay una sesión activa, entra directo al Campo Santo mapeando el balance
+        // Sincronizar con Redis antes de entrar — esto corrige el balance tras retiros
         if (typeof entrarAlCampoSanto === 'function') {
-            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 }); 
+            sincronizarBalanceConRedis().then(balanceActual => {
+                entrarAlCampoSanto({ balanceSG: balanceActual });
+            }).catch(() => {
+                // Si falla Redis, usar localStorage como respaldo
+                entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 });
+            });
         }
     }
 // Añade esto al final de tu bloque document.addEventListener("DOMContentLoaded", () => { ... });
@@ -2352,28 +2341,40 @@ async function descontarBalanceEnRedis(costoRitual) {
 }
 function cargarSaldosCriptas() {
     if (!window.userWallet) {
-        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Matic": 0, "Bnn": 0, "USDT": 0, "Bitcoin": 0 };
-        console.log("Nuevo usuario: criptas en cero");
+        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "MATIC/POL": 0, "BNB": 0, "USDT": 0, "Bitcoin": 0 };
         return;
     }
-
     const key = `soulgeist_criptas_${window.userWallet}`;
     const guardados = localStorage.getItem(key);
-    
     if (guardados) {
         window.tumbasConSaldo = JSON.parse(guardados);
-        console.log(`✅ Criptas cargadas para ${window.userWallet}`);
     } else {
-        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "Matic": 0, "Bnb": 0, "USDT": 0, "Bitcoin": 0 };
-        console.log(`Nuevo usuario: criptas en cero`);
+        window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "MATIC/POL": 0, "BNB": 0, "USDT": 0, "Bitcoin": 0 };
     }
+    // Cargar desde Redis (fuente de verdad)
+    fetch('/api/acumular-sg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: window.userWallet, accion: 'cargar_tumbas' })
+    }).then(r => r.json()).then(data => {
+        if (data.success && data.tumbas) {
+            window.tumbasConSaldo = data.tumbas;
+            localStorage.setItem(key, JSON.stringify(data.tumbas));
+            if (typeof generarCementerio === 'function') generarCementerio();
+            console.log('Tumbas sincronizadas desde Redis');
+        }
+    }).catch(() => {});
 }
-
 function guardarSaldosCriptas() {
     if (!window.userWallet) return;
     const key = `soulgeist_criptas_${window.userWallet}`;
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
-    console.log(`💾 Guardado criptas para ${window.userWallet}`);
+    // Sincronizar con Redis para persistencia entre dispositivos
+    fetch('/api/acumular-sg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: window.userWallet, accion: 'guardar_tumbas', tumbas: window.tumbasConSaldo })
+    }).catch(() => {});
 }
 function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)

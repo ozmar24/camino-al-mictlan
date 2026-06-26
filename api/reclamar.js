@@ -114,9 +114,13 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: resultado.error });
         }
 
-        // ── 5. Cerrar candados y resetear balance ──────────────────────────────
+        // ── 5. Cerrar candados, resetear balance Y limpiar tumba retirada ─────
         const usuarioActual = usuarioData || {};
         usuarioActual.balance_soulgeist = 0;
+        // Limpiar solo la tumba de la cripto retirada, no todas
+        if (usuarioActual.tumbas && usuarioActual.tumbas[cripto] !== undefined) {
+            usuarioActual.tumbas[cripto] = 0;
+        }
 
         await Promise.all([
             redisCmd(['SET', walletKey, 'activo', 'EX', 86400]),
