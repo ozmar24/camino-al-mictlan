@@ -2208,10 +2208,10 @@ function abrirModalSeleccionCantidad(pos) {
 async function iniciarTransferenciaElegida(pos, cantidad) {
     const tumbaOrigen = document.querySelector('.alma-maestra');
     const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
-   
+    
     if (!tumbaOrigen || !tumbaDestino) return;
 
-    // 1. Guardamos el balance ANTES de descontar (para debug)
+    // 1. Guardamos el balance ANTES de descontar
     const balanceAntes = balanceUsuarioSG;
     console.log(`[DEBUG] Balance antes: ${balanceAntes} | Cantidad a enviar: ${cantidad}`);
 
@@ -2222,49 +2222,51 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
 
     console.log(`[DEBUG] Balance después de descuento: ${balanceUsuarioSG}`);
 
-    const ganancia = cantidad * (pos.tasa || 0);
+    // --- CORRECCIÓN: Obtener la tasa fresca de la variable global ---
+    const tasaActual = (window.TASAS_ACTUALES && window.TASAS_ACTUALES[pos.nombre]) ? window.TASAS_ACTUALES[pos.nombre].tasa : (pos.tasa || 0);
+    const ganancia = cantidad * tasaActual;
+    
+    console.log(`[DEBUG] Calculando ganancia: ${cantidad} * ${tasaActual} = ${ganancia}`);
+    
     cerrarRitual();
 
-if (window.userWallet) {
-    try {
-        console.log(`[DESCUENTO] Enviando costoRitual = ${cantidad} a Redis`);
+    // 3. Enviar a Redis (await asegura que el servidor responda antes de continuar)
+    if (window.userWallet) {
+        try {
+            console.log(`[DESCUENTO] Enviando costoRitual = ${cantidad} a Redis`);
 
-        const response = await fetch('/api/acumular-sg', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                wallet: window.userWallet,
-                accion: 'descontar_ritual',
-                costoRitual: cantidad   // Correcto, esto lee tu backend
-            })
-        });
+            const response = await fetch('/api/acumular-sg', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    wallet: window.userWallet,
+                    accion: 'descontar_ritual',
+                    costoRitual: cantidad
+                })
+            });
 
-        // IMPORTANTE: Debes convertir la respuesta a JSON primero
-        const result = await response.json();
-        console.log("✅ Respuesta de Redis:", result);
+            const result = await response.json();
+            console.log("✅ Respuesta de Redis:", result);
 
-        if (result.success) {
-            // 🔥 AQUÍ ESTÁ LA CLAVE: Actualiza el balance global en el cliente
-            balanceUsuarioSG = result.nuevoBalance; 
-            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-            
-            // Asegúrate de que esta función exista y actualice el DOM
-            if (typeof actualizarBalanceSoulgeist === 'function') {
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
+            if (result.success) {
+                balanceUsuarioSG = result.nuevoBalance; 
+                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+                if (typeof actualizarBalanceSoulgeist === 'function') {
+                    actualizarBalanceSoulgeist(balanceUsuarioSG);
+                }
+                console.log("✅ Balance sincronizado con servidor:", result.nuevoBalance);
+            } else {
+                console.error("❌ Error en la respuesta de Redis:", result.error);
+                // Opcional: Podrías revertir el balance local aquí si el servidor falla
             }
-            
-            console.log("✅ Balance sincronizado con servidor:", result.nuevoBalance);
-        } else {
-            console.error("❌ Error en la respuesta de Redis:", result.error);
+        } catch (error) {
+            console.error("❌ Error al conectar con el servidor:", error);
         }
-
-    } catch (error) {
-        console.error("❌ Error al conectar con el servidor:", error);
     }
-}
 
     // 4. Animación + sumar a cripta
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
+        // Aseguramos que la suma sea con el valor calculado al inicio
         window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
         
         const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
