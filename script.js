@@ -1230,6 +1230,22 @@ setInterval(actualizarTasasEnVivo, 60000);
 function generarCementerio() {
     const contenedor = document.getElementById('contenedor-criptos');
     if (!contenedor) return;
+
+    // 1. Definimos una sola fuente de verdad
+    const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
+    const datosPersistidos = localStorage.getItem(keyCriptas);
+
+    // 2. Cargamos o inicializamos
+    if (datosPersistidos) {
+        window.tumbasConSaldo = JSON.parse(datosPersistidos);
+    } else {
+        // Inicialización para usuario nuevo
+        window.tumbasConSaldo = {
+            "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0,
+            "Solana": 0, "Dogecoin": 0, "USDT": 0, "Bitcoin": 0
+        };
+        localStorage.setItem(keyCriptas, JSON.stringify(window.tumbasConSaldo));
+    }
     
     contenedor.innerHTML = '';
 
@@ -2209,27 +2225,43 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
     const ganancia = cantidad * (pos.tasa || 0);
     cerrarRitual();
 
-    // 3. Enviar a Redis (CORREGIDO)
-    if (window.userWallet) {
-        try {
-            console.log(`[DESCUENTO] Enviando nuevoBalance = ${balanceUsuarioSG} a Redis`);
+if (window.userWallet) {
+    try {
+        console.log(`[DESCUENTO] Enviando costoRitual = ${cantidad} a Redis`);
 
-            const response = await fetch('/api/acumular-sg', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        wallet: window.userWallet,
-        accion: 'descontar_ritual',
-        costoRitual: cantidad   // <--- AQUÍ ESTABA EL ERROR. Debe llamarse 'costoRitual'
-    })
-});
+        const response = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                wallet: window.userWallet,
+                accion: 'descontar_ritual',
+                costoRitual: cantidad   // Correcto, esto lee tu backend
+            })
+        });
 
-            const result = await response.json();
-            console.log("✅ Respuesta de Redis:", result);
-        } catch (error) {
-            console.error("❌ Error al actualizar Redis:", error);
+        // IMPORTANTE: Debes convertir la respuesta a JSON primero
+        const result = await response.json();
+        console.log("✅ Respuesta de Redis:", result);
+
+        if (result.success) {
+            // 🔥 AQUÍ ESTÁ LA CLAVE: Actualiza el balance global en el cliente
+            balanceUsuarioSG = result.nuevoBalance; 
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            
+            // Asegúrate de que esta función exista y actualice el DOM
+            if (typeof actualizarBalanceSoulgeist === 'function') {
+                actualizarBalanceSoulgeist(balanceUsuarioSG);
+            }
+            
+            console.log("✅ Balance sincronizado con servidor:", result.nuevoBalance);
+        } else {
+            console.error("❌ Error en la respuesta de Redis:", result.error);
         }
+
+    } catch (error) {
+        console.error("❌ Error al conectar con el servidor:", error);
     }
+}
 
     // 4. Animación + sumar a cripta
     lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
