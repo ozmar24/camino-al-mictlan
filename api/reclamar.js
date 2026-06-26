@@ -114,10 +114,14 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: resultado.error });
         }
 
-        // ── 5. Cerrar candados, resetear balance Y limpiar tumba retirada ─────
+        // ── 5. Cerrar candados, descontar SG usados y limpiar tumba retirada ──
         const usuarioActual = usuarioData || {};
-        usuarioActual.balance_soulgeist = 0;
-        // Limpiar solo la tumba de la cripto retirada, no todas
+        // Restar solo los SG enviados, no poner todo en cero
+        const balanceAntes = parseFloat(usuarioActual.balance_soulgeist || 0);
+        const balanceDespues = Math.max(0, balanceAntes - cantidadSG);
+        usuarioActual.balance_soulgeist = balanceDespues;
+        console.log(`💰 Balance SG: ${balanceAntes} - ${cantidadSG} = ${balanceDespues}`);
+        // Limpiar solo la tumba de la cripto retirada
         if (usuarioActual.tumbas && usuarioActual.tumbas[cripto] !== undefined) {
             usuarioActual.tumbas[cripto] = 0;
         }
@@ -142,7 +146,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
             success: true,
             txHash: resultado.txHash,
-            balanceAlmas: 0,
+            balanceAlmas: balanceDespues,
             mensaje: `✅ ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.\n` +
                      `Puedes convertirlos a ${cripto} en QuickSwap.\n` +
                      `Tx: ${resultado.txHash.slice(0, 14)}...`
