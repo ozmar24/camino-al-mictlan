@@ -498,7 +498,7 @@ button,
     align-items: center !important;
     z-index: 1001 !important; /* Encima del candelabro */
     pointer-events: auto !important;
-    cursor: url('ruta/a/tu/pentaculo.png') 16 16, pointer !important;
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
 /* Mostrar solo dentro del cementerio */
