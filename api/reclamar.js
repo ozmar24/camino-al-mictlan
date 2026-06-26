@@ -3,8 +3,7 @@ import { ethers } from 'ethers';
 // ABI mínimo ERC-20 para transferir SG
 const ERC20_ABI = [
     "function transfer(address to, uint256 value) returns (bool)",
-    "function balanceOf(address account) view returns (uint256)",
-    "function decimals() view returns (uint8)"
+    "function balanceOf(address account) view returns (uint256)"
 ];
 
 export default async function handler(req, res) {
@@ -153,13 +152,35 @@ export default async function handler(req, res) {
 
 // ── Transferir SG desde la bóveda al usuario ─────────────────────────────────
 async function transferirSG(walletUsuario, cantidadSG, claveAdmin, contratoAddr, rpcUrl) {
+    // Lista de RPCs de respaldo si el principal falla
+    const RPCS = [
+        rpcUrl,
+        'https://rpc.ankr.com/polygon',
+        'https://polygon-bor-rpc.publicnode.com',
+        'https://rpc-mainnet.matic.quiknode.pro'
+    ].filter(Boolean);
+
+    let provider = null;
+    for (const rpc of RPCS) {
+        try {
+            const p = new ethers.JsonRpcProvider(rpc);
+            await p.getBlockNumber(); // test rápido
+            provider = p;
+            console.log(`✅ RPC conectado: ${rpc}`);
+            break;
+        } catch {
+            console.warn(`⚠️ RPC fallido: ${rpc}`);
+        }
+    }
+    if (!provider) return { success: false, error: 'No se pudo conectar a Polygon. Intenta de nuevo.' };
+
     try {
-        const provider    = new ethers.JsonRpcProvider(rpcUrl);
         const walletAdmin = new ethers.Wallet(claveAdmin, provider);
         const contrato    = new ethers.Contract(contratoAddr, ERC20_ABI, walletAdmin);
 
-        const decimals = await contrato.decimals();
-        const cantidad = ethers.parseUnits(cantidadSG.toFixed(18).slice(0, cantidadSG.toFixed(18).indexOf('.') + 19), decimals);
+        // SG usa 18 decimales (estándar OpenZeppelin ERC-20)
+        const cantidadStr = cantidadSG.toFixed(6);
+        const cantidad = ethers.parseUnits(cantidadStr, 18);
 
         // Verificar saldo de la bóveda
         const saldoBoveda = await contrato.balanceOf(walletAdmin.address);
@@ -179,6 +200,9 @@ async function transferirSG(walletUsuario, cantidadSG, claveAdmin, contratoAddr,
         console.error('❌ Error blockchain:', error.message);
         if (error.message?.includes('insufficient funds')) {
             return { success: false, error: 'La bóveda no tiene MATIC para el gas. Contacta al administrador.' };
+        }
+        if (error.message?.includes('transfer amount exceeds balance')) {
+            return { success: false, error: 'La bóveda no tiene suficientes SG. Contacta al administrador.' };
         }
         return { success: false, error: 'Error en la transferencia. Intenta de nuevo.' };
     }

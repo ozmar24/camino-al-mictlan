@@ -489,7 +489,7 @@ button,
 /* ✅ MENÚ TEXTOS: AJUSTADO EXACTAMENTE ENCIMA DE LAS LLAMAS */
 .menu-textos {
     display: none !important; /* Oculto al inicio */
-    position: relative !important;
+    position: fixed !important;
     bottom: 40px !important;  /* 👈 POSICIÓN SOBRE LAS LLAMAS: súbelo o bájalo aquí */
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -498,7 +498,7 @@ button,
     align-items: center !important;
     z-index: 1001 !important; /* Encima del candelabro */
     pointer-events: auto !important;
-    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+	
 }
 
 /* Mostrar solo dentro del cementerio */
@@ -2101,7 +2101,3 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 .bloque-metamask span {
     color: #000000 !important; 
 }
-.cursor-pentaculo {
-cursor: url('./img/pentaculo.png') 16 16, pointer !important;
-}
-
