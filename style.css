@@ -489,7 +489,7 @@ button,
 /* ✅ MENÚ TEXTOS: AJUSTADO EXACTAMENTE ENCIMA DE LAS LLAMAS */
 .menu-textos {
     display: none !important; /* Oculto al inicio */
-    position: fixed !important;
+    position: relative !important;
     bottom: 40px !important;  /* 👈 POSICIÓN SOBRE LAS LLAMAS: súbelo o bájalo aquí */
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -2101,3 +2101,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 .bloque-metamask span {
     color: #000000 !important; 
 }
+.cursor-pentaculo {
+cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+}
+
