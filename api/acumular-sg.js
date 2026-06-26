@@ -88,16 +88,12 @@ export default async function handler(req, res) {
             }
             usuario.balance_soulgeist = parseFloat(usuario.balance_soulgeist || 0) + 10;
         
-        } else if (accion === 'descontar_ritual') {
-            const costo = parseFloat(req.body.costoRitual || 0);
-            if (costo <= 0) {
-                return res.status(400).json({ success: false, error: 'Costo inválido' });
-            }
-            const balanceActual = parseFloat(usuario.balance_soulgeist || 0);
-            if (balanceActual < costo) {
-                return res.status(400).json({ success: false, error: 'SG insuficientes' });
-            }
-            usuario.balance_soulgeist = balanceActual - costo;
+} else if (accion === 'descontar_ritual') {
+    const nuevoBalance = parseFloat(req.body.nuevoBalance);
+    if (isNaN(nuevoBalance) || nuevoBalance < 0) {
+        return res.status(400).json({ success: false, error: 'Nuevo balance inválido' });
+    }
+    usuario.balance_soulgeist = nuevoBalance;
         } else if (accion === 'guardar_tumbas') {
             // Guardar saldos de tumbas en el objeto del usuario
             const tumbas = req.body.tumbas || {};

@@ -1366,7 +1366,8 @@ const cantidadConvertida = cantidadEnviada * infoTasa.tasa;
 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadConvertida, pos, async () => {
     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + cantidadConvertida;
     guardarSaldosCriptas();
-    await descontarBalanceEnRedis(cantidadEnviada);
+    const balanceRestante = balanceUsuarioSG;
+await descontarBalanceEnRedis(balanceRestante);
     generarCementerio();
     mostrarModalFusionExitosa(pos, cantidadConvertida);
 });
@@ -2315,7 +2316,7 @@ async function loginExitoso(datosUsuario) {
     window.userWallet = datosUsuario.email; // Define la identidad
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
-async function descontarBalanceEnRedis(costoRitual) {
+async function descontarBalanceEnRedis(nuevoBalanceFinal) {
     if (!window.userWallet) return;
 
     try {
@@ -2324,21 +2325,18 @@ async function descontarBalanceEnRedis(costoRitual) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 wallet: window.userWallet,
-                costoRitual: costoRitual,
+                nuevoBalance: nuevoBalanceFinal,   // ← Aquí va el balance REAL restante
                 accion: 'descontar_ritual'
             })
         });
 
         const resultado = await respuesta.json();
         console.log("✅ Descuento enviado a Redis:", resultado);
-
-        if (respuesta.ok) {
-            console.log("Balance actualizado en Redis correctamente");
-        }
     } catch (error) {
         console.error("❌ Error al actualizar Redis:", error);
     }
 }
+
 function cargarSaldosCriptas() {
     if (!window.userWallet) {
         window.tumbasConSaldo = { "Soulgeist": 0, "Ethereum": 0, "Litecoin": 0, "Pepe": 0, "MATIC/POL": 0, "BNB": 0, "USDT": 0, "Bitcoin": 0 };
@@ -2700,11 +2698,21 @@ async function conectarYRetirarMetaMask(pos) {
             return;
         }
 
+        const sgGastado = sgAEnviar || (window.tumbasConSaldo[pos.nombre] || 0);
+        balanceUsuarioSG = Math.max(0, balanceUsuarioSG - sgGastado);
+        
+        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+        actualizarBalanceSoulgeist(balanceUsuarioSG);
+
+        // Guardar en Redis
+        await descontarBalanceEnRedis(balanceUsuarioSG);
+
+        // Limpiar tumba
         window.tumbasConSaldo[pos.nombre] = 0;
         guardarSaldosCriptas();
-        generarCementerio();
 
-        lanzarAlertaMictlan(resultado.mensaje || "SG enviados a tu wallet.", "RITUAL COMPLETADO");
+        generarCementerio();
+        lanzarAlertaMictlan(resultado.mensaje || "Retiro a MetaMask completado.", "RITUAL COMPLETADO");
         cerrarRitual();
 
     } catch (err) {
