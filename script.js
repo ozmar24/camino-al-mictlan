@@ -2215,14 +2215,14 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
             console.log(`[DESCUENTO] Enviando nuevoBalance = ${balanceUsuarioSG} a Redis`);
 
             const response = await fetch('/api/acumular-sg', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    wallet: window.userWallet,
-                    accion: 'descontar_ritual',
-                    nuevoBalance: cantidad   // ← Este debe ser 990
-                })
-            });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        wallet: window.userWallet,
+        accion: 'descontar_ritual',
+        costoRitual: cantidad   // <--- AQUÍ ESTABA EL ERROR. Debe llamarse 'costoRitual'
+    })
+});
 
             const result = await response.json();
             console.log("✅ Respuesta de Redis:", result);
