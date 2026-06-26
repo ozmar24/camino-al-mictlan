@@ -1592,7 +1592,7 @@ const respuesta = await fetch('/api/reclamar', {
         }
 
         // 3. El balance ya se resetea en reclamar.js — no se necesita llamada extra
-        }
+        
 
         // 4. Actualización final visual
         generarCementerio();
