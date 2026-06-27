@@ -77,9 +77,15 @@
     <main class="universo-faucet">
         
         <div id="escena-portal" onclick="entrarAlMictlan()">        
-            <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
-            <div class="resplandor-suelo"></div>
-        </div>
+    <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
+    
+    <!-- Botón del Pacto Técnico (evitamos que active el portal con stopPropagation) -->
+    <button class="btn-pacto-portal" onclick="event.stopPropagation(); document.getElementById('pantalla-pacto').style.display='flex'">
+        📜 CONSULTAR PACTO TÉCNICO
+    </button>
+    
+    <div class="resplandor-suelo"></div>
+</div>
 
         <div id="modal-contrato" class="capa-oscura interface-mictlan">
 
@@ -218,7 +224,21 @@
         </div>
     </div>
 
-    
+    <div id="pantalla-pacto" class="capa-oscura" style="display: none;">
+    <div class="pergamino-quemado">
+        <h2>EL PACTO DE SOULGEIST</h2>
+        <div id="pacto-cuerpo">
+            <p>Selecciona tu idioma para revisar la documentación técnica:</p>
+            <br>
+            <a href="Legal/Pacto_Tecnico_Soulgeist.pdf" target="_blank" class="btn-ritual-grimorio" style="display: block; margin: 10px auto; width: 80%;">VER EN ESPAÑOL</a>
+            
+            <a href="Legal/Soulgeist_Technical_Pact_EN.pdf" target="_blank" class="btn-ritual-grimorio" style="display: block; margin: 10px auto; width: 80%;">VIEW IN ENGLISH</a>
+            
+            <br>
+            <div class="boton-cerrar-codice" onclick="document.getElementById('pantalla-pacto').style.display='none'">[ CERRAR PACTO ]</div>
+        </div>
+    </div>
+</div>
 
     <div id="pantalla-codice" class="capa-oscura">
         <div class="pergamino-quemado">
