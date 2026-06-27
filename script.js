@@ -1351,9 +1351,10 @@ function generarCementerio() {
                 }
 
                 // DESCUESTA REAL
-                balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidadEnviada);
-                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                actualizarBalanceSoulgeist(balanceUsuarioSG);
+                balanceUsuarioSG = Math.floor(Math.max(0, balanceUsuarioSG - cantidadEnviada));
+localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+actualizarBalanceSoulgeist(balanceUsuarioSG);
+await descontarBalanceEnRedis(balanceUsuarioSG);
 
                 ritualActivo = false;
 
@@ -2698,12 +2699,14 @@ async function conectarYRetirarMetaMask(pos) {
             return;
         }
 
+        // === ACTUALIZACIÓN CORRECTA DE BALANCE ===
         const sgGastado = sgAEnviar || (window.tumbasConSaldo[pos.nombre] || 0);
-        balanceUsuarioSG = Math.max(0, balanceUsuarioSG - sgGastado);
+        
+        balanceUsuarioSG = Math.floor(Math.max(0, balanceUsuarioSG - sgGastado));
         
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
         actualizarBalanceSoulgeist(balanceUsuarioSG);
-
+        
         // Guardar en Redis
         await descontarBalanceEnRedis(balanceUsuarioSG);
 

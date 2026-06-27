@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     if (isNaN(nuevoBalance) || nuevoBalance < 0) {
         return res.status(400).json({ success: false, error: 'Nuevo balance inválido' });
     }
-    usuario.balance_soulgeist = nuevoBalance;
+    usuario.balance_soulgeist = Math.floor(parseFloat(nuevoBalance));
         } else if (accion === 'guardar_tumbas') {
             // Guardar saldos de tumbas en el objeto del usuario
             const tumbas = req.body.tumbas || {};
@@ -129,7 +129,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             success: true,
-            nuevoBalance: usuario.balance_soulgeist,
+            usuario.balance_soulgeist = Math.floor(parseFloat(usuario.balance_soulgeist || 0));
             mensaje: accion === 'sumar_ritual' ? "+10 SG absorbidos" : "Balance actualizado correctamente"
         });
 
