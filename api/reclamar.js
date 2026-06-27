@@ -101,12 +101,10 @@ export default async function handler(req, res) {
         // ── 3. Verificar balance real en Redis ─────────────────────────────────
         const balanceRes  = await redisCmd(['GET', balanceKey]);
         const usuarioData = balanceRes?.result ? JSON.parse(balanceRes.result) : null;
-        
-        // CORRECCIÓN: Leemos la tumba, no el balance principal
-        const saldoEnTumba = parseFloat(usuarioData?.tumbas?.[cripto] || 0);
+        const balanceSG   = parseFloat(usuarioData?.balance_soulgeist || 0);
 
-        if (saldoEnTumba <= 0) {
-            return res.status(400).json({ error: `La bóveda de ${cripto} está vacía.` });
+        if (balanceSG <= 0) {
+            return res.status(400).json({ error: 'No tienes SG suficientes para retirar.' });
         }
 
         // ── 4. Transferir SG desde la bóveda al usuario ───────────────────────
@@ -116,22 +114,26 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: resultado.error });
         }
 
-        // ── 5. Cerrar candados y limpiar SÓLO la tumba retirada ────────────────
-        const usuarioActual = usuarioData || {};
-        
-        // Mantenemos el balance intacto para devolverlo en la respuesta
-        const balanceActualSG = parseFloat(usuarioActual.balance_soulgeist || 0);
-        
-        // Limpiar solo la tumba de la cripto retirada
-        if (usuarioActual.tumbas && usuarioActual.tumbas[cripto] !== undefined) {
-            usuarioActual.tumbas[cripto] = 0;
-        }
+        // ── 5. Cerrar candados, descontar SG usados y limpiar tumba retirada ──
+       const usuarioActual = usuarioData || {};
 
-        await Promise.all([
-            redisCmd(['SET', walletKey, 'activo', 'EX', 86400]),
-            redisCmd(['SET', ipKey,     'activo', 'EX', 86400]),
-            redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)])
-        ]);
+// YA NO RESTAMOS cantidadSG porque el usuario ya pagó esos SG al "fucionar"
+// Solo mantenemos el balance tal cual estaba
+const balanceFinal = parseFloat(usuarioActual.balance_soulgeist || 0); 
+
+usuarioActual.balance_soulgeist = balanceFinal; 
+
+// Limpiar solo la tumba de la cripto retirada (esto sí debe quedarse)
+if (usuarioActual.tumbas && usuarioActual.tumbas[cripto] !== undefined) {
+    usuarioActual.tumbas[cripto] = 0;
+}
+
+// Actualizar Redis solo con el balance sin cambios y la tumba en 0
+await Promise.all([
+    redisCmd(['SET', walletKey, 'activo', 'EX', 86400]),
+    redisCmd(['SET', ipKey,     'activo', 'EX', 86400]),
+    redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)])
+]);
 
         // ── 6. Alerta Telegram ─────────────────────────────────────────────────
         await enviarAlertaTelegram(
@@ -140,14 +142,16 @@ export default async function handler(req, res) {
             `📬 *Wallet:* \`${wallet}\`\n` +
             `💎 *SG enviados:* \`${cantidadSG.toFixed(4)}\`\n` +
             `🪙 *Cripto elegida:* ${cripto}\n` +
+            `📊 *Saldo visual:* ${parseFloat(saldoVisual || 0).toFixed(8)}\n` +
             `🔗 *Tx:* \`${resultado.txHash}\``
         );
 
         return res.status(200).json({
             success: true,
             txHash: resultado.txHash,
-            balanceAlmas: balanceActualSG, // Devolvemos el balance principal intacto
+            balanceAlmas: usuarioActual.balance_soulgeist,
             mensaje: `✅ ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.\n` +
+                     `Puedes convertirlos a ${cripto} en QuickSwap.\n` +
                      `Tx: ${resultado.txHash.slice(0, 14)}...`
         });
 
