@@ -2232,7 +2232,7 @@ async function iniciarTransferenciaElegida(pos, cantidad) {
                 body: JSON.stringify({
                     wallet: window.userWallet,
                     accion: 'descontar_ritual',
-                    costoRitual: cantidad
+                    nuevoBalance: balanceUsuarioSG
                 })
             });
 
@@ -2318,20 +2318,35 @@ async function loginExitoso(datosUsuario) {
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
 async function descontarBalanceEnRedis(nuevoBalanceFinal) {
-    if (!window.userWallet) return;
+    if (!window.userWallet) {
+        console.warn("❌ Intento de descuento sin Wallet");
+        return;
+    }
+
+    // Validación defensiva antes de llamar al API
+    if (isNaN(nuevoBalanceFinal) || nuevoBalanceFinal < 0) {
+        console.error("❌ ERROR: El valor a enviar es inválido:", nuevoBalanceFinal);
+        return; // Detenemos la ejecución aquí antes de que el servidor nos dé el 400
+    }
 
     try {
+        console.log("📤 Enviando balance final a Redis:", nuevoBalanceFinal); // DEBUG
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 wallet: window.userWallet,
-                nuevoBalance: nuevoBalanceFinal,   // ← Aquí va el balance REAL restante
+                nuevoBalance: nuevoBalanceFinal,
                 accion: 'descontar_ritual'
             })
         });
 
         const resultado = await respuesta.json();
+        
+        if (!respuesta.ok) {
+            throw new Error(resultado.error || "Error en el servidor");
+        }
+
         console.log("✅ Descuento enviado a Redis:", resultado);
     } catch (error) {
         console.error("❌ Error al actualizar Redis:", error);
