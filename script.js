@@ -2661,13 +2661,19 @@ async function conectarYRetirarMetaMask(pos) {
         btn.disabled = true;
 
         const saldoVisual = window.tumbasConSaldo[pos.nombre] || 0;
-        const sgGastado = Math.floor(saldoVisual);
+        // Los SG a enviar son los que están acumulados en la tumba
+        // balance_soulgeist NO se toca — ya se descontó al convertir
+        const infoTasaRetiro = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
+        // Calcular cuántos SG representan el saldo visual (con compensación del 2% de quema)
+        const sgBrutos = infoTasaRetiro.tasa > 0 ? (saldoVisual / infoTasaRetiro.tasa) : 0;
+        const sgAEnviar = sgBrutos / 0.98;
 
-        if (sgGastado <= 0) {
+        if (saldoVisual <= 0 || sgAEnviar <= 0) {
             lanzarAlertaMictlan("No tienes saldo suficiente para retirar.", "RITUAL INCOMPLETO");
             return;
         }
 
+        console.log(`Retiro: ${saldoVisual} ${pos.nombre} → ${sgAEnviar.toFixed(2)} SG a enviar`);
         btn.innerText = "PROCESANDO...";
 
         const respuesta = await fetch('/api/reclamar', {
@@ -2678,7 +2684,7 @@ async function conectarYRetirarMetaMask(pos) {
                 wallet: direccion,
                 cripto: pos.nombre,
                 pasarela: 'metamask',
-                sgAEnviar: sgGastado,
+                sgAEnviar: sgAEnviar,
                 saldoVisual: saldoVisual
             })
         });
@@ -2689,12 +2695,9 @@ async function conectarYRetirarMetaMask(pos) {
             return;
         }
 
-        // === ACTUALIZACIÓN CORRECTA ===
-        balanceUsuarioSG = Math.floor(Math.max(0, balanceUsuarioSG - sgGastado));
-        localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-        actualizarBalanceSoulgeist(balanceUsuarioSG);
-
-        await descontarBalanceEnRedis(balanceUsuarioSG);
+        // El balance SG no cambia al retirar — ya se descontó al convertir
+        // Solo sincronizar con Redis para mostrar el valor correcto
+        sincronizarBalanceConRedis().then(b => actualizarBalanceSoulgeist(b));
 
         window.tumbasConSaldo[pos.nombre] = 0;
         guardarSaldosCriptas();
