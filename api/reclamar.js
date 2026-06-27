@@ -101,10 +101,12 @@ export default async function handler(req, res) {
         // ── 3. Verificar balance real en Redis ─────────────────────────────────
         const balanceRes  = await redisCmd(['GET', balanceKey]);
         const usuarioData = balanceRes?.result ? JSON.parse(balanceRes.result) : null;
-        const balanceSG   = parseFloat(usuarioData?.balance_soulgeist || 0);
+        
+        // CORRECCIÓN: Leemos la tumba, no el balance principal
+        const saldoEnTumba = parseFloat(usuarioData?.tumbas?.[cripto] || 0);
 
-        if (balanceSG <= 0) {
-            return res.status(400).json({ error: 'No tienes SG suficientes para retirar.' });
+        if (saldoEnTumba <= 0) {
+            return res.status(400).json({ error: `La bóveda de ${cripto} está vacía.` });
         }
 
         // ── 4. Transferir SG desde la bóveda al usuario ───────────────────────
@@ -114,13 +116,12 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: resultado.error });
         }
 
-        // ── 5. Cerrar candados, descontar SG usados y limpiar tumba retirada ──
+        // ── 5. Cerrar candados y limpiar SÓLO la tumba retirada ────────────────
         const usuarioActual = usuarioData || {};
-        // Restar solo los SG enviados, no poner todo en cero
-        const balanceAntes = parseFloat(usuarioActual.balance_soulgeist || 0);
-        const balanceDespues = Math.max(0, balanceAntes - cantidadSG);
-        usuarioActual.balance_soulgeist = balanceDespues;
-        console.log(`💰 Balance SG: ${balanceAntes} - ${cantidadSG} = ${balanceDespues}`);
+        
+        // Mantenemos el balance intacto para devolverlo en la respuesta
+        const balanceActualSG = parseFloat(usuarioActual.balance_soulgeist || 0);
+        
         // Limpiar solo la tumba de la cripto retirada
         if (usuarioActual.tumbas && usuarioActual.tumbas[cripto] !== undefined) {
             usuarioActual.tumbas[cripto] = 0;
@@ -139,16 +140,14 @@ export default async function handler(req, res) {
             `📬 *Wallet:* \`${wallet}\`\n` +
             `💎 *SG enviados:* \`${cantidadSG.toFixed(4)}\`\n` +
             `🪙 *Cripto elegida:* ${cripto}\n` +
-            `📊 *Saldo visual:* ${parseFloat(saldoVisual || 0).toFixed(8)}\n` +
             `🔗 *Tx:* \`${resultado.txHash}\``
         );
 
         return res.status(200).json({
             success: true,
             txHash: resultado.txHash,
-            balanceAlmas: balanceDespues,
+            balanceAlmas: balanceActualSG, // Devolvemos el balance principal intacto
             mensaje: `✅ ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.\n` +
-                     `Puedes convertirlos a ${cripto} en QuickSwap.\n` +
                      `Tx: ${resultado.txHash.slice(0, 14)}...`
         });
 
