@@ -1319,7 +1319,7 @@ function generarCementerio() {
             `;
         }
 
-        div.onclick = (e) => {
+        div.onclick = async (e) => {
             e.stopPropagation();
 	
 	    if (esPuntoRojo) {
