@@ -2640,18 +2640,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // 2. Restringir retiros a PC
 async function conectarYRetirarMetaMask(pos) {
     if (isMobile) {
-        lanzarAlertaMictlan(
-            "Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).", 
-            "SANTUARIO PC REQUERIDO"
-        );
+        lanzarAlertaMictlan("Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).", "SANTUARIO PC REQUERIDO");
         return;
     }
-
     if (!pos || typeof pos.montoAEnviar === 'undefined') {
         lanzarAlertaMictlan("Ritual incompleto", "No se detectó el monto a retirar.");
         return;
     }
-
     if (typeof window.ethers === 'undefined') {
         setTimeout(() => conectarYRetirarMetaMask(pos), 1000);
         return;
@@ -2665,15 +2660,10 @@ async function conectarYRetirarMetaMask(pos) {
         btn.innerText = "FIRMANDO TRANSACCIÓN...";
         btn.disabled = true;
 
-        // SG equivalentes al saldo visual (compensando el 2% de quema del contrato)
-        const infoTasaRetiro = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
         const saldoVisual = window.tumbasConSaldo[pos.nombre] || 0;
-        // Cuántos SG son equivalentes al saldo visual
-        const sgBrutos = infoTasaRetiro.tasa > 0 ? (saldoVisual / infoTasaRetiro.tasa) : 0;
-        // Compensar el 2% que el contrato quema automáticamente
-        const sgAEnviar = sgBrutos / 0.98;
+        const sgGastado = Math.floor(saldoVisual);
 
-        if (sgAEnviar <= 0) {
+        if (sgGastado <= 0) {
             lanzarAlertaMictlan("No tienes saldo suficiente para retirar.", "RITUAL INCOMPLETO");
             return;
         }
@@ -2688,7 +2678,7 @@ async function conectarYRetirarMetaMask(pos) {
                 wallet: direccion,
                 cripto: pos.nombre,
                 pasarela: 'metamask',
-                sgAEnviar: sgAEnviar,
+                sgAEnviar: sgGastado,
                 saldoVisual: saldoVisual
             })
         });
@@ -2699,18 +2689,13 @@ async function conectarYRetirarMetaMask(pos) {
             return;
         }
 
-        // === ACTUALIZACIÓN CORRECTA DE BALANCE ===
-        const sgGastado = sgAEnviar || (window.tumbasConSaldo[pos.nombre] || 0);
-        
+        // === ACTUALIZACIÓN CORRECTA ===
         balanceUsuarioSG = Math.floor(Math.max(0, balanceUsuarioSG - sgGastado));
-        
         localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
         actualizarBalanceSoulgeist(balanceUsuarioSG);
-        
-        // Guardar en Redis
+
         await descontarBalanceEnRedis(balanceUsuarioSG);
 
-        // Limpiar tumba
         window.tumbasConSaldo[pos.nombre] = 0;
         guardarSaldosCriptas();
 

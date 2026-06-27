@@ -116,9 +116,11 @@ export default async function handler(req, res) {
 
         console.log(`✅ Balance actualizado para ${userKey}: ${usuario.balance_soulgeist}`);
 
+        const nuevoBalanceFinal = Math.floor(parseFloat(usuario.balance_soulgeist || 0));
+
         return res.status(200).json({
             success: true,
-            nuevoBalance: Math.floor(parseFloat(usuario.balance_soulgeist || 0)),
+            nuevoBalance: nuevoBalanceFinal,
             mensaje: accion === 'sumar_ritual' ? "+10 SG absorbidos" : "Balance actualizado correctamente"
         });
 
