@@ -930,6 +930,14 @@ const SOULGEIST_ABI = [
 
 const DIRECCION_CONTRATO = "0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB";
 
+let turnstileToken = "";
+
+// Cloudflare llamará a esta función automáticamente cuando el humano resuelva el puzzle
+function onTurnstileSuccess(token) {
+    turnstileToken = token;
+    console.log("✅ Verificación humana completada.");
+}
+
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
 // ==================================================================
@@ -1028,22 +1036,19 @@ async function manejarAuth() {
 
     if (!emailEl || !passwordEl || !btnAuth) return;
 
+    // VALIDACIÓN DE SEGURIDAD
+    if (!turnstileToken) {
+        lanzarAlertaMictlan("Debes completar el puzzle de seguridad.", "SEGURIDAD");
+        return;
+    }
+
     const email = emailEl.value.trim();
     const password = passwordEl.value.trim();
+    const accion = esModoRegistro ? 'registro' : 'login';
 
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
         return;
-    }
-
-    const accion = esModoRegistro ? 'registro' : 'login';
-
-    if (accion === 'registro') {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
-        if (!regex.test(password)) {
-            lanzarAlertaMictlan("La contraseña debe tener 8+ caracteres, mayúscula, minúscula y símbolo.", "LLAVE DÉBIL");
-            return;
-        }
     }
 
     const textoOriginal = btnAuth.innerText;
@@ -1054,7 +1059,12 @@ async function manejarAuth() {
         const respuesta = await fetch('/api/pacto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, accion })
+            body: JSON.stringify({ 
+                email, 
+                password, 
+                accion, 
+                turnstileToken // <-- Aquí enviamos el token al servidor
+            })
         });
 
         const resultado = await respuesta.json();
@@ -1066,13 +1076,10 @@ async function manejarAuth() {
 
         if (accion === 'registro') {
             lanzarAlertaMictlan("¡Pacto sellado! Ahora inicia sesión.", "ALMA REGISTRADA");
-            cambiarModoAuth();   // Cambia automáticamente a login
+            cambiarModoAuth();
         } else {
-            // Login exitoso
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
-            localStorage.setItem('usuario_email', resultado.usuario.email);
-
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
             entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
@@ -1087,14 +1094,22 @@ async function manejarAuth() {
 }
 
 async function manejarLoginGoogle(response) {
+    // VALIDACIÓN DE SEGURIDAD
+    if (!turnstileToken) {
+        lanzarAlertaMictlan("Debes completar el puzzle de seguridad primero.", "SEGURIDAD");
+        return;
+    }
+
     try {
-        // Reemplaza 'tu-dominio-en-vercel.vercel.app' por tu dirección real de Vercel
-        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com/'; 
+        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com'; 
 
         const res = await fetch(`${DOMINIO_VERCEL}/api/auth-google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: response.credential })
+            body: JSON.stringify({ 
+                token: response.credential, 
+                turnstileToken: turnstileToken // <-- Aquí enviamos el token al servidor
+            })
         });
 
         const datos = await res.json();
@@ -1102,9 +1117,8 @@ async function manejarLoginGoogle(response) {
         if (res.ok && datos.success) {
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
-
             await sincronizarBalanceConRedis();
-            entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
+            entrarAlCampoSanto({ balanceSG: datos.perfil.balanceSG });
         } else {
             lanzarAlertaMictlan(datos.error || "Fallo al autenticar con Google.", "ERROR GOOGLE");
         }

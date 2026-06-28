@@ -16,7 +16,7 @@
     
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
 <!-- Portal de Monlix - Reemplazo de Unity Ads -->
 <div id="portal-monlix-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 0, 0, 0.93); display: none; justify-content: center; align-items: center; z-index: 10002; border: 1px solid #ff0000; box-shadow: inset 0 0 50px #000;">
@@ -113,12 +113,13 @@
             <p id="left-desc">Sella tu rastro en el Mictlán con credenciales directas.</p>
             
             <div class="formulario-goth">
-                <input type="email" id="email" placeholder="CORREO DEL PACTO" 
-       autocomplete="email" class="input-pergamino-goth">
-<input type="password" id="password" placeholder="LLAVE SECRETA" 
-       autocomplete="current-password" class="input-pergamino-goth">
-                <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
-            </div>
+    <input type="email" id="email" placeholder="CORREO DEL PACTO" autocomplete="email" class="input-pergamino-goth">
+    <input type="password" id="password" placeholder="LLAVE SECRETA" autocomplete="current-password" class="input-pergamino-goth">
+    
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAADsa9JM6jbjeZkZj" data-callback="onTurnstileSuccess"></div>
+    
+    <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
+</div>
             
             <div class="cambio-modo-contenedor">
                 <span id="toggle-auth-text" onclick="cambiarModoAuth()">¿Eres un nuevo espíritu? Sella tu identidad aquí</span>
