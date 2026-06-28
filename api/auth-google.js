@@ -1,5 +1,24 @@
 import { OAuth2Client } from 'google-auth-library';
 
+// --- Función de verificación Turnstile ---
+async function verifyTurnstile(token, ip) {
+    const SECRET_KEY = process.env.CLOUDFLARE_SECRET_KEY;
+    const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            secret: SECRET_KEY,
+            response: token,
+            remoteip: ip
+        })
+    });
+    
+    const outcome = await response.json();
+    return outcome.success;
+}
+
 async function enviarAlertaTelegram(mensaje) {
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -17,22 +36,28 @@ async function enviarAlertaTelegram(mensaje) {
 }
 
 export default async function handler(req, res) {
-    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js globalmente.
-    // Solo aseguramos que el método entrante sea estrictamente POST.
     if (req.method !== 'POST') { 
         return res.status(405).json({ success: false, error: 'Método no permitido' }); 
     }
-    
+
+    // 1. Extraemos tokens del body
+    const { token, turnstileToken } = req.body;
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // 2. Validación de seguridad (Turnstile)
+    if (!turnstileToken) {
+        return res.status(400).json({ success: false, error: 'Verificación humana faltante' });
+    }
+
+    const isHuman = await verifyTurnstile(turnstileToken, userIp);
+    if (!isHuman) {
+        return res.status(403).json({ success: false, error: 'Bot detectado o verificación fallida' });
+    }
+
+    // 3. Validación de Google Auth
     const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
     if (!GOOGLE_CLIENT_ID) {
         return res.status(500).json({ success: false, error: 'Configuración de Google incompleta' });
-    }
-
-    let token;
-    try {
-        token = req.body?.token;
-    } catch (e) {
-        return res.status(400).json({ success: false, error: 'Token inválido' });
     }
 
     if (!token) {
@@ -57,7 +82,7 @@ export default async function handler(req, res) {
         if (redisUrl && redisToken) {
             const userKey = `usuario:${emailUsuario.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
-            // Verificar si el usuario ya existe
+            // Verificamos si el usuario YA existe
             const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
                 headers: { Authorization: `Bearer ${redisToken}` }
             });
@@ -65,21 +90,22 @@ export default async function handler(req, res) {
             let usuario = getData.result ? JSON.parse(getData.result) : null;
 
             if (!usuario) {
-                // === BONO PARA PRIMEROS 50 USUARIOS ===
-                const contadorRes = await fetch(`${redisUrl}/get/contador_almas`, {
+                // INCREMENTAMOS CONTADOR (Solo si pasó Turnstile y Google Auth)
+                const incrRes = await fetch(`${redisUrl}/incr/contador_almas`, {
                     headers: { Authorization: `Bearer ${redisToken}` }
                 });
-                const contadorData = await contadorRes.json();
-                const contadorActual = parseInt(contadorData?.result || 0);
+                const incrData = await incrRes.json();
+                const posicion = parseInt(incrData?.result || 0);
+
+                const premio = (posicion <= 50) ? 1000 : 0;
 
                 usuario = {
                     email: emailUsuario,
-                    balance_soulgeist: (contadorActual < 50) ? 1000 : 0,
+                    balance_soulgeist: premio,
                     metodo: 'google',
                     fecha_registro: new Date().toISOString()
                 };
 
-                // Guardar usuario nuevo
                 await fetch(`${redisUrl}`, {
                     method: 'POST',
                     headers: {
@@ -88,15 +114,8 @@ export default async function handler(req, res) {
                     },
                     body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
                 });
-		
-                await enviarAlertaTelegram(`<b>🚀 Nuevo Registro en el Mictlán</b>\n👤 Email: ${emailUsuario}`);
-
-                // Incrementar contador si es de los primeros 50
-                if (contadorActual < 50) {
-                    await fetch(`${redisUrl}/incr/contador_almas`, {
-                        headers: { Authorization: `Bearer ${redisToken}` }
-                    });
-                }
+                
+                await enviarAlertaTelegram(`<b>🚀 Nuevo Registro #${posicion} en el Mictlán</b>\n👤 Email: ${emailUsuario}`);
             }
 
             balanceSG = usuario.balance_soulgeist || 0;

@@ -72,53 +72,54 @@ export default async function handler(req, res) {
         const getData = await getRes.json();
         let usuario = getData.result ? JSON.parse(getData.result) : null;
 
-        // ==================== REGISTRO ====================
-        if (accion === 'registro') {
-            if (usuario) {
-                return res.status(409).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
-            }
+        
+        // ==================== REGISTRO OPTIMIZADO ====================
+if (accion === 'registro') {
+    if (usuario) {
+        return res.status(409).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
+    }
 
-            const contadorRes = await fetch(`${cleanUrl}/get/contador_almas`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const contadorData = await contadorRes.json();
-            const cuentaActual = parseInt(contadorData?.result || 0);
+    // 1. Incrementamos el contador ANTES de hacer nada más.
+    // Esto nos da el número único y exacto que le corresponde a este usuario.
+    const incrRes = await fetch(`${cleanUrl}/incr/contador_almas`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    const incrData = await incrRes.json();
+    const numeroUsuario = parseInt(incrData?.result || 0);
 
-            const premio = cuentaActual < 50 ? 1000 : 0;
-            const hash = await bcrypt.hash(password, 12);
+    // 2. Si el número es mayor a 50, ya no hay premio.
+    const premio = numeroUsuario <= 50 ? 1000 : 0;
+    
+    // Si llegara a ser mayor a 50, quizás quieras decrementar o simplemente dejarlo ahí
+    // pero el registro ya está protegido.
 
-            const nuevoUsuario = {
-                email: emailNormalizado,
-                password: hash,
-                balance_soulgeist: premio,
-                creado_en: new Date().toISOString(),
-                metodo: 'manual'
-            };
+    const hash = await bcrypt.hash(password, 12);
 
-            // Guardar
-            await fetch(`${cleanUrl}`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(['SET', userKey, JSON.stringify(nuevoUsuario)])
-            });
-		
-            await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (Manual):</b> ${emailNormalizado}`);
+    const nuevoUsuario = {
+        email: emailNormalizado,
+        password: hash,
+        balance_soulgeist: premio,
+        creado_en: new Date().toISOString(),
+        metodo: 'manual'
+    };
 
-            // Incrementar contador
-            if (cuentaActual < 50) {
-                await fetch(`${cleanUrl}/incr/contador_almas`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-            }
+    // 3. Guardamos al usuario
+    await fetch(`${cleanUrl}`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(['SET', userKey, JSON.stringify(nuevoUsuario)])
+    });
+    
+    await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (${numeroUsuario}/50):</b> ${emailNormalizado}`);
 
-            return res.status(200).json({ 
-                success: true, 
-                message: `Pacto sellado. ${premio > 0 ? 'Has recibido 1,000 SG de bienvenida.' : ''}` 
-            });
-        }
+    return res.status(200).json({ 
+        success: true, 
+        message: `Pacto sellado. ${premio > 0 ? 'Has recibido 1,000 SG de bienvenida.' : ''}` 
+    });
+}
 
         // ==================== LOGIN ====================
         if (accion === 'login') {
