@@ -2138,20 +2138,20 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    max-height: 65px !important;
+    max-height: 50px !important;
     overflow: hidden !important;
     margin: 8px auto !important;
 }
 
 .cf-turnstile {
-    transform: scale(0.72) !important;
+    transform: scale(0.6) !important;
     transform-origin: center top !important;
 }
 
 /* Popup expandido de verificación */
 .cf-turnstile iframe,
 iframe[src*="challenges.cloudflare.com"] {
-    max-width: 300px !important;
-    transform: scale(0.8) !important;
+    max-width: 100px !important;
+    transform: scale(0.6) !important;
     transform-origin: center top !important;
 }
