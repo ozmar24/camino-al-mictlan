@@ -744,7 +744,6 @@ button,
     flex-direction: column !important;
     align-items: center !important;
     justify-content: flex-start !important; 
-    gap: 15px !important;       
     box-sizing: border-box !important;
     padding: 10px 20px !important;
     z-index: 30 !important;
@@ -804,8 +803,8 @@ button,
     align-items: center !important;
     width: 100% !important;
     max-width: 180px !important;
-    min-height: 45px !important;
-    margin: 14px auto !important;
+    
+    margin: 10px auto !important;
     position: relative !important;
 }
 #google-btn-container::after {
@@ -2166,13 +2165,12 @@ input[type="button"], label, select {
     box-shadow: 0 0 20px #ff4500;
 }
 .turnstile-container {
-    width: 100%;
-    /* Asegura que el contenido extra no se salga */
-    overflow: hidden; 
-    /* Alineación perfecta dentro del grimorio */
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    /* Permitimos que se encoja si es necesario */
+    flex-shrink: 1; 
 }
 
 /* Forzamos al widget a ser lo más pequeño posible */
