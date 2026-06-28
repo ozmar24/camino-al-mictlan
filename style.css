@@ -2177,6 +2177,6 @@ input[type="button"], label, select {
 
 /* Forzamos al widget a ser lo más pequeño posible */
 .cf-turnstile {
-    transform: scale(0.9); /* Ligeramente más pequeño para mejor encaje */
+    transform: scale(0.5); /* Ligeramente más pequeño para mejor encaje */
     transform-origin: center;
 }
