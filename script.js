@@ -1063,7 +1063,7 @@ async function manejarAuth() {
                 email, 
                 password, 
                 accion, 
-                turnstileToken: turnstileToken // <-- Aquí enviamos el token al servidor
+                cfToken: turnstileToken // <-- Aquí enviamos el token al servidor
             })
         });
 
