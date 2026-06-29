@@ -935,7 +935,7 @@ let turnstileToken = "";
 // Exponemos la función al objeto window para asegurar que el HTML la encuentre siempre
 window.onTurnstileSuccess = function(token) {
     turnstileToken = token;
-    console.log("✅ Verificación humana completada y token guardado.");
+    console.log("✅ Token guardado en window:", turnstileToken);
 };
 
 // ==================================================================
