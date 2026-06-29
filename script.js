@@ -1095,11 +1095,8 @@ async function manejarAuth() {
 
 
 async function manejarLoginGoogle(response) {
-    // VALIDACIÓN DE SEGURIDAD
-    if (!turnstileToken) {
-        lanzarAlertaMictlan("Debes completar el puzzle de seguridad primero.", "SEGURIDAD");
-        return;
-    }
+   
+    const tokenParaEnviar = window.turnstileToken || ""; 
 
     try {
         const DOMINIO_VERCEL = 'https://www.caminoamictlan.com'; 
@@ -1109,26 +1106,32 @@ async function manejarLoginGoogle(response) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 token: response.credential, 
-                turnstileToken: turnstileToken // <-- Aquí enviamos el token al servidor
+                turnstileToken: tokenParaEnviar 
             })
         });
 
         const datos = await res.json();
 
         if (res.ok && datos.success) {
+            // ÉXITO: Usuario registrado o logueado
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
             await sincronizarBalanceConRedis();
             entrarAlCampoSanto({ balanceSG: datos.perfil.balanceSG });
         } else {
-            lanzarAlertaMictlan(datos.error || "Fallo al autenticar con Google.", "ERROR GOOGLE");
+           
+            if (datos.error === "PUZZLE_REQUIRED") {
+                lanzarAlertaMictlan("Para nuevos registros, por favor completa el puzzle primero.", "SEGURIDAD");
+                
+            } else {
+                lanzarAlertaMictlan(datos.error || "Fallo al autenticar con Google.", "ERROR GOOGLE");
+            }
         }
     } catch (error) {
         console.error("Error Google:", error);
         lanzarAlertaMictlan("Fallo en la autenticación.", "FALLO DE RED");
     }
-}
-function entrarAlCampoSanto(perfil = {}) {
+}function entrarAlCampoSanto(perfil = {}) {
     const modalContrato = document.getElementById('modal-contrato');
     const cementerio = document.getElementById('campo-santo');
     const candelabro = document.querySelector('.candelabro-central');
