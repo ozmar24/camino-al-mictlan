@@ -1060,11 +1060,11 @@ async function manejarAuth() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                email, 
-                password, 
-                accion, 
-                turnstileToken // <-- Aquí enviamos el token al servidor
-            })
+    email, 
+    password, 
+    accion, 
+    cfToken: turnstileToken // Cambia la clave a 'cfToken'
+})
         });
 
         const resultado = await respuesta.json();
