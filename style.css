@@ -2144,7 +2144,7 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 }
 
 .cf-turnstile {
-    transform: scale(0.7) !important;
+    transform: scale(0.6) !important;
     transform-origin: center top !important;
 }
 
@@ -2152,6 +2152,6 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
 .cf-turnstile iframe,
 iframe[src*="challenges.cloudflare.com"] {
     max-width: 100px !important;
-    transform: scale(0.7) !important;
+    transform: scale(0.6) !important;
     transform-origin: center top !important;
 }
