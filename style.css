@@ -2138,10 +2138,10 @@ text-shadow: 0 0 2px rgba(255,255,255,0.3) !important;
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    max-height: 50px !important;
-    overflow: hidden !important;
-    margin: 8px auto !important;
+    margin: 4px auto !important;
 }
+ 
+
 
 .cf-turnstile {
     transform: scale(0.6) !important;
