@@ -932,11 +932,11 @@ const DIRECCION_CONTRATO = "0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB";
 
 let turnstileToken = "";
 
-// Cloudflare llamará a esta función automáticamente cuando el humano resuelva el puzzle
-function onTurnstileSuccess(token) {
+// Exponemos la función al objeto window para asegurar que el HTML la encuentre siempre
+window.onTurnstileSuccess = function(token) {
     turnstileToken = token;
-    console.log("✅ Verificación humana completada.");
-}
+    console.log("✅ Verificación humana completada y token guardado.");
+};
 
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
