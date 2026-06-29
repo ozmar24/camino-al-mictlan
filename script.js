@@ -1036,15 +1036,15 @@ async function manejarAuth() {
 
     if (!emailEl || !passwordEl || !btnAuth) return;
 
-    // VALIDACIÓN DE SEGURIDAD
-    if (!turnstileToken) {
-        lanzarAlertaMictlan("Debes completar el puzzle de seguridad.", "SEGURIDAD");
-        return;
-    }
-
     const email = emailEl.value.trim();
     const password = passwordEl.value.trim();
     const accion = esModoRegistro ? 'registro' : 'login';
+
+    // VALIDACIÓN DE SEGURIDAD: solo requerido para registro
+    if (accion === 'registro' && !turnstileToken) {
+        lanzarAlertaMictlan("Debes completar el puzzle de seguridad antes de registrarte.", "SEGURIDAD");
+        return;
+    }
 
     if (!email || !password) {
         lanzarAlertaMictlan("Debes completar ambos campos.", "CAMPOS INCOMPLETOS");
@@ -1063,7 +1063,7 @@ async function manejarAuth() {
                 email, 
                 password, 
                 accion, 
-                cfToken: turnstileToken // <-- Aquí enviamos el token al servidor
+                turnstileToken // <-- Aquí enviamos el token al servidor
             })
         });
 
@@ -1092,6 +1092,7 @@ async function manejarAuth() {
         btnAuth.disabled = false;
     }
 }
+
 
 async function manejarLoginGoogle(response) {
     // VALIDACIÓN DE SEGURIDAD
