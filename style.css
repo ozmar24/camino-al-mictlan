@@ -2154,3 +2154,53 @@ iframe[src*="challenges.cloudflare.com"] {
     transform: scale(0.5) !important;
     transform-origin: center top !important;
 }
+/* ══════════════════════════════════════════════════════════════
+   REDES SOCIALES — Íconos góticos junto al footer
+   ══════════════════════════════════════════════════════════════ */
+.redes-mictlan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+ 
+.icono-red {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgba(139, 0, 0, 0.5);
+    border-radius: 50%;
+    color: #8B0000;
+    background: rgba(20, 0, 0, 0.4);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+}
+ 
+.icono-red:hover {
+    color: #ff3333;
+    border-color: #ff0000;
+    background: rgba(60, 0, 0, 0.6);
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+    transform: scale(1.12);
+}
+ 
+.icono-red svg {
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+}
+ 
+@media (max-width: 1024px) {
+    footer {
+        flex-direction: column !important;
+        gap: 6px !important;
+        padding-bottom: 8px !important;
+    }
+    .redes-mictlan {
+        gap: 14px;
+    }
+    .icono-red {
+        width: 24px;
+        height: 24px;
+    }
+}
