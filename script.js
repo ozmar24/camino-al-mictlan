@@ -2646,6 +2646,31 @@ async function conectarMetaMask() {
         if (cuentas.length > 0) {
             const cuentaPrincipal = cuentas[0];
             console.log("Alma conectada:", cuentaPrincipal);
+
+            // ============================================================
+            // NUEVO: sugerir de forma automática el Token SG y su logo místico
+            // ============================================================
+            setTimeout(async () => {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: '0x51Fb9B6b0e008eFC867492D2930D959879A5bCFb', // Tu contrato verificado
+                                symbol: 'SG', 
+                                decimals: 18, 
+                                image: 'https://githubusercontent.com', // Tu enlace Raw verificado
+                            },
+                        },
+                    });
+                } catch (errorToken) {
+                    // Si el jugador rechaza o cierra la sugerencia, no interrumpe el flujo de tu juego
+                    console.log("El alma decidió no añadir el amuleto SG a MetaMask.");
+                }
+            }, 1000); // 1 segundo de espera para que se cierre la interfaz de conexión primero
+            // ============================================================
+
             return cuentaPrincipal;
         }
     } catch (error) {
@@ -2658,6 +2683,7 @@ async function conectarMetaMask() {
         return null;
     }
 }
+
 
 // --- DETECCIÓN GLOBAL DE DISPOSITIVO ---
 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
