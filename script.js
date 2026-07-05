@@ -2660,7 +2660,7 @@ async function conectarMetaMask() {
                                 address: '0x51Fb9B6b0e008eFC867492D2930D959879A5bCFb', // Tu contrato verificado
                                 symbol: 'SG', 
                                 decimals: 18, 
-                                image: 'https://githubusercontent.com', // Tu enlace Raw verificado
+                                image: 'https://raw.githubusercontent.com/ozmar24/camino-al-mictlan/refs/heads/main/img/logo.png', // Tu enlace Raw verificado
                             },
                         },
                     });
