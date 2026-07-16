@@ -73,7 +73,7 @@ export default async function handler(req, res) {
         const posicion = parseInt(incrData?.result || 0);
 
         // 3. Calculamos premio BASADO en la posición atómica
-        const premio = (posicion <= 50) ? 1000 : 0;
+        const premio = (posicion <= 50) ? 500 : 0;
 
         usuario = {
             email: emailUsuario,

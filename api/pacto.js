@@ -115,7 +115,7 @@ if (accion === 'registro') {
     const numeroUsuario = parseInt(incrData?.result || 0);
 
     // 2. Si el número es mayor a 50, ya no hay premio.
-    const premio = numeroUsuario <= 50 ? 1000 : 0;
+    const premio = numeroUsuario <= 50 ? 500 : 0;
     
     // Si llegara a ser mayor a 50, quizás quieras decrementar o simplemente dejarlo ahí
     // pero el registro ya está protegido.
