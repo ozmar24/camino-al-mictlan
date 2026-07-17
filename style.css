@@ -2204,3 +2204,25 @@ iframe[src*="challenges.cloudflare.com"] {
         height: 24px;
     }
 }
+/* --- CURSOR PENTÁCULO GLOBAL --- */
+/* Agrupamos todos los elementos interactivos aquí */
+
+.icono-billetera:hover,
+.zona-publicidad:hover,
+.candelabro:hover,
+.leyes:hover,
+.oraculo:hover,
+.alianzas:hover,
+a:hover {
+    cursor: url('../img/pentaculo.png') 16 16, pointer !important;
+}
+
+/* Por si acaso el mouse toca la imagen interna dentro de los divs */
+.icono-billetera:hover img,
+.zona-publicidad:hover img,
+.candelabro:hover img,
+.leyes:hover img,
+.oraculo:hover img,
+.alianzas:hover img {
+    cursor: url('../img/pentaculo.png') 16 16, pointer !important;
+}
