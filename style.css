@@ -513,7 +513,7 @@ button,
     color: #8b0000 !important;
     text-shadow: 2px 2px 4px #000 !important;
     font-weight: bold !important;
-   
+    cursor: url('../img/pentaculo.png') 16 16, pointer !important;
     opacity: 0.8 !important;
     transition: all 0.3s ease !important;
     white-space: nowrap !important;
