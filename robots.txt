@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Bloquear acceso a la carpeta de la API (por seguridad y ahorro de recursos)
+Disallow: /api/
+Disallow: /Instrucciones.txt
+Disallow: /Readme.txt
+Disallow: /package.json
+Disallow: /admin/
+Disallow: /private/
+
+# Indicar la ruta exacta del mapa del sitio para Google y Bing
+Sitemap: https://caminoamictlan.com/sitemap.xml
