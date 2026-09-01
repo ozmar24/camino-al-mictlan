@@ -46,12 +46,16 @@ export default async function handler(req, res) {
         return res.status(500).json({ success: false, error: 'Configuración Redis incompleta' });
     }
     
-    const origenPeticion = req.headers.origin || req.headers.referer;
-    const MI_DOMINIO = "caminoamictlan.com"; 
+    const origenPeticion = req.headers.origin || req.headers.referer || '';
+const MI_DOMINIO = "caminoamictlan.com";
+const esLocal = origenPeticion.includes("localhost") || 
+                origenPeticion.includes("127.0.0.1") ||
+                origenPeticion === '' ||
+                process.env.VERCEL_ENV === 'development';
 
-    if (!origenPeticion || (!origenPeticion.includes(MI_DOMINIO) && !origenPeticion.includes("localhost"))) {
-        return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
-    }
+if (!esLocal && !origenPeticion.includes(MI_DOMINIO)) {
+    return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
+}
 
     const { email, password, accion } = req.body || {};
 
