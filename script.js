@@ -1099,7 +1099,7 @@ async function manejarLoginGoogle(response) {
     const tokenParaEnviar = window.turnstileToken || ""; 
 
     try {
-        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com'; 
+        const DOMINIO_VERCEL = window.location.origin; 
 
         const res = await fetch('/api/auth-google', {
             method: 'POST',
