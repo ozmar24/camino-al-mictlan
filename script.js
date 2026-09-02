@@ -1285,7 +1285,6 @@ function generarCementerio() {
     const configuracion = [
     { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
     { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%" },
-    { nombre: "Slot", sim: "♦", color: "#627eea", top: "69%", left: "12.5%" },
     { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%" },
     { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%" },
     { nombre: "MATIC/POL", sim: "M", color: "#8247E5", top: "64%", left: "46%" },

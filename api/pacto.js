@@ -48,12 +48,13 @@ export default async function handler(req, res) {
     
     const origenPeticion = req.headers.origin || req.headers.referer || '';
 const MI_DOMINIO = "caminoamictlan.com";
-const esLocal = origenPeticion.includes("localhost") || 
-                origenPeticion.includes("127.0.0.1") ||
-                origenPeticion === '' ||
-                process.env.VERCEL_ENV === 'development';
 
-if (!esLocal && !origenPeticion.includes(MI_DOMINIO)) {
+// Permitir localhost en desarrollo
+if (origenPeticion && 
+    !origenPeticion.includes(MI_DOMINIO) && 
+    !origenPeticion.includes("localhost") &&
+    !origenPeticion.includes("127.0.0.1") &&
+    !origenPeticion.includes("vercel.app")) {
     return res.status(403).json({ success: false, error: 'Acceso denegado desde portales externos.' });
 }
 
