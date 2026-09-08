@@ -1080,8 +1080,10 @@ async function manejarAuth() {
         } else {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
+            if (resultado.sesion) localStorage.setItem('soulgeist_sesion', resultado.sesion);
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
+            tragaSincronizarSaldoFlotante();
             entrarAlCampoSanto({ balanceSG: balanceUsuarioSG });
         }
     } catch (error) {
@@ -1116,7 +1118,9 @@ async function manejarLoginGoogle(response) {
             // ÉXITO: Usuario registrado o logueado
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
+            if (datos.sesion) localStorage.setItem('soulgeist_sesion', datos.sesion);
             await sincronizarBalanceConRedis();
+            tragaSincronizarSaldoFlotante();
             entrarAlCampoSanto({ balanceSG: datos.perfil.balanceSG });
         } else {
            
@@ -1157,7 +1161,7 @@ cargarSaldosCriptas();
     generarCementerio();
 }
 // ==================================================================
-// PASO 1: CLICK EN SOULGEIST -> MODAL INFORMATIVO CON SOLO BOTÓN "CERRAR"
+// PASO 1: CLICK EN SOULGEIST -> MODAL DE CANALIZACIÓN (CANTIDAD)
 // ==================================================================
 function dispararInicioRitualGlobal() {
     const modal = document.getElementById('modal-ritual');
@@ -1168,13 +1172,13 @@ function dispararInicioRitualGlobal() {
 
     // 1. Mostrar el modal
     modal.style.display = 'block';
-    if (titulo) titulo.innerText = "CANALIZACIÓN DE SOULGEIST";
-    
+    if (titulo) titulo.innerText = "CANALIZACIÓN DE ALMAS";
+
     // 2. Inyectar el selector de cantidad
     if (info) {
         info.innerHTML = `
             <div style="text-align: center; margin: 20px 0;">
-                <p style="color: #aaa;">Poder disponible en Soulgeist:</p>
+                <p style="color: #aaa;">Soulgeist disponible:</p>
                 <h2 style="color: #00ffff;">${balanceUsuarioSG.toFixed(2)} SG</h2>
                 <input type="number" id="input-cantidad-ritual" 
                        placeholder="Cantidad a enviar" 
@@ -1193,20 +1197,19 @@ function dispararInicioRitualGlobal() {
 
         document.getElementById('btn-ritual-aceptar').onclick = () => {
             const cantidad = parseFloat(document.getElementById('input-cantidad-ritual').value);
-            
+
             if (isNaN(cantidad) || cantidad <= 0 || cantidad > balanceUsuarioSG) {
                 lanzarAlertaMictlan("Cantidad no válida o insuficiente.", "ERROR");
                 return;
             }
 
-            // GUARDAMOS LA CANTIDAD EN UNA VARIABLE GLOBAL
+            // Guardamos la cantidad y activamos el estado de ritual para que
+            // las tumbas respondan: al tocar la destino, el alma viaja.
             window.cantidadParaRitual = cantidad;
-            
-            // Activamos el estado de ritual para que las tumbas respondan
             ritualActivo = true;
-            
+
             lanzarAlertaMictlan("Ahora selecciona una tumba para canalizar.", "RITUAL LISTO");
-            cerrarRitual(); 
+            cerrarRitual();
         };
     }
 }
@@ -1344,13 +1347,13 @@ function generarCementerio() {
                 return;
             }
 
-            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
-                abrirModalCosechaFinal(pos);
+            if (pos.especial) {
+                dispararInicioRitualGlobal();
                 return;
             }
 
-            if (pos.especial) {
-                dispararInicioRitualGlobal();
+            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
+                abrirModalCosechaFinal(pos);
                 return;
             }
 
@@ -1367,11 +1370,10 @@ function generarCementerio() {
                     return;
                 }
 
-                // DESCUESTA REAL
+                // DESCUENTO LOCAL (visual): el descuento real lo hace el servidor
                 balanceUsuarioSG = Math.floor(Math.max(0, balanceUsuarioSG - cantidadEnviada));
 localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
 actualizarBalanceSoulgeist(balanceUsuarioSG);
-await descontarBalanceEnRedis(balanceUsuarioSG);
 
                 ritualActivo = false;
 
@@ -1381,11 +1383,13 @@ await descontarBalanceEnRedis(balanceUsuarioSG);
     const infoTasa = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
 const cantidadConvertida = cantidadEnviada * infoTasa.tasa;
 
+// CANALIZACIÓN SERVER-SIDE: 'fusionar' descuenta el balance real y abona la
+// cripta con la tasa del servidor. Una sola llamada (sin doble descuento).
+await descontarBalanceEnRedis(cantidadEnviada, pos.nombre);
+
 lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadConvertida, pos, async () => {
     window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + cantidadConvertida;
     guardarSaldosCriptas();
-    const balanceRestante = balanceUsuarioSG;
-await descontarBalanceEnRedis(balanceRestante);
     generarCementerio();
     mostrarModalFusionExitosa(pos, cantidadConvertida);
 });
@@ -1566,13 +1570,14 @@ console.log("📤 Enviando reclamo:", {
 
 const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            },
             body: JSON.stringify({
-                identidad: identidad,
                 wallet: walletUsuario,
                 cripto: criptoSeleccionada,
-                pasarela: pasarela,
-                saldoCripto: saldoCripto
+                pasarela: pasarela
             })
         });
 
@@ -1643,7 +1648,7 @@ const checkFocus = () => {
     }
 };
 
-function mostrarVideoUnityAds() {
+async function mostrarVideoUnityAds() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
         return;
@@ -1652,6 +1657,31 @@ function mostrarVideoUnityAds() {
     if (anuncioEnCurso) return;
 
     anuncioEnCurso = true;
+
+    // ANTI-FUERZA-BRUTA: el servidor emite un sello de un solo uso al ABRIR el
+    // portal. Sin ese sello no hay SG, sin importar lo que se inyecte por consola.
+    try {
+        const resNonce = await fetch('/api/acumular-sg', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            },
+            body: JSON.stringify({ accion: 'obtener_nonce' })
+        });
+        const dataNonce = await resNonce.json();
+        if (!resNonce.ok || !dataNonce.nonce) {
+            anuncioEnCurso = false;
+            lanzarAlertaMictlan(dataNonce.error || "El portal no pudo abrirse. Intenta de nuevo.", "SELLO DENEGADO");
+            return;
+        }
+        window.noncePortalActual = dataNonce.nonce;
+    } catch (e) {
+        anuncioEnCurso = false;
+        lanzarAlertaMictlan("No se pudo contactar al inframundo. Intenta de nuevo.", "FALLO DE CONEXIÓN");
+        return;
+    }
+
     focoPerdido = false;
     window.vigilanciaActiva = false; // Activamos vigilancia mediante una variable global
 
@@ -1736,21 +1766,20 @@ async function videoCompletado() {
     try {
         const walletLimpia = window.userWallet.toLowerCase().trim();
         const accion = 'sumar_ritual';
-        
-        // --- RITUAL DE FIRMA CRIPTOGRÁFICA ---
-        // Creamos un mensaje único combinando los datos
-        const mensaje = `${walletLimpia}:${accion}:${ENLACE_MISTICO_KEY}`;
-        const encoder = new TextEncoder();
-        const data = encoder.encode(mensaje);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const firmaSegura = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // Se envía el sello (nonce) emitido por el servidor al abrir el portal.
+        // Un solo uso: sin sello válido el servidor rechaza el reclamo.
+        const nonce = window.noncePortalActual || '';
+        window.noncePortalActual = '';
 
         // Envia el POST real a tu API para acumular los 10 SG en Redis
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wallet: window.userWallet, accion: 'sumar_ritual' })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            },
+            body: JSON.stringify({ wallet: window.userWallet, accion: 'sumar_ritual', nonce })
         });
 
         const resultado = await respuesta.json();
@@ -1775,12 +1804,40 @@ async function videoCompletado() {
         lanzarAlertaMictlan(resultado.mensaje || `+10 SG absorbidos`, "ENERGÍA ABSORBIDA");
 
     } catch (error) {
-	anuncioEnCurso = false;
+	anuncioEnCurso = true; // el estado lo limpia cerrarPortalOficial()
 	document.removeEventListener("visibilitychange", checkFocus);
         console.error("Error en video:", error);
         lanzarAlertaMictlan("No se pudo conectar con el inframundo.", "FALLO DE RED");
     }
 }
+
+// ==================================================================
+// CIERRE OFICIAL DEL PORTAL DE ANUNCIOS (única vía, exportada a window)
+// El HTML no puede llamar a funciones del módulo directamente: por eso el
+// botón cerraba en silencio sin reclamar los SG.
+// ==================================================================
+async function cerrarPortalOficial() {
+    // 1. Reclamar la recompensa (solo si el ritual terminó bien)
+    if (typeof videoCompletado === 'function' && !focoPerdido && window.noncePortalActual) {
+        try {
+            await videoCompletado();
+        } catch (e) {
+            console.error("Error reclamando energía del portal:", e);
+            lanzarAlertaMictlan("No se pudo reclamar la energía. Intenta de nuevo.", "FALLO DE RECLAMO");
+        }
+    }
+
+    // 2. LIMPIEZA DE ESTADOS (crucial para el siguiente ritual)
+    const modalPortal = document.getElementById('portal-monlix-modal');
+    if (modalPortal) modalPortal.style.display = 'none';
+    anuncioEnCurso = false;      // la variable REAL del módulo, no window.anuncioEnCurso
+    focoPerdido = false;
+    window.noncePortalActual = '';
+    document.removeEventListener("visibilitychange", checkFocus);
+    document.title = "Camino al Mictlán";
+}
+
+// ==================================================================
 
 // ==================================================================
 // EXTRAS Y MODALES SECUNDARIOS
@@ -1869,7 +1926,7 @@ function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
     const titulo   = document.getElementById('codice-titulo');
     const cuerpo   = document.getElementById('codice-cuerpo');
-    const boton    = document.querySelector('.boton-cerrar-codice');
+    const boton    = document.getElementById('btn-cerrar-codice');
 
     if (tipo === 'leyes') {
         titulo.innerText = "LEYES DEL MICTLÁN";
@@ -1879,9 +1936,9 @@ function mostrarPergamino(tipo) {
     </p>
     <div style="display:flex; flex-direction:column; gap:18px; text-align:center; margin-top:10px;">
         <span onclick="mostrarSubLey('privacidad')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— SEGURIDAD Y PRIVACIDAD —</span>
-<span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— REGLAS ETERNAS —</span>
-<span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
-<span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
+        <span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— REGLAS ETERNAS —</span>
+        <span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
+        <span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
     </div>
 `;
 
@@ -1892,14 +1949,18 @@ function mostrarPergamino(tipo) {
         }
 
     } else if (tipo === 'alianzas') {
-    titulo.innerText = "ALIANZAS OSCURAS"; 
-    
-   cuerpo.innerHTML = `
-    <div class="bloque-metamask" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        <img src="img/Meta1.png" alt="MetaMask" style="width: 50px; height: 50px;">
-        <span style="font-weight: 900;">METAMASK</span>
-    </div>
-`;
+        titulo.innerText = "ALIANZAS OSCURAS";
+        cuerpo.innerHTML = `
+            <div class="bloque-metamask" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <img src="img/Meta1.png" alt="MetaMask" style="width: 50px; height: 50px;">
+                <span style="font-weight: 900;">METAMASK</span>
+            </div>
+        `;
+        // ✅ Cerrar: volver al cementerio (mismo comportamiento que LEYES)
+        if (boton) {
+            boton.innerHTML = '[ CERRAR PACTO ]';
+            boton.onclick = cerrarCodice;
+        }
     }
 
     if (pantalla) {
@@ -1912,7 +1973,7 @@ function mostrarPergamino(tipo) {
 function mostrarSubLey(seccion) {
     const titulo = document.getElementById('codice-titulo');
     const cuerpo = document.getElementById('codice-cuerpo');
-    const boton  = document.querySelector('.boton-cerrar-codice');
+    const boton  = document.getElementById('btn-cerrar-codice');
 
     if (boton) {
         boton.innerHTML = '[ REGRESAR A LEYES ]';
@@ -1982,10 +2043,6 @@ function cerrarCodice() {
         pantalla.style.display = 'none';
     }
 }
-
-function cerrarCodice() { 
-    document.getElementById('pantalla-codice').style.display = 'none'; 
-} 
 
 
 function abrirSoporte() {
@@ -2292,11 +2349,13 @@ async function sincronizarBalanceConRedis() {
     if (!window.userWallet) return 0;
 
     try {
-        const emailLimpio = window.userWallet.toLowerCase().trim();
-        
-        // Pon aquí tu dominio real de Vercel
-        const DOMINIO_VERCEL = 'https://www.caminoamictlan.com';
-        const res = await fetch(`${DOMINIO_VERCEL}/api/obtener-balance?wallet=${encodeURIComponent(emailLimpio)}`);
+        // Mismo origen y con el token de sesión: el servidor deduce la identidad
+        // del token, nunca de la URL (que cualquiera podría cambiar).
+        const res = await fetch('/api/obtener-balance', {
+            headers: {
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            }
+        });
         
         if (!res.ok) {
             const errorData = await res.json();
@@ -2334,7 +2393,7 @@ async function loginExitoso(datosUsuario) {
     window.userWallet = datosUsuario.email; // Define la identidad
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
-async function descontarBalanceEnRedis(nuevoBalanceFinal) {
+async function descontarBalanceEnRedis(nuevoBalanceFinal, criptaDestino = null) {
     if (!window.userWallet) {
         console.warn("❌ Intento de descuento sin Wallet");
         return;
@@ -2347,14 +2406,19 @@ async function descontarBalanceEnRedis(nuevoBalanceFinal) {
     }
 
     try {
-        console.log("📤 Enviando balance final a Redis:", nuevoBalanceFinal); // DEBUG
+        // FUSIÓN SERVER-SIDE: el servidor descuenta de SU balance y calcula la
+        // conversión con SUS tasas. El cliente nunca envía saldos (anti-F12).
         const respuesta = await fetch('/api/acumular-sg', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            },
             body: JSON.stringify({
                 wallet: window.userWallet,
-                nuevoBalance: nuevoBalanceFinal,
-                accion: 'descontar_ritual'
+                accion: 'fusionar',
+                cantidadSG: nuevoBalanceFinal,
+                cripto: criptaDestino
             })
         });
 
@@ -2364,7 +2428,21 @@ async function descontarBalanceEnRedis(nuevoBalanceFinal) {
             throw new Error(resultado.error || "Error en el servidor");
         }
 
-        console.log("✅ Descuento enviado a Redis:", resultado);
+        // El servidor devuelve su verdad: balance y tumbas actualizadas
+        if (typeof resultado.nuevoBalance === 'number') {
+            balanceUsuarioSG = resultado.nuevoBalance;
+            localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
+            if (typeof actualizarBalanceSoulgeist === 'function') {
+                actualizarBalanceSoulgeist(balanceUsuarioSG);
+            }
+        }
+        if (resultado.tumbas) {
+            window.tumbasConSaldo = resultado.tumbas;
+            const key = `soulgeist_criptas_${window.userWallet}`;
+            localStorage.setItem(key, JSON.stringify(resultado.tumbas));
+        }
+
+        console.log("✅ Canalización confirmada por el servidor:", resultado.ganancia ?? resultado.nuevoBalance);
     } catch (error) {
         console.error("❌ Error al actualizar Redis:", error);
     }
@@ -2385,7 +2463,10 @@ function cargarSaldosCriptas() {
     // Cargar desde Redis (fuente de verdad)
     fetch('/api/acumular-sg', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+        },
         body: JSON.stringify({ wallet: window.userWallet, accion: 'cargar_tumbas' })
     }).then(r => r.json()).then(data => {
         if (data.success && data.tumbas) {
@@ -2400,12 +2481,8 @@ function guardarSaldosCriptas() {
     if (!window.userWallet) return;
     const key = `soulgeist_criptas_${window.userWallet}`;
     localStorage.setItem(key, JSON.stringify(window.tumbasConSaldo));
-    // Sincronizar con Redis para persistencia entre dispositivos
-    fetch('/api/acumular-sg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: window.userWallet, accion: 'guardar_tumbas', tumbas: window.tumbasConSaldo })
-    }).catch(() => {});
+    // Persistencia LOCAL únicamente: la verdad vive en el servidor. Las tumbas
+    // solo se modifican vía acciones server-side (fusionar, retiros, tragamonedas).
 }
 function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)
@@ -2562,6 +2639,281 @@ async function asegurarRedProduccion() {
     }
 }
 window.entrarAlMictlan = entrarAlMictlan;
+
+// ==========================================================
+// EXPORTE DE HANDLERS PARA ONCLICK (el módulo no los expone)
+// ==========================================================
+window.manejarAuth = manejarAuth;
+window.cambiarModoAuth = cambiarModoAuth;
+window.abrirModalWallet = abrirModalWallet;
+window.abrirCompraTarjeta = abrirCompraTarjeta;
+window.abrirQuickSwap = abrirQuickSwap;
+window.abrirSoporte = abrirSoporte;
+window.enviarOfrendaOraculo = enviarOfrendaOraculo;
+window.mostrarPergamino = mostrarPergamino;
+window.mostrarVideoUnityAds = mostrarVideoUnityAds;
+window.cerrarAlertaMictlan = cerrarAlertaMictlan;
+window.cerrarBoveda = cerrarBoveda;
+window.cerrarOraculo = cerrarOraculo;
+window.cerrarRitual = cerrarRitual;
+window.conectarMetaMask = conectarMetaMask;
+window.salirDelMictlan = salirDelMictlan;
+window.mostrarSubLey = mostrarSubLey;
+window.abrirModalSeleccionCantidad = abrirModalSeleccionCantidad;
+window.cerrarPortalOficial = cerrarPortalOficial;
+window.cerrarCodice = cerrarCodice;
+window.onTurnstileSuccess = window.onTurnstileSuccess;
+
+// ==========================================================
+// TRAGAMONEDAS DEL MICTLÁN — CLIENTE
+// La lógica y pagos SIEMPRE los decide el servidor
+// (api/tragamonedas.js); esto solo muestra el resultado.
+// ==========================================================
+
+const TRAGA_LINEAS_MIN = 5;
+const TRAGA_LINEAS_MAX = 20;
+
+let tragaLineas = 5;
+let tragaGirando = false;
+let tragaSimbolos = [];
+let tragaUltimoSaldo = 0;
+
+// Mapa de imágenes reales en /img (Cempasúchil tiene acento en el archivo)
+const TRAGA_IMGS = {
+    'Vela': 'img/Vela.jpeg',
+    'Hueso': 'img/Hueso.png',
+    'Cempasuchil': 'img/Cempasuchil.webp',
+    'Calavera': 'img/Calavera.jpeg',
+    'Xoloit': 'img/Xoloit.jpeg',
+    'Macuahuitl': 'img/Macuahuitl.png',
+    'Mictlantecuhtli': 'img/Mictlantecuhtli.png',
+    'Soulgeist': 'img/Soulgeist.png'
+};
+const TRAGA_FALLBACK_IMG = 'img/Soul.png';
+
+function tragaTokenSesion() {
+    return localStorage.getItem('soulgeist_sesion') || '';
+}
+
+async function tragaApi(accion, extra = {}) {
+    const token = tragaTokenSesion();
+    const res = await fetch('/api/tragamonedas', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+        },
+        body: JSON.stringify({ accion, ...extra })
+    });
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* respuesta no JSON */ }
+    return { ok: res.ok, status: res.status, data };
+}
+
+function tragaImgSimbolo(nombre) {
+    return TRAGA_IMGS[nombre] || TRAGA_FALLBACK_IMG;
+}
+
+function tragaEsComodin(nombre) {
+    return nombre === 'Mictlantecuhtli';
+}
+
+function tragaEsScatter(nombre) {
+    return nombre === 'Soulgeist';
+}
+
+function tragaRenderGrid(grid) {
+    const cont = document.getElementById('grid-traga');
+    if (!cont) return;
+    cont.innerHTML = '';
+    // grid[col][fila] → celda índice col*5+fila
+    for (let f = 0; f < 5; f++) {
+        for (let c = 0; c < 5; c++) {
+            const nombre = grid[c][f];
+            const celda = document.createElement('div');
+            celda.className = 'celda-traga';
+            celda.dataset.fila = f;
+            celda.dataset.col = c;
+            const img = document.createElement('img');
+            img.src = tragaImgSimbolo(nombre);
+            img.alt = nombre;
+            img.title = nombre;
+            img.onerror = () => { img.src = TRAGA_FALLBACK_IMG; };
+            celda.appendChild(img);
+            cont.appendChild(celda);
+        }
+    }
+}
+
+function tragaRefrescarDisplays(casino, balanceSG) {
+    const saldoCasino = document.getElementById('saldo-casino-display-modal');
+    const saldoFlotante = document.getElementById('saldo-casino-display');
+    const saldoSG = document.getElementById('soulgeist-casino-display');
+    const gratis = document.getElementById('gratis-restantes-display');
+    const costo = document.getElementById('costo-tirada-display');
+    const lineas = document.getElementById('lineas-jugadas-display');
+    const s = casino ? casino.saldo : 0;
+    if (casino) tragaUltimoSaldo = s;
+    if (saldoCasino) saldoCasino.innerText = `${Number(s).toFixed(2)} SG`;
+    if (saldoFlotante) {
+        // Igual que las demás criptas: visible solo si hay saldo
+        saldoFlotante.innerText = `${Number(s).toFixed(2)} SG`;
+        saldoFlotante.classList.toggle('saldo-activo', s > 0);
+    }
+    if (saldoSG && balanceSG !== undefined) saldoSG.innerText = `${Math.floor(balanceSG)} SG`;
+    if (gratis && casino) gratis.innerText = String(casino.gratisRestantes ?? 0);
+    if (costo) costo.innerText = (2 * (tragaLineas / TRAGA_LINEAS_MIN)).toFixed(2);
+    if (lineas) lineas.innerText = String(tragaLineas);
+}
+
+function tragaMostrarGanancias(ganancias, premio, scatter) {
+    const lista = document.getElementById('lista-ganancias');
+    const total = document.getElementById('total-ganancia');
+    const sinGanancias = document.getElementById('sin-ganancias-traga');
+    if (!lista || !total) return;
+    lista.innerHTML = '';
+    if (!premio) {
+        total.innerText = '';
+        if (sinGanancias) {
+            sinGanancias.style.display = 'block';
+            sinGanancias.innerText = 'Sin coincidencias esta vez. Los premios aparecerán aquí al girar.';
+        }
+        return;
+    }
+    if (sinGanancias) sinGanancias.style.display = 'none';
+    for (const g of ganancias || []) {
+        const div = document.createElement('div');
+        div.innerText = `Línea ${g.linea}: ${g.coincidencias}× ${g.simbolo} → +${g.monto} SG`;
+        lista.appendChild(div);
+    }
+    if (scatter && scatter.monto > 0) {
+        const div = document.createElement('div');
+        div.style.color = '#ffd700';
+        div.innerText = `⚡ ${scatter.cantidad}× SOULGEIST → +${scatter.monto} SG`;
+        lista.appendChild(div);
+    }
+    total.innerText = `TOTAL: +${premio} SG`;
+}
+
+function tragaResaltarLineas(ganancias) {
+    // Limpia resaltados previos
+    document.querySelectorAll('#grid-traga .celda-ganadora').forEach(el => el.classList.remove('celda-ganadora'));
+    if (!ganancias || !ganancias.length) return;
+    const celdas = new Set();
+    for (const g of ganancias) for (const idx of (g.celdas || [])) celdas.add(idx);
+    for (const idx of celdas) {
+        const celda = document.querySelector(`#grid-traga [data-col="${Math.floor(idx / 5)}"][data-fila="${idx % 5}"]`);
+        if (celda) celda.classList.add('celda-ganadora');
+    }
+}
+
+function tragaAnimacionGiro(callback) {
+    const cont = document.getElementById('grid-traga');
+    if (!cont) { callback(); return; }
+    let t = 0;
+    const intervalo = setInterval(() => {
+        const columnas = [];
+        for (let c = 0; c < 5; c++) {
+            const col = [];
+            for (let f = 0; f < 5; f++) col.push(tragaSimbolos[Math.floor(Math.random() * tragaSimbolos.length)] || 'Vela');
+            columnas.push(col);
+        }
+        tragaRenderGrid(columnas);
+        if (++t >= 12) {
+            clearInterval(intervalo);
+            callback();
+        }
+    }, 70);
+}
+
+window.abrirTragamonedas = async function () {
+    const panel = document.getElementById('panel-traga');
+    if (!panel) return;
+    panel.style.display = 'flex';
+    tragaRefrescarDisplays(null);
+    if (!tragaSimbolos.length) {
+        tragaSimbolos = ['Vela', 'Hueso', 'Cempasuchil', 'Calavera', 'Xoloit', 'Macuahuitl', 'Mictlantecuhtli', 'Soulgeist'];
+    }
+    tragaRenderGrid([['Vela','Hueso','Cempasuchil','Calavera','Xoloit'],['Macuahuitl','Mictlantecuhtli','Vela','Hueso','Cempasuchil'],['Calavera','Xoloit','Macuahuitl','Soulgeist','Vela'],['Hueso','Cempasuchil','Calavera','Xoloit','Macuahuitl'],['Mictlantecuhtli','Vela','Hueso','Cempasuchil','Calavera']]);
+    const { data } = await tragaApi('saldo');
+    if (data && data.success) {
+        tragaRefrescarDisplays(data.casino, data.balanceSG);
+    } else if (data && data.error) {
+        lanzarAlertaMictlan(data.error, 'TRAGAMONEDAS');
+    }
+};
+
+window.cerrarTragamonedas = function () {
+    const panel = document.getElementById('panel-traga');
+    if (panel) panel.style.display = 'none';
+};
+
+window.cambiarLineasTraga = function (delta) {
+    tragaLineas = Math.max(TRAGA_LINEAS_MIN, Math.min(TRAGA_LINEAS_MAX, tragaLineas + delta * 5));
+    tragaRefrescarDisplays(null);
+};
+
+window.girarTragamonedas = async function () {
+    if (tragaGirando) return;
+    const btn = document.getElementById('btn-girar-traga');
+    tragaGirando = true;
+    if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
+    try {
+        const { ok, data } = await tragaApi('girar', { lineas: tragaLineas });
+        if (!ok || !data || !data.success) {
+            lanzarAlertaMictlan((data && data.error) || 'El servidor rechazó el giro.', 'TRAGAMONEDAS');
+            return;
+        }
+        await new Promise(resolve => tragaAnimacionGiro(resolve));
+        tragaRenderGrid(data.grid);
+        tragaResaltarLineas(data.ganancias);
+        tragaMostrarGanancias(data.ganancias, data.premio, data.scatter);
+        tragaRefrescarDisplays(data.casino, data.balanceSG);
+    } catch (e) {
+        console.error('Error al girar:', e);
+        lanzarAlertaMictlan('No se pudo conectar con la tragamonedas.', 'FALLO DE CONEXIÓN');
+    } finally {
+        tragaGirando = false;
+        if (btn) { btn.disabled = false; btn.innerText = '🔄 GIRAR'; }
+    }
+};
+
+window.reclamarTiradasGratisTraga = async function () {
+    const { ok, data } = await tragaApi('reclamar_gratis');
+    if (!ok || !data || !data.success) {
+        lanzarAlertaMictlan((data && data.error) || 'No se pudieron reclamar las tiradas.', 'TRAGAMONEDAS');
+        if (data && data.casino) tragaRefrescarDisplays(data.casino, data.balanceSG);
+        return;
+    }
+    tragaRefrescarDisplays(data.casino, data.balanceSG);
+    lanzarAlertaMictlan(data.mensaje || 'Tiradas gratis reclamadas.', 'REGALO DEL MICTLÁN');
+};
+
+// Sincroniza el saldo del casino (badge flotante) al cargar con sesión activa
+async function tragaSincronizarSaldoFlotante() {
+    if (!localStorage.getItem('soulgeist_sesion')) return;
+    try {
+        const { data } = await tragaApi('saldo');
+        if (data && data.success) tragaRefrescarDisplays(data.casino, data.balanceSG);
+    } catch (e) { /* silencioso: el badge es solo visual */ }
+}
+tragaSincronizarSaldoFlotante();
+
+window.retirarTragaMetaMask = async function () {
+    if (!tragaUltimoSaldo || tragaUltimoSaldo < 100) {
+        lanzarAlertaMictlan('Mínimo de retiro: 100 SG de saldo casino.', 'TRAGAMONEDAS');
+        return;
+    }
+    const wallet = prompt('Dirección de tu MetaMask (0x...):');
+    if (!wallet) return;
+    const { ok, data } = await tragaApi('retirar', { wallet: wallet.trim() });
+    if (!ok || !data || !data.success) {
+        lanzarAlertaMictlan((data && data.error) || 'El retiro falló.', 'TRAGAMONEDAS');
+        return;
+    }
+    tragaRefrescarDisplays(data.casino, data.balanceSG);
+    lanzarAlertaMictlan(data.mensaje || 'Retiro completado.', 'RITUAL COMPLETADO');
+};
 
 async function cargarABI() {
     try {
@@ -2736,14 +3088,14 @@ async function conectarYRetirarMetaMask(pos) {
 
         const respuesta = await fetch('/api/reclamar', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
+            },
             body: JSON.stringify({
-                identidad: window.userWallet,
                 wallet: direccion,
                 cripto: pos.nombre,
-                pasarela: 'metamask',
-                sgAEnviar: sgAEnviar,
-                saldoVisual: saldoVisual
+                pasarela: 'metamask'
             })
         });
 
@@ -2852,3 +3204,11 @@ async function borrarCuenta() {
     }
 }
 window.borrarCuenta = borrarCuenta;
+
+// ==========================================================
+// CÓDICE: cableado inicial del botón [ CERRAR PACTO ]
+// ==========================================================
+(function cablearCodice() {
+    const btn = document.getElementById('btn-cerrar-codice');
+    if (btn) btn.onclick = cerrarCodice;
+})();

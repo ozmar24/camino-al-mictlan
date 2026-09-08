@@ -1,41 +1,47 @@
+import {
+    autenticarPeticion,
+    claveUsuario,
+    redisGet,
+    verificarLimitePeticion,
+    verificarOrigen,
+    manejarError,
+    obtenerIpLimpia
+} from '../lib/seguridad.js';
+
 export default async function handler(req, res) {
-    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js de forma global.
-    // Permitimos tanto GET como POST según la lógica de tu aplicación.
     if (req.method !== 'GET' && req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
 
-    let wallet = req.query.wallet || (req.body && req.body.wallet);
-    if (!wallet) {
-        return res.status(400).json({ success: false, error: "Falta la wallet/email" });
-    }
-
     try {
-        const redisUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, "");
-        const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-        if (!redisUrl || !redisToken) {
-            return res.status(500).json({ success: false, error: "Configuración Redis incompleta" });
+        // 0. Anti-bot: solo peticiones desde el sitio oficial
+        if (!verificarOrigen(req)) {
+            return res.status(403).json({ success: false, error: 'Origen no autorizado.' });
         }
 
-        const emailLimpio = wallet.toLowerCase().trim();
-        const userKey = `usuario:${emailLimpio.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
+        // 1. Rate Limiting
+        const ip = obtenerIpLimpia(req);
+        if (!(await verificarLimitePeticion(req, { max: 60, ventanaSegundos: 60, prefijo: 'rl:balance' }))) {
+            return res.status(429).json({ success: false, error: 'Demasiadas peticiones. Espera un momento.' });
+        }
 
-        const respuesta = await fetch(`${redisUrl}/get/${userKey}`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
-        });
+        // 2. Sesión Real: no aceptamos la wallet por query/body por seguridad
+        const email = await autenticarPeticion(req);
+        if (!email) {
+            return res.status(401).json({ success: false, error: 'Sesión no válida. Vuelve a entrar al Mictlán.' });
+        }
 
-        const data = await respuesta.json();
+        const emailLimpio = email.toLowerCase().trim();
+        const userKey = claveUsuario(emailLimpio);
 
+        const usuarioRaw = await redisGet(userKey);
         let balance = 0;
-        if (data.result) {
-            const usuario = typeof data.result === 'string' 
-                ? JSON.parse(data.result) 
-                : data.result;
+        if (usuarioRaw) {
+            const usuario = typeof usuarioRaw === 'string' ? JSON.parse(usuarioRaw) : usuarioRaw;
             balance = parseFloat(usuario.balance_soulgeist || 0);
         }
 
-        console.log(`✅ Balance consultado para ${userKey}: ${balance}`);
+        // (log retirado: no exponer balances en la consola del servidor)
 
         return res.status(200).json({
             success: true,
@@ -44,9 +50,6 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error("❌ Error en obtener-balance:", error);
-        return res.status(500).json({ 
-            success: false, 
-            error: "Error de conexión con el Inframundo" 
-        });
+        return manejarError(res, error);
     }
 }

@@ -1,5 +1,10 @@
 // api/invocar.js
 import https from 'https';
+import {
+    verificarLimitePeticion,
+    verificarOrigen,
+    manejarError
+} from '../lib/seguridad.js';
 
 export default async function handler(req, res) {
 
@@ -25,6 +30,18 @@ export default async function handler(req, res) {
     }
 
     // ── Validar API Key ────────────────────────────────────────────────────────
+    // ── Anti-abuso: cada llamada cuesta dinero real (API de Gemini) ─────────
+    try {
+        if (!verificarOrigen(req)) {
+            return res.status(403).json({ error: 'Origen no autorizado.' });
+        }
+        if (!(await verificarLimitePeticion(req, { max: 10, ventanaSegundos: 60, prefijo: 'rl:invocar' }))) {
+            return res.status(429).json({ error: 'El Oráculo necesita descansar. Espera un momento.' });
+        }
+    } catch (e) {
+        return manejarError(res, e);
+    }
+
     const API_KEY = process.env.GEMINI_API_KEY;
     if (!API_KEY) {
         return res.status(500).json({ error: 'El Oráculo no está configurado. Falta GEMINI_API_KEY.' });
@@ -133,6 +150,7 @@ Reglas de respuesta:
 
     } catch (e) {
         console.error('Error en invocar.js:', e.message);
-        return res.status(500).json({ error: 'Error en el inframundo técnico: ' + e.message });
+        // No exponer el error interno completo al cliente
+        return res.status(500).json({ error: 'El inframundo técnico perturbó la visión del Oráculo.' });
     }
 }

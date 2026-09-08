@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    
+
     <meta name="google-site-verification" content="yFG3HzADCkU57r3u9oihvndMG6OqTHDk2P_XQ1bOmw0" />
-    <meta name="bitmedia-site-verification" content="c66f87a30e22195f872ddb40f20cf574" />
+    <meta name="bitmedia-site-verification" content="c66f87a30e22195f87ddb40f20cf574" />
     <meta name='admaven-placement' content=BqjCErjY4>
     <meta name="clckd" content="2e0a900c3db6b3ca0e32509017ab5856" />
     <meta name="335c92b73e8c6892bced4c3957c84394d2f8072e" content="335c92b73e8c6892bced4c3957c84394d2f8072e" />
@@ -12,21 +12,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cementerio - El Umbral del Mictlán</title>
     <link rel="icon" type="image/png" href="/img/Soul.png">
-    <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=999">
     <meta name="description" content="Bienvenido a Camino al Mictlán 💀 . Reclama las almas de las cripto 👻, el ecosistema Web3, la liquidez bloqueada y únete a nuestras redes oficiales.">
-    
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
-    
 <!-- Portal de Monlix - Reemplazo de Unity Ads -->
 <div id="portal-monlix-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 0, 0, 0.93); display: none; justify-content: center; align-items: center; z-index: 10002; border: 1px solid #ff0000; box-shadow: inset 0 0 50px #000;">
     <div style="background: rgba(18, 4, 4, 0.98); padding: 25px; border: 2px solid #4a0000; width: 92%; max-width: 850px; height: 85%; box-shadow: 0 0 30px #ff4500; display: flex; flex-direction: column;">
         <button id="cerrar-portal-btn" style="background: #3a0000; color: #ffcccc; border: 1px solid #ff0000; padding: 10px 25px; cursor: url('../img/pentaculo.png') 16 16, pointer; font-family: 'MedievalSharp', cursive; font-size: 0.85rem; margin-bottom: 15px; align-self: flex-start; text-shadow: 1px 1px 2px #000; letter-spacing: 1px; transition: all 0.3s ease;" onmouseover="this.style.background='#ff0000'; this.style.color='#fff';" onmouseout="this.style.background='#3a0000'; this.style.color='#ffcccc';">
             RETROCEDER AL CEMENTERIO
         </button>
-        
+
     </div>
 </div>
 
@@ -48,29 +47,20 @@
         if (btnCerrar) {
             btnCerrar.onclick = async () => {
                 console.log("🔮 Iniciando transmutación...");
-                
+
                 // 1. Ejecutar la lógica de recompensa
-                if (typeof videoCompletado === 'function') {
-                    await videoCompletado(); 
-                }
-                
-                // 2. LIMPIEZA DE ESTADOS (Crucial para el siguiente ritual)
-                document.getElementById('portal-monlix-modal').style.display = 'none';
-                document.title = "Camino al Mictlán"; // Resetear el título de la pestaña
-                window.anuncioEnCurso = false;        // Permitir que el usuario vuelva a abrir el portal después
-                
-                console.log("Portal cerrado, ritual completado y sistema liberado.");
+            if (window.cerrarPortalOficial) {
+                await window.cerrarPortalOficial();
+            }
+
+            console.log("Portal cerrado, ritual completado y sistema liberado.");
             };
         }
     });
 </script>
 
-
 </head>
 <body>
-
-
-
 
     <div id="aviso-rotar" style="display: none;">
         <h2>SABIDURÍA DEL INFRAMUNDO</h2>
@@ -88,29 +78,29 @@
     </svg>
 
     <main class="universo-faucet">
-        
-        <div id="escena-portal" onclick="entrarAlMictlan()">        
+
+        <div id="escena-portal" onclick="entrarAlMictlan()">
     <p class="instruccion">CAMINO AL MICTLÁN. BIENVENIDOS</p>
-    
+
     <!-- Botón del Pacto Técnico (evitamos que active el portal con stopPropagation) -->
     <button class="btn-pacto-portal" onclick="event.stopPropagation(); document.getElementById('pantalla-pacto').style.display='flex'">
         📜 CONSULTAR PACTO TÉCNICO
     </button>
-    
+
     <div class="resplandor-suelo"></div>
 </div>
 
         <div id="modal-contrato" class="capa-oscura interface-mictlan">
 
 <div id="contenedor-progreso-airdrop" class="mobile-responsive" style="
-    position: absolute; 
-    top: 15%; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    width: 350px; 
-    text-align: center; 
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 350px;
+    text-align: center;
     z-index: 1000;">
-    
+
     <p style="color: #ff4500; font-family: 'Nosifer', sans-serif; font-size: 0.9rem; text-shadow: 2px 2px 4px #000; margin-bottom: 5px;">
         ALMAS FUNDADORAS: 50 / 50
     </p>
@@ -120,17 +110,17 @@
 </div>
 
     <div class="grimorio-container">
-        
+
         <div class="pagina-izquierda">
             <h2 id="auth-tagline">REGISTRO DE ALMAS</h2>
             <p id="left-desc">Sella tu rastro en el Mictlán con credenciales directas.</p>
-            
+
             <div class="formulario-goth">
     <input type="email" id="email" placeholder="CORREO DEL PACTO" autocomplete="email" class="input-pergamino-goth">
     <input type="password" id="password" placeholder="LLAVE SECRETA" autocomplete="current-password" class="input-pergamino-goth">
     <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
 </div>
-            
+
             <div class="cambio-modo-contenedor">
                 <span id="toggle-auth-text" onclick="cambiarModoAuth()">¿Eres un nuevo espíritu? Sella tu identidad aquí</span>
             </div>
@@ -142,26 +132,26 @@
 
            <div class="invocacion-goth" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
     <p style="margin: 0;">Invoca tu identidad con un clic</p>
-    
-    
-        
+
+
+
         <div id="google-btn-container" class="btn-ritual-grimorio" style="background: #2a0000; border: 1px solid #8B0000; padding: 10px;">
             </div>
-	<div class="turnstile-container" style="height: 70px; display: flex; justify-content: center; align-items: center; margin: 3px 0;">
-    <div class="cf-turnstile" 
-         data-sitekey="0x4AAAAAADsa9JM6jbjeZkZj" 
-         data-callback="onTurnstileSuccess" ... 
-         data-size="compact" 
+		<div class="turnstile-container" style="height: 70px; display: flex; justify-content: center; align-items: center; margin: 3px 0;">
+    <div class="cf-turnstile"
+         data-sitekey="0x4AAAAAADsa9JM6jbjeZkZj"
+         data-callback="onTurnstileSuccess" ...
+         data-size="compact"
          data-theme="dark">
     </div>
 </div>
 </div>
-            
+
             <div class="divisor-arcano"></div>
 
             <div id="new-user-helper">
                 <p></p>
-                
+
             </div>
         </div>
 
@@ -169,30 +159,29 @@
 </div>
 
         <section id="campo-santo" style="display: none;">
-            
-<button id="btn-salir-mictlan" class="pentaculo-cursor" 
+
+<button id="btn-salir-mictlan" class="pentaculo-cursor"
         style="position: fixed; top: 20px; left: 20px; background: rgba(20, 0, 0, 0.8); color: #ff0000; border: 1px solid #ff0000; padding: 10px 20px; font-family: 'MedievalSharp', cursive; z-index: 1000; cursor: pointer;"
         onclick="salirDelMictlan()">
     DESVANECERSE EN LAS SOMBRAS
 </button>
 
-
-          <div class="zona-patrocinadores" style="position: absolute; top: 60px; left: 20px; z-index: 100; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px; width: 180px;">
+            <div class="zona-patrocinadores" style="position: absolute; top: 60px; left: 20px; z-index: 100; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #4a0000; border-radius: 5px; width: 180px;">
     <p style="font-family: 'MedievalSharp'; color: #8B0000; font-size: 0.7rem; margin: 0 0 5px 0; text-align: center;">ABSORBER ENERGÍA</p>
-    
-    <div id="reproductor-ad" onclick="mostrarVideoUnityAds()" 
-         style="width: 160px; height: 90px; 
-         background-image: url('img/Mictlayxolo.png'); 
-         background-size: cover; 
+
+    <div id="reproductor-ad" onclick="mostrarVideoUnityAds()"
+         style="width: 160px; height: 90px;
+         background-image: url('img/Mictlayxolo.png');
+         background-size: cover;
          background-position: center;
-         border: 1px solid #4a0000; 
+         border: 1px solid #4a0000;
          cursor: url('../img/pentaculo.png') 16 16, pointer !important;
-         border-radius: 4px; 
-         display: flex; 
-         align-items: center; 
+         border-radius: 4px;
+         display: flex;
+         align-items: center;
          justify-content: center;
          position: relative;">
-         
+
         <div style="background: rgba(0,0,0,0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;cursor: url('../img/pentaculo.png') 16 16, pointer !important;">
             <span style="font-size: 0.7rem; color: #ffcccc; font-family: 'MedievalSharp'; text-shadow: 1px 1px 2px #000;">¡ABSORBER ENERGÍA!</span>
         </div>
@@ -200,7 +189,7 @@
 </div>
 <div class="contenedor-estado">
     <p class="texto-estado">
-        <span class="punto-activo">●</span> QUEMA DE TOKENS: 
+        <span class="punto-activo">●</span> QUEMA DE TOKENS:
         <span id="tokensQuemados">Sincronizando...</span>
     </p>
 </div>
@@ -208,6 +197,13 @@
 <div class="icono-billetera" onclick="abrirModalWallet()" style="position: absolute; top: 20px; right: 20px; z-index: 100;">
     <img src="img/Cartera.png" alt="Bóveda del Mictlán" style="width: 60px; height: 60px; filter: drop-shadow(0 0 8px rgba(139,0,0,0.8));">
 </div>
+
+<div id="icono-traga-flotante" class="zona-traga-flotante" onclick="abrirTragamonedas()" title="Tragamonedas del Mictlán">
+    <div class="sigilo-traga">🎰</div>
+    <div class="nombre-traga">TRAGAMONEDAS</div>
+    <div id="saldo-casino-display" class="saldo-traga"></div>
+</div>
+
 <div class="contenedor-boton-meta">
     <button id="btn-conectar" class="btn-meta" onclick="conectarMetaMask()">
         <img src="img/Meta1.png" alt="Conectar" class="img-meta">
@@ -236,11 +232,11 @@
     <div id="modal-ritual" class="modal-oculto">
         <div class="contenido-ritual">
             <h3 id="titulo-ritual">INICIANDO COSECHA</h3>
-            
+
             <div id="info-ritual"></div>
-            
+
             <div class="botones-exchange" style="margin-top: 15px;">
-                
+
                 <button onclick="cerrarRitual()" class="pentaculo-cursor">ACEPTAR</button>
             </div>
         </div>
@@ -253,9 +249,9 @@
             <p>Selecciona tu idioma para revisar la documentación técnica:</p>
             <br>
             <a href="Legal/Pacto_Tecnico_Soulgeist.pdf" target="_blank" class="btn-ritual-grimorio" style="display: block; margin: 10px auto; width: 80%;">VER EN ESPAÑOL</a>
-            
+
             <a href="Legal/Soulgeist_Technical_Pact_EN.pdf" target="_blank" class="btn-ritual-grimorio" style="display: block; margin: 10px auto; width: 80%;">VIEW IN ENGLISH</a>
-            
+
             <br>
             <div class="boton-cerrar-codice" onclick="document.getElementById('pantalla-pacto').style.display='none'">[ CERRAR PACTO ]</div>
         </div>
@@ -266,7 +262,7 @@
         <div class="pergamino-quemado">
             <h2 id="codice-titulo"></h2>
             <div id="codice-cuerpo"></div>
-            <div class="boton-cerrar-codice" onclick="cerrarCodice()">[ CERRAR PACTO ]</div>
+            <div id="btn-cerrar-codice" class="boton-cerrar-codice">[ CERRAR PACTO ]</div>
         </div>
     </div>
 
@@ -301,23 +297,22 @@
         <h2>BÓVEDA DEL MICTLÁN</h2>
         <div id="boveda-cuerpo">
             <p>El portal a la riqueza del inframundo está abierto.</p>
-            
+
             <button class="btn-ritual-grimorio" onclick="abrirQuickSwap()">COMPRAR TOKENS (VÍA METAMASK)</button>
-            
+
             <button class="btn-ritual-grimorio" onclick="abrirCompraTarjeta()">COMPRAR CON TARJETA DE CRÉDITO</button>
-            
+
             <button class="btn-ritual-grimorio" onclick="cerrarBoveda()" style="margin-top: 20px; background: rgba(20, 0, 0, 0.6);">[ VOLVER AL CEMENTERIO ]</button>
         </div>
     </div>
 </div>
 
 
-
 <div id="cursor-serpiente"></div>
 
 <footer style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 5px 0 10px 0; background: rgba(0, 0, 0, 0.4); color: #555; font-family: 'MedievalSharp', cursive; z-index: 10000; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
     <p style="margin: 0; font-size: 0.75rem; text-shadow: 1px 1px 2px #000;">
-        Contacto Oficial: 
+        Contacto Oficial:
         <a href="mailto:ozmar2408.ma@caminoamictlan.com" style="color: #8B0000; text-decoration: none;">
             ozmar2408.ma@caminoamictlan.com
         </a>
@@ -331,12 +326,44 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.05 2.36 2.9 9.85c-1.31.52-1.3 1.24-.24 1.56l4.91 1.53 1.9 5.81c.23.63.12.88.79.88.51 0 .74-.23 1.02-.5l2.45-2.38 4.99 3.68c.92.5 1.58.25 1.81-.85l3.28-15.46c.34-1.35-.51-1.96-1.66-1.76zM8.6 13.44l9.8-6.18c.49-.3.94-.13.57.2l-8.4 7.6-.32 3.4z"/></svg>
         </a>
         <a href="https://www.youtube.com/@SOULGEIST-SG" target="_blank" rel="noopener" class="icono-red" title="Mira nuestros videos en YouTube" aria-label="YouTube">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.56 9.38.56 9.38.56s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"/></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2A31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8a3.02 3.02 0 0 0 2.12 2.14c1.88.56 9.38.56 9.38.56s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"/></svg>
         </a>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
-    <script src="script.js" defer></script>
+    <script type="module" src="script.js" defer></script><!-- === MODAL PRINCIPAL DE TRAGAMONEDAS === -->
+<!-- Modal de la tragamonedas. Estructura aqui, estilos en style.css (seccion TRAGAMONEDAS) -->
+<div id="panel-traga" class="modal-oculto">
+    <div id="panel-traga-contenedor">
+        <div id="columna-juego-traga">
+            <div id="cabecera-traga">
+                <div><span class="etiqueta-traga">SALDO SOULGEIST:</span> <span id="soulgeist-casino-display" class="valor-soulgeist">0 SG</span></div>
+                <div><span class="etiqueta-traga">SALDO CASINO:</span> <span id="saldo-casino-display-modal" class="valor-casino">0.00 SG</span></div>
+                <div><span class="etiqueta-traga">🎁 GRATIS:</span> <span id="gratis-restantes-display" class="valor-gratis">0</span><span class="etiqueta-traga">/5</span></div>
+            </div>
+            <div id="grid-traga"></div>
+            <div id="selector-lineas-traga">
+                <button onclick="cambiarLineasTraga(-1)" class="btn-flecha-traga">−</button>
+                <span class="etiqueta-traga">LÍNEAS:</span>
+                <span id="lineas-jugadas-display" class="valor-lineas">5</span>
+                <button onclick="cambiarLineasTraga(1)" class="btn-flecha-traga">+</button>
+                <span class="etiqueta-traga">COSTO: <span id="costo-tirada-display" class="valor-costo">2.00</span> SG</span>
+            </div>
+            <div id="zona-botones-traga">
+                <button id="btn-reclamar-gratis-traga" onclick="reclamarTiradasGratisTraga()">🎁 RECLAMAR 5 TIROS GRATIS</button>
+                <button id="btn-girar-traga" onclick="girarTragamonedas()">🔄 GIRAR</button>
+                <button id="btn-retiro-metamask-traga" onclick="retirarTragaMetaMask()">📤 RETIRAR A METAMASK</button>
+                <button id="btn-cerrar-traga" onclick="cerrarTragamonedas()">✖ CERRAR</button>
+            </div>
+        </div>
+        <div id="columna-resultados-traga">
+            <h3 id="titulo-resultados-traga">RESULTADOS</h3>
+            <p id="sin-ganancias-traga">Los premios por línea y por scatter aparecerán aquí al girar.</p>
+            <div id="lista-ganancias"></div>
+            <div id="total-ganancia"></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
