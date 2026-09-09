@@ -1921,6 +1921,7 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
+
 // ====================== MENÚ PRINCIPAL DE LEYES ======================
 function mostrarPergamino(tipo) {
     const pantalla = document.getElementById('pantalla-codice');
