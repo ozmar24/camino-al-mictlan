@@ -1,5 +1,21 @@
 import { OAuth2Client } from 'google-auth-library';
 
+async function verifyTurnstile(token, ip) {
+    const SECRET_KEY = process.env.CLOUDFLARE_SECRET_KEY;
+    if (!SECRET_KEY) return true; // Si no hay key configurada, no bloquear
+    try {
+        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret: SECRET_KEY, response: token, remoteip: ip })
+        });
+        const data = await res.json();
+        return data.success === true;
+    } catch {
+        return true; // Si falla la verificación, no bloquear al usuario
+    }
+}
+
 async function enviarAlertaTelegram(mensaje) {
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -17,8 +33,6 @@ async function enviarAlertaTelegram(mensaje) {
 }
 
 export default async function handler(req, res) {
-    // 1. El control de CORS y OPTIONS ya lo maneja next.config.js globalmente.
-    // Solo aseguramos que el método entrante sea estrictamente POST.
     if (req.method !== 'POST') { 
         return res.status(405).json({ success: false, error: 'Método no permitido' }); 
     }
@@ -39,6 +53,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Falta el token de Google' });
     }
 
+    const { turnstileToken } = req.body || {};
+    const userIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+
     try {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
         const ticket = await client.verifyIdToken({
@@ -55,44 +72,49 @@ export default async function handler(req, res) {
         let balanceSG = 0;
 
         if (redisUrl && redisToken) {
-    const userKey = `usuario:${emailUsuario.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
+            const userKey = `usuario:${emailUsuario.replace(/[^a-zA-Z0-9@._-]/g, '_')}`;
 
-    // 1. Verificamos si el usuario YA existe (para no duplicar registros)
-    const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
-        headers: { Authorization: `Bearer ${redisToken}` }
-    });
-    const getData = await getRes.json();
-    let usuario = getData.result ? JSON.parse(getData.result) : null;
+            const getRes = await fetch(`${redisUrl}/get/${userKey}`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            });
+            const getData = await getRes.json();
+            let usuario = getData.result ? JSON.parse(getData.result) : null;
 
-    if (!usuario) {
-        // 2. INCREMENTAMOS PRIMERO. Esto nos da el número de orden exacto.
-        const incrRes = await fetch(`${redisUrl}/incr/contador_almas`, {
-            headers: { Authorization: `Bearer ${redisToken}` }
-        });
-        const incrData = await incrRes.json();
-        const posicion = parseInt(incrData?.result || 0);
+            if (!usuario) {
+                // ES UN REGISTRO NUEVO -> validamos el puzzle, igual que en pacto.js
+                if (!turnstileToken) {
+                    return res.status(400).json({ success: false, error: 'PUZZLE_REQUIRED' });
+                }
+                const isHuman = await verifyTurnstile(turnstileToken, userIp);
+                if (!isHuman) {
+                    return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
+                }
 
-        // 3. Calculamos premio BASADO en la posición atómica
-        const premio = (posicion <= 50) ? 500 : 0;
+                const incrRes = await fetch(`${redisUrl}/incr/contador_almas`, {
+                    headers: { Authorization: `Bearer ${redisToken}` }
+                });
+                const incrData = await incrRes.json();
+                const posicion = parseInt(incrData?.result || 0);
 
-        usuario = {
-            email: emailUsuario,
-            balance_soulgeist: premio,
-            metodo: 'google',
-            fecha_registro: new Date().toISOString()
-        };
+                const premio = (posicion <= 50) ? 500 : 0;
 
-        // 4. Guardar usuario
-        await fetch(`${redisUrl}`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${redisToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
-        });
+                usuario = {
+                    email: emailUsuario,
+                    balance_soulgeist: premio,
+                    metodo: 'google',
+                    fecha_registro: new Date().toISOString()
+                };
+
+                await fetch(`${redisUrl}`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${redisToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(['SET', userKey, JSON.stringify(usuario)])
+                });
+
                 await enviarAlertaTelegram(`<b>🚀 Nuevo Registro #${posicion} en el Mictlán</b>\n👤 Email: ${emailUsuario}`);
-
             }
 
             balanceSG = usuario.balance_soulgeist || 0;

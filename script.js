@@ -1156,7 +1156,6 @@ async function manejarLoginGoogle(response) {
 cargarSaldosCriptas();
     generarCementerio();
 }
-
 // ==================================================================
 // PASO 1: CLICK EN SOULGEIST -> MODAL INFORMATIVO CON SOLO BOTÓN "CERRAR"
 // ==================================================================
