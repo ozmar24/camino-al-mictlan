@@ -3,6 +3,7 @@ import https from 'https';
 import {
     verificarLimitePeticion,
     verificarOrigen,
+    esDesarrollo,
     manejarError
 } from '../lib/seguridad.js';
 
@@ -12,8 +13,9 @@ export default async function handler(req, res) {
     const ORIGENES_PERMITIDOS = [
         'https://caminoamictlan.com',
     'https://www.caminoamictlan.com', // Añade esto
-    // localhost solo en desarrollo; en producción se excluye (anti-bypass de origen)
-    ...(process.env.VERCEL ? [] : ['http://localhost:3000'])
+    // localhost solo en desarrollo (por Host de la petición, no por env:
+    // `vercel env pull` copia VERCEL="1" al local y rompía el desarrollo)
+    ...(esDesarrollo(req) ? ['http://localhost:3000'] : [])
     ];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {
