@@ -935,8 +935,25 @@ let turnstileToken = "";
 // Exponemos la función al objeto window para asegurar que el HTML la encuentre siempre
 window.onTurnstileSuccess = function(token) {
     turnstileToken = token;
+    window.turnstileToken = token; // alias para flujos que lo lean de window
     console.log("✅ Token guardado en window:", turnstileToken);
 };
+
+// Reinicia el puzzle para generar un token fresco.
+// Los tokens de Turnstile son de UN SOLO USO y expiran (~5 min):
+// si el usuario tarda o ya usó el token, hay que pedírselo de nuevo.
+function regenerarPuzzleTurnstile() {
+    turnstileToken = "";
+    window.turnstileToken = "";
+    try {
+        if (typeof turnstile !== 'undefined') {
+            const widget = document.querySelector('.cf-turnstile');
+            if (widget) turnstile.reset(widget);
+        }
+    } catch (e) {
+        console.warn("No se pudo reiniciar el puzzle:", e);
+    }
+}
 
 // ==================================================================
 // VARIABLES GLOBALES DEL INFRAMUNDO
@@ -1071,7 +1088,12 @@ async function manejarAuth() {
         const resultado = await respuesta.json();
 
         if (!respuesta.ok || resultado.success === false) {
-            lanzarAlertaMictlan(resultado.error || "Pacto rechazado.", "RITUAL RECHAZADO");
+            if (resultado.error === "PUZZLE_REQUIRED") {
+                lanzarAlertaMictlan("Completa el puzzle de seguridad e inténtalo de nuevo.", "SEGURIDAD");
+                regenerarPuzzleTurnstile();
+            } else {
+                lanzarAlertaMictlan(resultado.error || "Pacto rechazado.", "RITUAL RECHAZADO");
+            }
             return;
         }
 
@@ -1099,7 +1121,7 @@ async function manejarAuth() {
 
 async function manejarLoginGoogle(response) {
    
-    const tokenParaEnviar = window.turnstileToken || ""; 
+    const tokenParaEnviar = turnstileToken || ""; 
 
     try {
         const DOMINIO_VERCEL = window.location.origin; 
@@ -1127,6 +1149,7 @@ async function manejarLoginGoogle(response) {
            
             if (datos.error === "PUZZLE_REQUIRED") {
                 lanzarAlertaMictlan("Completa el puzzle de seguridad e inténtalo de nuevo.", "SEGURIDAD");
+                regenerarPuzzleTurnstile();
                 
             } else {
                 lanzarAlertaMictlan(datos.error || "Fallo al autenticar con Google.", "ERROR GOOGLE");

@@ -67,14 +67,14 @@ export default async function handler(req, res) {
                 return res.status(409).json({ success: false, error: 'Este email ya tiene un pacto activo.' });
             }
 
-            // Validar Turnstile para registro manual
+            // Validar Turnstile para registro manual (código unificado con auth-google)
             const { turnstileToken } = req.body;
             if (!turnstileToken) {
-                return res.status(400).json({ success: false, error: 'Debes completar el puzzle de seguridad.' });
+                return res.status(400).json({ success: false, error: 'PUZZLE_REQUIRED' });
             }
             const isHuman = await verificarTurnstile(turnstileToken, ip);
             if (!isHuman) {
-                return res.status(403).json({ success: false, error: 'Verificación de seguridad fallida. Intenta de nuevo.' });
+                return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
             }
 
             // 1. Incrementamos el contador ANTES de hacer nada más.
@@ -107,15 +107,8 @@ export default async function handler(req, res) {
 
         // ==================== LOGIN ====================
         if (accion === 'login') {
-            // Turnstile obligatorio (igual que en el registro)
-            const { turnstileToken } = req.body;
-            if (!turnstileToken) {
-                return res.status(400).json({ success: false, error: 'Debes completar el puzzle de seguridad.' });
-            }
-            const isHuman = await verificarTurnstile(turnstileToken, ip);
-            if (!isHuman) {
-                return res.status(403).json({ success: false, error: 'Verificación de seguridad fallida. Intenta de nuevo.' });
-            }
+            // Sin puzzle en el login: el token de Turnstile es de un solo uso
+            // y expira, lo que bloqueaba inicios de sesión legítimos.
 
             // Bloqueo por demasiados intentos fallidos (5 fallos → 15 minutos)
             if (await verificarBloqueoLogin(emailNormalizado, ip)) {

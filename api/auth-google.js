@@ -39,17 +39,6 @@ async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Falta el token de Google' });
         }
 
-        // Anti-bot: puzzle de Turnstile obligatorio para registro Y login,
-        // en paridad con pacto.js
-        const { turnstileToken } = req.body || {};
-        if (!turnstileToken) {
-            return res.status(400).json({ success: false, error: 'PUZZLE_REQUIRED' });
-        }
-        const isHuman = await verificarTurnstile(turnstileToken, ip);
-        if (!isHuman) {
-            return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
-        }
-
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
         const ticket = await client.verifyIdToken({
             idToken: token,
@@ -65,6 +54,18 @@ async function handler(req, res) {
         let usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
 
         if (!usuario) {
+            // Registro nuevo: el puzzle es obligatorio SOLO aquí (el login no
+            // lo pide). Validamos ANTES de incrementar para no quemar plazas
+            // de fundador con intentos fallidos.
+            const { turnstileToken } = req.body || {};
+            if (!turnstileToken) {
+                return res.status(400).json({ success: false, error: 'PUZZLE_REQUIRED' });
+            }
+            const isHuman = await verificarTurnstile(turnstileToken, ip);
+            if (!isHuman) {
+                return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
+            }
+
             // 2. INCREMENTAMOS PRIMERO. Esto nos da el número de orden exacto.
             const incrRes = await redisCmd('INCR', 'contador_almas');
             const posicion = parseInt(incrRes?.result || 0);
