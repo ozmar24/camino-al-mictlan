@@ -18,7 +18,6 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 <!-- Portal de Monlix - Reemplazo de Unity Ads -->
 <div id="portal-monlix-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 0, 0, 0.93); display: none; justify-content: center; align-items: center; z-index: 10002; border: 1px solid #ff0000; box-shadow: inset 0 0 50px #000;">
     <div style="background: rgba(18, 4, 4, 0.98); padding: 25px; border: 2px solid #4a0000; width: 92%; max-width: 850px; height: 85%; box-shadow: 0 0 30px #ff4500; display: flex; flex-direction: column;">
@@ -30,17 +29,6 @@
 </div>
 
 <script>
-    // SDK de CrazyGames (el juego está publicado en CrazyGames)
-    if (typeof window.CrazyGames !== 'undefined' && window.CrazyGames.SDK) {
-        window.CrazyGames.SDK.init().then(() => {
-            console.log("SDK de CrazyGames inicializado correctamente.");
-        }).catch((err) => {
-            console.error("Error al inicializar el SDK:", err);
-        });
-    } else {
-        console.warn("CrazyGames SDK no disponible en este entorno.");
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
         // --- LÓGICA DE CIERRE DEL PORTAL ---
         const btnCerrar = document.getElementById('cerrar-portal-btn');

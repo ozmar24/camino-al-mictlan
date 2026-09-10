@@ -1,5 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
 import {
+    verificarTurnstile,
     verificarLimitePeticion,
     verificarOrigen,
     claveUsuario,
@@ -36,6 +37,17 @@ async function handler(req, res) {
         const token = req.body?.token;
         if (!token) {
             return res.status(400).json({ success: false, error: 'Falta el token de Google' });
+        }
+
+        // Anti-bot: puzzle de Turnstile obligatorio para registro Y login,
+        // en paridad con pacto.js
+        const { turnstileToken } = req.body || {};
+        if (!turnstileToken) {
+            return res.status(400).json({ success: false, error: 'PUZZLE_REQUIRED' });
+        }
+        const isHuman = await verificarTurnstile(turnstileToken, ip);
+        if (!isHuman) {
+            return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
         }
 
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
