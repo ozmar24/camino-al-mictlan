@@ -2554,11 +2554,12 @@ function cerrarAlerta() {
 async function asegurarRedProduccion() {
     const POLYGON_CHAIN_ID = '0x89'; // Polygon Mainnet (137)
 
-    if (window.ethereum) {
+    const ethereum = proveedorMetaMask();
+    if (ethereum) {
         try {
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+            const chainId = await ethereum.request({ method: 'eth_chainId' });
             if (chainId !== POLYGON_CHAIN_ID) {
-                await window.ethereum.request({
+                await ethereum.request({
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: POLYGON_CHAIN_ID }],
                 });
@@ -2590,6 +2591,7 @@ window.cerrarBoveda = cerrarBoveda;
 window.cerrarOraculo = cerrarOraculo;
 window.cerrarRitual = cerrarRitual;
 window.conectarMetaMask = conectarMetaMask;
+window.proveedorMetaMask = proveedorMetaMask;
 window.salirDelMictlan = salirDelMictlan;
 window.mostrarSubLey = mostrarSubLey;
 window.cerrarPortalOficial = cerrarPortalOficial;
@@ -2919,13 +2921,49 @@ async function verificarSaludGas(walletAdmin, provider) {
  * Si falla o el usuario cancela, lanza una alerta temática.
  */
 
+/**
+ * Devuelve el proveedor de MetaMask de forma confiable incluso en navegadores
+ * con wallet nativa (Brave, Opera, Coinbase): esas wallets se anuncian a sí
+ * mismas como window.ethereum y hasta imitan isMetaMask, así que confiar en
+ * window.ethereum a secas abre la wallet equivocada. EIP-6963 resuelve el
+ * conflicto a favor de la extensión real de MetaMask; si no responde, se
+ * intenta con window.ethereum descartando las wallets nativas detectables.
+ */
+let proveedorEIP6963 = null;
+window.addEventListener('eip6963:announceProvider', (evento) => {
+    const info = evento.detail?.info;
+    if (info?.rdns?.startsWith('io.metamask') && evento.detail.provider) {
+        proveedorEIP6963 = evento.detail.provider;
+    }
+});
+window.dispatchEvent(new Event('eip6963:requestProvider')); // provoca el anuncio si MetaMask ya cargó
+
+function esWalletNativa(p) {
+    return !!(p.isBraveWallet || p.isOpera || p.isCoinbaseWallet || p.isTrust || p.isTrustWallet);
+}
+
+function proveedorMetaMask() {
+    if (proveedorEIP6963) return proveedorEIP6963;
+    const ethereum = window.ethereum;
+    if (!ethereum) return null;
+    const candidatos = Array.isArray(ethereum) ? ethereum : [ethereum];
+    const deMetaMask = candidatos.filter(p => p && p.isMetaMask && !esWalletNativa(p));
+    if (deMetaMask.length > 0) {
+        // Si varias dicen ser MetaMask, la extensión real suele ser la última inyectada.
+        return deMetaMask[deMetaMask.length - 1];
+    }
+    // Solo hay wallet nativa del navegador: la usamos para no romper el flujo.
+    return Array.isArray(ethereum) ? ethereum[ethereum.length - 1] : ethereum;
+}
+
 async function conectarMetaMask() {
-    if (!window.ethereum) {
-        lanzarAlertaMictlan("Billetera no detectada", "Necesitas instalar MetaMask para continuar con el ritual.");
+    const ethereum = proveedorMetaMask();
+    if (!ethereum) {
+        lanzarAlertaMictlan("Billetera no detectada", "Necesitas instalar la extensión de MetaMask para continuar con el ritual. Si usas Brave, desactiva su billetera nativa en brave://settings/wallet o instala MetaMask desde metamask.io.");
         return null;
     }
     try {
-        const cuentas = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const cuentas = await ethereum.request({ method: 'eth_requestAccounts' });
         if (cuentas.length > 0) {
             const cuentaPrincipal = cuentas[0];
             console.log("Alma conectada:", cuentaPrincipal);
@@ -2935,7 +2973,7 @@ async function conectarMetaMask() {
             // ============================================================
             setTimeout(async () => {
                 try {
-                    await window.ethereum.request({
+                    await ethereum.request({
                         method: 'wallet_watchAsset',
                         params: {
                             type: 'ERC20',
