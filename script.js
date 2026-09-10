@@ -1404,15 +1404,19 @@ actualizarBalanceSoulgeist(balanceUsuarioSG);
                 const tumbaOrigen = document.querySelector('.alma-maestra');
                 const tumbaDestino = e.currentTarget;
 
-    const infoTasa = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
-const cantidadConvertida = cantidadEnviada * infoTasa.tasa;
-
 // CANALIZACIÓN SERVER-SIDE: 'fusionar' descuenta el balance real y abona la
 // cripta con la tasa del servidor. Una sola llamada (sin doble descuento).
-await descontarBalanceEnRedis(cantidadEnviada, pos.nombre);
+// La verdad (ganancia y tumbas) la devuelve el servidor; el cliente no re-suma.
+const resultadoFusion = await descontarBalanceEnRedis(cantidadEnviada, pos.nombre);
+if (!resultadoFusion || !resultadoFusion.ok) {
+    ritualActivo = false;
+    lanzarAlertaMictlan(resultadoFusion?.error || "El ritual falló. Intenta de nuevo.", "RITUAL FALLIDO");
+    sincronizarBalanceConRedis().then(b => actualizarBalanceSoulgeist(b));
+    return;
+}
+const cantidadConvertida = resultadoFusion.ganancia ?? 0;
 
-lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadConvertida, pos, async () => {
-    window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + cantidadConvertida;
+lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, cantidadConvertida, pos, () => {
     guardarSaldosCriptas();
     generarCementerio();
     mostrarModalFusionExitosa(pos, cantidadConvertida);
@@ -1491,7 +1495,7 @@ function abrirModalCosechaFinal(pos) {
     botones.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
             <!-- Opción 1: Seguir acumulando -->
-            <button onclick="abrirModalSeleccionCantidad(window.currentCripto)" 
+            <button onclick="dispararInicioRitualGlobal()" 
                     style="background: #222; color: ${pos.color}; border: 1px solid ${pos.color}; padding: 12px; font-weight: bold;">
                 ➕ AÑADIR MÁS PODER
             </button>
@@ -1773,9 +1777,7 @@ async function mostrarVideoUnityAds() {
     }
 }
 
-// 2. AQUÍ ESTÁ TU BLOQUE TOTALMENTE INTACTO (Se ejecuta al cerrar el portal de Monlix)
-const ENLACE_MISTICO_KEY = "TuPalabraSecretaDelInframundo";
-
+// Se ejecuta al cerrar el portal de Monlix
 async function videoCompletado() {
     if (!window.userWallet) {
         lanzarAlertaMictlan("Debes ligar tu wallet antes de absorber energía.", "SANTUARIO SIN DUEÑO");
@@ -1803,7 +1805,7 @@ async function videoCompletado() {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
             },
-            body: JSON.stringify({ wallet: window.userWallet, accion: 'sumar_ritual', nonce })
+            body: JSON.stringify({ accion: 'sumar_ritual', nonce })
         });
 
         const resultado = await respuesta.json();
@@ -2259,114 +2261,6 @@ function mostrarModalFusionExitosa(pos, cantidad) {
         cerrarRitual();
     }, 1800);
 }
-// --- MODAL DE SELECCIÓN DE CANTIDAD ---
-function abrirModalSeleccionCantidad(pos) {
-    const modal = document.getElementById('modal-ritual'); // Reutilizamos el contenedor
-    if (!modal) return;
-
-    document.getElementById('titulo-ritual').innerText = `SACRIFICIO A ${pos.nombre.toUpperCase()}`;
-    
-    document.getElementById('info-ritual').innerHTML = `
-        <div style="text-align: center; color: #fff;">
-            <p>Soulgeist disponible: <b>${balanceUsuarioSG.toFixed(2)} SG</b></p>
-            <input type="number" id="cantidad-a-enviar" placeholder="Cantidad SG" 
-                   style="width:80%; padding:10px; background:#000; color:#fff; border:1px solid ${pos.color}; margin:10px 0;">
-        </div>
-    `;
-
-    // Reconfiguramos los botones del modal
-    const botones = document.querySelector('.botones-exchange');
-    botones.innerHTML = `
-        <button id="btn-confirmar-envio" style="background:${pos.color};">INICIAR RITUAL</button>
-        <button onclick="cerrarRitual()">CANCELAR</button>
-    `;
-
-    document.getElementById('btn-confirmar-envio').onclick = () => {
-        const cantidad = parseFloat(document.getElementById('cantidad-a-enviar').value);
-        if (isNaN(cantidad) || cantidad <= 0 || cantidad > balanceUsuarioSG) {
-            lanzarAlertaMictlan("Cantidad no válida o insuficiente.", "SACRIFICIO INVÁLIDO");
-            return;
-        }
-        
-        // Ejecutamos la transferencia con la cantidad elegida
-        iniciarTransferenciaElegida(pos, cantidad);
-    };
-    
-    modal.style.display = 'block';
-}
-
-async function iniciarTransferenciaElegida(pos, cantidad) {
-    const tumbaOrigen = document.querySelector('.alma-maestra');
-    const tumbaDestino = document.querySelector(`[data-nombre="${pos.nombre}"]`);
-    
-    if (!tumbaOrigen || !tumbaDestino) return;
-
-    // 1. Guardamos el balance ANTES de descontar
-    const balanceAntes = balanceUsuarioSG;
-    console.log(`[DEBUG] Balance antes: ${balanceAntes} | Cantidad a enviar: ${cantidad}`);
-
-    // 2. Descontar localmente
-    balanceUsuarioSG = Math.max(0, balanceUsuarioSG - cantidad);
-    actualizarBalanceSoulgeist(balanceUsuarioSG);
-    localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-
-    console.log(`[DEBUG] Balance después de descuento: ${balanceUsuarioSG}`);
-
-    // --- CORRECCIÓN: Obtener la tasa fresca de la variable global ---
-    const tasaActual = (window.TASAS_ACTUALES && window.TASAS_ACTUALES[pos.nombre]) ? window.TASAS_ACTUALES[pos.nombre].tasa : (pos.tasa || 0);
-    const ganancia = cantidad * tasaActual;
-    
-    console.log(`[DEBUG] Calculando ganancia: ${cantidad} * ${tasaActual} = ${ganancia}`);
-    
-    cerrarRitual();
-
-    // 3. Enviar a Redis (await asegura que el servidor responda antes de continuar)
-    if (window.userWallet) {
-        try {
-            console.log(`[DESCUENTO] Enviando costoRitual = ${cantidad} a Redis`);
-
-            const response = await fetch('/api/acumular-sg', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    wallet: window.userWallet,
-                    accion: 'descontar_ritual',
-                    nuevoBalance: balanceUsuarioSG
-                })
-            });
-
-            const result = await response.json();
-            console.log("✅ Respuesta de Redis:", result);
-
-            if (result.success) {
-                balanceUsuarioSG = result.nuevoBalance; 
-                localStorage.setItem('soulgeist_balance', balanceUsuarioSG);
-                if (typeof actualizarBalanceSoulgeist === 'function') {
-                    actualizarBalanceSoulgeist(balanceUsuarioSG);
-                }
-                console.log("✅ Balance sincronizado con servidor:", result.nuevoBalance);
-            } else {
-                console.error("❌ Error en la respuesta de Redis:", result.error);
-                // Opcional: Podrías revertir el balance local aquí si el servidor falla
-            }
-        } catch (error) {
-            console.error("❌ Error al conectar con el servidor:", error);
-        }
-    }
-
-    // 4. Animación + sumar a cripta
-    lanzarAlma(tumbaOrigen, tumbaDestino, pos.color, ganancia, pos, () => {
-        // Aseguramos que la suma sea con el valor calculado al inicio
-        window.tumbasConSaldo[pos.nombre] = (window.tumbasConSaldo[pos.nombre] || 0) + ganancia;
-        
-        const keyCriptas = `soulgeist_criptas_${window.userWallet || 'anonimo'}`;
-        localStorage.setItem(keyCriptas, JSON.stringify(window.tumbasConSaldo));
-
-        generarCementerio();
-        mostrarModalFusionExitosa(pos, ganancia);
-    });
-}
-
 
 // ======================== SINCRONIZACIÓN DE BALANCE ========================
 
@@ -2418,16 +2312,16 @@ async function loginExitoso(datosUsuario) {
     window.userWallet = datosUsuario.email; // Define la identidad
     await entrarAlCampoSanto(); // Carga la verdad desde Redis
 }
-async function descontarBalanceEnRedis(nuevoBalanceFinal, criptaDestino = null) {
+async function descontarBalanceEnRedis(cantidadSG, criptaDestino = null) {
     if (!window.userWallet) {
         console.warn("❌ Intento de descuento sin Wallet");
-        return;
+        return { ok: false, error: "Sesión no iniciada." };
     }
 
     // Validación defensiva antes de llamar al API
-    if (isNaN(nuevoBalanceFinal) || nuevoBalanceFinal < 0) {
-        console.error("❌ ERROR: El valor a enviar es inválido:", nuevoBalanceFinal);
-        return; // Detenemos la ejecución aquí antes de que el servidor nos dé el 400
+    if (isNaN(cantidadSG) || cantidadSG <= 0) {
+        console.error("❌ ERROR: El valor a enviar es inválido:", cantidadSG);
+        return { ok: false, error: "Cantidad inválida." };
     }
 
     try {
@@ -2440,17 +2334,16 @@ async function descontarBalanceEnRedis(nuevoBalanceFinal, criptaDestino = null) 
                 'Authorization': 'Bearer ' + (localStorage.getItem('soulgeist_sesion') || '')
             },
             body: JSON.stringify({
-                wallet: window.userWallet,
                 accion: 'fusionar',
-                cantidadSG: nuevoBalanceFinal,
+                cantidadSG: cantidadSG,
                 cripto: criptaDestino
             })
         });
 
         const resultado = await respuesta.json();
-        
+
         if (!respuesta.ok) {
-            throw new Error(resultado.error || "Error en el servidor");
+            return { ok: false, error: resultado.error || "Error en el servidor" };
         }
 
         // El servidor devuelve su verdad: balance y tumbas actualizadas
@@ -2468,8 +2361,10 @@ async function descontarBalanceEnRedis(nuevoBalanceFinal, criptaDestino = null) 
         }
 
         console.log("✅ Canalización confirmada por el servidor:", resultado.ganancia ?? resultado.nuevoBalance);
+        return { ok: true, ganancia: resultado.ganancia };
     } catch (error) {
         console.error("❌ Error al actualizar Redis:", error);
+        return { ok: false, error: "No se pudo conectar con el inframundo." };
     }
 }
 
@@ -2513,8 +2408,21 @@ function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)
     localStorage.removeItem('soulgeist_user_email');
     localStorage.removeItem('usuario_email');
-    // Opcional: Si quieres limpiar el balance al salir
-    // localStorage.removeItem('soulgeist_balance'); 
+    localStorage.removeItem('soulgeist_sesion');
+    localStorage.removeItem('soulgeist_balance');
+
+    // 2. Cierre de sesión REAL: invalidamos el token en Redis para que deje
+    //    de servir aunque alguien lo haya copiado (antes solo se limpiaba
+    //    el navegador y el token seguía vivo 7 días).
+    try {
+        const token = localStorage.getItem('soulgeist_sesion');
+        if (token) {
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).catch(() => {});
+        }
+    } catch { /* el logout local siempre procede */ }
 
     lanzarAlertaMictlan("Tu rastro se desvanece... Regresando al umbral.", "ALMA EN REPOSO");
 
@@ -2684,7 +2592,6 @@ window.cerrarRitual = cerrarRitual;
 window.conectarMetaMask = conectarMetaMask;
 window.salirDelMictlan = salirDelMictlan;
 window.mostrarSubLey = mostrarSubLey;
-window.abrirModalSeleccionCantidad = abrirModalSeleccionCantidad;
 window.cerrarPortalOficial = cerrarPortalOficial;
 window.cerrarCodice = cerrarCodice;
 window.onTurnstileSuccess = window.onTurnstileSuccess;
@@ -3078,8 +2985,8 @@ async function conectarYRetirarMetaMask(pos) {
         lanzarAlertaMictlan("Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).", "SANTUARIO PC REQUERIDO");
         return;
     }
-    if (!pos || typeof pos.montoAEnviar === 'undefined') {
-        lanzarAlertaMictlan("Ritual incompleto", "No se detectó el monto a retirar.");
+    if (!pos || !pos.nombre) {
+        lanzarAlertaMictlan("Ritual incompleto", "No se detectó la cripta a retirar.");
         return;
     }
     if (typeof window.ethers === 'undefined') {
@@ -3096,19 +3003,14 @@ async function conectarYRetirarMetaMask(pos) {
         btn.disabled = true;
 
         const saldoVisual = window.tumbasConSaldo[pos.nombre] || 0;
-        // Los SG a enviar son los que están acumulados en la tumba
-        // balance_soulgeist NO se toca — ya se descontó al convertir
-        const infoTasaRetiro = window.TASAS_ACTUALES[pos.nombre] || { tasa: 0 };
-        // Calcular cuántos SG representan el saldo visual (con compensación del 2% de quema)
-        const sgBrutos = infoTasaRetiro.tasa > 0 ? (saldoVisual / infoTasaRetiro.tasa) : 0;
-        const sgAEnviar = sgBrutos / 0.98;
-
-        if (saldoVisual <= 0 || sgAEnviar <= 0) {
+        if (saldoVisual <= 0) {
             lanzarAlertaMictlan("No tienes saldo suficiente para retirar.", "RITUAL INCOMPLETO");
             return;
         }
 
-        console.log(`Retiro: ${saldoVisual} ${pos.nombre} → ${sgAEnviar.toFixed(2)} SG a enviar`);
+        // MONTO 100% SERVER-SIDE: el servidor calcula el equivalente en SG
+        // desde SU cripta y compensa él mismo el 2% de quema del contrato.
+        // El cliente solo envía wallet, cripto y pasarela (anti-F12).
         btn.innerText = "PROCESANDO...";
 
         const respuesta = await fetch('/api/reclamar', {

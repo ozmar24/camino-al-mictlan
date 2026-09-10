@@ -160,9 +160,10 @@ export default async function handler(req, res) {
             usuarioActual.tumbas[cripto] = 0;
         }
 
-        await Promise.all([
-            redisCmd(['SET', balanceKey, JSON.stringify(usuarioActual)])
-        ]);
+        // ⚠️ CRÍTICO: redisCmd espera argumentos sueltos, NO un array. Con el
+        // array anidado Upstash devolvía null silenciosamente y la cripta
+        // NUNCA se vaciaba → doble pago real tras el cooldown de 24 h.
+        await redisCmd('SET', balanceKey, JSON.stringify(usuarioActual));
 
         // 12. Alerta Telegram
         await enviarAlertaTelegram(

@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     const ORIGENES_PERMITIDOS = [
         'https://caminoamictlan.com',
     'https://www.caminoamictlan.com', // Añade esto
-    'http://localhost:3000'
+    // localhost solo en desarrollo; en producción se excluye (anti-bypass de origen)
+    ...(process.env.VERCEL ? [] : ['http://localhost:3000'])
     ];
     const origin = req.headers.origin;
     if (ORIGENES_PERMITIDOS.includes(origin)) {

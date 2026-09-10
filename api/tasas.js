@@ -22,8 +22,9 @@ export default async function handler(req, res) {
             return res.status(429).json({ success: false, error: 'Demasiadas peticiones. Espera un momento.' });
         }
 
-        // Precio fijo de SG en POL desde el par de QuickSwap
-        const SG_EN_POL = 0.002458;
+        // Precio del SG en POL: variable de entorno si existe, si no la constante
+        // (la misma fuente que usa lib/tasas.js para fusión y retiros)
+        const SG_EN_POL = parseFloat(process.env.SG_PRECIO_POL) || 0.002638;
 
         // Tasas de emergencia si falla CoinGecko
         const FALLBACK_USD = {
