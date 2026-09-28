@@ -2643,3 +2643,92 @@ a:hover {
         max-height: 14vh;
     }
 }
+
+/* ==========================================================================
+   14. TRAGAMONEDAS EN MOVILES (portrait / pantallas pequenas)
+   Cabecera compacta, rejilla 5x5 cuadrada y legible, botones grandes
+   para el pulgar. Todo degradativo: si el navegador no soporta una
+   propiedad, conserva el comportamiento anterior.
+   ========================================================================== */
+@media (max-width: 820px) {
+    #panel-traga-contenedor {
+        padding: 12px 10px;
+        gap: 10px;
+        height: 100dvh; /* viewport dinamico: se ajusta a la barra del navegador */
+        max-height: none;
+    }
+
+    /* Cabecera: 3 datos apilados y compactos */
+    #cabecera-traga {
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 8px;
+    }
+    #cabecera-traga > div {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+    }
+    .etiqueta-traga { font-size: 0.62rem; }
+    .valor-soulgeist, .valor-casino { font-size: 0.95rem; }
+    .valor-gratis { font-size: 0.9rem; }
+
+    /* Rejilla 5x5: celdas cuadradas que nunca desbordan la pantalla */
+    #grid-traga {
+        max-width: min(100%, 52vh);
+        margin: 0 auto;
+        gap: 4px;
+    }
+    #grid-traga .celda-traga {
+        aspect-ratio: 1 / 1;
+        height: auto;
+    }
+
+    /* Selector de lineas: botones con area de toque comoda */
+    #selector-lineas-traga {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-flecha-traga {
+        min-width: 42px;
+        min-height: 42px;
+        font-size: 1.2rem;
+    }
+
+    /* Botones principales: grandes, apilados, a la altura del pulgar */
+    #zona-botones-traga {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+    #zona-botones-traga button {
+        width: 100%;
+        min-height: 48px;
+        font-size: 0.95rem;
+        padding: 10px 12px;
+        box-sizing: border-box;
+    }
+
+    /* Columna de resultados plegada compacta abajo */
+    #columna-resultados-traga {
+        max-height: 26vh;
+    }
+    #lista-ganancias {
+        max-height: 12vh;
+    }
+}
+
+/* Moviles muy pequenos: compactar un poco mas */
+@media (max-width: 400px) {
+    .etiqueta-traga { font-size: 0.56rem; }
+    #grid-traga { gap: 3px; }
+    #zona-botones-traga button {
+        min-height: 44px;
+        font-size: 0.85rem;
+    }
+}
