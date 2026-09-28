@@ -15,6 +15,24 @@
     <link rel="stylesheet" href="style.css?v=999">
     <meta name="description" content="Bienvenido a Camino al Mictlán 💀 . Reclama las almas de las cripto 👻, el ecosistema Web3, la liquidez bloqueada y únete a nuestras redes oficiales.">
 
+    <!-- PWA: instalable en moviles (base para el APK) -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b0000">
+    <link rel="apple-touch-icon" href="/img/icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mictlán">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw-pwa.js').catch(function (e) {
+                    console.log('SW PWA no registrado:', e);
+                });
+            });
+        }
+    </script>
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <!-- Portal de Monlix - Reemplazo de Unity Ads -->
