@@ -2727,6 +2727,14 @@ function tragaMostrarGanancias(ganancias, premio, scatter) {
         lista.appendChild(div);
     }
     total.innerText = `TOTAL: +${premio} SG`;
+
+    // En movil los resultados quedan debajo de la rejilla: llevarlos a la vista
+    try {
+        if (window.matchMedia('(max-width: 820px)').matches) {
+            const col = document.getElementById('columna-resultados-traga');
+            if (col) col.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    } catch (e) { /* silencioso */ }
 }
 
 function tragaResaltarLineas(ganancias) {

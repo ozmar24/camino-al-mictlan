@@ -2724,11 +2724,73 @@ a:hover {
 }
 
 /* Moviles muy pequenos: compactar un poco mas */
-@media (max-width: 400px) {
-    .etiqueta-traga { font-size: 0.56rem; }
-    #grid-traga { gap: 3px; }
-    #zona-botones-traga button {
-        min-height: 44px;
-        font-size: 0.85rem;
+@media (max-width: 550px) {
+    #panel-traga-contenedor {
+        padding: 8px 6px;
+        gap: 8px;
+        height: 100dvh;
+        max-height: none;
     }
+    #cabecera-traga {
+        gap: 2px;
+        padding: 4px 6px;
+    }
+    .etiqueta-traga { font-size: 0.55rem; }
+    .valor-soulgeist, .valor-casino { font-size: 0.85rem; }
+    .valor-gratis { font-size: 0.8rem; }
+    #grid-traga {
+        gap: 3px;
+        max-width: min(100%, 46vh);
+    }
+    #selector-lineas-traga { gap: 4px; }
+    .btn-flecha-traga {
+        min-width: 38px;
+        min-height: 38px;
+    }
+    #zona-botones-traga button {
+        min-height: 42px;
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+    #columna-resultados-traga {
+        max-height: 24vh;
+        padding-top: 8px;
+    }
+    #lista-ganancias { font-size: 0.72rem; }
+    #total-ganancia { font-size: 0.9rem; }
+}
+
+@media (max-width: 400px) {
+    .etiqueta-traga { font-size: 0.52rem; }
+    #grid-traga { gap: 2px; }
+    #zona-botones-traga button {
+        min-height: 40px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ==========================================================================
+   15. BOTON DE INSTALAR APP (PWA)
+   Aparece solo cuando el navegador dispara beforeinstallprompt.
+   ========================================================================== */
+#btn-instalar-pwa {
+    display: none;
+    position: fixed;
+    bottom: 14px;
+    left: 14px;
+    z-index: 10050;
+    background: linear-gradient(145deg, #2b0a0a, #4a0000);
+    color: #ffcc66;
+    border: 2px solid #c8a951;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: 'MedievalSharp', cursive;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(139, 0, 0, 0.8);
+}
+#btn-instalar-pwa:active {
+    transform: scale(0.96);
 }
