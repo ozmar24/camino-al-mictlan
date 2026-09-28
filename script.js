@@ -2797,10 +2797,30 @@ function tragaAnimacionGiro(callback) {
     }, 70);
 }
 
+// En telefonos en HORIZONTAL, mueve la zona de botones a la columna de
+// resultados (derecha): la izquierda queda libre para la ruleta.
+// En vertical, los devuelve a su lugar original bajo la rejilla.
+function tragaAjustarLayout() {
+    const zona = document.getElementById('zona-botones-traga');
+    const colJuego = document.getElementById('columna-juego-traga');
+    const colResult = document.getElementById('columna-resultados-traga');
+    if (!zona || !colJuego || !colResult) return;
+    const horizontal = window.matchMedia('(max-width: 820px) and (orientation: landscape)').matches;
+    if (horizontal && zona.parentElement !== colResult) {
+        colResult.insertBefore(zona, colResult.firstChild);
+    } else if (!horizontal && zona.parentElement !== colJuego) {
+        colJuego.appendChild(zona);
+    }
+}
+window.addEventListener('resize', tragaAjustarLayout);
+window.addEventListener('orientationchange', tragaAjustarLayout);
+document.addEventListener('DOMContentLoaded', tragaAjustarLayout);
+
 window.abrirTragamonedas = async function () {
     const panel = document.getElementById('panel-traga');
     if (!panel) return;
     panel.style.display = 'flex';
+    tragaAjustarLayout();
     tragaRefrescarDisplays(null);
     if (!tragaSimbolos.length) {
         tragaSimbolos = ['Vela', 'Hueso', 'Cempasuchil', 'Calavera', 'Xoloit', 'Macuahuitl', 'Mictlantecuhtli', 'Soulgeist'];

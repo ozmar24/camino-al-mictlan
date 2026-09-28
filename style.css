@@ -2697,20 +2697,20 @@ a:hover {
         font-size: 1.2rem;
     }
 
-    /* Botones principales: grandes, apilados, a la altura del pulgar */
+    /* Botones principales: apilados pero compactos, para dejar aire a la rejilla */
     #zona-botones-traga {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
         width: 100%;
         max-width: 420px;
         margin: 0 auto;
     }
     #zona-botones-traga button {
         width: 100%;
-        min-height: 48px;
-        font-size: 0.95rem;
-        padding: 10px 12px;
+        min-height: 40px;
+        font-size: 0.85rem;
+        padding: 8px 10px;
         box-sizing: border-box;
     }
 
@@ -2748,9 +2748,9 @@ a:hover {
         min-height: 38px;
     }
     #zona-botones-traga button {
-        min-height: 42px;
-        font-size: 0.8rem;
-        padding: 8px;
+        min-height: 38px;
+        font-size: 0.75rem;
+        padding: 6px;
     }
     #columna-resultados-traga {
         max-height: 24vh;
@@ -2764,8 +2764,57 @@ a:hover {
     .etiqueta-traga { font-size: 0.52rem; }
     #grid-traga { gap: 2px; }
     #zona-botones-traga button {
-        min-height: 40px;
-        font-size: 0.75rem;
+        min-height: 36px;
+        font-size: 0.7rem;
+    }
+}
+
+/* HORIZONTAL en movil (telefono girado): dos columnas como en escritorio.
+   Izquierda: ruleta completa. Derecha: resultados y botones compactos. */
+@media (max-width: 820px) and (orientation: landscape) {
+    #panel-traga-contenedor {
+        flex-direction: row;
+        height: 100dvh;
+        overflow: hidden;
+        padding: 10px 12px;
+    }
+    #columna-juego-traga {
+        flex: 1 1 62%;
+        justify-content: center;
+    }
+    #columna-resultados-traga {
+        flex: 1 1 38%;
+        border-left: 1px solid #4a0000;
+        border-top: none;
+        padding-left: 12px;
+        padding-top: 0;
+        max-height: none;
+        overflow-y: auto;
+    }
+    /* La zona de botones la mueve aqui el JS (tragaAjustarLayout) al girar */
+    #zona-botones-traga {
+        max-width: none;
+        margin: 0;
+    }
+    #zona-botones-traga button {
+        min-height: 36px;
+        font-size: 0.72rem;
+        padding: 6px 8px;
+    }
+    #grid-traga {
+        max-width: min(100%, 58vh); /* en horizontal manda la altura */
+    }
+    #lista-ganancias {
+        max-height: 20vh;
+        font-size: 0.72rem;
+    }
+}
+
+/* Resaltado de combinaciones ganadoras: sutil en movil, sin tapar las imagenes */
+@media (max-width: 820px) {
+    #grid-traga .celda-traga.celda-ganadora {
+        border-width: 2px;
+        box-shadow: 0 0 6px rgba(255, 215, 0, 0.55);
     }
 }
 
