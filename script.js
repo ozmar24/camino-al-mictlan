@@ -2648,6 +2648,20 @@ function tragaImgSimbolo(nombre) {
     return TRAGA_IMGS[nombre] || TRAGA_FALLBACK_IMG;
 }
 
+// Precarga en memoria TODOS los simbolos: sin esto, en moviles la animacion
+// de giro decodifica imagenes sobre la marcha y las celdas quedan vacias
+let tragaPrecargaHecha = false;
+function tragaPrecargarImagenes() {
+    if (tragaPrecargaHecha) return;
+    tragaPrecargaHecha = true;
+    for (const ruta of Object.values(TRAGA_IMGS || {})) {
+        const im = new Image();
+        im.src = ruta;
+    }
+    new Image().src = TRAGA_FALLBACK_IMG;
+}
+tragaPrecargarImagenes();
+
 function tragaEsComodin(nombre) {
     return nombre === 'Mictlantecuhtli';
 }
@@ -2659,22 +2673,37 @@ function tragaEsScatter(nombre) {
 function tragaRenderGrid(grid) {
     const cont = document.getElementById('grid-traga');
     if (!cont) return;
-    cont.innerHTML = '';
-    // grid[col][fila] → celda índice col*5+fila
-    for (let f = 0; f < 5; f++) {
-        for (let c = 0; c < 5; c++) {
-            const nombre = grid[c][f];
+
+    // Construye las 25 celdas UNA sola vez y reutilizalas en cada giro:
+    // recrearlas 12 veces por animacion agota el render de los moviles
+    if (cont.childElementCount !== 25) {
+        cont.innerHTML = '';
+        for (let i = 0; i < 25; i++) {
             const celda = document.createElement('div');
             celda.className = 'celda-traga';
-            celda.dataset.fila = f;
-            celda.dataset.col = c;
+            celda.dataset.fila = i % 5;
+            celda.dataset.col = Math.floor(i / 5);
             const img = document.createElement('img');
-            img.src = tragaImgSimbolo(nombre);
-            img.alt = nombre;
-            img.title = nombre;
+            img.decoding = 'async';
             img.onerror = () => { img.src = TRAGA_FALLBACK_IMG; };
             celda.appendChild(img);
             cont.appendChild(celda);
+        }
+    }
+
+    // grid[col][fila]: la celda de la columna c y fila f vive en el indice
+    // c*5+f (las celdas se crearon columna por columna, igual que antes).
+    for (let c = 0; c < 5; c++) {
+        for (let f = 0; f < 5; f++) {
+            const nombre = grid[c][f];
+            const img = cont.children[c * 5 + f].firstChild;
+            const ruta = tragaImgSimbolo(nombre);
+            if (img.dataset.sym !== ruta) {  // solo toca el DOM si cambio
+                img.dataset.sym = ruta;
+                img.src = ruta;
+            }
+            img.alt = nombre;
+            img.title = nombre;
         }
     }
 }
