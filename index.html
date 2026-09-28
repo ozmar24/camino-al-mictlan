@@ -225,7 +225,12 @@
 
             <div class="botones-exchange" style="margin-top: 15px;">
 
-                <button onclick="cerrarRitual()" class="pentaculo-cursor">ACEPTAR</button>
+                <div id="seccion-aceptar-ritual">
+                    <button onclick="cerrarRitual()" class="pentaculo-cursor">ACEPTAR</button>
+                </div>
+                <!-- El boton de retiro a MetaMask se construye dinamicamente en
+                     script.js (prepararModalRetiroMetaMask) para sobrevivir a los
+                     modales de criptas que reescriben esta zona -->
             </div>
         </div>
     </div>

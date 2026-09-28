@@ -567,6 +567,12 @@ button,
     display: none;
 }
 
+/* Cuando el ritual se abre DESDE la tragamonedas (#panel-traga tiene z-index 10003),
+   el modal debe quedar por encima para ser visible */
+#modal-ritual.modal-sobre-traga {
+    z-index: 10010 !important;
+}
+
 .contenido-ritual h3 { font-family: 'Metal Mania', cursive; color: var(--color-ritmo); font-size: 1.8rem; margin-bottom: 10px; }
 .contenido-ritual p { font-size: 0.9rem; color: #ccc; margin-bottom: 20px; }
 

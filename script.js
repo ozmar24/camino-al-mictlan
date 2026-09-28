@@ -1659,7 +1659,7 @@ const respuesta = await fetch('/api/reclamar', {
 function cerrarRitual() {
     const modal = document.getElementById('modal-ritual'); 
     const cementerio = document.getElementById('campo-santo'); 
-    if(modal) modal.style.display = 'none'; 
+    if(modal) { modal.style.display = 'none'; modal.classList.remove('modal-sobre-traga'); } 
     if(cementerio) cementerio.style.filter = "none"; 
 }
 
@@ -2838,16 +2838,89 @@ window.retirarTragaMetaMask = async function () {
         lanzarAlertaMictlan('Mínimo de retiro: 100 SG de saldo casino.', 'TRAGAMONEDAS');
         return;
     }
-    const wallet = prompt('Dirección de tu MetaMask (0x...):');
+
+    // Modal temático (mismo estilo que el ritual de las criptas) en lugar del
+    // cuadro gris nativo del navegador
+    prepararModalRetiroMetaMask();
+};
+
+// ==================================================================
+// MODAL DE RETIRO A METAMASK (mismo estilo que el ritual de criptas)
+// ==================================================================
+function prepararModalRetiroMetaMask() {
+    const modal = document.getElementById('modal-ritual');
+    if (!modal) return;
+
+    // Pinta la interfaz de retiro. Se reaplica tras un instante porque otros
+    // flujos (bloqueos de pantalla, estiloDark) reescriben el contenido del
+    // modal y podrian tapar esta seccion si corren a la vez.
+    const aplicar = () => {
+        const titulo  = document.getElementById('titulo-ritual');
+        const info    = document.getElementById('info-ritual');
+        const botones = modal.querySelector('.botones-exchange');
+
+        if (titulo) titulo.innerText = 'RETIRO A METAMASK';
+        if (info) info.innerHTML = `
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="img/Meta1.png" alt="MetaMask" style="width: 56px; height: 56px;">
+                <p style="color: #aaa; margin-top: 12px;">
+                    Retirarás tu saldo del casino como <b style="color:#c8a951;">SG tokens</b>
+                    directamente a tu billetera MetaMask.
+                </p>
+                <p style="color:#888; font-size:13px; margin-top:8px;">
+                    Al aceptar, se abrirá MetaMask para autorizar el retiro.
+                </p>
+            </div>`;
+
+        // (Re)construye la zona de botones: los modales de criptas reescriben
+        // .botones-exchange con sus opciones, asi que garantizamos la nuestra.
+        // ACEPTAR ejecuta el retiro; CANCELAR cierra sin hacer nada.
+        if (botones) {
+            botones.style.display = 'flex';
+            botones.style.flexDirection = 'column';
+            botones.style.gap = '8px';
+            botones.style.alignItems = 'stretch';
+            botones.innerHTML = `
+                <button id="btn-confirmar-retiro-metamask" class="pentaculo-cursor"
+                        style="background: linear-gradient(145deg, #2b0a0a, #4a0000); color: #ffcc66; border: 2px solid #c8a951; padding: 12px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%;">
+                    📤 ACEPTAR RETIRO A METAMASK
+                </button>
+                <button class="pentaculo-cursor" onclick="cerrarRitual()"
+                        style="background: transparent; color: #666; padding: 6px; border: none; font-size: 12px; letter-spacing: 1px; cursor: pointer; width: 100%;">
+                    CANCELAR
+                </button>`;
+            const btnMM = document.getElementById('btn-confirmar-retiro-metamask');
+            if (btnMM) btnMM.onclick = confirmarRetiroMetaMask;
+        }
+
+        modal.classList.add('modal-sobre-traga');
+        modal.style.display = 'block';
+        const cementerio = document.getElementById('campo-santo');
+        if (cementerio) cementerio.style.filter = "none";
+    };
+
+    modal.style.display = 'none';
+    aplicar();
+    setTimeout(aplicar, 120);
+}
+
+async function confirmarRetiroMetaMask() {
+    cerrarRitual();
+
+    // Abre/asesora MetaMask y devuelve la dirección conectada (null si cancela)
+    const wallet = await conectarMetaMask();
     if (!wallet) return;
-    const { ok, data } = await tragaApi('retirar', { wallet: wallet.trim() });
+
+    const { ok, data } = await tragaApi('retirar', { wallet: wallet });
     if (!ok || !data || !data.success) {
         lanzarAlertaMictlan((data && data.error) || 'El retiro falló.', 'TRAGAMONEDAS');
         return;
     }
     tragaRefrescarDisplays(data.casino, data.balanceSG);
     lanzarAlertaMictlan(data.mensaje || 'Retiro completado.', 'RITUAL COMPLETADO');
-};
+}
+
+window.prepararModalRetiroMetaMask = prepararModalRetiroMetaMask;
 
 async function cargarABI() {
     try {
