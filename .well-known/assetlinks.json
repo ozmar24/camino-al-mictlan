@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.caminoamictlan.twa",
+        "sha256_cert_fingerprints": ["0B:C7:EE:63:12:F8:99:A2:C2:A8:99:18:07:25:F0:BD:DD:30:8E:47:50:5F:F6:7B:EC:6E:78:36:49:88:53:BF"]
+      }
+    }]
