@@ -2900,6 +2900,12 @@ async function tragaSincronizarSaldoFlotante() {
 tragaSincronizarSaldoFlotante();
 
 window.retirarTragaMetaMask = async function () {
+    // Politica de seguridad: retiros solo en PC (consistente con el flujo de criptas).
+    // En movil no existe la extension de MetaMask y se evitan riesgos de apps maliciosas.
+    if (typeof isMobile !== 'undefined' && isMobile) {
+        lanzarAlertaMictlan('Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).', 'SANTUARIO PC REQUERIDO');
+        return;
+    }
     if (!tragaUltimoSaldo || tragaUltimoSaldo < 100) {
         lanzarAlertaMictlan('Mínimo de retiro: 100 SG de saldo casino.', 'TRAGAMONEDAS');
         return;
