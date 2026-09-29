@@ -2805,7 +2805,7 @@ function tragaAjustarLayout() {
     const colJuego = document.getElementById('columna-juego-traga');
     const colResult = document.getElementById('columna-resultados-traga');
     if (!zona || !colJuego || !colResult) return;
-    const horizontal = window.matchMedia('(max-width: 820px) and (orientation: landscape)').matches;
+    const horizontal = window.matchMedia('(orientation: landscape) and ((max-width: 1100px) or (max-height: 520px))').matches;
     if (horizontal && zona.parentElement !== colResult) {
         colResult.insertBefore(zona, colResult.firstChild);
     } else if (!horizontal && zona.parentElement !== colJuego) {
@@ -2821,6 +2821,9 @@ window.abrirTragamonedas = async function () {
     if (!panel) return;
     panel.style.display = 'flex';
     tragaAjustarLayout();
+    // Oculta el boton de instalar mientras se juega: no estorba al selector de lineas
+    const btnPWA = document.getElementById('btn-instalar-pwa');
+    if (btnPWA) btnPWA.style.display = 'none';
     tragaRefrescarDisplays(null);
     if (!tragaSimbolos.length) {
         tragaSimbolos = ['Vela', 'Hueso', 'Cempasuchil', 'Calavera', 'Xoloit', 'Macuahuitl', 'Mictlantecuhtli', 'Soulgeist'];
@@ -2837,6 +2840,9 @@ window.abrirTragamonedas = async function () {
 window.cerrarTragamonedas = function () {
     const panel = document.getElementById('panel-traga');
     if (panel) panel.style.display = 'none';
+    // Restaura el boton de instalar si el navegador sigue ofreciendo la instalacion
+    const btnPWA = document.getElementById('btn-instalar-pwa');
+    if (btnPWA && window.eventoInstalacionPWA) btnPWA.style.display = 'block';
 };
 
 window.cambiarLineasTraga = function (delta) {
@@ -2849,6 +2855,9 @@ window.girarTragamonedas = async function () {
     const btn = document.getElementById('btn-girar-traga');
     tragaGirando = true;
     if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
+    // Limpia el resaltado dorado de la tirada anterior: como las celdas ahora
+    // se reutilizan, la clase persistiria congelada durante todo el giro
+    document.querySelectorAll('#grid-traga .celda-ganadora').forEach(el => el.classList.remove('celda-ganadora'));
     try {
         const { ok, data } = await tragaApi('girar', { lineas: tragaLineas });
         if (!ok || !data || !data.success) {
