@@ -1,14 +1,20 @@
 {
+  "id": "/",
   "name": "Camino al Mictlán",
   "short_name": "Mictlán",
   "description": "Reclama las almas de las cripto, el ecosistema Web3 y la liquidez bloqueada.",
   "lang": "es",
+  "dir": "ltr",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#0a0000",
   "theme_color": "#8b0000",
+  "categories": ["entertainment", "games", "finance"],
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/img/icon-192.png",
@@ -27,6 +33,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Jugar Tragamonedas",
+      "short_name": "Traga",
+      "description": "Abre el cementerio para jugar la tragamonedas.",
+      "url": "/index.html?ref=shortcut-traga",
+      "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bóveda del Mictlán",
+      "short_name": "Bóveda",
+      "description": "Compra tokens SG directamente.",
+      "url": "/index.html?ref=shortcut-boveda",
+      "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
