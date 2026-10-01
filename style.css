@@ -2454,6 +2454,10 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
+    /* Las celdas se crean columna por columna (grid[col][fila], igual que el
+       servidor). Sin esto, CSS Grid las pinta fila por fila y el tablero se
+       muestra transpuesto: las líneas horizontales se ven verticales. */
+    grid-auto-flow: column;
     gap: 6px;
     flex: 1 1 auto;
     min-height: 0;
