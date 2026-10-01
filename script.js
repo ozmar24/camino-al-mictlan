@@ -1032,6 +1032,10 @@ function cambiarModoAuth() {
     const btnAuth = document.getElementById('btn-auth'); 
     const toggleText = document.getElementById('toggle-auth-text'); 
 
+    // El consentimiento legal (Términos + Privacidad + 18+) solo se pide al registrarse
+    const contConsent = document.getElementById('contenedor-consent-legal');
+    if (contConsent) contConsent.style.display = esModoRegistro ? 'flex' : 'none';
+
     if (esModoRegistro) {
         tagline.innerText = "REGISTRO DE ALMAS"; 
         btnAuth.innerText = "SELLAR NUEVA IDENTIDAD"; 
@@ -1047,6 +1051,35 @@ function cambiarModoAuth() {
 // ==================================================================
 // FASE 2 -> FASE 3: VALIDACIÓN Y ENTRADA AL CAMPO SANTO (CONECTADO A API)
 // ==================================================================
+
+/** ¿El usuario marcó la casilla de consentimiento legal (+18, Términos, Privacidad)? */
+function consentimientoLegalAceptado() {
+    const chk = document.getElementById('chk-consent-legal');
+    return !!(chk && chk.checked);
+}
+
+// Cláusula EXACTA que el servidor exige en el registro (debe coincidir con
+// api/pacto.js y api/auth-google.js): evidencia del consentimiento +18/legal.
+const CLAUSULAS_LEGALES = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
+
+/** Muestra y resalta la casilla de consentimiento (la usa el flujo de Google). */
+function mostrarConsentimientoLegal() {
+    const cont = document.getElementById('contenedor-consent-legal');
+    if (!cont) return;
+    cont.style.display = 'flex';
+    cont.style.borderColor = '#ff4500';
+    try { cont.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { /* silencioso */ }
+}
+
+/** Pantalla legal (Términos / Privacidad) reutilizando el estilo del grimorio. */
+window.abrirPantallaLegal = function (tipo) {
+    const pantalla = document.getElementById('pantalla-legal');
+    const titulo = document.getElementById('legal-titulo');
+    if (!pantalla) return;
+    if (titulo) titulo.innerText = tipo === 'privacidad' ? 'AVISO DE PRIVACIDAD' : 'TÉRMINOS DEL SERVICIO';
+    pantalla.style.display = 'flex';
+};
+
 async function manejarAuth() {
     const emailEl = document.getElementById('email');
     const passwordEl = document.getElementById('password');
@@ -1057,6 +1090,13 @@ async function manejarAuth() {
     const email = emailEl.value.trim();
     const password = passwordEl.value.trim();
     const accion = esModoRegistro ? 'registro' : 'login';
+
+    // Consentimiento legal obligatorio SOLO al crear el pacto (registro)
+    if (accion === 'registro' && !consentimientoLegalAceptado()) {
+        mostrarConsentimientoLegal();
+        lanzarAlertaMictlan("Debes confirmar que eres mayor de 18 años y aceptar los Términos y el Aviso de Privacidad.", "CONSENTIMIENTO REQUERIDO");
+        return;
+    }
 
     // VALIDACIÓN DE SEGURIDAD: solo requerido para registro
     if (accion === 'registro' && !turnstileToken) {
@@ -1081,7 +1121,8 @@ async function manejarAuth() {
                 email, 
                 password, 
                 accion, 
-                turnstileToken // <-- Aquí enviamos el token al servidor
+                turnstileToken, // <-- Aquí enviamos el token al servidor
+                aceptaLegal: (accion === 'registro' && consentimientoLegalAceptado()) ? CLAUSULAS_LEGALES : undefined
             })
         });
 
@@ -1122,6 +1163,9 @@ async function manejarAuth() {
 async function manejarLoginGoogle(response) {
    
     const tokenParaEnviar = turnstileToken || ""; 
+    // Consentimiento legal: se exige solo al crear la cuenta; para logins
+    // posteriores el servidor lo ignora si el usuario ya existe
+    const aceptaLegal = consentimientoLegalAceptado() ? CLAUSULAS_LEGALES : "";
 
     try {
         const DOMINIO_VERCEL = window.location.origin; 
@@ -1131,7 +1175,8 @@ async function manejarLoginGoogle(response) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 token: response.credential, 
-                turnstileToken: tokenParaEnviar 
+                turnstileToken: tokenParaEnviar,
+                aceptaLegal 
             })
         });
 
@@ -1150,6 +1195,12 @@ async function manejarLoginGoogle(response) {
             if (datos.error === "PUZZLE_REQUIRED") {
                 lanzarAlertaMictlan("Completa el puzzle de seguridad e inténtalo de nuevo.", "SEGURIDAD");
                 regenerarPuzzleTurnstile();
+                
+            } else if (datos.error === "CONSENT_REQUIRED") {
+                // Registro nuevo con Google sin consentimiento legal: mostrar la
+                // casilla; al marcarla, bastará reintentar el botón de Google
+                mostrarConsentimientoLegal();
+                lanzarAlertaMictlan("Para sellar tu pacto debes confirmar que eres mayor de 18 años y aceptar los Términos y el Aviso de Privacidad, y volver a intentarlo.", "CONSENTIMIENTO REQUERIDO");
                 
             } else {
                 lanzarAlertaMictlan(datos.error || "Fallo al autenticar con Google.", "ERROR GOOGLE");

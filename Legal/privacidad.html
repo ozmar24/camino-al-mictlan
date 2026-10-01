@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso de Privacidad — Camino al Mictlán</title>
+    <meta name="robots" content="index, follow">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Nosifer&display=swap" rel="stylesheet">
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #0a0000;
+            color: #ffcccc;
+            font-family: 'MedievalSharp', cursive;
+            line-height: 1.7;
+            padding: 24px 16px 60px;
+        }
+        .pergamino {
+            max-width: 820px;
+            margin: 0 auto;
+            background: rgba(18, 4, 4, 0.95);
+            border: 2px solid #4a0000;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 69, 0, 0.35);
+            padding: 32px 28px;
+        }
+        h1 {
+            font-family: 'Nosifer', cursive;
+            color: #ff4500;
+            font-size: 1.4rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+            margin: 0 0 6px;
+        }
+        .actualizado { text-align: center; color: #aa6666; font-size: 0.8rem; margin-bottom: 22px; }
+        h2 { color: #ffd700; font-size: 1.05rem; margin: 26px 0 8px; border-bottom: 1px solid #4a0000; padding-bottom: 4px; }
+        p, li { font-size: 0.92rem; }
+        ul { padding-left: 22px; }
+        a { color: #ffd700; }
+        .pie { text-align: center; margin-top: 30px; font-size: 0.8rem; color: #aa6666; }
+        .pie a { margin: 0 8px; }
+    </style>
+</head>
+<body>
+    <div class="pergamino">
+        <h1>AVISO DE PRIVACIDAD</h1>
+        <p class="actualizado">Camino al Mictlán · Soulgeist (SG) · Última actualización: 1 de octubre de 2026</p>
+
+        <h2>1. Responsable del tratamiento</h2>
+        <p>Camino al Mictlán (Soulgeist), con contacto oficial:
+        <a href="mailto:ozmar2408.ma@caminoamictlan.com">ozmar2408.ma@caminoamictlan.com</a>.</p>
+
+        <h2>2. Datos que recabamos</h2>
+        <ul>
+            <li><strong>Cuenta:</strong> correo electrónico y contraseña (almacenada únicamente como hash
+            criptográfico con bcrypt; nunca en texto plano).</li>
+            <li><strong>Inicio de sesión con Google:</strong> correo, nombre y foto de perfil que Google
+            comparte al autorizar el acceso.</li>
+            <li><strong>Juego:</strong> balances de SG y demás criptas, historial de giros, tiradas gratis y
+            estado del casino asociado a tu cuenta.</li>
+            <li><strong>Retiros:</strong> la dirección de wallet pública que indiques para recibir tokens
+            (las direcciones son públicas por naturaleza de la blockchain).</li>
+            <li><strong>Seguridad:</strong> dirección IP, resultados de verificación anti-bot (Cloudflare
+            Turnstile, escudo VPN/proxy) y contadores de peticiones, exclusivamente para prevenir fraude,
+            bots y abusos.</li>
+        </ul>
+
+        <h2>3. Finalidades</h2>
+        <ul>
+            <li>Crear y operar tu cuenta, acreditar balances y procesar giros, retiros y canalizaciones.</li>
+            <li>Proteger la Plataforma contra fraude, cuentas automatizadas, VPN abusivas y doble registro.</li>
+            <li>Enviarte alertas operativas internas (por ejemplo, registro de retiros a nuestro canal
+            privado de Telegram de administración; estos avisos no exponen tus datos a terceros públicos).</li>
+            <li>Dar soporte y responder solicitudes.</li>
+        </ul>
+        <p>No vendemos, rentamos ni cedemos tus datos personales a terceros con fines publicitarios.</p>
+
+        <h2>4. Encargados y proveedores</h2>
+        <ul>
+            <li><strong>Vercel</strong> — alojamiento y despliegue de la Plataforma.</li>
+            <li><strong>Upstash (Redis)</strong> — almacenamiento de cuentas, sesiones y saldos de juego.</li>
+            <li><strong>Google Identity Services</strong> — autenticación con Google (solo si la usas).</li>
+            <li><strong>Cloudflare Turnstile</strong> — verificación anti-bot en el registro.</li>
+            <li><strong>Proveedores RPC de Polygon</strong> (Ankr, PublicNode, QuikNode u otros) — envío de
+            tokens al retirar.</li>
+        </ul>
+        <p>Estos proveedores procesan datos estrictamente para prestar su servicio conforme a sus propias
+        políticas de privacidad.</p>
+
+        <h2>5. Almacenamiento local (cookies y similares)</h2>
+        <p>La Plataforma utiliza <em>localStorage</em> del navegador para mantener tu sesión y mostrar saldos.
+        No empleamos cookies de publicidad ni rastreadores de terceros con fines comerciales.</p>
+
+        <h2>6. Conservación</h2>
+        <p>Conservamos los datos de tu cuenta mientras exista. Si solicitas la eliminación, borraremos tu
+        cuenta y datos personales; ciertos registros mínimos podrán conservarse por razones de seguridad o
+        obligaciones legales. Ten en cuenta que las transacciones en blockchain son públicas e inmutables.</p>
+
+        <h2>7. Tus derechos (ARCO)</h2>
+        <p>Puedes ejercer tus derechos de <strong>acceso, rectificación, cancelación y oposición</strong>,
+        así como solicitar la eliminación de tu cuenta, escribiendo a
+        <a href="mailto:ozmar2408.ma@caminoamictlan.com">ozmar2408.ma@caminoamictlan.com</a>. Responderemos
+        en un plazo razonable y verificaremos tu identidad como titular de la cuenta.</p>
+
+        <h2>8. Menores</h2>
+        <p>La Plataforma está dirigida exclusivamente a personas mayores de 18 años. No recabamos
+        intencionalmente datos de menores; si detectamos una cuenta de un menor de edad será eliminada.</p>
+
+        <h2>9. Cambios</h2>
+        <p>Cualquier modificación sustancial a este aviso se publicará en esta misma página.</p>
+
+        <p class="pie">
+            <a href="/Legal/terminos.html">Términos del Servicio</a> ·
+            <a href="/">← Volver al Mictlán</a>
+        </p>
+    </div>
+</body>
+</html>

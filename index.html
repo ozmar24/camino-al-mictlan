@@ -120,6 +120,10 @@
         📜 CONSULTAR PACTO TÉCNICO
     </button>
 
+    <div class="aviso-legal-portal">
+        🔞 +18 · Juego responsable · <a onclick="event.stopPropagation(); abrirPantallaLegal('terminos')" href="javascript:void(0)">Términos</a> · <a onclick="event.stopPropagation(); abrirPantallaLegal('privacidad')" href="javascript:void(0)">Privacidad</a>
+    </div>
+
     <div class="resplandor-suelo"></div>
 </div>
 
@@ -151,6 +155,10 @@
             <div class="formulario-goth">
     <input type="email" id="email" placeholder="CORREO DEL PACTO" autocomplete="email" class="input-pergamino-goth">
     <input type="password" id="password" placeholder="LLAVE SECRETA" autocomplete="current-password" class="input-pergamino-goth">
+    <label class="consentimiento-legal" id="contenedor-consent-legal" style="display: none;">
+        <input type="checkbox" id="chk-consent-legal">
+        <span>Mayor de 18 años. Acepto los <a href="/Legal/terminos.html" target="_blank" rel="noopener">Términos</a> y el <a href="/Legal/privacidad.html" target="_blank" rel="noopener">Aviso de Privacidad</a>.</span>
+    </label>
     <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
 </div>
 
@@ -304,6 +312,28 @@
         </div>
     </div>
 
+    <!-- PANTALLA LEGAL: Términos del Servicio y Aviso de Privacidad -->
+    <div id="pantalla-legal" class="capa-oscura" style="display: none;">
+        <div class="pergamino-quemado">
+            <h2 id="legal-titulo">TÉRMINOS DEL SERVICIO</h2>
+            <div id="legal-cuerpo">
+                <p class="caja-aviso-legal">
+                    🔞 Plataforma exclusiva para <strong>mayores de 18 años</strong>.
+                    La tragamonedas es un juego de azar virtual con premios en el token Soulgeist (SG).
+                    <strong>Juega de forma responsable:</strong> destina solo el tiempo y los activos que
+                    puedas permitirte perder. No hay garantía de ganancia; el retorno esperado a largo plazo
+                    es aproximadamente del 93% (RTP).
+                </p>
+                <a href="/Legal/terminos.html" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">📜 TÉRMINOS DEL SERVICIO (PDF/HTML)</a>
+                <a href="/Legal/privacidad.html" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">🔒 AVISO DE PRIVACIDAD</a>
+                <a href="/Legal/Pacto_Tecnico_Soulgeist.pdf" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">🤝 PACTO TÉCNICO DE SOULGEIST (ES)</a>
+                <p class="legal-nota">El uso de la Plataforma implica la aceptación íntegra de estos
+                documentos y la declaración de ser mayor de edad conforme a tu jurisdicción.</p>
+            </div>
+            <div class="boton-cerrar-codice" onclick="document.getElementById('pantalla-legal').style.display='none'">[ CERRAR ]</div>
+        </div>
+    </div>
+
     <div id="pantalla-oraculo" class="capa-oscura">
         <div class="espejo-arcaico">
             <div class="espejo-superficie">
@@ -381,6 +411,7 @@
                 <div><span class="etiqueta-traga">SALDO CASINO:</span> <span id="saldo-casino-display-modal" class="valor-casino">0.00 SG</span></div>
                 <div><span class="etiqueta-traga">🎁 GRATIS:</span> <span id="gratis-restantes-display" class="valor-gratis">0</span><span class="etiqueta-traga">/5</span></div>
             </div>
+            <p class="aviso-18-traga">🔞 +18 · Juego de azar virtual con premios en SG. Juega responsablemente. <a onclick="abrirPantallaLegal('terminos')" href="javascript:void(0)">Términos</a></p>
             <div id="grid-traga"></div>
             <div id="selector-lineas-traga">
                 <button onclick="cambiarLineasTraga(-1)" class="btn-flecha-traga">−</button>

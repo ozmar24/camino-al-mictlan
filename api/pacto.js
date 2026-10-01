@@ -77,6 +77,13 @@ export default async function handler(req, res) {
                 return res.status(403).json({ success: false, error: 'PUZZLE_REQUIRED' });
             }
 
+            // Consentimiento legal obligatorio: solo adultos (18+) que acepten
+            // los Términos del Servicio y el Aviso de Privacidad verbalizados.
+            const CLAUSULAS = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
+            if (req.body?.aceptaLegal !== CLAUSULAS) {
+                return res.status(403).json({ success: false, error: 'CONSENT_REQUIRED' });
+            }
+
             // 1. Incrementamos el contador ANTES de hacer nada más.
             const incrRes = await redisCmd('INCR', 'contador_almas');
             const numeroUsuario = parseInt(incrRes?.result || 0);

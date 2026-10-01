@@ -2816,6 +2816,77 @@ a:hover {
     }
 }
 
+/* ==================================================================
+   LEGAL: aviso +18 en portal, consentimiento en registro y pantalla legal
+   ================================================================== */
+.aviso-legal-portal {
+    position: absolute;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.68rem;
+    color: #aa6666;
+    z-index: 5;
+    text-shadow: 1px 1px 2px #000;
+}
+.aviso-legal-portal a {
+    color: #c98f8f;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.aviso-legal-portal a:hover { color: #ffd700; }
+
+.consentimiento-legal {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #d9a0a0;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid #4a0000;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 4px 0 2px;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+}
+.consentimiento-legal input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    margin-top: 1px;
+    accent-color: #ff4500;
+    cursor: pointer;
+}
+.consentimiento-legal a { color: #ffd700; text-decoration: underline; }
+
+.aviso-18-traga {
+    margin: 2px 0 4px;
+    font-size: 0.62rem;
+    color: #aa6666;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+}
+.aviso-18-traga a { color: #c98f8f; text-decoration: underline; cursor: pointer; }
+.aviso-18-traga a:hover { color: #ffd700; }
+
+#pantalla-legal .pergamino-quemado { max-width: 640px; }
+.caja-aviso-legal {
+    border: 2px solid #8B0000;
+    background: rgba(139, 0, 0, 0.18);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #ffcccc;
+}
+.caja-aviso-legal strong { color: #ff4500; }
+.btn-legal-enlace { display: block; margin: 10px auto; width: 85%; }
+.legal-nota { font-size: 0.72rem; color: #aa6666; margin-top: 10px; }
+
 /* Resaltado de combinaciones ganadoras: sutil en movil, sin tapar las imagenes */
 @media (max-width: 1100px) {
     #grid-traga .celda-traga.celda-ganadora {
