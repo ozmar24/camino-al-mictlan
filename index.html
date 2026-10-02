@@ -9,11 +9,31 @@
     <meta name="referrer" content="no-referrer-when-downgrade" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cementerio - El Umbral del Mictlán</title>
+    <title>Camino al Mictlán - Tragamonedas Web3 | Token Soulgeist (SG)</title>
     <link rel="icon" type="image/png" href="/img/Soul.png">
+
+    <!-- SEO: canonical y metadatos sociales -->
+    <link rel="canonical" href="https://www.caminoamictlan.com/">
+    <meta name="description" content="Camino al Mictlán 💀. Tragamonedas Web3 con token Soulgeist (SG) en Polygon. Gana SG, retira a MetaMask y participa por 500 SG en la bonificación de almas fundadoras. ¡Solo 50 cupos!">
+
+    <!-- OpenGraph -->
+    <meta property="og:title" content="Camino al Mictlán - Tragamonedas Web3 con Token Soulgeist (SG)">
+    <meta property="og:description" content="Juega la tragamonedas del Mictlán y gana tokens Soulgeist (SG) en la red Polygon. Bonificación de 500 SG para los primeros 50 jugadores. ¡Regístrate gratis!">
+    <meta property="og:image" content="https://www.caminoamictlan.com/img/Mictlantecuhtli.png">
+    <meta property="og:url" content="https://www.caminoamictlan.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_MX">
+    <meta property="og:site_name" content="Camino al Mictlán">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Camino al Mictlán - Tragamonedas Web3 con Token Soulgeist (SG)">
+    <meta name="twitter:description" content="Juega la tragamonedas del Mictlán y gana tokens Soulgeist (SG). Bonificación de 500 SG para los primeros 50 jugadores.">
+    <meta name="twitter:image" content="https://www.caminoamictlan.com/img/Mictlantecuhtli.png">
+    <meta name="twitter:site" content="@SOULGEIST-SG">
     <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Butcherman&family=Metal+Mania&family=UnifrakturMaguntia&family=MedievalSharp&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1002">
-    <meta name="description" content="Bienvenido a Camino al Mictlán 💀 . Reclama las almas de las cripto 👻, el ecosistema Web3, la liquidez bloqueada y únete a nuestras redes oficiales.">
+    <link rel="stylesheet" href="style.css?v=1004">
+
 
     <!-- PWA: instalable en moviles (base para el APK) -->
     <link rel="manifest" href="/manifest.json">
@@ -120,8 +140,13 @@
         📜 CONSULTAR PACTO TÉCNICO
     </button>
 
+    <!-- Modo demo: probar la tragamonedas sin crear cuenta -->
+    <button id="btn-demo-portal" onclick="event.stopPropagation(); window.jugarDemoTragamonedas && window.jugarDemoTragamonedas()">
+        🎰 JUGAR DEMO SIN CUENTA
+    </button>
+
     <div class="aviso-legal-portal">
-        🔞 +18 · Juego responsable · <a onclick="event.stopPropagation(); abrirPantallaLegal('terminos')" href="javascript:void(0)">Términos</a> · <a onclick="event.stopPropagation(); abrirPantallaLegal('privacidad')" href="javascript:void(0)">Privacidad</a>
+        🔞  
     </div>
 
     <div class="resplandor-suelo"></div>
@@ -138,8 +163,8 @@
     text-align: center;
     z-index: 1000;">
 
-    <p style="color: #ff4500; font-family: 'Nosifer', sans-serif; font-size: 0.9rem; text-shadow: 2px 2px 4px #000; margin-bottom: 5px;">
-        ALMAS FUNDADORAS: 50 / 50
+    <p id="texto-almas-fundadoras" style="color: #ff4500; font-family: 'Nosifer', sans-serif; font-size: 0.9rem; text-shadow: 2px 2px 4px #000; margin-bottom: 5px;">
+        ALMAS FUNDADORAS: 0 / 50
     </p>
     <div style="background: rgba(0,0,0,0.7); height: 8px; width: 100%; border: 1px solid #ff4500; border-radius: 4px; overflow: hidden; box-shadow: 0 0 10px #ff4500;">
         <div id="barra-progreso" style="background: #ff4500; height: 100%; width: 100%;"></div>
@@ -157,7 +182,7 @@
     <input type="password" id="password" placeholder="LLAVE SECRETA" autocomplete="current-password" class="input-pergamino-goth">
     <label class="consentimiento-legal" id="contenedor-consent-legal" style="display: none;">
         <input type="checkbox" id="chk-consent-legal">
-        <span>Mayor de 18 años. Acepto los <a href="/Legal/terminos.html" target="_blank" rel="noopener">Términos</a> y el <a href="/Legal/privacidad.html" target="_blank" rel="noopener">Aviso de Privacidad</a>.</span>
+        <span>Mayor de 18 años. Acepto los <a href="/Legal/terminos.html">Términos</a> y el <a href="/Legal/privacidad.html">Aviso de Privacidad</a>.</span>
     </label>
     <button id="btn-auth" onclick="manejarAuth()" class="btn-ritual-grimorio pentaculo-cursor">ACCEDER AL CEMENTERIO</button>
 </div>
@@ -324,13 +349,13 @@
                     puedas permitirte perder. No hay garantía de ganancia; el retorno esperado a largo plazo
                     es aproximadamente del 93% (RTP).
                 </p>
-                <a href="/Legal/terminos.html" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">📜 TÉRMINOS DEL SERVICIO (PDF/HTML)</a>
-                <a href="/Legal/privacidad.html" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">🔒 AVISO DE PRIVACIDAD</a>
+                <a href="/Legal/terminos.html" class="btn-ritual-grimorio btn-legal-enlace">📜 TÉRMINOS DEL SERVICIO (PDF/HTML)</a>
+                <a href="/Legal/privacidad.html" class="btn-ritual-grimorio btn-legal-enlace">🔒 AVISO DE PRIVACIDAD</a>
                 <a href="/Legal/Pacto_Tecnico_Soulgeist.pdf" target="_blank" rel="noopener" class="btn-ritual-grimorio btn-legal-enlace">🤝 PACTO TÉCNICO DE SOULGEIST (ES)</a>
                 <p class="legal-nota">El uso de la Plataforma implica la aceptación íntegra de estos
                 documentos y la declaración de ser mayor de edad conforme a tu jurisdicción.</p>
             </div>
-            <div class="boton-cerrar-codice" onclick="document.getElementById('pantalla-legal').style.display='none'">[ CERRAR ]</div>
+            <div id="legal-cerrar-btn" class="boton-cerrar-codice pentaculo-cursor">[ VOLVER AL CEMENTERIO ]</div>
         </div>
     </div>
 
@@ -381,14 +406,16 @@
 
 <div id="cursor-serpiente"></div>
 
-<footer style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 5px 0 10px 0; background: rgba(0, 0, 0, 0.4); color: #555; font-family: 'MedievalSharp', cursive; z-index: 10000; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;">
-    <p style="margin: 0; font-size: 0.75rem; text-shadow: 1px 1px 2px #000;">
-        Contacto Oficial:
-        <a href="mailto:ozmar2408.ma@caminoamictlan.com" style="color: #8B0000; text-decoration: none;">
-            ozmar2408.ma@caminoamictlan.com
-        </a>
+<footer id="barra-inferior" style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 6px 14px 8px 14px; background: rgba(0, 0, 0, 0.55); color: #555; font-family: 'MedievalSharp', cursive; z-index: 2500; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-sizing: border-box;">
+    <div class="footer-zona footer-legal">
+        <a href="/Legal/terminos.html">📜 Términos</a>
+        <a href="/Legal/privacidad.html">🔒 Privacidad</a>
+    </div>
+    <p class="footer-zona footer-contacto" style="margin: 0; flex: 0 0 auto; font-size: 0.72rem; text-shadow: 1px 1px 2px #000;">
+        Contacto:
+        <a href="mailto:ozmar2408.ma@caminoamictlan.com" style="color: #8B0000; text-decoration: none;">ozmar2408.ma@caminoamictlan.com</a>
     </p>
-
+    <div class="footer-zona footer-redes">
     <div class="redes-mictlan">
         <a href="https://x.com/MartinAlmarazm" target="_blank" rel="noopener" class="icono-red" title="Síguenos en X" aria-label="X (Twitter)">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -400,8 +427,29 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2A31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8a3.02 3.02 0 0 0 2.12 2.14c1.88.56 9.38.56 9.38.56s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"/></svg>
         </a>
     </div>
-</footer>    <script src="/js/ethers.umd.min.js"></script>
-    <script type="module" src="script.js?v=6" defer></script><!-- === MODAL PRINCIPAL DE TRAGAMONEDAS === -->
+    </div>
+</footer>    <script>
+        // EMPATE LEGAL: sincroniza el pergamino LEYES del cementerio con las paginas legales reales
+        (function cablearLeyesLegales() {
+            window.abrirDocumentacionLegal = function (tipo) {
+                var panel = document.getElementById('pantalla-legal');
+                if (!panel) return;
+                var titulo = document.getElementById('legal-titulo');
+                if (titulo) titulo.innerText = tipo === 'privacidad' ? 'AVISO DE PRIVACIDAD' : 'TÉRMINOS DEL SERVICIO';
+                panel.style.display = 'flex';
+            };
+            document.addEventListener('DOMContentLoaded', function () {
+                var btnCerrarLegal = document.getElementById('legal-cerrar-btn');
+                if (btnCerrarLegal) {
+                    btnCerrarLegal.onclick = function () {
+                        var panel = document.getElementById('pantalla-legal');
+                        if (panel) panel.style.display = 'none';
+                    };
+                }
+            });
+        })();
+    </script>    <script src="/js/ethers.umd.min.js"></script>
+    <script type="module" src="script.js?v=7" defer></script><!-- === MODAL PRINCIPAL DE TRAGAMONEDAS === -->
 <!-- Modal de la tragamonedas. Estructura aqui, estilos en style.css (seccion TRAGAMONEDAS) -->
 <div id="panel-traga" class="modal-oculto">
     <div id="panel-traga-contenedor">
@@ -411,7 +459,7 @@
                 <div><span class="etiqueta-traga">SALDO CASINO:</span> <span id="saldo-casino-display-modal" class="valor-casino">0.00 SG</span></div>
                 <div><span class="etiqueta-traga">🎁 GRATIS:</span> <span id="gratis-restantes-display" class="valor-gratis">0</span><span class="etiqueta-traga">/5</span></div>
             </div>
-            <p class="aviso-18-traga">🔞 +18 · Juego de azar virtual con premios en SG. Juega responsablemente. <a onclick="abrirPantallaLegal('terminos')" href="javascript:void(0)">Términos</a></p>
+            <p class="aviso-18-traga">🔞 +18 · Juego de azar virtual con premios en SG. Juega responsablemente. <a onclick="event.stopPropagation();" href="/Legal/terminos.html">Términos</a></p>
             <div id="grid-traga"></div>
             <div id="selector-lineas-traga">
                 <button onclick="cambiarLineasTraga(-1)" class="btn-flecha-traga">−</button>

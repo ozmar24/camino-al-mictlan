@@ -68,7 +68,7 @@ async function handler(req, res) {
 
             // Consentimiento legal obligatorio para NUEVAS cuentas con Google.
             // Los logins de cuentas ya existentes ignoran este campo.
-            const CLAUSULAS = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
+            const CLAUSULAS = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://www.caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://www.caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
             if (req.body?.aceptaLegal !== CLAUSULAS) {
                 return res.status(403).json({ success: false, error: 'CONSENT_REQUIRED' });
             }

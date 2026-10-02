@@ -1060,7 +1060,7 @@ function consentimientoLegalAceptado() {
 
 // Cláusula EXACTA que el servidor exige en el registro (debe coincidir con
 // api/pacto.js y api/auth-google.js): evidencia del consentimiento +18/legal.
-const CLAUSULAS_LEGALES = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
+const CLAUSULAS_LEGALES = 'He leído, soy mayor de 18 años y acepto los Términos del Servicio (https://www.caminoamictlan.com/Legal/terminos.html) y el Aviso de Privacidad (https://www.caminoamictlan.com/Legal/privacidad.html) de Camino al Mictlán.';
 
 /** Muestra y resalta la casilla de consentimiento (la usa el flujo de Google). */
 function mostrarConsentimientoLegal() {
@@ -1141,6 +1141,7 @@ async function manejarAuth() {
         if (accion === 'registro') {
             lanzarAlertaMictlan("¡Pacto sellado! Ahora inicia sesión.", "ALMA REGISTRADA");
             cambiarModoAuth();
+            await actualizarBarraProgreso();
         } else {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
@@ -1190,6 +1191,7 @@ async function manejarLoginGoogle(response) {
             await sincronizarBalanceConRedis();
             tragaSincronizarSaldoFlotante();
             entrarAlCampoSanto({ balanceSG: datos.perfil.balanceSG });
+            await actualizarBarraProgreso();
         } else {
            
             if (datos.error === "PUZZLE_REQUIRED") {
@@ -2017,6 +2019,7 @@ function mostrarPergamino(tipo) {
         <span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— REGLAS ETERNAS —</span>
         <span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
         <span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
+        <a href="/Legal/terminos.html" class="pentaculo-cursor" style="font-family:'MedievalSharp',cursive; font-size:0.65rem; letter-spacing:1px; display:block; color:#c98f8f; text-decoration:underline; margin-top:18px;">📜 VER DOCUMENTOS OFICIALES (TÉRMINOS Y PRIVACIDAD)</a>
     </div>
 `;
 
@@ -2891,6 +2894,12 @@ window.abrirTragamonedas = async function () {
 window.cerrarTragamonedas = function () {
     const panel = document.getElementById('panel-traga');
     if (panel) panel.style.display = 'none';
+    // Limpia el modo demo: banner, bandera y displays a sus valores reales
+    if (tragaDemoMode) {
+        tragaDemoMode = false;
+        document.getElementById('banner-demo-traga')?.remove();
+        tragaRefrescarDisplays(null);
+    }
     // Restaura el boton de instalar si el navegador sigue ofreciendo la instalacion
     const btnPWA = document.getElementById('btn-instalar-pwa');
     if (btnPWA && window.eventoInstalacionPWA) btnPWA.style.display = 'block';
@@ -2903,6 +2912,8 @@ window.cambiarLineasTraga = function (delta) {
 
 window.girarTragamonedas = async function () {
     if (tragaGirando) return;
+    // En modo demo el giro lo resuelve el motor local (sin servidor)
+    if (tragaDemoMode) { await window.girarDemoTragamonedas(); return; }
     const btn = document.getElementById('btn-girar-traga');
     tragaGirando = true;
     if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
@@ -2930,6 +2941,13 @@ window.girarTragamonedas = async function () {
 };
 
 window.reclamarTiradasGratisTraga = async function () {
+    // En modo demo, otorga spins gratis adicionales
+    if (tragaDemoMode) {
+        tragaDemoFreeSpins += 5;
+        tragaRefrescarDisplaysDemo();
+        lanzarAlertaMictlan('Has recibado 5 spins gratis de demostración. ¡Prueba tu suerte!', 'SPINS GRATIS');
+        return;
+    }
     const { ok, data } = await tragaApi('reclamar_gratis');
     if (!ok || !data || !data.success) {
         lanzarAlertaMictlan((data && data.error) || 'No se pudieron reclamar las tiradas.', 'TRAGAMONEDAS');
@@ -2951,6 +2969,11 @@ async function tragaSincronizarSaldoFlotante() {
 tragaSincronizarSaldoFlotante();
 
 window.retirarTragaMetaMask = async function () {
+    // En demo no hay saldo real que retirar: guia al registro
+    if (tragaDemoMode) {
+        lanzarAlertaMictlan('En el modo demo los créditos son ficticios. Crea tu cuenta para ganar SG reales y retirarlos a MetaMask.', 'MODO DEMO');
+        return;
+    }
     // Politica de seguridad: retiros solo en PC (consistente con el flujo de criptas).
     // En movil no existe la extension de MetaMask y se evitan riesgos de apps maliciosas.
     if (typeof isMobile !== 'undefined' && isMobile) {
@@ -3291,7 +3314,8 @@ async function conectarYRetirarMetaMask(pos) {
 
 async function actualizarBarraProgreso() {
     const barra = document.getElementById('barra-progreso');
-    const texto = document.querySelector('p[style*="font-family"]');
+    const texto = document.getElementById('texto-almas-fundadoras');
+    const contenedor = document.getElementById('contenedor-progreso-airdrop');
     if (!barra || !texto) return;
 
     try {
@@ -3300,7 +3324,7 @@ async function actualizarBarraProgreso() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ accion: 'estado_pacto' })
         });
-        
+
         // Si el servidor responde con error, salimos suavemente
         if (!res.ok) {
             console.warn("El inframundo no responde correctamente:", res.status);
@@ -3308,19 +3332,29 @@ async function actualizarBarraProgreso() {
         }
 
         const data = await res.json();
-        
+
         // Verificamos que 'data' tenga lo necesario
         if (data && typeof data.actual !== 'undefined') {
             const porcentaje = (data.actual / data.limite) * 100;
             barra.style.width = porcentaje + "%";
-            texto.innerText = data.actual >= 50 
-                ? "PACTO FUNDADOR CERRADO" 
-                : `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+
+            if (data.actual >= data.limite) {
+                // El bono de fundador está agotado: ocultamos el banner/barra
+                texto.innerText = "PACTO FUNDADOR CERRADO";
+                if (contenedor) contenedor.style.display = 'none';
+            } else {
+                texto.innerText = `ALMAS FUNDADORAS: ${data.actual} / ${data.limite}`;
+                if (contenedor) contenedor.style.display = 'block';
+            }
         }
     } catch (e) {
-        console.error("Fallo de conexión:", e);
+        // Fallo de red: mantén el contenedor visible con el último estado conocido
+        console.warn("Fallo de conexión al consultar el contador de almas:", e.message || e);
     }
 }
+
+// Refrescar la barra de progreso periódicamente (cada 30s)
+setInterval(actualizarBarraProgreso, 30000);
 
 // ==========================================================
 // CÓDICE: cableado inicial del botón [ CERRAR PACTO ]
@@ -3329,3 +3363,140 @@ async function actualizarBarraProgreso() {
     const btn = document.getElementById('btn-cerrar-codice');
     if (btn) btn.onclick = cerrarCodice;
 })();
+
+// ==================================================================
+// MODO DEMO DE LA TRAGAMONEDAS (sin registro, 100% client-side)
+// Deja que el visitante pruebe el juego en segundos. Todo es simulado
+// en el navegador: NADA de créditos ni premios reales. Al girar, se
+// le recuerda que debe crear su cuenta para jugar con SG de verdad.
+// ==================================================================
+let tragaDemoMode = false;
+let tragaDemoSaldo = 0;
+let tragaDemoFreeSpins = 0;
+
+window.jugarDemoTragamonedas = function () {
+    // Siempre entrar en modo demo desde cero, sin cargar saldos de sesión real.
+    // Se ignoran las sesiones guardadas en localStorage para no mostrar saldos reales.
+    tragaDemoMode = true;
+    tragaDemoSaldo = 0;
+    const panel = document.getElementById('panel-traga');
+    if (!panel) return;
+    panel.style.display = 'flex';
+    tragaAjustarLayout();
+    const btnPWA = document.getElementById('btn-instalar-pwa');
+    if (btnPWA) btnPWA.style.display = 'none';
+
+    // Banner del modo demo con acceso rápido al registro
+    const cab = document.getElementById('cabecera-traga');
+    if (cab && !document.getElementById('banner-demo-traga')) {
+        const b = document.createElement('div');
+        b.id = 'banner-demo-traga';
+        b.innerHTML = '🧪 <strong>MODO DEMOSTRACIÓN</strong> · créditos ficticios, sin premios reales · '
+            + '<a href="javascript:void(0)" onclick="window.cerrarTragamonedas(); window.entrarAlMictlan();">Crear cuenta para jugar de verdad</a>';
+        cab.parentNode.insertBefore(b, cab);
+    }
+    tragaRefrescarDisplaysDemo();
+    // Créditos iniciales de demo: 0 SG mostrados, pero con 5 tiradas gratis
+tragaDemoFreeSpins = 5; // 5 spins gratuitos para probar el juego
+    if (!tragaSimbolos.length) {
+        tragaSimbolos = ['Vela', 'Hueso', 'Cempasuchil', 'Calavera', 'Xoloit', 'Macuahuitl', 'Mictlantecuhtli', 'Soulgeist'];
+    }
+    tragaRenderGrid([['Vela','Hueso','Cempasuchil','Calavera','Xoloit'],['Macuahuitl','Mictlantecuhtli','Vela','Hueso','Cempasuchil'],['Calavera','Xoloit','Macuahuitl','Soulgeist','Vela'],['Hueso','Cempasuchil','Calavera','Xoloit','Macuahuitl'],['Mictlantecuhtli','Vela','Hueso','Cempasuchil','Calavera']]);
+};
+
+function tragaRefrescarDisplaysDemo() {
+    const s = document.getElementById('soulgeist-casino-display');
+    const c = document.getElementById('saldo-casino-display-modal');
+    const g = document.getElementById('gratis-restantes-display');
+    if (s) s.innerText = '—';
+    if (c) c.innerText = `${Number(tragaDemoSaldo).toFixed(2)} SG (demo)`;
+    if (g) g.innerText = String(tragaDemoFreeSpins);
+}
+
+// La sesión ganadora del demo se calcula con el MISMO motor de líneas que
+// usa el servidor (lib/traga-constantes.js vía api/tragamonedas.js), para
+// que el visitante pruebe exactamente el juego real.
+window.girarDemoTragamonedas = async function () {
+    if (tragaGirando) return;
+    const btn = document.getElementById('btn-girar-traga');
+    tragaGirando = true;
+    if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
+    document.querySelectorAll('#grid-traga .celda-ganadora').forEach(el => el.classList.remove('celda-ganadora'));
+    try {
+        // En demo: usar spins gratis primero, luego saldo demostración
+        if (tragaDemoFreeSpins > 0) {
+            tragaDemoFreeSpins--;
+            tragaRefrescarDisplaysDemo();
+        } else if (tragaDemoSaldo < 2) {
+            lanzarAlertaMictlan('Te quedaste sin créditos de demostración. Crea tu cuenta para reclamar tiradas gratis y jugar con SG de verdad.', 'FIN DEL DEMO');
+            return;
+        }
+        if (tragaDemoFreeSpins === 0) {
+            tragaDemoSaldo -= 2;
+            tragaRefrescarDisplaysDemo();
+        }
+
+        // Motor local (sin red): mismos pesos, líneas y pagos que el servidor
+        const SIMBOLOS = [
+            { nombre: 'Vela', peso: 16 }, { nombre: 'Hueso', peso: 16 },
+            { nombre: 'Cempasuchil', peso: 12 }, { nombre: 'Calavera', peso: 8 },
+            { nombre: 'Xoloit', peso: 7 }, { nombre: 'Macuahuitl', peso: 4 },
+            { nombre: 'Mictlantecuhtli', peso: 1 }
+        ];
+        const PAGOS = {
+            'Vela': { 3: 10, 4: 29, 5: 95 }, 'Hueso': { 3: 10, 4: 29, 5: 95 },
+            'Cempasuchil': { 3: 10, 4: 29, 5: 95 }, 'Calavera': { 3: 24, 4: 73, 5: 244 },
+            'Xoloit': { 3: 24, 4: 73, 5: 244 }, 'Macuahuitl': { 3: 24, 4: 73, 5: 244 },
+            'Mictlantecuhtli': { 3: 19, 4: 49, 5: 121 }
+        };
+        const PESO_TOTAL = SIMBOLOS.reduce((a, s) => a + s.peso, 0);
+        const grid = [];
+        for (let c = 0; c < 5; c++) {
+            const col = [];
+            for (let f = 0; f < 5; f++) {
+                let r = Math.floor(Math.random() * PESO_TOTAL);
+                let sim = SIMBOLOS[0].nombre;
+                for (const s of SIMBOLOS) { r -= s.peso; if (r < 0) { sim = s.nombre; break; } }
+                col.push(sim);
+            }
+            if (Math.random() < 1 / 20) col[Math.floor(Math.random() * 5)] = 'Soulgeist';
+            grid.push(col);
+        }
+
+        await new Promise(resolve => tragaAnimacionGiro(resolve));
+        tragaRenderGrid(grid);
+
+        // Evaluación con el motor oficial (importado del módulo compartido)
+        const { TRAGA, evaluarLinea } = await import('/lib/traga-constantes.js');
+        const lineasActivas = TRAGA.LINEAS.slice(0, tragaLineas);
+        let premio = 0;
+        const ganancias = [];
+        for (let i = 0; i < lineasActivas.length; i++) {
+            const L = lineasActivas[i];
+            const celdas = L.map((fila, col) => grid[col][fila]);
+            const { simbolo, coincidencias } = evaluarLinea(celdas);
+            const mult = PAGOS[simbolo]?.[coincidencias];
+            if (mult) {
+                const monto = Math.round(mult * (2 / tragaLineas));
+                if (monto > 0) {
+                    premio += monto;
+                    ganancias.push({ linea: i + 1, celdas: L.map((fila, col) => col * 5 + fila), simbolo, coincidencias, monto });
+                }
+            }
+        }
+        let sgCount = 0;
+        grid.forEach(col => col.forEach(s => { if (s === 'Soulgeist') sgCount++; }));
+        const scatterMonto = TRAGA.SCATTER_PAGOS[sgCount] ? Math.round(TRAGA.SCATTER_PAGOS[sgCount] * 2) : 0;
+        premio += scatterMonto;
+
+        tragaResaltarLineas(ganancias);
+        tragaMostrarGanancias(ganancias, premio, { cantidad: sgCount, monto: scatterMonto });
+        if (premio > 0) {
+            tragaDemoSaldo += premio;
+            tragaRefrescarDisplaysDemo();
+        }
+    } finally {
+        tragaGirando = false;
+        if (btn) { btn.disabled = false; btn.innerText = '🔄 GIRAR'; }
+    }
+};

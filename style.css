@@ -139,6 +139,7 @@ button,
     height: 120px;
     background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
     filter: blur(20px);
+    pointer-events: none;
 }
 
 /* ==========================================================================
@@ -2824,18 +2825,39 @@ a:hover {
     bottom: 14px;
     left: 0;
     right: 0;
-    text-align: center;
+    text-align: left;
     font-size: 0.68rem;
     color: #aa6666;
-    z-index: 5;
+    z-index: 10;
     text-shadow: 1px 1px 2px #000;
 }
-.aviso-legal-portal a {
+#escena-portal .aviso-legal-portal a {
     color: #c98f8f;
     text-decoration: underline;
-    cursor: pointer;
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+    pointer-events: auto !important;
 }
 .aviso-legal-portal a:hover { color: #ffd700; }
+
+/* --- BARRA INFERIOR UNIFICADA: legales izq / correo centro / redes der --- */
+#barra-inferior .footer-zona { flex: 1 1 0; min-width: 0; }
+#barra-inferior .footer-legal { display: flex; gap: 14px; align-items: center; justify-content: flex-start; }
+#barra-inferior .footer-legal a {
+    color: #c98f8f;
+    text-decoration: underline;
+    font-size: 0.68rem;
+    text-shadow: 1px 1px 2px #000;
+    transition: color 0.3s ease;
+}
+#barra-inferior .footer-legal a:hover { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
+#barra-inferior .footer-redes { display: flex; justify-content: flex-end; }
+@media (max-width: 640px) {
+    #barra-inferior { flex-wrap: wrap; row-gap: 3px; }
+    #barra-inferior .footer-legal { gap: 8px; }
+    #barra-inferior .footer-legal a { font-size: 0.6rem; }
+    /* El correo baja a una segunda linea centrada para no desbordar */
+    #barra-inferior .footer-contacto { flex: 1 1 100% !important; order: 3; text-align: center; font-size: 0.6rem; }
+}
 
 .consentimiento-legal {
     display: flex;
@@ -2873,7 +2895,40 @@ a:hover {
 .aviso-18-traga a { color: #c98f8f; text-decoration: underline; cursor: pointer; }
 .aviso-18-traga a:hover { color: #ffd700; }
 
-#pantalla-legal .pergamino-quemado { max-width: 640px; }
+/* ==================================================================
+   MODO DEMO DE LA TRAGAMONEDAS (sin registro)
+   ================================================================== */
+#banner-demo-traga {
+    width: 100%;
+    text-align: center;
+    font-size: 0.68rem;
+    color: #ffd700;
+    background: rgba(40, 20, 0, 0.75);
+    border: 1px dashed #ffd700;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+}
+#banner-demo-traga a { color: #ff4500; text-decoration: underline; cursor: pointer; font-weight: bold; }
+#banner-demo-traga a:hover { color: #ff8c69; }
+
+#btn-demo-portal {
+    position: relative !important;
+    z-index: 2001 !important;
+    background: rgba(30, 15, 0, 0.75) !important;
+    color: #ffd700 !important;
+    border: 1px solid #ffd700 !important;
+    padding: 8px 22px !important;
+    font-family: 'MedievalSharp', cursive !important;
+    font-size: 0.75rem !important;
+    cursor: url('./img/pentaculo.png') 16 16, pointer !important;
+    margin-top: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.25) !important;
+    display: inline-block !important;
+}
 .caja-aviso-legal {
     border: 2px solid #8B0000;
     background: rgba(139, 0, 0, 0.18);
@@ -2884,7 +2939,8 @@ a:hover {
     color: #ffcccc;
 }
 .caja-aviso-legal strong { color: #ff4500; }
-.btn-legal-enlace { display: block; margin: 10px auto; width: 85%; }
+.btn-legal-enlace { display: block; margin: 10px auto; width: 85%; cursor: url('./img/pentaculo.png') 16 16, pointer !important; }
+.btn-legal-enlace:hover { background: #7a0000; box-shadow: 0 0 12px rgba(255, 69, 0, 0.5); }
 .legal-nota { font-size: 0.72rem; color: #aa6666; margin-top: 10px; }
 
 /* Resaltado de combinaciones ganadoras: sutil en movil, sin tapar las imagenes */
