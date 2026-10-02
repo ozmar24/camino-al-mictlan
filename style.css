@@ -2850,13 +2850,22 @@ a:hover {
     transition: color 0.3s ease;
 }
 #barra-inferior .footer-legal a:hover { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
-#barra-inferior .footer-redes { display: flex; justify-content: flex-end; }
+#barra-inferior .footer-centro { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+#barra-inferior .footer-centro .redes-mictlan { gap: 8px; }
+/* El sobre compacto solo existe en movil; en escritorio se muestra el correo completo */
+#barra-inferior .correo-icono { display: none; }
 @media (max-width: 640px) {
-    #barra-inferior { flex-wrap: wrap; row-gap: 3px; }
-    #barra-inferior .footer-legal { gap: 8px; }
-    #barra-inferior .footer-legal a { font-size: 0.6rem; }
-    /* El correo baja a una segunda linea centrada para no desbordar */
-    #barra-inferior .footer-contacto { flex: 1 1 100% !important; order: 3; text-align: center; font-size: 0.6rem; }
+    /* TODO en UNA sola linea compacta: legales izq (igual que escritorio),
+       sobre + redes al centro. Sin segundo renglon: la barra queda delgada. */
+    #barra-inferior { flex-wrap: nowrap; padding-right: 10px; }
+    #barra-inferior .footer-legal { gap: 8px; white-space: nowrap; }
+    #barra-inferior .footer-legal a { font-size: 0.58rem; }
+    #barra-inferior .contacto-label { display: none; }
+    #barra-inferior .correo-texto { display: none; }
+    #barra-inferior .correo-icono { display: inline; font-size: 0.8rem; }
+    #barra-inferior .footer-centro { gap: 8px; flex-wrap: nowrap; }
+    #barra-inferior .footer-centro .redes-mictlan { gap: 6px; }
+    #barra-inferior .icono-red { width: 24px; height: 24px; }
 }
 
 .consentimiento-legal {
@@ -2958,7 +2967,7 @@ a:hover {
 #btn-instalar-pwa {
     display: none;
     position: fixed;
-    bottom: 12px;
+    bottom: 12px; /* Esquina derecha: la barra deja esa zona VACIA (correo+redes viven al centro), asi no tapa redes ni la cripta de BTC */
     right: 12px;
     z-index: 10050;
     background: linear-gradient(145deg, #2b0a0a, #4a0000);
