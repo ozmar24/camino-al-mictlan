@@ -2852,6 +2852,17 @@ a:hover {
 #barra-inferior .footer-legal a:hover { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
 #barra-inferior .footer-centro { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
 #barra-inferior .footer-centro .redes-mictlan { gap: 8px; }
+
+/* ================================================================
+   CRIPTAS vs BARRA INFERIOR: la barra es fija y puede tapar los
+   saldos de las tumbas bajas. Se reserva espacio con padding-bottom
+   en el contenedor del cementerio (no afecta el portal, que es otra
+   capa) y se suben un poco las tumbas del fondo en el movil.
+   ================================================================ */
+#campo-santo { padding-bottom: 46px; box-sizing: border-box; }
+@media (max-width: 1100px) {
+    #campo-santo .zona-tumba { margin-bottom: 44px; }
+}
 /* El sobre compacto solo existe en movil; en escritorio se muestra el correo completo */
 #barra-inferior .correo-icono { display: none; }
 @media (max-width: 640px) {

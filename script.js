@@ -1220,6 +1220,15 @@ async function manejarLoginGoogle(response) {
     if (modalContrato) modalContrato.style.display = 'none';
     if (cementerio) cementerio.style.display = 'block';
 
+    // Ocultar el portal de entrada: si no, su capa (z-index 2000, 100vh) tapa
+    // el cementerio y el usuario creye que lo mando a la pantalla de inicio
+    // de sesion. Fix clave al volver desde /Legal/terminos.html o privacidad.html
+    const portalEntrada = document.getElementById('escena-portal');
+    if (portalEntrada) {
+        portalEntrada.style.opacity = '0';
+        portalEntrada.style.display = 'none';
+    }
+
     if (candelabro) {
         candelabro.style.display = 'block';
         setTimeout(() => candelabro.style.opacity = '1', 50);
@@ -2023,10 +2032,10 @@ function mostrarPergamino(tipo) {
     </div>
 `;
 
-        // ✅ Botón principal → cierra el pergamino
+        // ✅ Botón principal → volver al cementerio (criptas) si hay sesión
         if (boton) {
-            boton.innerHTML = '[ CERRAR PACTO ]';
-            boton.onclick = cerrarCodice;
+            boton.innerHTML = '[ VOLVER AL CEMENTERIO ]';
+            boton.onclick = window.volverAlCementerio || cerrarCodice;
         }
 
     } else if (tipo === 'alianzas') {
@@ -2223,14 +2232,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
     if (usuarioGuardado) {
         window.userWallet = usuarioGuardado;
-        // Sincronizar con Redis antes de entrar — esto corrige el balance tras retiros
-        if (typeof entrarAlCampoSanto === 'function') {
+        const tieneEntrada = typeof entrarAlCampoSanto === 'function';
+
+        // 1) PINTAR EL CEMENTERIO DE INMEDIATO con el ultimo saldo guardado.
+        //    entrarAlCampoSanto() ya oculta el portal, asi que al volver desde
+        //    /Legal/terminos.html o privacidad.html el usuario ve directo las
+        //    criptas: nunca la pantalla de inicio de sesion.
+        if (tieneEntrada) {
+            entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 });
+        }
+
+        // 2) Sincronizar con Redis y repintar con el saldo real. No duplica
+        //    tumbas: generarCementerio() vacia el contenedor antes de crearlas.
+        if (tieneEntrada) {
             sincronizarBalanceConRedis().then(balanceActual => {
                 entrarAlCampoSanto({ balanceSG: balanceActual });
-            }).catch(() => {
-                // Si falla Redis, usar localStorage como respaldo
-                entrarAlCampoSanto({ balanceSG: parseFloat(localStorage.getItem('soulgeist_balance')) || 0 });
-            });
+            }).catch(() => { /* localStorage ya aplicado como respaldo */ });
         }
     }
 // Añade esto al final de tu bloque document.addEventListener("DOMContentLoaded", () => { ... });
@@ -2458,6 +2475,32 @@ function guardarSaldosCriptas() {
     // Persistencia LOCAL únicamente: la verdad vive en el servidor. Las tumbas
     // solo se modifican vía acciones server-side (fusionar, retiros, tragamonedas).
 }
+// ==========================================================
+// BOTON "VOLVER AL CEMENTERIO": regresa directo al campo santo
+// (donde estan las criptas) SIN cerrar la sesion y SIN recargar.
+// La salida real con logout sigue en "DESVANECERSE EN LAS SOMBRAS".
+// ==========================================================
+function volverAlCementerio() {
+    // 1. Cerrar cualquier modal/pantalla que pueda estar abierta
+    ['modal-boveda', 'modal-ritual', 'panel-traga', 'pantalla-codice', 'pantalla-legal', 'pantalla-oraculo', 'pantalla-pacto'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    // 2. Mostrar el cementerio (las criptas) SOLO si hay sesion; si no,
+    //    quedarse en el portal para no mostrar tumbas sin datos
+    if (localStorage.getItem('soulgeist_sesion')) {
+        const cementerio = document.getElementById('campo-santo');
+        if (cementerio) cementerio.style.display = 'block';
+        // 3. Restaurar el boton "DESVANECERSE..." si el demo lo habia ocultado
+        const btnSalir = document.getElementById('btn-salir-mictlan');
+        if (btnSalir) btnSalir.style.display = '';
+    }
+
+    console.log('Regresando al Campo Santo...');
+}
+window.volverAlCementerio = volverAlCementerio;
+
 function salirDelMictlan() {
     // 1. Limpiamos la identidad del alma (sesión)
     localStorage.removeItem('soulgeist_user_email');
