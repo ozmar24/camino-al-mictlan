@@ -1730,6 +1730,11 @@ function cerrarRitual() {
 // ==================================================================
 let anuncioEnCurso = false;
 let focoPerdido = false;
+// Móvil: la pestaña del anuncio se abre a pantalla completa y tapa nuestra modal,
+// así que el contador de 30s NO se ve y el anti-trampa de 3s marca el ritual como
+// abandonado. En móvil damos más margen y auto-reclamamos al cumplir el tiempo.
+const ES_MOVIL = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+    || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 const checkFocus = () => {
     // Nota: Usamos una variable de estado que revisaremos dentro de mostrarVideoUnityAds
     if (document.hidden && window.vigilanciaActiva) {
@@ -1777,7 +1782,7 @@ async function mostrarVideoUnityAds() {
 
     setTimeout(() => {
         window.vigilanciaActiva = true;
-    }, 3000);
+    }, ES_MOVIL ? 10000 : 3000);
 
     document.addEventListener("visibilitychange", checkFocus);
 
@@ -1794,6 +1799,13 @@ async function mostrarVideoUnityAds() {
         lanzarAlertaMictlan("Interactúa con el anuncio y regresa para reclamar.", "PORTAL ABIERTO");
 
         let tiempoRestante = 30;
+        // Marca de tiempo real: los timers de una pestaña en segundo plano se
+        // congelan (sobre todo en móvil), así que contar ticks haría que el
+        // usuario tuviera que esperar 30s EXTRA al volver del anuncio.
+        // Con la marca de tiempo, los 30s se cumplen mientras mira el video.
+        const INICIO_PORTAL = Date.now();
+        const DURACION_PORTAL = 30; // segundos que el usuario DEBE ver el anuncio
+
         btnCerrar.disabled = true;
         btnCerrar.style.background = "#222";
         btnCerrar.innerText = `CANALIZANDO ENERGÍA (${tiempoRestante}s)...`;
@@ -1810,7 +1822,10 @@ async function mostrarVideoUnityAds() {
         return;
     }
 
-    tiempoRestante--;
+    // El tiempo restante se calcula contra el reloj real, no sumando ticks.
+    // Así los 30s son reales: si el usuario se va del anuncio antes, no hay reclamo.
+    const transcurrido = Math.floor((Date.now() - INICIO_PORTAL) / 1000);
+    tiempoRestante = Math.max(0, DURACION_PORTAL - transcurrido);
 
     // 2. ACTUALIZACIÓN EN BARRA DE TÍTULO
     // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
@@ -1832,6 +1847,18 @@ async function mostrarVideoUnityAds() {
         btnCerrar.style.background = "#3a0000";
         btnCerrar.style.color = "#ffcccc";
         btnCerrar.style.cursor = "pointer";
+
+        // EN MÓVIL: el contador no se ve, así que reclamamos solos al cumplir 30s.
+        // El nonce es de un solo uso: si el usuario también pulsa el botón, el
+        // servidor rechaza el segundo reclamo (no se puede farmear).
+        if (ES_MOVIL) {
+            document.title = "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+            setTimeout(() => {
+                if (typeof window.cerrarPortalOficial === 'function') {
+                    window.cerrarPortalOficial();
+                }
+            }, 1200);
+        }
     }
 }, 1000);
     } else {
