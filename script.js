@@ -1146,6 +1146,8 @@ async function manejarAuth() {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             if (resultado.sesion) localStorage.setItem('soulgeist_sesion', resultado.sesion);
+            // Sesión viva: sobrevive al F5 pero se borra al cerrar la app (ver autorrestore)
+            sessionStorage.setItem('mictlan_sesion_activa', '1');
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
             tragaSincronizarSaldoFlotante();
@@ -1188,6 +1190,8 @@ async function manejarLoginGoogle(response) {
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
             if (datos.sesion) localStorage.setItem('soulgeist_sesion', datos.sesion);
+            // Sesión viva: sobrevive al F5 pero se borra al cerrar la app (ver autorrestore)
+            sessionStorage.setItem('mictlan_sesion_activa', '1');
             await sincronizarBalanceConRedis();
             tragaSincronizarSaldoFlotante();
             entrarAlCampoSanto({ balanceSG: datos.perfil.balanceSG });
@@ -2255,10 +2259,33 @@ document.addEventListener("DOMContentLoaded", () => {
         btnCancelarGlobal.onclick = cerrarRitual;
     }
 
-    // Persistencia del usuario en el Inframundo
+    // Persistencia del usuario en el Inframundo.
+    // REGLA DE SESIÓN MÓVIL (2026-10-02): al cerrar la app y la volver a abrir se pide
+    // el login de nuevo. sessionStorage sobrevive a un F5 pero se borra al cerrar la
+    // PWA. En navegador de escritorio NO se aplica: sigue restaurando la sesión.
+    const sesionViva = sessionStorage.getItem('mictlan_sesion_activa') === '1';
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
-    if (usuarioGuardado) {
-        window.userWallet = usuarioGuardado;
+
+    // SOLO MÓVIL/PWA: al cerrar la app y reabrirla se pide el login de nuevo.
+    // En NAVEGADOR NO SE TOCA NADA: la sesión se restaura siempre desde localStorage.
+    const exigirLoginAlReabrir = ES_MOVIL;
+
+    if (usuarioGuardado && exigirLoginAlReabrir && !sesionViva) {
+        try {
+            const tokenViejo = localStorage.getItem('soulgeist_sesion');
+            if (tokenViejo) {
+                fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenViejo } }).catch(() => {});
+            }
+        } catch (e) { /* silencioso */ }
+        localStorage.removeItem('soulgeist_sesion');
+        localStorage.removeItem('usuario_email');
+        localStorage.removeItem('soulgeist_user_email');
+        window.userWallet = null;
+    }
+
+    const usuarioActivo = (!exigirLoginAlReabrir || sesionViva) ? usuarioGuardado : null;
+    if (usuarioActivo) {
+        window.userWallet = usuarioActivo;
         const tieneEntrada = typeof entrarAlCampoSanto === 'function';
 
         // 1) PINTAR EL CEMENTERIO DE INMEDIATO con el ultimo saldo guardado.
@@ -2534,6 +2561,7 @@ function salirDelMictlan() {
     localStorage.removeItem('usuario_email');
     localStorage.removeItem('soulgeist_sesion');
     localStorage.removeItem('soulgeist_balance');
+    try { sessionStorage.removeItem('mictlan_sesion_activa'); } catch (e) { /* silencioso */ }
 
     // 2. Cierre de sesión REAL: invalidamos el token en Redis para que deje
     //    de servir aunque alguien lo haya copiado (antes solo se limpiaba
