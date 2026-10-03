@@ -1146,7 +1146,8 @@ async function manejarAuth() {
             window.userWallet = resultado.usuario.email;
             localStorage.setItem('soulgeist_user_email', resultado.usuario.email);
             if (resultado.sesion) localStorage.setItem('soulgeist_sesion', resultado.sesion);
-            // Sesión viva: sobrevive al F5 pero se borra al cerrar la app (ver autorrestore)
+            // Sesión viva en esta pestaña (sesión estricta: solo se restaura
+            // al volver de /Legal/ con ?regreso=legal; ver autorrestore)
             sessionStorage.setItem('mictlan_sesion_activa', '1');
             lanzarAlertaMictlan("Bienvenido al Mictlán.", "ACCESO CONCEDIDO");
             await sincronizarBalanceConRedis();
@@ -1190,7 +1191,8 @@ async function manejarLoginGoogle(response) {
             window.userWallet = datos.perfil.email;
             localStorage.setItem('soulgeist_user_email', datos.perfil.email);
             if (datos.sesion) localStorage.setItem('soulgeist_sesion', datos.sesion);
-            // Sesión viva: sobrevive al F5 pero se borra al cerrar la app (ver autorrestore)
+            // Sesión viva en esta pestaña (sesión estricta: solo se restaura
+            // al volver de /Legal/ con ?regreso=legal; ver autorrestore)
             sessionStorage.setItem('mictlan_sesion_activa', '1');
             await sincronizarBalanceConRedis();
             tragaSincronizarSaldoFlotante();
@@ -1690,6 +1692,10 @@ const respuesta = await fetch('/api/reclamar', {
         console.log("Respuesta del backend:", resultado);
 
         if (!respuesta.ok || !resultado.success) {
+            if (respuesta.status === 401) {
+                manejarSesionExpirada();
+                return;
+            }
             lanzarAlertaMictlan(resultado.error || "Error del servidor", "ADVERTENCIA MORTAL");
             return;
         }
@@ -1904,6 +1910,10 @@ async function videoCompletado() {
         const resultado = await respuesta.json();
 
         if (!respuesta.ok) {
+            if (respuesta.status === 401) {
+                manejarSesionExpirada();
+                return;
+            }
             lanzarAlertaMictlan(resultado.error || "Los espíritus bloquearon esta ofrenda.", "CANDADO DEL TIEMPO");
             return;
         }
@@ -2040,6 +2050,35 @@ function cerrarAlertaMictlan() {
     if (modalAlterno) modalAlterno.style.display = 'none';
 }
 
+// ====================== SESIÓN EXPIRADA (401) ======================
+// El token vive 7 días en Redis (TTL_SESION_SEGUNDOS). Cuando vence, el
+// servidor responde 401 y ANTES la app solo mostraba errores sueltos
+// ("Sesión no válida") sin dejar claro qué hacer: parecía que se
+// "cerraba sesión sola". Ahora cualquier 401 limpia el alma local y
+// manda al portal con un aviso claro de que el pacto expiró.
+let sesionExpiradaEnCurso = false; // varias llamadas pueden fallar a la vez: la primera gana
+function manejarSesionExpirada() {
+    if (sesionExpiradaEnCurso) return;
+    sesionExpiradaEnCurso = true;
+    try {
+        const token = localStorage.getItem('soulgeist_sesion');
+        if (token) {
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).catch(() => {});
+        }
+    } catch (e) { /* silencioso */ }
+    localStorage.removeItem('soulgeist_user_email');
+    localStorage.removeItem('usuario_email');
+    localStorage.removeItem('soulgeist_sesion');
+    try { sessionStorage.removeItem('mictlan_sesion_activa'); } catch (e) { /* silencioso */ }
+    window.userWallet = null;
+    lanzarAlertaMictlan("Tu pacto ha expirado por seguridad. Vuelve a sellar tu identidad para continuar.", "PACTO EXPIRADO");
+    setTimeout(() => { window.location.reload(); }, 2500);
+}
+window.manejarSesionExpirada = manejarSesionExpirada;
+
 
 // ====================== MENÚ PRINCIPAL DE LEYES ======================
 function mostrarPergamino(tipo) {
@@ -2059,8 +2098,13 @@ function mostrarPergamino(tipo) {
         <span onclick="mostrarSubLey('reglas')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— REGLAS ETERNAS —</span>
         <span onclick="mostrarSubLey('prohibiciones')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— PROHIBICIONES DEL INFRAMUNDO —</span>
         <span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
-        <a href="/Legal/terminos.html" class="pentaculo-cursor" style="font-family:'MedievalSharp',cursive; font-size:0.65rem; letter-spacing:1px; display:block; color:#c98f8f; text-decoration:underline; margin-top:18px;">📜 VER DOCUMENTOS OFICIALES (TÉRMINOS Y PRIVACIDAD)</a>
     </div>
+    <p style="text-align:center; font-family:'MedievalSharp',cursive; font-size:0.55rem; color:#8a6a6a; margin-top:20px; line-height:1.4;">
+        📜 Los documentos oficiales (Términos del Servicio y Aviso de Privacidad)<br>se consultan en la barra inferior del portal.
+    </p>
+    <!-- Los documentos oficiales (Términos y Privacidad) ya NO se enlazan aqui:
+         vivian duplicados (version tematica + version formal de /Legal/).
+         La version formal vive en la barra inferior del portal. -->
 `;
 
         // ✅ Botón principal → volver al cementerio (criptas) si hay sesión
@@ -2155,7 +2199,14 @@ function mostrarSubLey(seccion) {
     const data = contenidos[seccion];
     if (data) {
         titulo.innerText = data.titulo;
-        cuerpo.innerHTML = `<p>${data.texto}</p>`;
+        // NOTA DE CONCORDANCIA LEGAL: estas sub-leyes son la versión temática
+        // (ambientación) de los documentos oficiales de /Legal/. El texto dice
+        // exactamente que NO los sustituyen, para no confundir al usuario.
+        cuerpo.innerHTML = `<p>${data.texto}</p>
+            <p style="margin-top:18px; padding-top:8px; border-top:1px solid rgba(139,0,0,0.35); font-size:0.5rem; line-height:1.4; color:#8a6a6a; text-align:center;">
+                Resumen temático de ambientación. Este texto NO sustituye a los documentos oficiales
+                (Términos del Servicio y Aviso de Privacidad), disponibles en la barra inferior del portal.
+            </p>`;
     }
 }
 function cerrarCodice() {
@@ -2260,31 +2311,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Persistencia del usuario en el Inframundo.
-    // REGLA DE SESIÓN MÓVIL (2026-10-02): al cerrar la app y la volver a abrir se pide
-    // el login de nuevo. sessionStorage sobrevive a un F5 pero se borra al cerrar la
-    // PWA. En navegador de escritorio NO se aplica: sigue restaurando la sesión.
-    const sesionViva = sessionStorage.getItem('mictlan_sesion_activa') === '1';
+    // REGLA DE SESIÓN ESTRICTA (2026-10-03, decisión del usuario: "el más seguro"):
+    // La sesión NO sobrevive a un F5, al cerrar el navegador ni al reabrir la
+    // app/PWA. SOLO se restaura al regresar de las páginas legales oficiales
+    // (Términos/Privacidad), que es navegación interna del mismo flujo: esas
+    // páginas enlazan de vuelta con ?regreso=legal y aquí se limpia la URL con
+    // history.replaceState para que un F5 posterior vuelva a pedir login.
+    const regresoDeLegal = new URLSearchParams(window.location.search).get('regreso') === 'legal';
     const usuarioGuardado = localStorage.getItem('soulgeist_user_email');
+    const tokenGuardado = localStorage.getItem('soulgeist_sesion');
 
-    // SOLO MÓVIL/PWA: al cerrar la app y reabrirla se pide el login de nuevo.
-    // En NAVEGADOR NO SE TOCA NADA: la sesión se restaura siempre desde localStorage.
-    const exigirLoginAlReabrir = ES_MOVIL;
+    if (regresoDeLegal) {
+        // Bandera de UN SOLO USO: sin esto, un F5 tras volver mantendría la sesión
+        try { history.replaceState(null, '', window.location.pathname); } catch (e) { /* silencioso */ }
+    }
 
-    if (usuarioGuardado && exigirLoginAlReabrir && !sesionViva) {
+    if (tokenGuardado && !regresoDeLegal) {
+        // Invalidar el token anterior en el servidor: no queda nada vivo en Redis
         try {
-            const tokenViejo = localStorage.getItem('soulgeist_sesion');
-            if (tokenViejo) {
-                fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenViejo } }).catch(() => {});
-            }
+            fetch('/api/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tokenGuardado } }).catch(() => {});
         } catch (e) { /* silencioso */ }
         localStorage.removeItem('soulgeist_sesion');
         localStorage.removeItem('usuario_email');
         localStorage.removeItem('soulgeist_user_email');
+        try { sessionStorage.removeItem('mictlan_sesion_activa'); } catch (e) { /* silencioso */ }
         window.userWallet = null;
     }
 
-    const usuarioActivo = (!exigirLoginAlReabrir || sesionViva) ? usuarioGuardado : null;
+    const usuarioActivo = (regresoDeLegal && usuarioGuardado && tokenGuardado) ? usuarioGuardado : null;
     if (usuarioActivo) {
+        sessionStorage.setItem('mictlan_sesion_activa', '1');
         window.userWallet = usuarioActivo;
         const tieneEntrada = typeof entrarAlCampoSanto === 'function';
 
@@ -2402,6 +2458,10 @@ async function sincronizarBalanceConRedis() {
         });
         
         if (!res.ok) {
+            if (res.status === 401) {
+                manejarSesionExpirada();
+                return parseFloat(localStorage.getItem('soulgeist_balance')) || 0;
+            }
             const errorData = await res.json();
             console.error("Detalle del error en el servidor:", errorData);
             throw new Error(`Servidor respondió con status ${res.status}`);
@@ -2468,6 +2528,10 @@ async function descontarBalanceEnRedis(cantidadSG, criptaDestino = null) {
         const resultado = await respuesta.json();
 
         if (!respuesta.ok) {
+            if (respuesta.status === 401) {
+                manejarSesionExpirada();
+                return { ok: false, error: "Sesión expirada." };
+            }
             return { ok: false, error: resultado.error || "Error en el servidor" };
         }
 
@@ -2556,16 +2620,9 @@ function volverAlCementerio() {
 window.volverAlCementerio = volverAlCementerio;
 
 function salirDelMictlan() {
-    // 1. Limpiamos la identidad del alma (sesión)
-    localStorage.removeItem('soulgeist_user_email');
-    localStorage.removeItem('usuario_email');
-    localStorage.removeItem('soulgeist_sesion');
-    localStorage.removeItem('soulgeist_balance');
-    try { sessionStorage.removeItem('mictlan_sesion_activa'); } catch (e) { /* silencioso */ }
-
-    // 2. Cierre de sesión REAL: invalidamos el token en Redis para que deje
-    //    de servir aunque alguien lo haya copiado (antes solo se limpiaba
-    //    el navegador y el token seguía vivo 7 días).
+    // 1. Cierre de sesión REAL: invalidamos el token en Redis ANTES de
+    //    limpiar el navegador (se leía DESPUÉS de borrarlo: llegaba vacío
+    //    y el token seguía vivo en Redis hasta 7 días).
     try {
         const token = localStorage.getItem('soulgeist_sesion');
         if (token) {
@@ -2575,6 +2632,13 @@ function salirDelMictlan() {
             }).catch(() => {});
         }
     } catch { /* el logout local siempre procede */ }
+
+    // 2. Limpiamos la identidad del alma (sesión)
+    localStorage.removeItem('soulgeist_user_email');
+    localStorage.removeItem('usuario_email');
+    localStorage.removeItem('soulgeist_sesion');
+    localStorage.removeItem('soulgeist_balance');
+    try { sessionStorage.removeItem('mictlan_sesion_activa'); } catch (e) { /* silencioso */ }
 
     lanzarAlertaMictlan("Tu rastro se desvanece... Regresando al umbral.", "ALMA EN REPOSO");
 
@@ -2793,6 +2857,13 @@ async function tragaApi(accion, extra = {}) {
     });
     let data = null;
     try { data = await res.json(); } catch (e) { /* respuesta no JSON */ }
+    // Punto único de detección de sesión vencida para la tragamonedas.
+    // SOLO si hay sesión viva en esta pestaña: al recargar con un token viejo,
+    // esta llamada salta ANTES del bloque de restauración (que limpia el token
+    // y la bandera), y sin este filtro cada F5 mostraría "PACTO EXPIRADO".
+    if (res.status === 401 && sessionStorage.getItem('mictlan_sesion_activa') === '1') {
+        manejarSesionExpirada();
+    }
     return { ok: res.ok, status: res.status, data };
 }
 
@@ -2981,6 +3052,12 @@ window.abrirTragamonedas = async function () {
         tragaSimbolos = ['Vela', 'Hueso', 'Cempasuchil', 'Calavera', 'Xoloit', 'Macuahuitl', 'Mictlantecuhtli', 'Soulgeist'];
     }
     tragaRenderGrid([['Vela','Hueso','Cempasuchil','Calavera','Xoloit'],['Macuahuitl','Mictlantecuhtli','Vela','Hueso','Cempasuchil'],['Calavera','Xoloit','Macuahuitl','Soulgeist','Vela'],['Hueso','Cempasuchil','Calavera','Xoloit','Macuahuitl'],['Mictlantecuhtli','Vela','Hueso','Cempasuchil','Calavera']]);
+    // MODO DEMO: no hay sesión (ni debe haberla). No llamar al API autenticado:
+    // respondería 401 y en modo demo se pinta "—" sin red.
+    if (tragaDemoMode) {
+        tragaRefrescarDisplaysDemo();
+        return;
+    }
     const { data } = await tragaApi('saldo');
     if (data && data.success) {
         tragaRefrescarDisplays(data.casino, data.balanceSG);
@@ -3064,7 +3141,16 @@ async function tragaSincronizarSaldoFlotante() {
         if (data && data.success) tragaRefrescarDisplays(data.casino, data.balanceSG);
     } catch (e) { /* silencioso: el badge es solo visual */ }
 }
-tragaSincronizarSaldoFlotante();
+// Diferida a DOMContentLoaded: debe correr DESPUES del bloque de restauracion
+// de sesion estricta (que invalida el token viejo en cada F5). Si corriera al
+// cargar el modulo, llamaria con el token aun vivo y provocaria un 401 falso.
+// DOMContentLoaded respeta el orden de registro: el bloque de restauracion se
+// registro antes, asi que aqui el token viejo ya fue limpiado.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tragaSincronizarSaldoFlotante);
+} else {
+    tragaSincronizarSaldoFlotante();
+}
 
 window.retirarTragaMetaMask = async function () {
     // En demo no hay saldo real que retirar: guia al registro

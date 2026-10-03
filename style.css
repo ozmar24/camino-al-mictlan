@@ -19,9 +19,23 @@ html, body, #campo-santo {
     overflow-x: hidden;
     font-family: 'Metal Mania', cursive;
     cursor: url('./img/daga.png') 5 28, auto !important;
-}
+}/* DESKTOP ONLY: la barra de scroll se OCULTA en el navegador (pantalla amplia:
+   todo el diseño — portal + footer con correo, redes, Términos/Privacidad —
+   cabe dentro de la ventana). */
+html, body { overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
 
-/* --- SISTEMA DE CURSORES MÍSTICOS --- */
+/* MOVIL: NO se oculta la barra. El scroll es REAL ahí mesma, porque la barra
+   inferior (correo + redes + Términos/Privacidad) se encima de las letras y
+   tapa los saldos. */
+@media (max-width: 640px) {
+    /* Si acaso el CSS de escritorio llegara a aplicarse en móvil, lo desactiva:
+       el scroll vuelve a estar disponible y la barra se vuelve visible. */
+    html, body { overflow-x: auto !important; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { width: 11px !important; height: 11px !important; display: block !important; }
+}/* SISTEMA DE CURSORES MÍSTICOS: se aplica a la escena de entrada y a toda la
+   interfaz (botones, enlaces, opciones, paneles) con cursos de daga/pentáculo.
+   No genera barra de scroll. */
 #escena-portal, 
 #escena-portal *, 
 .titulo-mictlan, 
@@ -2197,8 +2211,12 @@ iframe[src*="challenges.cloudflare.com"] {
     filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
 }
  
+/* Regla ANTIGUA del footer apilado: SOLO para footers viejos.
+   #barra-inferior tiene su propio layout de 3 zonas en linea
+   (legales izq / correo+redes centro) y NUNCA debe apilarse: en movil
+   el apilado empuja los links legales arriba del correo y engrosa la barra. */
 @media (max-width: 1024px) {
-    footer {
+    footer:not(#barra-inferior) {
         flex-direction: column !important;
         gap: 6px !important;
         padding-bottom: 8px !important;
@@ -2866,17 +2884,27 @@ a:hover {
 /* El sobre compacto solo existe en movil; en escritorio se muestra el correo completo */
 #barra-inferior .correo-icono { display: none; }
 @media (max-width: 640px) {
-    /* TODO en UNA sola linea compacta: legales izq (igual que escritorio),
-       sobre + redes al centro. Sin segundo renglon: la barra queda delgada. */
+    /* TODO en UNA sola linea compacta, IGUAL que escritorio:
+       legales a la IZQUIERDA, sobre + redes al centro. La regla vieja
+       que apilaba el footer (flex-direction: column) ya no aplica a
+       #barra-inferior, asi que la barra queda delgada y sin renglones
+       extra encima del correo. */
     #barra-inferior { flex-wrap: nowrap; padding-right: 10px; }
-    #barra-inferior .footer-legal { gap: 8px; white-space: nowrap; }
+    #barra-inferior .footer-zona { flex: 1 1 0; min-width: 0; }
+    #barra-inferior .footer-legal { display: flex; gap: 8px; align-items: center; justify-content: flex-start; white-space: nowrap; }
     #barra-inferior .footer-legal a { font-size: 0.58rem; }
     #barra-inferior .contacto-label { display: none; }
     #barra-inferior .correo-texto { display: none; }
     #barra-inferior .correo-icono { display: inline; font-size: 0.8rem; }
-    #barra-inferior .footer-centro { gap: 8px; flex-wrap: nowrap; }
-    #barra-inferior .footer-centro .redes-mictlan { gap: 6px; }
-    #barra-inferior .icono-red { width: 24px; height: 24px; }
+    /* Centro: SIEMPRE horizontal. El sobre (mailto) y las redes comparten
+       renglon; si algo apilara el centro, la barra engordaria. */
+    #barra-inferior .footer-centro { display: flex; flex-direction: row !important; gap: 8px; flex-wrap: nowrap !important; align-items: center; justify-content: center; }
+    #barra-inferior .footer-centro .footer-contacto { margin: 0; }
+    #barra-inferior .footer-centro .redes-mictlan { display: flex; flex-direction: row !important; gap: 6px; flex-wrap: nowrap !important; }
+    #barra-inferior .icono-red { width: 22px; height: 22px; flex: 0 0 auto; }
+    /* Botones dentro de la barra: sin encimarse ni crecer de mas */
+    #barra-inferior a { flex: 0 0 auto; }
+    #barra-inferior .footer-contacto, #barra-inferior .redes-mictlan { min-width: 0; }
 }
 
 .consentimiento-legal {
@@ -2959,6 +2987,20 @@ a:hover {
     color: #ffcccc;
 }
 .caja-aviso-legal strong { color: #ff4500; }
+/* Nota de concordancia entre el modal LEYES (tematico) y los documentos
+   oficiales de /Legal/ (vinculantes). Vivir en ambas paginas legales. */
+.caja-concordancia {
+    border: 1px solid rgba(139, 0, 0, 0.5);
+    background: rgba(139, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #d9a8a8;
+    margin: 0 0 18px 0;
+    text-align: justify;
+}
+.caja-concordancia strong { color: #ffcccc; }
 .btn-legal-enlace { display: block; margin: 10px auto; width: 85%; cursor: url('./img/pentaculo.png') 16 16, pointer !important; }
 .btn-legal-enlace:hover { background: #7a0000; box-shadow: 0 0 12px rgba(255, 69, 0, 0.5); }
 .legal-nota { font-size: 0.72rem; color: #aa6666; margin-top: 10px; }
