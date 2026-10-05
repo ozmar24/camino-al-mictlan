@@ -2,3 +2,5 @@
 .env*
 node_modules/
 BITACORA.md
+diag-telegram.cjs
+vercel-deploys.json
