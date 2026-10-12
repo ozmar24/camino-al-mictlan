@@ -10,7 +10,8 @@ import {
     manejarError,
     obtenerIpLimpia,
     escudoAntiBots,
-    estaIpBloqueada
+    estaIpBloqueada,
+    enviarAlertaTelegram
 } from '../lib/seguridad.js';
 import { obtenerTasas } from '../lib/tasas.js';
 import {
