@@ -140,9 +140,12 @@ export default async function handler(req, res) {
         }
 
         // 13. Transferir SG desde la bóveda al usuario
-        // Compensamos la quema automática del 2% del contrato para que el usuario
-        // reciba la cantidad íntegra en su MetaMask.
-        const cantidadCompensada = cantidadSG / 0.98;
+        // REGLA DE RETIRO ÍNTEGRO (igual que en tragamonedas.js): el 2% de
+        // quema automática del contrato lo absorbe la cuenta emisora, NO el
+        // usuario. Se compensa dividiendo entre 0.98 y se redondea SIEMPRE
+        // hacia arriba a 6 decimales para que a la wallet lleguen mínimo los
+        // SG retirados (véase transferirSG, que corta a 6 decimales).
+        const cantidadCompensada = Math.ceil((cantidadSG / 0.98) * 1e6) / 1e6;
         const resultado = await transferirSG(wallet, cantidadCompensada, claveAdmin, contratoAddr, blockchainRPC);
 
         if (!resultado.success) {

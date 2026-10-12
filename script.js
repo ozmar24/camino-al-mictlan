@@ -3164,6 +3164,13 @@ window.retirarTragaMetaMask = async function () {
         lanzarAlertaMictlan('Los retiros a MetaMask son una operación de alta seguridad que solo puede realizarse desde un navegador en computadora (PC).', 'SANTUARIO PC REQUERIDO');
         return;
     }
+    // Pedimos el saldo FRESCO al servidor antes de abrir el modal: el monto
+    // que se muestra debe ser exactamente el que el servidor va a validar y
+    // vaciar (evita mostrar un saldo viejo de la pestaña).
+    try {
+        const { data } = await tragaApi('saldo');
+        if (data && data.success) tragaRefrescarDisplays(data.casino, data.balanceSG);
+    } catch (e) { /* si falla, seguimos con el saldo local ya refrescado */ }
     if (!tragaUltimoSaldo || tragaUltimoSaldo < 100) {
         lanzarAlertaMictlan('Mínimo de retiro: 100 SG de saldo casino.', 'TRAGAMONEDAS');
         return;
@@ -3181,6 +3188,12 @@ function prepararModalRetiroMetaMask() {
     const modal = document.getElementById('modal-ritual');
     if (!modal) return;
 
+    // Monto exacto del retiro: el saldo del casino que el servidor movió
+    // validar y vaciará al confirmar. Se pinta en el modal para que lo que se
+    // ve es LO MISMO que llega a MetaMask (el 2% de quema del contrato lo
+    // absorbe la cuenta emisora, NO el usuario).
+    const montoRetiro = Math.floor((Number(tragaUltimoSaldo) || 0) * 10000) / 10000;
+
     // Pinta la interfaz de retiro. Se reaplica tras un instante porque otros
     // flujos (bloqueos de pantalla, estiloDark) reescriben el contenido del
     // modal y podrian tapar esta seccion si corren a la vez.
@@ -3197,6 +3210,9 @@ function prepararModalRetiroMetaMask() {
                     Retirarás tu saldo del casino como <b style="color:#c8a951;">SG tokens</b>
                     directamente a tu billetera MetaMask.
                 </p>
+                <h2 style="color:#c8a951; font-size:28px; text-shadow:0 0 10px #c8a951; margin:6px 0;">
+                    ${montoRetiro.toFixed(4)} SG
+                </h2>
                 <p style="color:#888; font-size:13px; margin-top:8px;">
                     Al aceptar, se abrirá MetaMask para autorizar el retiro.
                 </p>
@@ -3237,17 +3253,39 @@ function prepararModalRetiroMetaMask() {
 async function confirmarRetiroMetaMask() {
     cerrarRitual();
 
-    // Abre/asesora MetaMask y devuelve la dirección conectada (null si cancela)
-    const wallet = await conectarMetaMask();
-    if (!wallet) return;
+    try {
+        // Abre/asesora MetaMask y devuelve la dirección conectada (null si cancela)
+        const wallet = await conectarMetaMask();
+        if (!wallet) return;
 
-    const { ok, data } = await tragaApi('retirar', { wallet: wallet });
-    if (!ok || !data || !data.success) {
-        lanzarAlertaMictlan((data && data.error) || 'El retiro falló.', 'TRAGAMONEDAS');
-        return;
+        const { ok, data } = await tragaApi('retirar', { wallet: wallet });
+        if (!ok || !data || !data.success) {
+            // El servidor SOLO vacía el saldo si la transferencia on-chain se
+            // confirmó. Al fallar aquí, el saldo sigue vivo en Redis: pedimos
+            // el estado real y lo repintamos para que la UI no muestre 0.
+            try {
+                const sincro = await tragaApi('saldo');
+                if (sincro.ok && sincro.data && sincro.data.success) {
+                    tragaRefrescarDisplays(sincro.data.casino, sincro.data.balanceSG);
+                }
+            } catch (e) { /* silencioso: el mensaje de error del retiro manda */ }
+            lanzarAlertaMictlan((data && data.error) || 'El retiro falló. Tu saldo del casino NO se perdió: sigue intacto en tu cuenta.', 'TRAGAMONEDAS');
+            return;
+        }
+        tragaRefrescarDisplays(data.casino, data.balanceSG);
+        // Igual que Telegram, pero en la UI: monto EXACTO enviado + tx en Polygon.
+        // El 2% de quema del contrato lo absorbe la cuenta emisora (no el usuario).
+        const montoEnviado = Number(data.monto) || 0;
+        const txCorta = data.txHash ? String(data.txHash).slice(0, 12) + '…' : 'en confirmación';
+        lanzarAlertaMictlan(
+            `✅ ${montoEnviado.toFixed(2)} SG enviados directo a tu MetaMask.\r\n` +
+            `🔗 Tx Polygon: ${txCorta}`,
+            'RITUAL COMPLETADO'
+        );
+    } catch (e) {
+        console.error('Error en el retiro del casino:', e);
+        lanzarAlertaMictlan('No se pudo completar el retiro. Revisa tu conexión con MetaMask y reintenta.', 'TRAGAMONEDAS');
     }
-    tragaRefrescarDisplays(data.casino, data.balanceSG);
-    lanzarAlertaMictlan(data.mensaje || 'Retiro completado.', 'RITUAL COMPLETADO');
 }
 
 window.prepararModalRetiroMetaMask = prepararModalRetiroMetaMask;

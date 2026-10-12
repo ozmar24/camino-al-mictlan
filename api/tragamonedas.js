@@ -302,7 +302,12 @@ async function retirar(req, res, emailLimpio, userKey) {
     }
 
     try {
-        const cantidadAEnviar = monto / 0.98;
+        // REGLA DE RETIRO ÍNTEGRO: el 2% de quema del contrato lo absorbe la
+        // cuenta "Eventos y Marketing" (emisora), NO el usuario. Se envía
+        // monto/0.98 y se redondea SIEMPRE hacia arriba a 6 decimales para
+        // que a la wallet lleguen mínimo los SG retirados (véase transferirSG,
+        // que corta a 6 decimales). El usuario recibe lo que retiró, íntegro.
+        const cantidadAEnviar = Math.ceil((monto / 0.98) * 1e6) / 1e6;
         const tx = await transferirSG(wallet, cantidadAEnviar, claveMarketing, contratoAddr, rpcUrl);
         if (!tx.success) {
             return res.status(500).json({ success: false, error: tx.error });
@@ -311,14 +316,22 @@ async function retirar(req, res, emailLimpio, userKey) {
         casino.saldo = 0;
         await redisCmd('SET', userKey, JSON.stringify(usuario));
 
-        await enviarTelegram(
-            `🎰 *RETIRO DE TRAGAMONEDAS*\n` +
-            `👤 \`${emailLimpio}\`\n` +
-            `📬 \`${wallet}\`\n` +
-            `💎 \`${monto.toFixed(4)} SG\`\n` +
-            `📤 Cuenta: Eventos y Marketing\n` +
-            `🔗 Tx: \`${tx.txHash}\``
-        );
+        // La transferencia YA SE CONFIRMÓ y el saldo YA SE VACIÓ: a partir de
+        // aquí nada puede convertir este retiro en "error" para el usuario.
+        // Telegram va encapsulado: una caída de Telegram jamás debe provocar
+        // que el jugador reintente un retiro ya pagado (riesgo de doble pago).
+        try {
+            await enviarTelegram(
+                `🎰 *RETIRO DE TRAGAMONEDAS*\n` +
+                `👤 \`${emailLimpio}\`\n` +
+                `📬 \`${wallet}\`\n` +
+                `💎 \`${monto.toFixed(4)} SG\` (enviados: ${cantidadAEnviar.toFixed(6)} SG, el 2% de quema lo absorbe la cuenta emisora)\n` +
+                `📤 Cuenta: Eventos y Marketing\n` +
+                `🔗 Tx: \`${tx.txHash}\``
+            );
+        } catch (eTelegram) {
+            console.error('⚠️ Telegram falló tras un retiro CONFIRMADO (no crítico):', eTelegram?.message);
+        }
 
         return res.status(200).json({
             success: true,
@@ -419,7 +432,8 @@ async function intentarBarridoRecaudo() {
         if (!claveBoveda || !claveMarketing || !contratoAddr) return;
 
         const direccionMarketing = new ethers.Wallet(claveMarketing).address;
-        const cantidadNeta = pot / 0.98;
+        // Tope hacia arriba: que la tesorería nunca reciba menos que lo recaudado
+        const cantidadNeta = Math.ceil((pot / 0.98) * 1e6) / 1e6;
         const tx = await transferirSG(direccionMarketing, cantidadNeta, claveBoveda, contratoAddr, rpcUrl);
         if (!tx.success) return;
 
@@ -461,11 +475,33 @@ async function transferirSG(walletUsuario, cantidadSG, claveMarketing, contratoA
         if (saldoMarketing < cantidad) {
             return { success: false, error: 'La cuenta de marketing no tiene fondos.' };
         }
+        // Diagnóstico del gas: los transfers ERC-20 pagan el gas en POL nativo.
+        // Sin POL la firma de la tx falla con "insufficient funds" y el
+        // retiro muere con un error genérico. Detectarlo ANTES da un mensaje
+        // accionable (recargar POL en la wallet emisora).
+        const gasDisponible = await provider.getBalance(wallet.address);
+        if (gasDisponible < ethers.parseEther('0.03')) {
+            return {
+                success: false,
+                error: 'La cuenta de envíos no tiene POL para pagar el gas de Polygon. Añádele un poco de POL a esa wallet y reintenta.'
+            };
+        }
         const tx = await contrato.transfer(walletUsuario, cantidad);
         const receipt = await tx.wait(1);
         return { success: true, txHash: receipt.hash };
     } catch (error) {
         console.error('❌ Error blockchain marketing:', error.message);
+        // Traducir los errores con causa conocida a mensajes accionables.
+        const msg = String(error?.shortMessage || error?.message || '');
+        if (/insufficient funds/i.test(msg)) {
+            return { success: false, error: 'La cuenta de envíos no tiene POL suficiente para el gas. Añádele POL y reintenta.' };
+        }
+        if (/transfer amount exceeds balance/i.test(msg)) {
+            return { success: false, error: 'La cuenta de envíos no tiene SG suficientes para cubrir este retiro.' };
+        }
+        if (/(timeout|TIMEOUT|network|ETIMEDOUT|ECONNRESET)/i.test(msg)) {
+            return { success: false, error: 'Polygon no respondió a tiempo. Reintenta en un minuto.' }; 
+        }
         return { success: false, error: 'Error en la transferencia.' };
     }
 }

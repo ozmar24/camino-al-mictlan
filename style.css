@@ -19,11 +19,25 @@ html, body, #campo-santo {
     overflow-x: hidden;
     font-family: 'Metal Mania', cursive;
     cursor: url('./img/daga.png') 5 28, auto !important;
-}/* DESKTOP ONLY: la barra de scroll se OCULTA en el navegador (pantalla amplia:
-   todo el diseño — portal + footer con correo, redes, Términos/Privacidad —
-   cabe dentro de la ventana). */
-html, body { overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
-html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+}
+
+/* DESKTOP ONLY (decisión 2026-10-03, restaurada 2026-10-12): la barra de scroll
+   se OCULTA solo en dispositivos con mouse/puntero fino. En MÓVIL/TÁCTIL el
+   scroll es REAL y NO se oculta: la barra inferior tapa contenidos y los
+   documentos legales necesitan llegar hasta abajo. */
+@media (hover: hover) and (pointer: fine) {
+    html, body {
+        overflow-x: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+    }
+}
 
 /* MOVIL: NO se oculta la barra. El scroll es REAL ahí mesma, porque la barra
    inferior (correo + redes + Términos/Privacidad) se encima de las letras y
