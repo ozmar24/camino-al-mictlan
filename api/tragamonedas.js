@@ -303,11 +303,23 @@ async function retirar(req, res, emailLimpio, userKey) {
 
     try {
         // REGLA DE RETIRO ÍNTEGRO: el 2% de quema del contrato lo absorbe la
-        // cuenta "Eventos y Marketing" (emisora), NO el usuario. Se envía
-        // monto/0.98 y se redondea SIEMPRE hacia arriba a 6 decimales para
-        // que a la wallet lleguen mínimo los SG retirados (véase transferirSG,
-        // que corta a 6 decimales). El usuario recibe lo que retiró, íntegro.
-        const cantidadAEnviar = Math.ceil((monto / 0.98) * 1e6) / 1e6;
+        // cuenta emisora, NO el usuario. PERO si el DESTINO está excluido de
+        // la quema (isExcludedFromBurn) el contrato NO quema nada y
+        // compensar con /0.98 pagaría de más (incidente 2026-10-12: retiro
+        // de 102 SG llegó como 104.0816 a una wallet excluida). Se pregunta
+        // al contrato y se compensa SOLO si la quema aplica.
+        let destinoExcluido = false;
+        try {
+            const sonda = new ethers.Contract(
+                contratoAddr,
+                ['function isExcludedFromBurn(address) view returns (bool)'],
+                new ethers.JsonRpcProvider(rpcUrl)
+            );
+            destinoExcluido = await sonda.isExcludedFromBurn(wallet);
+        } catch (e) { destinoExcluido = false; } // ante duda, compensa (conservador)
+        const cantidadAEnviar = destinoExcluido
+            ? Math.ceil(monto * 1e6) / 1e6
+            : Math.ceil((monto / 0.98) * 1e6) / 1e6;
         const tx = await transferirSG(wallet, cantidadAEnviar, claveMarketing, contratoAddr, rpcUrl);
         if (!tx.success) {
             return res.status(500).json({ success: false, error: tx.error });

@@ -140,12 +140,23 @@ export default async function handler(req, res) {
         }
 
         // 13. Transferir SG desde la bóveda al usuario
-        // REGLA DE RETIRO ÍNTEGRO (igual que en tragamonedas.js): el 2% de
-        // quema automática del contrato lo absorbe la cuenta emisora, NO el
-        // usuario. Se compensa dividiendo entre 0.98 y se redondea SIEMPRE
-        // hacia arriba a 6 decimales para que a la wallet lleguen mínimo los
-        // SG retirados (véase transferirSG, que corta a 6 decimales).
-        const cantidadCompensada = Math.ceil((cantidadSG / 0.98) * 1e6) / 1e6;
+        // REGLA DE RETIRO ÍNTEGRO: el 2% de quema automática del contrato lo
+        // absorbe la cuenta emisora. PERO si el DESTINO está excluido de la
+        // quema (isExcludedFromBurn) el contrato NO quema nada y compensar
+        // con /0.98 pagaría de más (incidente 2026-10-12: 102 → 104.0816).
+        // Se pregunta al contrato y se compensa SOLO si la quema aplica.
+        let destinoExcluido = false;
+        try {
+            const sonda = new ethers.Contract(
+                contratoAddr,
+                ['function isExcludedFromBurn(address) view returns (bool)'],
+                new ethers.JsonRpcProvider(blockchainRPC)
+            );
+            destinoExcluido = await sonda.isExcludedFromBurn(wallet);
+        } catch (e) { destinoExcluido = false; } // ante duda, compensa
+        const cantidadCompensada = destinoExcluido
+            ? Math.ceil(cantidadSG * 1e6) / 1e6
+            : Math.ceil((cantidadSG / 0.98) * 1e6) / 1e6;
         const resultado = await transferirSG(wallet, cantidadCompensada, claveAdmin, contratoAddr, blockchainRPC);
 
         if (!resultado.success) {
