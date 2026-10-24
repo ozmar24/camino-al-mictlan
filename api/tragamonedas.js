@@ -442,22 +442,52 @@ async function intentarBarridoRecaudo() {
         const contratoAddr   = process.env.SOULGEIST_CONTRACT_ADDRESS;
         const rpcUrl         = process.env.BLOCKCHAIN_RPC || 'https://rpc.ankr.com/polygon';
 
-        if (!claveBoveda || !claveMarketing || !contratoAddr) return;
+        if (!claveBoveda || !claveMarketing || !contratoAddr) {
+            const faltan = [
+                !claveBoveda && 'ADMIN_PRIVATE_KEY',
+                !claveMarketing && 'MARKETING_PRIVATE_KEY',
+                !contratoAddr && 'SOULGEIST_CONTRACT_ADDRESS'
+            ].filter(Boolean).join(', ');
+            await alertarBarridoFallido(`falta configurar ${faltan}`, pot);
+            return;
+        }
 
         const direccionMarketing = new ethers.Wallet(claveMarketing).address;
         // Tope hacia arriba: que la tesorería nunca reciba menos que lo recaudado
         const cantidadNeta = Math.ceil((pot / 0.98) * 1e6) / 1e6;
         const tx = await transferirSG(direccionMarketing, cantidadNeta, claveBoveda, contratoAddr, rpcUrl);
-        if (!tx.success) return;
+        if (!tx.success) {
+            // Antes moría en silencio: el pot crecía sin límite y no se veía ningún aviso.
+            await alertarBarridoFallido(tx.error || 'error desconocido', pot);
+            return;
+        }
 
         await redisCmd('SET', CLAVE_RECAUDO, '0');
         await enviarTelegram(
             `🎰💰 *RECAUDACIÓN DE TRAGAMONEDAS*\n` +
-            `💎 \`${pot.toFixed(2)} SG\` Bóveda → Eventos y Marketing\n` +
+            `💎 Recaudado: \`${pot.toFixed(2)} SG\`\n` +
+            `💸 Enviado on-chain: \`${cantidadNeta.toFixed(6)} SG\` Bóveda → Eventos y Marketing\n` +
+            `🧯 Quema 2% (la absorbe la wallet emisora): \`${(cantidadNeta - pot).toFixed(6)} SG\`\n` +
             `🔗 Tx: \`${tx.txHash}\``
         );
     } finally {
         await redisCmd('DEL', CLAVE_LOCK_RECAUDO);
+    }
+}
+
+// Aviso de barrido fallido, como máximo 1 cada 30 min (se intenta en cada tirada).
+async function alertarBarridoFallido(motivo, pot) {
+    try {
+        const aviso = await redisCmd('SET', 'casino:recaudo_aviso', '1', 'EX', 1800, 'NX');
+        if (!aviso?.result) return;
+        await enviarTelegram(
+            `⚠️💰 *BARRIDO DE RECAUDO NO EJECUTADO*\n` +
+            `💎 Acumulado sin mover: \`${pot.toFixed(2)} SG\`\n` +
+            `🔎 Motivo: ${motivo}\n` +
+            `⏸️ El acumulado NO se borró: se reintenta solo en la próxima tirada.`
+        );
+    } catch (e) {
+        console.warn('⚠️ Aviso de barrido fallido:', e.message);
     }
 }
 
