@@ -515,11 +515,11 @@ button,
     display: block;
 }
 
-/* ✅ MENÚ TEXTOS: AJUSTADO EXACTAMENTE ENCIMA DE LAS LLAMAS */
+/* MENÚ TEXTOS: AJUSTADO EXACTAMENTE ENCIMA DE LAS LLAMAS */
 .menu-textos {
     display: none !important; /* Oculto al inicio */
     position: fixed !important;
-    bottom: 40px !important;  /* 👈 POSICIÓN SOBRE LAS LLAMAS: súbelo o bájalo aquí */
+    bottom: 40px !important;  /* POSICIÓN SOBRE LAS LLAMAS: súbelo o bájalo aquí */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 220px !important;   /* Ancho exacto para que quepan los 3 */
@@ -558,7 +558,7 @@ button,
 .menu-textos .oraculo:hover  { color: #ff0000 !important; opacity: 1 !important; transform: translate(0, -8px) scale(1.1) !important; filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)) !important; }
 .menu-textos .alianzas:hover { color: #ff0000 !important; opacity: 1 !important; transform: translate(0, 0) rotate(10deg) scale(1.1) !important; filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.6)) !important; }
 
-/* ✅ VERSIÓN MÓVIL: ARREGLADO PARA QUE NO CHOQUE CON BOTÓN DE SALIR */
+/* VERSIÓN MÓVIL: ARREGLADO PARA QUE NO CHOQUE CON BOTÓN DE SALIR */
 @media (max-width: 600px) {
     .menu-textos {
         bottom: 20px !important; /* Más abajo para no chocar */
@@ -1129,7 +1129,7 @@ button,
     cursor: url('./img/pentaculo.png') 16 16, pointer !important;
 }
 
-/* ➡️ PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
+/* PÁGINA IZQUIERDA: Formulario Tradicional perfectamente centrado en su pergamino */
 .grimorio-container .pagina-izquierda {
     position: absolute !important;
     top: 20% !important;        /* Bajado lo suficiente para esquivar el marco de cuero superior */
@@ -1147,7 +1147,7 @@ button,
     color: #7a1c1c !important;
 }
 
-/* ⬅️ PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
+/* PÁGINA DERECHA: Google Auth y helpers en perfecta simetría */
 .grimorio-container .pagina-derecha {
     position: absolute !important;
     top: 20% !important;        
@@ -1165,7 +1165,7 @@ button,
     color: #7a1c1c !important;
 }
 
-/* 📌 CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
+/* CONTROL ESTRICTO DE FORMULARIOS E INPUTS */
 .grimorio-container .formulario-goth {
     display: flex !important;
     flex-direction: column !important;
@@ -1190,7 +1190,7 @@ button,
     margin-top: 5px !important;
 }
 
-/* 📌 CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO CON CURSOR FORZADO */
+/* CONTROL DEL CONTENEDOR BOTÓN GOOGLE NATIVO CON CURSOR FORZADO */
 #google-btn-container {
     display: flex !important;
     justify-content: center !important;
@@ -1211,7 +1211,7 @@ button,
     height: 100% !important;
     z-index: 10 !important;
     cursor: url('./img/pentaculo.png') 16 16, pointer !important;
-    pointer-events: none !important; /* 🔥 Hace que el clic ignore esta capa y presione el botón real de Google */
+    pointer-events: none !important; /* Hace que el clic ignore esta capa y presione el botón real de Google */
 }
 
 /* El divisor sutil del lado derecho */
@@ -1221,7 +1221,7 @@ button,
     margin: 5px 0 !important;
 }
 
-/* 📌 PIES DE PÁGINA ACOMODADOS */
+/* PIES DE PÁGINA ACOMODADOS */
 .grimorio-container .cambio-modo-contenedor,
 .grimorio-container #new-user-helper {
     position: relative !important;

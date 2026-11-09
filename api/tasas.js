@@ -66,7 +66,7 @@ export default async function handler(req, res) {
             return res.status(200).json(tasas);
 
         } catch (error) {
-            console.warn('⚠️ Error en tasas, usando fallback:', error.message);
+            console.warn('\u{26A0}\u{FE0F} Error en tasas, usando fallback:', error.message);
             const sgUSD = SG_EN_POL * FALLBACK_USD.pol;
             const fallback = {
                 "Soulgeist": { tasa: 1 },

@@ -104,7 +104,7 @@ export default async function handler(req, res) {
             // 3. Guardamos al usuario
             await redisCmd('SET', userKey, JSON.stringify(nuevoUsuario));
 
-            await enviarAlertaTelegram(`<b>👤 Nuevo Pacto (${numeroUsuario}/50):</b> ${emailNormalizado}`, 'HTML');
+            await enviarAlertaTelegram(`<b>\u{1F464} Nuevo Pacto (${numeroUsuario}/50):</b> ${emailNormalizado}`, 'HTML');
 
             return res.status(200).json({
                 success: true,

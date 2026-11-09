@@ -174,7 +174,7 @@ export default async function handler(req, res) {
         });
 
     } catch (e) {
-        console.error("❌ Error en acumular-sg:", e);
+        console.error("\u{274C} Error en acumular-sg:", e);
         return manejarError(res, e);
     }
 }

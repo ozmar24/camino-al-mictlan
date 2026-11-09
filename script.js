@@ -936,7 +936,7 @@ let turnstileToken = "";
 window.onTurnstileSuccess = function(token) {
     turnstileToken = token;
     window.turnstileToken = token; // alias para flujos que lo lean de window
-    console.log("✅ Token guardado en window:", turnstileToken);
+    console.log("\u{2705} Token guardado en window:", turnstileToken);
 };
 
 // Reinicia el puzzle para generar un token fresco.
@@ -1328,10 +1328,10 @@ async function actualizarTasasEnVivo() {
         const tasasNuevas = await res.json();
         if (tasasNuevas && !tasasNuevas.error) {
             window.TASAS_ACTUALES = tasasNuevas;
-            console.log('✅ Tasas actualizadas desde QuickSwap:', tasasNuevas);
+            console.log('\u{2705} Tasas actualizadas desde QuickSwap:', tasasNuevas);
         }
     } catch (e) {
-        console.warn('⚠️ Usando tasas de respaldo:', e.message);
+        console.warn('\u{26A0}\u{FE0F} Usando tasas de respaldo:', e.message);
     }
 }
 
@@ -1378,9 +1378,9 @@ function generarCementerio() {
 
     const configuracion = [
     { nombre: "Soulgeist", sim: "SG", color: "#00ffff", top: "48%", left: "78.5%", especial: true },
-    { nombre: "Ethereum", sim: "♦", color: "#627eea", top: "72%", left: "7.5%" },
+    { nombre: "Ethereum", sim: "\u{2666}", color: "#627eea", top: "72%", left: "7.5%" },
     { nombre: "Litecoin", sim: "Ł", color: "#00d4ff", top: "75%", left: "26.5%" },
-    { nombre: "Pepe", sim: "🐸", color: "#45ca5d", top: "68%", left: "38%" },
+    { nombre: "Pepe", sim: "\u{1F438}", color: "#45ca5d", top: "68%", left: "38%" },
     { nombre: "MATIC/POL", sim: "M", color: "#8247E5", top: "64%", left: "46%" },
     { nombre: "BNB", sim: "B", color: "#F0B90B", top: "61%", left: "68%" },
     { nombre: "USDT", sim: "₮", color: "#26a17b", top: "73%", left: "77%" },
@@ -1444,7 +1444,10 @@ function generarCementerio() {
                 return;
             }
 
-            if (window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
+            // El ritual tiene prioridad: el alma debe viajar aunque la tumba
+            // destino ya tenga saldo. La bóveda de cosecha solo se abre si no
+            // hay una canalización en curso.
+            if (!ritualActivo && window.tumbasConSaldo && window.tumbasConSaldo[pos.nombre] > 0) {
                 abrirModalCosechaFinal(pos);
                 return;
             }
@@ -1547,11 +1550,11 @@ function abrirModalCosechaFinal(pos) {
             </p>
             <div style="margin:14px auto; max-width:320px; padding:10px 14px; background:rgba(200,169,81,0.08); border-left:3px solid #c8a951; border-radius:4px; text-align:left;">
                 <p style="color:#c8a951; font-size:11px; margin:0; line-height:1.6;">
-                    ⚠️ <b>Nota:</b> Los saldos mostrados son valores de referencia.
+                    \u{26A0}\u{FE0F} <b>Nota:</b> Los saldos mostrados son valores de referencia.
                     Al retirar recibirás <b>SG tokens</b> equivalentes en tu MetaMask,
                     que puedes convertir a ${pos.nombre} en
                     <a href="https://quickswap.exchange/#/swap?inputCurrency=0x51Fb9B6b0e008eFC867492D2930D959879A5bCfB"
-                       target="_blank" style="color:#ff6b35; text-decoration:underline;">QuickSwap ↗</a>.
+                       target="_blank" style="color:#ff6b35; text-decoration:underline;">QuickSwap \u{2197}</a>.
                 </p>
             </div>
             <p style="color:#666; font-size:12px; margin-top:6px;">
@@ -1565,13 +1568,13 @@ function abrirModalCosechaFinal(pos) {
             <!-- Opción 1: Seguir acumulando -->
             <button onclick="dispararInicioRitualGlobal()" 
                     style="background: #222; color: ${pos.color}; border: 1px solid ${pos.color}; padding: 12px; font-weight: bold;">
-                ➕ AÑADIR MÁS PODER
+                \u{2795} AÑADIR MÁS PODER
             </button>
             
             <!-- Opción 2: Retirar (Muestra los campos de wallet) -->
             <button id="btn-mostrar-retiro" 
                     style="background: ${pos.color}; color: #000; padding: 12px; font-weight: bold;">
-                💰 RETIRAR A BILLETERA
+                \u{1F4B0} RETIRAR A BILLETERA
             </button>
             
             <button onclick="cerrarRitual()" style="background: transparent; color: #666; padding: 5px;">
@@ -1650,14 +1653,14 @@ async function procesarRetiro() {
 
 async function procesarCosecha(identidad, walletUsuario, criptoSeleccionada, pasarela) {
     try {
-        console.log("🔄 Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
+        console.log("\u{1F504} Enviando reclamo:", { identidad, walletUsuario, cripto: criptoSeleccionada, pasarela });
 
         const saldoCripto = window.tumbasConSaldo[criptoSeleccionada] || 0;
 
 console.log(`Saldo real de ${criptoSeleccionada}: ${saldoCripto}`);
 
 // === LLAMADA AL BACKEND MEJORADA ===
-console.log("📤 Enviando reclamo:", { 
+console.log("\u{1F4E4} Enviando reclamo:", { 
     identidad: identidad, 
     wallet: walletUsuario, 
     cripto: criptoSeleccionada, 
@@ -1701,7 +1704,7 @@ const respuesta = await fetch('/api/reclamar', {
         }
 
         // === ÉXITO: PROCESAR AHORA ===
-        console.log("✅ Cosecha confirmada por el servidor:", resultado);
+        console.log("\u{2705} Cosecha confirmada por el servidor:", resultado);
 
         // 1. Resetear localmente solo la cripta retirada
         window.tumbasConSaldo[criptoSeleccionada] = 0;
@@ -1841,7 +1844,7 @@ async function mostrarVideoUnityAds() {
     // Si quedan segundos, muestra el conteo. Si llega a 0, avisa que ya puede cerrar.
     document.title = tiempoRestante > 0 
         ? `(${tiempoRestante}s) Canalizando... | Camino al Mictlán` 
-        : "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+        : "\u{2705} ¡ENERGÍA LISTA! | Camino al Mictlán";
 
     // 3. Actualización en el botón
     btnCerrar.innerText = tiempoRestante > 0 
@@ -1862,7 +1865,7 @@ async function mostrarVideoUnityAds() {
         // El nonce es de un solo uso: si el usuario también pulsa el botón, el
         // servidor rechaza el segundo reclamo (no se puede farmear).
         if (ES_MOVIL) {
-            document.title = "✅ ¡ENERGÍA LISTA! | Camino al Mictlán";
+            document.title = "\u{2705} ¡ENERGÍA LISTA! | Camino al Mictlán";
             setTimeout(() => {
                 if (typeof window.cerrarPortalOficial === 'function') {
                     window.cerrarPortalOficial();
@@ -2100,14 +2103,14 @@ function mostrarPergamino(tipo) {
         <span onclick="mostrarSubLey('consecuencias')" class="pentaculo-cursor link-ley" style="font-family:'MedievalSharp',cursive; font-size:0.7rem; letter-spacing:1px; display:block;">— CONSECUENCIAS —</span>
     </div>
     <p style="text-align:center; font-family:'MedievalSharp',cursive; font-size:0.55rem; color:#8a6a6a; margin-top:20px; line-height:1.4;">
-        📜 Los documentos oficiales (Términos del Servicio y Aviso de Privacidad)<br>se consultan en la barra inferior del portal.
+        \u{1F4DC} Los documentos oficiales (Términos del Servicio y Aviso de Privacidad)<br>se consultan en la barra inferior del portal.
     </p>
     <!-- Los documentos oficiales (Términos y Privacidad) ya NO se enlazan aqui:
          vivian duplicados (version tematica + version formal de /Legal/).
          La version formal vive en la barra inferior del portal. -->
 `;
 
-        // ✅ Botón principal → volver al cementerio (criptas) si hay sesión
+        // Botón principal → volver al cementerio (criptas) si hay sesión
         if (boton) {
             boton.innerHTML = '[ VOLVER AL CEMENTERIO ]';
             boton.onclick = window.volverAlCementerio || cerrarCodice;
@@ -2121,7 +2124,7 @@ function mostrarPergamino(tipo) {
                 <span style="font-weight: 900;">METAMASK</span>
             </div>
         `;
-        // ✅ Cerrar: volver al cementerio (mismo comportamiento que LEYES)
+        // Cerrar: volver al cementerio (mismo comportamiento que LEYES)
         if (boton) {
             boton.innerHTML = '[ CERRAR PACTO ]';
             boton.onclick = cerrarCodice;
@@ -2499,13 +2502,13 @@ async function loginExitoso(datosUsuario) {
 }
 async function descontarBalanceEnRedis(cantidadSG, criptaDestino = null) {
     if (!window.userWallet) {
-        console.warn("❌ Intento de descuento sin Wallet");
+        console.warn("\u{274C} Intento de descuento sin Wallet");
         return { ok: false, error: "Sesión no iniciada." };
     }
 
     // Validación defensiva antes de llamar al API
     if (isNaN(cantidadSG) || cantidadSG <= 0) {
-        console.error("❌ ERROR: El valor a enviar es inválido:", cantidadSG);
+        console.error("\u{274C} ERROR: El valor a enviar es inválido:", cantidadSG);
         return { ok: false, error: "Cantidad inválida." };
     }
 
@@ -2549,10 +2552,10 @@ async function descontarBalanceEnRedis(cantidadSG, criptaDestino = null) {
             localStorage.setItem(key, JSON.stringify(resultado.tumbas));
         }
 
-        console.log("✅ Canalización confirmada por el servidor:", resultado.ganancia ?? resultado.nuevoBalance);
+        console.log("\u{2705} Canalización confirmada por el servidor:", resultado.ganancia ?? resultado.nuevoBalance);
         return { ok: true, ganancia: resultado.ganancia };
     } catch (error) {
-        console.error("❌ Error al actualizar Redis:", error);
+        console.error("\u{274C} Error al actualizar Redis:", error);
         return { ok: false, error: "No se pudo conectar con el inframundo." };
     }
 }
@@ -2806,6 +2809,7 @@ window.cerrarAlertaMictlan = cerrarAlertaMictlan;
 window.cerrarBoveda = cerrarBoveda;
 window.cerrarOraculo = cerrarOraculo;
 window.cerrarRitual = cerrarRitual;
+window.dispararInicioRitualGlobal = dispararInicioRitualGlobal;
 window.conectarMetaMask = conectarMetaMask;
 window.proveedorMetaMask = proveedorMetaMask;
 window.salirDelMictlan = salirDelMictlan;
@@ -2975,7 +2979,7 @@ function tragaMostrarGanancias(ganancias, premio, scatter) {
     if (scatter && scatter.monto > 0) {
         const div = document.createElement('div');
         div.style.color = '#ffd700';
-        div.innerText = `⚡ ${scatter.cantidad}× SOULGEIST → +${scatter.monto} SG`;
+        div.innerText = `\u{26A1} ${scatter.cantidad}× SOULGEIST → +${scatter.monto} SG`;
         lista.appendChild(div);
     }
     total.innerText = `TOTAL: +${premio} SG`;
@@ -3091,7 +3095,7 @@ window.girarTragamonedas = async function () {
     if (tragaDemoMode) { await window.girarDemoTragamonedas(); return; }
     const btn = document.getElementById('btn-girar-traga');
     tragaGirando = true;
-    if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
+    if (btn) { btn.disabled = true; btn.innerText = '\u{1F300} GIRANDO...'; }
     // Limpia el resaltado dorado de la tirada anterior: como las celdas ahora
     // se reutilizan, la clase persistiria congelada durante todo el giro
     document.querySelectorAll('#grid-traga .celda-ganadora').forEach(el => el.classList.remove('celda-ganadora'));
@@ -3111,7 +3115,7 @@ window.girarTragamonedas = async function () {
         lanzarAlertaMictlan('No se pudo conectar con la tragamonedas.', 'FALLO DE CONEXIÓN');
     } finally {
         tragaGirando = false;
-        if (btn) { btn.disabled = false; btn.innerText = '🔄 GIRAR'; }
+        if (btn) { btn.disabled = false; btn.innerText = '\u{1F504} GIRAR'; }
     }
 };
 
@@ -3229,7 +3233,7 @@ function prepararModalRetiroMetaMask() {
             botones.innerHTML = `
                 <button id="btn-confirmar-retiro-metamask" class="pentaculo-cursor"
                         style="background: linear-gradient(145deg, #2b0a0a, #4a0000); color: #ffcc66; border: 2px solid #c8a951; padding: 12px 24px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%;">
-                    📤 ACEPTAR RETIRO A METAMASK
+                    \u{1F4E4} ACEPTAR RETIRO A METAMASK
                 </button>
                 <button class="pentaculo-cursor" onclick="cerrarRitual()"
                         style="background: transparent; color: #666; padding: 6px; border: none; font-size: 12px; letter-spacing: 1px; cursor: pointer; width: 100%;">
@@ -3278,8 +3282,8 @@ async function confirmarRetiroMetaMask() {
         const montoEnviado = Number(data.monto) || 0;
         const txCorta = data.txHash ? String(data.txHash).slice(0, 12) + '…' : 'en confirmación';
         lanzarAlertaMictlan(
-            `✅ ${montoEnviado.toFixed(2)} SG enviados directo a tu MetaMask.\r\n` +
-            `🔗 Tx Polygon: ${txCorta}`,
+            `\u{2705} ${montoEnviado.toFixed(2)} SG enviados directo a tu MetaMask.\r\n` +
+            `\u{1F517} Tx Polygon: ${txCorta}`,
             'RITUAL COMPLETADO'
         );
     } catch (e) {
@@ -3334,7 +3338,7 @@ async function actualizarTransparencia() {
         }
 
         elemento.textContent = `${textoAbreviado} SG QUEMADOS`;
-        console.log("✅ Quemados actualizados:", textoAbreviado);
+        console.log("\u{2705} Quemados actualizados:", textoAbreviado);
 
     } catch (err) {
         console.error("Error al actualizar quemados:", err);
@@ -3352,7 +3356,7 @@ async function verificarSaludGas(walletAdmin, provider) {
     const balanceGas = await provider.getBalance(walletAdmin.address);
     // 0.01 MATIC es suficiente para varios retiros, si tiene menos, alerta!
     if (balanceGas < ethers.parseEther("0.01")) {
-        await enviarAlertaTelegram("⚠️ *ALERTA:* La billetera de gas se está agotando.");
+        await enviarAlertaTelegram("\u{26A0}\u{FE0F} *ALERTA:* La billetera de gas se está agotando.");
         throw new Error("Fondos de gas insuficientes.");
     }
 }
@@ -3528,7 +3532,7 @@ async function conectarYRetirarMetaMask(pos) {
     } finally {
         const btn = document.getElementById('btn-mostrar-retiro');
         if (btn) {
-            btn.innerText = "💰 RETIRAR A BILLETERA";
+            btn.innerText = "\u{1F4B0} RETIRAR A BILLETERA";
             btn.disabled = false;
         }
     }
@@ -3613,7 +3617,7 @@ window.jugarDemoTragamonedas = function () {
     if (cab && !document.getElementById('banner-demo-traga')) {
         const b = document.createElement('div');
         b.id = 'banner-demo-traga';
-        b.innerHTML = '🧪 <strong>MODO DEMOSTRACIÓN</strong> · créditos ficticios, sin premios reales · '
+        b.innerHTML = '\u{1F9EA} <strong>MODO DEMOSTRACIÓN</strong> · créditos ficticios, sin premios reales · '
             + '<a href="javascript:void(0)" onclick="window.cerrarTragamonedas(); window.entrarAlMictlan();">Crear cuenta para jugar de verdad</a>';
         cab.parentNode.insertBefore(b, cab);
     }
@@ -3642,7 +3646,7 @@ window.girarDemoTragamonedas = async function () {
     if (tragaGirando) return;
     const btn = document.getElementById('btn-girar-traga');
     tragaGirando = true;
-    if (btn) { btn.disabled = true; btn.innerText = '🌀 GIRANDO...'; }
+    if (btn) { btn.disabled = true; btn.innerText = '\u{1F300} GIRANDO...'; }
     document.querySelectorAll('#grid-traga .celda-ganadora').forEach(el => el.classList.remove('celda-ganadora'));
     try {
         // En demo: usar spins gratis primero, luego saldo demostración
@@ -3719,6 +3723,6 @@ window.girarDemoTragamonedas = async function () {
         }
     } finally {
         tragaGirando = false;
-        if (btn) { btn.disabled = false; btn.innerText = '🔄 GIRAR'; }
+        if (btn) { btn.disabled = false; btn.innerText = '\u{1F504} GIRAR'; }
     }
 };

@@ -89,7 +89,7 @@ async function handler(req, res) {
 
             // 4. Guardar usuario
             await redisCmd('SET', userKey, JSON.stringify(usuario));
-            await enviarAlertaTelegram(`<b>🚀 Nuevo Registro #${posicion} en el Mictlán (Google)</b>\n👤 Email: ${emailUsuario}`, 'HTML');
+            await enviarAlertaTelegram(`<b>\u{1F680} Nuevo Registro #${posicion} en el Mictlán (Google)</b>\n\u{1F464} Email: ${emailUsuario}`, 'HTML');
         }
 
         const balanceSG = usuario.balance_soulgeist || 0;

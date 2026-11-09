@@ -13,8 +13,8 @@ const datosDelRitual = {
 };
 
 async function ejecutarPrueba() {
-    console.log("💀 Iniciando ritual de prueba hacia el inframundo...");
-    console.log(`📡 Enviando petición a: ${ENDPOINT}`);
+    console.log("\u{1F480} Iniciando ritual de prueba hacia el inframundo...");
+    console.log(`\u{1F4E1} Enviando petición a: ${ENDPOINT}`);
 
     try {
         const respuesta = await fetch(ENDPOINT, {
@@ -26,8 +26,8 @@ async function ejecutarPrueba() {
         const text = await respuesta.text();
         
         console.log("\n==============================================");
-        console.log(`📊 Estatus del Servidor: ${respuesta.status}`);
-        console.log("📦 Respuesta del Servidor:");
+        console.log(`\u{1F4CA} Estatus del Servidor: ${respuesta.status}`);
+        console.log("\u{1F4E6} Respuesta del Servidor:");
         
         try {
             console.log(JSON.stringify(JSON.parse(text), null, 2));
@@ -38,7 +38,7 @@ async function ejecutarPrueba() {
         console.log("==============================================\n");
 
     } catch (error) {
-        console.error("💥 Error de red o conexión al pegarle a Vercel:", error);
+        console.error("\u{1F4A5} Error de red o conexión al pegarle a Vercel:", error);
     }
 }
 

@@ -1,5 +1,5 @@
 // api/test.js
-// ⚠️ DESACTIVADO: este archivo era un script de prueba que ejecutaba un
+// DESACTIVADO: este archivo era un script de prueba que ejecutaba un
 // registro real contra producción cada vez que alguien lo invocaba
 // (creaba usuarios "prueba@example.com" e incrementaba el contador de almas,
 // consumiendo premios de bienvenida). Se reemplaza por un stub inofensivo.

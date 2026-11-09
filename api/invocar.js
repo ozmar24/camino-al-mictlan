@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'La ofrenda está vacía. Formula una pregunta.' });
     }
 
-    // ✅ Limitar longitud para evitar abuso y prompt injection
+    // Limitar longitud para evitar abuso y prompt injection
     const promptLimpio = promptText.trim().slice(0, 500);
 
     if (promptLimpio.length < 3) {

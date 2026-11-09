@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("❌ Error en obtener-balance:", error);
+        console.error("\u{274C} Error en obtener-balance:", error);
         return manejarError(res, error);
     }
 }

@@ -174,19 +174,19 @@ export default async function handler(req, res) {
             usuarioActual.tumbas[cripto] = 0;
         }
 
-        // ⚠️ CRÍTICO: redisCmd espera argumentos sueltos, NO un array. Con el
+        // CRÍTICO: redisCmd espera argumentos sueltos, NO un array. Con el
         // array anidado Upstash devolvía null silenciosamente y la cripta
         // NUNCA se vaciaba → doble pago real tras el cooldown de 24 h.
         await redisCmd('SET', balanceKey, JSON.stringify(usuarioActual));
 
         // 12. Alerta Telegram
         await enviarAlertaTelegram(
-            `💀 *RETIRO EXITOSO*\n` +
-            `👤 *Usuario:* \`${identidadNorm}\`\n` +
-            `📬 *Wallet:* \`${wallet}\`\n` +
-            `💎 *SG enviados:* \`${cantidadSG.toFixed(4)}\`\n` +
-            `🪙 *Cripto elegida:* ${cripto}\n` +
-            `🔗 *Tx:* \`${resultado.txHash}\``,
+            `\u{1F480} *RETIRO EXITOSO*\n` +
+            `\u{1F464} *Usuario:* \`${identidadNorm}\`\n` +
+            `\u{1F4EC} *Wallet:* \`${wallet}\`\n` +
+            `\u{1F48E} *SG enviados:* \`${cantidadSG.toFixed(4)}\`\n` +
+            `\u{1FA99} *Cripto elegida:* ${cripto}\n` +
+            `\u{1F517} *Tx:* \`${resultado.txHash}\``,
             'Markdown'
         );
 
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
             success: true,
             txHash: resultado.txHash,
             balanceAlmas: usuarioActual.balance_soulgeist,
-            mensaje: `✅ ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.`
+            mensaje: `\u{2705} ${cantidadSG.toFixed(2)} SG enviados a tu MetaMask.`
         });
 
     } catch (err) {
@@ -234,7 +234,7 @@ async function transferirSG(walletUsuario, cantidadSG, claveMarketing, contratoA
         const receipt = await tx.wait(1);
         return { success: true, txHash: receipt.hash };
     } catch (error) {
-        console.error('❌ Error blockchain:', error.message);
+        console.error('\u{274C} Error blockchain:', error.message);
         return { success: false, error: 'Error en la transferencia.' };
     }
 }

@@ -34,12 +34,12 @@ const MIN_GAS_POL = ethers.parseEther('0.03');
     // 1. Env
     const pk = process.env.MARKETING_PRIVATE_KEY;
     console.log('[1] Claves del .env:');
-    console.log('    MARKETING_PRIVATE_KEY   :', pk ? '✅ presente' : '❌ FALTA (esa es la wallet emisora del retiro del casino)');
-    console.log('    ADMIN_PRIVATE_KEY       :', process.env.ADMIN_PRIVATE_KEY ? '✅ presente' : '❌ falta (solo se usa para el barrido de recaudo)');
+    console.log('    MARKETING_PRIVATE_KEY   :', pk ? '\u{2705} presente' : '\u{274C} FALTA (esa es la wallet emisora del retiro del casino)');
+    console.log('    ADMIN_PRIVATE_KEY       :', process.env.ADMIN_PRIVATE_KEY ? '\u{2705} presente' : '\u{274C} falta (solo se usa para el barrido de recaudo)');
     console.log('    SOULGEIST_CONTRACT_ADDR :', CONTRATO);
     console.log('');
     if (!pk) {
-        console.log('🛑 Sin MARKETING_PRIVATE_KEY no se puede diagnosticar la wallet emisora. Copia el .env de Vercel a local y reintenta.');
+        console.log('\u{1F6D1} Sin MARKETING_PRIVATE_KEY no se puede diagnosticar la wallet emisora. Copia el .env de Vercel a local y reintenta.');
         return;
     }
 
@@ -56,7 +56,7 @@ const MIN_GAS_POL = ethers.parseEther('0.03');
             console.log(`    RPC caído: ${rpc}`);
         }
     }
-    if (!provider) { console.log('🛑 Ningún RPC de Polygon respondió.'); return; }
+    if (!provider) { console.log('\u{1F6D1} Ningún RPC de Polygon respondió.'); return; }
     console.log('');
 
     const wallet = new ethers.Wallet(pk, provider);
@@ -65,7 +65,7 @@ const MIN_GAS_POL = ethers.parseEther('0.03');
     // 3-4. POL nativo (gas)
     const pol = ethers.formatEther(await provider.getBalance(addr));
     console.log(`[3] Wallet emisora: ${addr}`);
-    console.log(`[4] POL nativo (gas): ${pol}  ${Number(pol) >= 0.03 ? '✅ suficiente' : '❌ INSUFICIENTE (< 0.03) — CAUSA CLÁSICA del "Error en la transferencia"'}`);
+    console.log(`[4] POL nativo (gas): ${pol}  ${Number(pol) >= 0.03 ? '\u{2705} suficiente' : '\u{274C} INSUFICIENTE (< 0.03) — CAUSA CLÁSICA del "Error en la transferencia"'}`);
     console.log('');
 
     // 5. SG
@@ -86,7 +86,7 @@ const MIN_GAS_POL = ethers.parseEther('0.03');
             const sgUser = await contrato.balanceOf(destino);
             console.log(`[6] Saldo SG del destino ${destino}: ${Number(ethers.formatUnits(sgUser, decimales)).toFixed(6)} SG`);
         } catch {
-            console.log(`[6] ⚠️ No pude leer la wallet destino ${destino} (¿dirección válida?)`);
+            console.log(`[6] \u{26A0}\u{FE0F} No pude leer la wallet destino ${destino} (¿dirección válida?)`);
         }
         console.log('');
     }
@@ -95,5 +95,5 @@ const MIN_GAS_POL = ethers.parseEther('0.03');
     console.log(`POL gas : ${Number(pol) >= 0.03 ? 'OK' : 'FALTA → esa es la causa del error'}`);
     console.log(`SG fondo: ${sgFmt > 0 ? 'hay fondo' : 'CERO → revisa el barrido de recaudo o recarga SG en esta wallet'}`);
     console.log('');
-    console.log('Siguiente pista si ambas están OK: revisa los LOGS de Vercel (función /api/tragamonedas, ~1 h de retención) buscando "❌ Error blockchain marketing".');
+    console.log('Siguiente pista si ambas están OK: revisa los LOGS de Vercel (función /api/tragamonedas, ~1 h de retención) buscando "\u{274C} Error blockchain marketing".');
 })();

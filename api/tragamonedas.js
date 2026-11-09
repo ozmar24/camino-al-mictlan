@@ -93,7 +93,7 @@ export default async function handler(req, res) {
             await liberarLock();
         }
     } catch (e) {
-        console.error('❌ Error en tragamonedas:', e);
+        console.error('\u{274C} Error en tragamonedas:', e);
         return manejarError(res, e);
     }
 }
@@ -158,7 +158,7 @@ async function girar(req, res, emailLimpio, userKey) {
             await redisCmd('INCRBYFLOAT', CLAVE_RECAUDO, costo);
             await intentarBarridoRecaudo();
         } catch (e) {
-            console.warn('⚠️ Recaudo no crítico:', e.message);
+            console.warn('\u{26A0}\u{FE0F} Recaudo no crítico:', e.message);
         }
     }
 
@@ -266,7 +266,7 @@ async function reclamarGratis(req, res, userKey) {
         success: true,
         casino: estadoCasino(casino),
         balanceSG: Math.floor(parseFloat(usuario.balance_soulgeist || 0)),
-        mensaje: `🎁 Recibiste ${TIRADAS_GRATIS_DIARIAS} tiradas gratis para hoy.`
+        mensaje: `\u{1F381} Recibiste ${TIRADAS_GRATIS_DIARIAS} tiradas gratis para hoy.`
     });
 }
 
@@ -335,15 +335,15 @@ async function retirar(req, res, emailLimpio, userKey) {
         // que el jugador reintente un retiro ya pagado (riesgo de doble pago).
         try {
             await enviarTelegram(
-                `🎰 *RETIRO DE TRAGAMONEDAS*\n` +
-                `👤 \`${emailLimpio}\`\n` +
-                `📬 \`${wallet}\`\n` +
-                `💎 \`${monto.toFixed(4)} SG\` (enviados: ${cantidadAEnviar.toFixed(6)} SG, el 2% de quema lo absorbe la cuenta emisora)\n` +
-                `📤 Cuenta: Eventos y Marketing\n` +
-                `🔗 Tx: \`${tx.txHash}\``
+                `\u{1F3B0} *RETIRO DE TRAGAMONEDAS*\n` +
+                `\u{1F464} \`${emailLimpio}\`\n` +
+                `\u{1F4EC} \`${wallet}\`\n` +
+                `\u{1F48E} \`${monto.toFixed(4)} SG\` (enviados: ${cantidadAEnviar.toFixed(6)} SG, el 2% de quema lo absorbe la cuenta emisora)\n` +
+                `\u{1F4E4} Cuenta: Eventos y Marketing\n` +
+                `\u{1F517} Tx: \`${tx.txHash}\``
             );
         } catch (eTelegram) {
-            console.error('⚠️ Telegram falló tras un retiro CONFIRMADO (no crítico):', eTelegram?.message);
+            console.error('\u{26A0}\u{FE0F} Telegram falló tras un retiro CONFIRMADO (no crítico):', eTelegram?.message);
         }
 
         return res.status(200).json({
@@ -352,10 +352,10 @@ async function retirar(req, res, emailLimpio, userKey) {
             txHash: tx.txHash,
             casino: estadoCasino(casino),
             balanceSG: Math.floor(parseFloat(usuario.balance_soulgeist || 0)),
-            mensaje: `✅ ${monto.toFixed(2)} SG enviados a tu MetaMask.`
+            mensaje: `\u{2705} ${monto.toFixed(2)} SG enviados a tu MetaMask.`
         });
     } catch (e) {
-        console.error('❌ Error retirar tragamonedas:', e);
+        console.error('\u{274C} Error retirar tragamonedas:', e);
         return res.status(500).json({ success: false, error: 'Error en la transferencia.' });
     }
 }
@@ -385,7 +385,7 @@ async function canalizar(req, res, emailLimpio, userKey) {
 
     if (cripta === 'Soulgeist') {
         usuario.balance_soulgeist = parseFloat(usuario.balance_soulgeist || 0) + monto;
-        mensaje = `✅ ${monto.toFixed(2)} SG absorbidos por tu poder Soulgeist.`;
+        mensaje = `\u{2705} ${monto.toFixed(2)} SG absorbidos por tu poder Soulgeist.`;
     } else {
         if (!usuario.casino_tumbas || typeof usuario.casino_tumbas !== 'object') usuario.casino_tumbas = {};
         const tasas = await obtenerTasas();
@@ -397,7 +397,7 @@ async function canalizar(req, res, emailLimpio, userKey) {
         }
         montoNative = +(monto * tasa).toFixed(8);
         usuario.casino_tumbas[cripta] = parseFloat(usuario.casino_tumbas[cripta] || 0) + montoNative;
-        mensaje = `✅ ${monto.toFixed(2)} SG canalizados a la cripta ${cripta}.`;
+        mensaje = `\u{2705} ${monto.toFixed(2)} SG canalizados a la cripta ${cripta}.`;
     }
 
     await redisCmd('SET', userKey, JSON.stringify(usuario));
@@ -464,11 +464,11 @@ async function intentarBarridoRecaudo() {
 
         await redisCmd('SET', CLAVE_RECAUDO, '0');
         await enviarTelegram(
-            `🎰💰 *RECAUDACIÓN DE TRAGAMONEDAS*\n` +
-            `💎 Recaudado: \`${pot.toFixed(2)} SG\`\n` +
-            `💸 Enviado on-chain: \`${cantidadNeta.toFixed(6)} SG\` Bóveda → Eventos y Marketing\n` +
-            `🧯 Quema 2% (la absorbe la wallet emisora): \`${(cantidadNeta - pot).toFixed(6)} SG\`\n` +
-            `🔗 Tx: \`${tx.txHash}\``
+            `\u{1F3B0}\u{1F4B0} *RECAUDACIÓN DE TRAGAMONEDAS*\n` +
+            `\u{1F48E} Recaudado: \`${pot.toFixed(2)} SG\`\n` +
+            `\u{1F4B8} Enviado on-chain: \`${cantidadNeta.toFixed(6)} SG\` Bóveda → Eventos y Marketing\n` +
+            `\u{1F9EF} Quema 2% (la absorbe la wallet emisora): \`${(cantidadNeta - pot).toFixed(6)} SG\`\n` +
+            `\u{1F517} Tx: \`${tx.txHash}\``
         );
     } finally {
         await redisCmd('DEL', CLAVE_LOCK_RECAUDO);
@@ -481,13 +481,13 @@ async function alertarBarridoFallido(motivo, pot) {
         const aviso = await redisCmd('SET', 'casino:recaudo_aviso', '1', 'EX', 1800, 'NX');
         if (!aviso?.result) return;
         await enviarTelegram(
-            `⚠️💰 *BARRIDO DE RECAUDO NO EJECUTADO*\n` +
-            `💎 Acumulado sin mover: \`${pot.toFixed(2)} SG\`\n` +
-            `🔎 Motivo: ${motivo}\n` +
-            `⏸️ El acumulado NO se borró: se reintenta solo en la próxima tirada.`
+            `\u{26A0}\u{FE0F}\u{1F4B0} *BARRIDO DE RECAUDO NO EJECUTADO*\n` +
+            `\u{1F48E} Acumulado sin mover: \`${pot.toFixed(2)} SG\`\n` +
+            `\u{1F50E} Motivo: ${motivo}\n` +
+            `\u{23F8}\u{FE0F} El acumulado NO se borró: se reintenta solo en la próxima tirada.`
         );
     } catch (e) {
-        console.warn('⚠️ Aviso de barrido fallido:', e.message);
+        console.warn('\u{26A0}\u{FE0F} Aviso de barrido fallido:', e.message);
     }
 }
 
@@ -533,7 +533,7 @@ async function transferirSG(walletUsuario, cantidadSG, claveMarketing, contratoA
         const receipt = await tx.wait(1);
         return { success: true, txHash: receipt.hash };
     } catch (error) {
-        console.error('❌ Error blockchain marketing:', error.message);
+        console.error('\u{274C} Error blockchain marketing:', error.message);
         // Traducir los errores con causa conocida a mensajes accionables.
         const msg = String(error?.shortMessage || error?.message || '');
         if (/insufficient funds/i.test(msg)) {
@@ -555,10 +555,10 @@ async function enviarTelegram(mensaje) {
 
 async function alertarJackpot(email, cantidadSG, monto) {
     await enviarTelegram(
-        `🚨🎰 *PREMIO MAYOR EN LA TRAGAMONEDAS*\n` +
-        `👤 \`${email}\`\n` +
-        `💠 ${cantidadSG}× Soulgeist\n` +
-        `💎 \`${monto.toFixed(2)} SG\`\n` +
-        `⚡ Revisar actividad si hay algo sospechoso.`
+        `\u{1F6A8}\u{1F3B0} *PREMIO MAYOR EN LA TRAGAMONEDAS*\n` +
+        `\u{1F464} \`${email}\`\n` +
+        `\u{1F4A0} ${cantidadSG}× Soulgeist\n` +
+        `\u{1F48E} \`${monto.toFixed(2)} SG\`\n` +
+        `\u{26A1} Revisar actividad si hay algo sospechoso.`
     );
 }
